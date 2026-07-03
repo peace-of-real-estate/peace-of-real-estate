@@ -38,7 +38,12 @@ export const Route = createRootRouteWithContext<{
 		}
 
 		const session = await getCurrentSession()
-		if (!session) {
+		const protectedPrefixes = ['/agent/dashboard/', '/consumer/dashboard/']
+
+		if (
+			!session &&
+			protectedPrefixes.some((prefix) => location.pathname.startsWith(prefix))
+		) {
 			throw redirect({
 				to: '/login',
 				search: { redirect: location.pathname },

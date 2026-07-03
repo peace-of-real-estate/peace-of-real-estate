@@ -8,7 +8,6 @@ import { getAvatarUrl } from '@/lib/s3'
 import {
 	agentProfileCreateSchema,
 	consumerProfileCreateSchema,
-	type AgentProfileUpdate,
 	type ConsumerProfileUpdate,
 } from '@/lib/matching/profile.types'
 
@@ -25,14 +24,12 @@ export {
 export {
 	agentProfileCreateSchema,
 	consumerProfileCreateSchema,
-	hasCompletedConsumerIntake,
 } from '@/lib/matching/profile.types'
 
 export type {
 	AgentDraft,
 	AgentProfile,
 	AgentProfileCreateInput,
-	AgentProfileUpdate,
 	ConsumerDraft,
 	ConsumerProfile,
 	ConsumerProfileCreateInput,
@@ -51,7 +48,7 @@ export const loadConsumerProfile = createServerFn({ method: 'GET' }).handler(
 	},
 )
 
-export const upsertConsumerProfile = createServerFn({ method: 'POST' })
+export const createConsumerProfileFromDraft = createServerFn({ method: 'POST' })
 	.validator((data: ConsumerProfileUpdate) => data)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
@@ -64,16 +61,12 @@ export const upsertConsumerProfile = createServerFn({ method: 'POST' })
 			.limit(1)
 
 		if (existing[0]) {
-			await db
-				.update(consumerProfiles)
-				.set({ ...data, updatedAt: now })
-				.where(eq(consumerProfiles.id, existing[0].id))
-			return
+			throw new Error('Consumer profile already exists')
 		}
 
 		const insert = consumerProfileCreateSchema.parse({
 			...data,
-			status: data.status ?? 'draft',
+			status: 'active',
 		})
 
 		await db.insert(consumerProfiles).values({
@@ -83,52 +76,6 @@ export const upsertConsumerProfile = createServerFn({ method: 'POST' })
 			createdAt: now,
 			updatedAt: now,
 		})
-	})
-
-export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
-	async () => {
-		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(agentProfiles)
-			.where(eq(agentProfiles.userId, userId))
-			.limit(1)
-		return profile ?? null
-	},
-)
-
-export const updateAgentProfile = createServerFn({ method: 'POST' })
-	.validator((data: AgentProfileUpdate) => data)
-	.handler(async ({ data }) => {
-		const userId = await requireUserId()
-		const now = new Date()
-
-		const existing = await db
-			.select({ id: agentProfiles.id })
-			.from(agentProfiles)
-			.where(eq(agentProfiles.userId, userId))
-			.limit(1)
-
-		if (!existing[0]) {
-			throw new Error('Agent profile not found')
-		}
-
-		await db
-			.update(agentProfiles)
-			.set({ ...data, updatedAt: now })
-			.where(eq(agentProfiles.id, existing[0].id))
-	})
-
-export const createConsumerProfileFromDraft = createServerFn({ method: 'POST' })
-	.validator((data: ConsumerProfileUpdate) => data)
-	.handler(async ({ data }) => {
-		await requireUserId()
-		const createInput = consumerProfileCreateSchema.parse({
-			...data,
-			status: 'active',
-		})
-
-		await upsertConsumerProfile({ data: createInput })
 
 		return { success: true }
 	})
@@ -160,6 +107,18 @@ export const completeAgentSignup = createServerFn({ method: 'POST' })
 		await db.insert(agentProfiles).values(insert)
 		return { success: true }
 	})
+
+export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
+	async () => {
+		const userId = await requireUserId()
+		const [profile] = await db
+			.select()
+			.from(agentProfiles)
+			.where(eq(agentProfiles.userId, userId))
+			.limit(1)
+		return profile ?? null
+	},
+)
 
 export const loadAgentMatches = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<AgentMatchData[]> => {

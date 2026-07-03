@@ -45,14 +45,3 @@ export type AgentProfileUpdate = Partial<AgentProfileCreateInput>
 export type ConsumerDraft = ConsumerProfileUpdate
 
 export type AgentDraft = Partial<AgentProfileCreateInput>
-
-export function hasCompletedConsumerIntake(
-	profile: ConsumerProfile | null | undefined,
-) {
-	return Boolean(
-		profile?.preferredContactMethod ||
-		profile?.involvementLevel ||
-		profile?.representationPreference ||
-		profile?.commissionComfort,
-	)
-}

@@ -6,11 +6,7 @@ import { WizardShell } from '@/components/signup/wizard-shell'
 import { FlowIntakeProgress } from '@/components/signup/shared'
 import { LeaveDialog } from '@/components/signup/leave-dialog'
 import { getCurrentSession } from '@/lib/auth/functions'
-import {
-	hasCompletedConsumerIntake,
-	type ConsumerDraft,
-	loadConsumerProfile,
-} from '@/lib/matching/profile'
+import { type ConsumerDraft, loadConsumerProfile } from '@/lib/matching/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 import {
 	ConsumerHome,
@@ -42,7 +38,7 @@ export const Route = createFileRoute('/(app)/consumer/signup/')({
 		if (session) {
 			const profile = await loadConsumerProfile()
 
-			if (hasCompletedConsumerIntake(profile)) {
+			if (profile) {
 				throw redirect({ to: '/consumer/dashboard/matches' })
 			}
 		}
