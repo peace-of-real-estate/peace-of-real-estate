@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 export type SignupFormProps<TData = unknown> = {
 	idPrefix?: string
 	redirect: string
+	oauthRedirect?: string
 	createProfile: (payload: { data: TData }) => Promise<unknown>
 	loadDraft: () => TData | null
 	clearDraft: () => void
@@ -23,6 +24,7 @@ export type SignupFormProps<TData = unknown> = {
 export function SignupForm<TData>({
 	idPrefix = 'signup',
 	redirect,
+	oauthRedirect = redirect,
 	createProfile,
 	loadDraft,
 	clearDraft,
@@ -39,7 +41,7 @@ export function SignupForm<TData>({
 		isLoading: isGoogleLoading,
 		isAvailable: googleAvailable,
 	} = useGoogleSignIn({
-		fallbackRedirect: redirect,
+		fallbackRedirect: oauthRedirect,
 	})
 
 	const nameId = `${idPrefix}-name`
