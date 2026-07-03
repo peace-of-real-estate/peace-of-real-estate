@@ -27,8 +27,6 @@ export const Route = createRootRouteWithContext<{
 		],
 	}),
 	beforeLoad: async ({ location }) => {
-		if (import.meta.env.DEV) return
-
 		const isAuthenticated = hasBetaAccess()
 
 		if (!isAuthenticated && location.pathname !== '/beta') {

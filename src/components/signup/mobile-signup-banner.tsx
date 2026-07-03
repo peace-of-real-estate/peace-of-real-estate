@@ -29,13 +29,10 @@ export function MobileSignupBanner<TData>({
 }: MobileSignupBannerProps<TData>) {
 	const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 	const redirect = signupFormProps.redirect
-	const callbackURL =
-		typeof window !== 'undefined'
-			? new URL(redirect, window.location.origin).toString()
-			: redirect
 
 	const handleGoogleSignIn = async () => {
 		setIsGoogleLoading(true)
+		const callbackURL = new URL(redirect, window.location.origin).toString()
 		try {
 			const { data, error } = await authClient.signIn.social({
 				provider: 'google',

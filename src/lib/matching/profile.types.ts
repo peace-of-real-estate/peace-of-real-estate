@@ -5,11 +5,7 @@ import { agentProfiles, consumerProfiles } from '@/db/tables'
 
 export type ConsumerProfile = typeof consumerProfiles.$inferSelect
 
-export type ConsumerProfileInsert = typeof consumerProfiles.$inferInsert
-
 export type AgentProfile = typeof agentProfiles.$inferSelect
-
-export type AgentProfileInsert = typeof agentProfiles.$inferInsert
 
 const consumerProfileCreateSchema = createInsertSchema(consumerProfiles)
 	.omit({
