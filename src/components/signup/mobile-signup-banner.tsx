@@ -1,9 +1,7 @@
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { GoogleIcon } from '@/components/icons/google'
-import { authClient } from '@/lib/auth/client'
+import { useGoogleSignIn } from '@/hooks/use-google-sign-in'
 import { Button } from '@/components/ui/button'
 import {
 	Sheet,
@@ -27,39 +25,10 @@ export function MobileSignupBanner<TData>({
 	ctaLabel = 'Create account',
 	...signupFormProps
 }: MobileSignupBannerProps<TData>) {
-	const [isGoogleLoading, setIsGoogleLoading] = useState(false)
 	const redirect = signupFormProps.redirect
-	const callbackURL =
-		typeof window !== 'undefined'
-			? new URL(redirect, window.location.origin).toString()
-			: redirect
-
-	const handleGoogleSignIn = async () => {
-		setIsGoogleLoading(true)
-		try {
-			const { data, error } = await authClient.signIn.social({
-				provider: 'google',
-				callbackURL,
-			})
-			if (error) throw error
-			window.location.assign(data?.url ?? redirect)
-		} catch (error) {
-			if (
-				error &&
-				typeof error === 'object' &&
-				'code' in error &&
-				error.code === 'PROVIDER_NOT_FOUND'
-			) {
-				toast.error(
-					'Google login is not configured yet. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env.development.',
-				)
-			} else {
-				toast.error('Google sign-in failed. Try again.')
-			}
-			console.error('Google sign-in failed', error)
-			setIsGoogleLoading(false)
-		}
-	}
+	const oauthRedirect = signupFormProps.oauthRedirect ?? redirect
+	const { signIn: handleGoogleSignIn, isLoading: isGoogleLoading } =
+		useGoogleSignIn({ fallbackRedirect: oauthRedirect })
 
 	return (
 		<Sheet>

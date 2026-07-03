@@ -1,6 +1,4 @@
-import { useEffect, useRef } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start'
 import {
 	Crown,
 	ExternalLink,
@@ -23,12 +21,7 @@ import {
 } from '@/components/ui/card'
 import { DashboardPage, DashboardPageMobileNav } from '@/components/dashboard'
 import { authClient } from '@/lib/auth/client'
-import {
-	createConsumerProfileFromDraft,
-	loadConsumerProfile,
-} from '@/lib/matching/profile'
-import { type ConsumerDraft } from '@/lib/matching/profile'
-import { createLocalStorage } from '@/lib/utils/localstorage'
+import { loadConsumerProfile } from '@/lib/matching/profile'
 import {
 	formatPriceRange,
 	parsePriceRange,
@@ -39,43 +32,9 @@ export const Route = createFileRoute('/(app)/consumer/dashboard/')({
 	loader: () => loadConsumerProfile(),
 })
 
-const consumerDraftStorage =
-	createLocalStorage<ConsumerDraft>('pre-consumer-draft')
-
 function ConsumerDashboard() {
 	const consumerProfile = Route.useLoaderData()
 	const { data: session } = authClient.useSession()
-	const createProfile = useServerFn(createConsumerProfileFromDraft)
-	const draftCompletionStarted = useRef(false)
-
-	useEffect(() => {
-		if (!session || draftCompletionStarted.current) {
-			return
-		}
-
-		const draft = consumerDraftStorage.load()
-		if (!draft) {
-			return
-		}
-
-		draftCompletionStarted.current = true
-
-		async function completeDraft(draft: ConsumerDraft) {
-			try {
-				await createProfile({ data: draft })
-				consumerDraftStorage.clear()
-			} catch (error) {
-				console.error('Unable to complete consumer profile', error)
-				draftCompletionStarted.current = false
-			}
-		}
-
-		void completeDraft(draft)
-	}, [createProfile, session])
-
-	if (consumerProfile === undefined) {
-		return <div className="flex-1" />
-	}
 
 	const initials = getInitials(session?.user.name, session?.user.email)
 	const searchSnapshot = [

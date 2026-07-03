@@ -140,6 +140,7 @@ export function ConsumerPreview({ profile }: { profile: ConsumerProfile }) {
 						<SignupForm
 							idPrefix="desktop-signup"
 							redirect="/consumer/dashboard/matches"
+							oauthRedirect="/consumer/signup/complete"
 							createProfile={createConsumerProfileFromDraft}
 							loadDraft={consumerDraftStorage.load}
 							clearDraft={consumerDraftStorage.clear}
@@ -234,6 +235,7 @@ export function ConsumerPreview({ profile }: { profile: ConsumerProfile }) {
 					subtitle="Create your profile to view full agent matches."
 					ctaLabel="Create account"
 					redirect="/consumer/dashboard/matches"
+					oauthRedirect="/consumer/signup/complete"
 					createProfile={createConsumerProfileFromDraft}
 					loadDraft={consumerDraftStorage.load}
 					clearDraft={consumerDraftStorage.clear}

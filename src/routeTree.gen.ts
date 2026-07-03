@@ -23,10 +23,12 @@ import { Route as appConsumerDashboardIndexRouteImport } from './routes/(app)/co
 import { Route as appAgentSignupIndexRouteImport } from './routes/(app)/agent/signup/index'
 import { Route as appAgentDashboardIndexRouteImport } from './routes/(app)/agent/dashboard/index'
 import { Route as ApiIngestStaticSplatRouteImport } from './routes/api/ingest.static.$'
+import { Route as appConsumerSignupCompleteRouteImport } from './routes/(app)/consumer/signup/complete'
 import { Route as appConsumerDashboardSearchPreferencesRouteImport } from './routes/(app)/consumer/dashboard/search-preferences'
 import { Route as appConsumerDashboardPracticeNegotiatingRouteImport } from './routes/(app)/consumer/dashboard/practice-negotiating'
 import { Route as appConsumerDashboardMatchesRouteImport } from './routes/(app)/consumer/dashboard/matches'
 import { Route as appConsumerDashboardIntroductionsRouteImport } from './routes/(app)/consumer/dashboard/introductions'
+import { Route as appAgentSignupCompleteRouteImport } from './routes/(app)/agent/signup/complete'
 import { Route as appAgentDashboardSubscribeRouteImport } from './routes/(app)/agent/dashboard/subscribe'
 import { Route as appAgentDashboardPeacePactRouteImport } from './routes/(app)/agent/dashboard/peace-pact'
 import { Route as appAgentDashboardIntroductionsRouteImport } from './routes/(app)/agent/dashboard/introductions'
@@ -103,6 +105,12 @@ const ApiIngestStaticSplatRoute = ApiIngestStaticSplatRouteImport.update({
   path: '/api/ingest/static/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const appConsumerSignupCompleteRoute =
+  appConsumerSignupCompleteRouteImport.update({
+    id: '/(app)/consumer/signup/complete',
+    path: '/consumer/signup/complete',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const appConsumerDashboardSearchPreferencesRoute =
   appConsumerDashboardSearchPreferencesRouteImport.update({
     id: '/search-preferences',
@@ -127,6 +135,11 @@ const appConsumerDashboardIntroductionsRoute =
     path: '/introductions',
     getParentRoute: () => appConsumerDashboardRoute,
   } as any)
+const appAgentSignupCompleteRoute = appAgentSignupCompleteRouteImport.update({
+  id: '/(app)/agent/signup/complete',
+  path: '/agent/signup/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const appAgentDashboardSubscribeRoute =
   appAgentDashboardSubscribeRouteImport.update({
     id: '/subscribe',
@@ -166,10 +179,12 @@ export interface FileRoutesByFullPath {
   '/agent/dashboard/introductions': typeof appAgentDashboardIntroductionsRoute
   '/agent/dashboard/peace-pact': typeof appAgentDashboardPeacePactRoute
   '/agent/dashboard/subscribe': typeof appAgentDashboardSubscribeRoute
+  '/agent/signup/complete': typeof appAgentSignupCompleteRoute
   '/consumer/dashboard/introductions': typeof appConsumerDashboardIntroductionsRoute
   '/consumer/dashboard/matches': typeof appConsumerDashboardMatchesRoute
   '/consumer/dashboard/practice-negotiating': typeof appConsumerDashboardPracticeNegotiatingRoute
   '/consumer/dashboard/search-preferences': typeof appConsumerDashboardSearchPreferencesRoute
+  '/consumer/signup/complete': typeof appConsumerSignupCompleteRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
   '/agent/dashboard/': typeof appAgentDashboardIndexRoute
   '/agent/signup/': typeof appAgentSignupIndexRoute
@@ -188,10 +203,12 @@ export interface FileRoutesByTo {
   '/agent/dashboard/introductions': typeof appAgentDashboardIntroductionsRoute
   '/agent/dashboard/peace-pact': typeof appAgentDashboardPeacePactRoute
   '/agent/dashboard/subscribe': typeof appAgentDashboardSubscribeRoute
+  '/agent/signup/complete': typeof appAgentSignupCompleteRoute
   '/consumer/dashboard/introductions': typeof appConsumerDashboardIntroductionsRoute
   '/consumer/dashboard/matches': typeof appConsumerDashboardMatchesRoute
   '/consumer/dashboard/practice-negotiating': typeof appConsumerDashboardPracticeNegotiatingRoute
   '/consumer/dashboard/search-preferences': typeof appConsumerDashboardSearchPreferencesRoute
+  '/consumer/signup/complete': typeof appConsumerSignupCompleteRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
   '/agent/dashboard': typeof appAgentDashboardIndexRoute
   '/agent/signup': typeof appAgentSignupIndexRoute
@@ -213,10 +230,12 @@ export interface FileRoutesById {
   '/(app)/agent/dashboard/introductions': typeof appAgentDashboardIntroductionsRoute
   '/(app)/agent/dashboard/peace-pact': typeof appAgentDashboardPeacePactRoute
   '/(app)/agent/dashboard/subscribe': typeof appAgentDashboardSubscribeRoute
+  '/(app)/agent/signup/complete': typeof appAgentSignupCompleteRoute
   '/(app)/consumer/dashboard/introductions': typeof appConsumerDashboardIntroductionsRoute
   '/(app)/consumer/dashboard/matches': typeof appConsumerDashboardMatchesRoute
   '/(app)/consumer/dashboard/practice-negotiating': typeof appConsumerDashboardPracticeNegotiatingRoute
   '/(app)/consumer/dashboard/search-preferences': typeof appConsumerDashboardSearchPreferencesRoute
+  '/(app)/consumer/signup/complete': typeof appConsumerSignupCompleteRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
   '/(app)/agent/dashboard/': typeof appAgentDashboardIndexRoute
   '/(app)/agent/signup/': typeof appAgentSignupIndexRoute
@@ -239,10 +258,12 @@ export interface FileRouteTypes {
     | '/agent/dashboard/introductions'
     | '/agent/dashboard/peace-pact'
     | '/agent/dashboard/subscribe'
+    | '/agent/signup/complete'
     | '/consumer/dashboard/introductions'
     | '/consumer/dashboard/matches'
     | '/consumer/dashboard/practice-negotiating'
     | '/consumer/dashboard/search-preferences'
+    | '/consumer/signup/complete'
     | '/api/ingest/static/$'
     | '/agent/dashboard/'
     | '/agent/signup/'
@@ -261,10 +282,12 @@ export interface FileRouteTypes {
     | '/agent/dashboard/introductions'
     | '/agent/dashboard/peace-pact'
     | '/agent/dashboard/subscribe'
+    | '/agent/signup/complete'
     | '/consumer/dashboard/introductions'
     | '/consumer/dashboard/matches'
     | '/consumer/dashboard/practice-negotiating'
     | '/consumer/dashboard/search-preferences'
+    | '/consumer/signup/complete'
     | '/api/ingest/static/$'
     | '/agent/dashboard'
     | '/agent/signup'
@@ -285,10 +308,12 @@ export interface FileRouteTypes {
     | '/(app)/agent/dashboard/introductions'
     | '/(app)/agent/dashboard/peace-pact'
     | '/(app)/agent/dashboard/subscribe'
+    | '/(app)/agent/signup/complete'
     | '/(app)/consumer/dashboard/introductions'
     | '/(app)/consumer/dashboard/matches'
     | '/(app)/consumer/dashboard/practice-negotiating'
     | '/(app)/consumer/dashboard/search-preferences'
+    | '/(app)/consumer/signup/complete'
     | '/api/ingest/static/$'
     | '/(app)/agent/dashboard/'
     | '/(app)/agent/signup/'
@@ -306,6 +331,8 @@ export interface RootRouteChildren {
   ApiIngestSplatRoute: typeof ApiIngestSplatRoute
   appAgentIndexRoute: typeof appAgentIndexRoute
   appConsumerIndexRoute: typeof appConsumerIndexRoute
+  appAgentSignupCompleteRoute: typeof appAgentSignupCompleteRoute
+  appConsumerSignupCompleteRoute: typeof appConsumerSignupCompleteRoute
   ApiIngestStaticSplatRoute: typeof ApiIngestStaticSplatRoute
   appAgentSignupIndexRoute: typeof appAgentSignupIndexRoute
   appConsumerSignupIndexRoute: typeof appConsumerSignupIndexRoute
@@ -411,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIngestStaticSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(app)/consumer/signup/complete': {
+      id: '/(app)/consumer/signup/complete'
+      path: '/consumer/signup/complete'
+      fullPath: '/consumer/signup/complete'
+      preLoaderRoute: typeof appConsumerSignupCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(app)/consumer/dashboard/search-preferences': {
       id: '/(app)/consumer/dashboard/search-preferences'
       path: '/search-preferences'
@@ -438,6 +472,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/consumer/dashboard/introductions'
       preLoaderRoute: typeof appConsumerDashboardIntroductionsRouteImport
       parentRoute: typeof appConsumerDashboardRoute
+    }
+    '/(app)/agent/signup/complete': {
+      id: '/(app)/agent/signup/complete'
+      path: '/agent/signup/complete'
+      fullPath: '/agent/signup/complete'
+      preLoaderRoute: typeof appAgentSignupCompleteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(app)/agent/dashboard/subscribe': {
       id: '/(app)/agent/dashboard/subscribe'
@@ -521,6 +562,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIngestSplatRoute: ApiIngestSplatRoute,
   appAgentIndexRoute: appAgentIndexRoute,
   appConsumerIndexRoute: appConsumerIndexRoute,
+  appAgentSignupCompleteRoute: appAgentSignupCompleteRoute,
+  appConsumerSignupCompleteRoute: appConsumerSignupCompleteRoute,
   ApiIngestStaticSplatRoute: ApiIngestStaticSplatRoute,
   appAgentSignupIndexRoute: appAgentSignupIndexRoute,
   appConsumerSignupIndexRoute: appConsumerSignupIndexRoute,

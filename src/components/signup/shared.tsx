@@ -111,38 +111,35 @@ export function AnimatedStatusIcon({
 }
 
 const cardVariants = {
-	enter: (direction: number) => ({
-		y: direction > 0 ? '100%' : '-40%',
+	enter: {
+		y: '2rem',
 		opacity: 0,
 		scale: 0.96,
-	}),
+	},
 	center: {
 		y: 0,
 		opacity: 1,
 		scale: 1,
 	},
-	exit: (direction: number) => ({
-		y: direction > 0 ? '-40%' : '60%',
+	exit: {
+		y: '-1rem',
 		opacity: 0,
 		scale: 0.96,
-	}),
+	},
 }
 
 export function AnimatedStepCard({
 	children,
 	stepKey,
-	direction,
 }: {
 	children: ReactNode
 	stepKey: string
-	direction: number
 }) {
 	return (
 		<div className="relative overflow-hidden">
-			<AnimatePresence mode="wait" custom={direction}>
+			<AnimatePresence mode="wait">
 				<motion.div
 					key={stepKey}
-					custom={direction}
 					variants={cardVariants}
 					initial="enter"
 					animate="center"

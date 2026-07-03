@@ -85,6 +85,7 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 						<SignupForm
 							idPrefix="desktop-signup"
 							redirect="/agent/dashboard/introductions"
+							oauthRedirect="/agent/signup/complete"
 							createProfile={completeAgentSignup}
 							loadDraft={agentDraftStorage.load}
 							clearDraft={agentDraftStorage.clear}
@@ -121,6 +122,7 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 					subtitle="Create your account to start matching with consumers."
 					ctaLabel="Create account"
 					redirect="/agent/dashboard/introductions"
+					oauthRedirect="/agent/signup/complete"
 					createProfile={completeAgentSignup}
 					loadDraft={agentDraftStorage.load}
 					clearDraft={agentDraftStorage.clear}

@@ -1,16 +1,12 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { z } from 'zod'
 
 import { WizardShell } from '@/components/signup/wizard-shell'
 import { FlowIntakeProgress } from '@/components/signup/shared'
 import { LeaveDialog } from '@/components/signup/leave-dialog'
 import { getCurrentSession } from '@/lib/auth/functions'
-import {
-	hasCompletedConsumerIntake,
-	type ConsumerDraft,
-	loadConsumerProfile,
-} from '@/lib/matching/profile'
+import { type ConsumerDraft, loadConsumerProfile } from '@/lib/matching/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 import {
 	ConsumerHome,
@@ -19,11 +15,7 @@ import {
 	ConsumerSituation,
 } from './-steps'
 import { ConsumerPreview, draftToPreviewProfile } from './-steps/step-5-preview'
-import {
-	consumerFlowSteps,
-	stepOrder,
-	type ConsumerFlowStep,
-} from './-steps/shared'
+import { consumerFlowSteps, type ConsumerFlowStep } from './-steps/shared'
 import { isConsumerQuizComplete } from './-steps/step-4-quiz'
 
 const signupSearchSchema = z.object({
@@ -46,7 +38,7 @@ export const Route = createFileRoute('/(app)/consumer/signup/')({
 		if (session) {
 			const profile = await loadConsumerProfile()
 
-			if (hasCompletedConsumerIntake(profile)) {
+			if (profile) {
 				throw redirect({ to: '/consumer/dashboard/matches' })
 			}
 		}
@@ -60,13 +52,10 @@ const consumerDraftStorage =
 function ConsumerSignupRoute() {
 	const { step } = Route.useSearch()
 	const navigate = useNavigate()
-	const currentIndex = stepOrder.indexOf(step as ConsumerFlowStep)
 	const [state, setState] = useState<ConsumerDraft>(() => {
 		return consumerDraftStorage.load() ?? { zipCodes: [] }
 	})
-	const [direction, setDirection] = useState(1)
 	const [showLeaveDialog, setShowLeaveDialog] = useState(false)
-	const previousIndexRef = useRef(currentIndex)
 
 	const hasDraft =
 		state.intent !== undefined ||
@@ -88,11 +77,6 @@ function ConsumerSignupRoute() {
 		}
 		void navigate({ to: '/' })
 	}
-
-	useEffect(() => {
-		setDirection(currentIndex >= previousIndexRef.current ? 1 : -1)
-		previousIndexRef.current = currentIndex
-	}, [currentIndex])
 
 	const goToStep = (nextStep: ConsumerFlowStep) => {
 		void navigate({
@@ -156,28 +140,24 @@ function ConsumerSignupRoute() {
 				{step === 'intro' ? (
 					<ConsumerSituation
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('intent')}
 					/>
 				) : step === 'intent' ? (
 					<ConsumerLocation
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('home')}
 					/>
 				) : step === 'home' ? (
 					<ConsumerHome
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('quiz')}
 					/>
 				) : (
 					<ConsumerQuiz
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onComplete={() => goToStep('preview')}
 					/>

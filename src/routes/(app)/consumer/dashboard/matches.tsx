@@ -26,11 +26,7 @@ import { Card } from '@/components/ui/card'
 import { DashboardPage, DashboardPageMobileNav } from '@/components/dashboard'
 import type { MatchDetails } from '@/components/match/card'
 import { authClient } from '@/lib/auth/client'
-import {
-	loadAgentMatches,
-	loadConsumerProfile,
-	hasCompletedConsumerIntake,
-} from '@/lib/matching/profile'
+import { loadAgentMatches, loadConsumerProfile } from '@/lib/matching/profile'
 import { consumerAnswerLabels } from '@/components/signup/questions'
 import type { ConsumerProfile } from '@/lib/matching/profile'
 import {
@@ -62,7 +58,7 @@ export const Route = createFileRoute('/(app)/consumer/dashboard/matches')({
 	beforeLoad: async () => {
 		const consumerProfile = await loadConsumerProfile()
 
-		if (!hasCompletedConsumerIntake(consumerProfile)) {
+		if (!consumerProfile) {
 			throw redirect({ to: '/consumer/signup', search: { step: 'intro' } })
 		}
 	},

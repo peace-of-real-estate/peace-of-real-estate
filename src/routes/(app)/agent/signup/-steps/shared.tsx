@@ -13,7 +13,7 @@ import type { RepresentationSide } from '@/lib/matching/profile'
 import { bestClientTypeLabels } from '@/components/signup/questions'
 
 export type AgentFlowStep =
-	| 'welcome'
+	| 'intro'
 	| 'identity'
 	| 'market'
 	| 'compliance'
@@ -25,19 +25,11 @@ export const agentFlowSteps: {
 	label: string
 	icon: Icon
 }[] = [
-	{ id: 'welcome', label: 'Start', icon: UserIcon },
+	{ id: 'intro', label: 'Start', icon: UserIcon },
 	{ id: 'identity', label: 'Identity', icon: UserIcon },
 	{ id: 'market', label: 'Market', icon: MapPinIcon },
 	{ id: 'compliance', label: 'Compliance', icon: ShieldCheckIcon },
 	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
-]
-
-export const stepOrder: AgentFlowStep[] = [
-	'welcome',
-	'identity',
-	'market',
-	'compliance',
-	'peacePact',
 ]
 
 export const yearsLicensedOptions = [

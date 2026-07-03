@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { agentFlowSteps } from './shared'
 
-export function AgentWelcome({ onContinue }: { onContinue: () => void }) {
+export function AgentIntro({ onContinue }: { onContinue: () => void }) {
 	return (
-		<AnimatedStepCard stepKey="welcome" direction={1}>
+		<AnimatedStepCard stepKey="intro">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-8">
 					<div className="space-y-2 text-center">

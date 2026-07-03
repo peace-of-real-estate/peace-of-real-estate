@@ -37,7 +37,7 @@ export function NotFoundComponent() {
 							</Link>
 						</Button>
 						<Button asChild variant="secondary">
-							<Link to="/agent/signup" search={{ step: 'welcome' }}>
+							<Link to="/agent/signup" search={{ step: 'intro' }}>
 								<MapPin className="h-4 w-4" />
 								Find an Agent
 							</Link>

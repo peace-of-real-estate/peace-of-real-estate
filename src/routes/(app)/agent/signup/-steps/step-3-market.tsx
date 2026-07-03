@@ -34,12 +34,10 @@ import { bestClientTypeLabels } from '@/components/signup/questions'
 
 export function AgentMarket({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: AgentDraft
-	direction: number
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
@@ -106,7 +104,7 @@ export function AgentMarket({
 	}
 
 	return (
-		<AnimatedStepCard stepKey="market" direction={direction}>
+		<AnimatedStepCard stepKey="market">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader

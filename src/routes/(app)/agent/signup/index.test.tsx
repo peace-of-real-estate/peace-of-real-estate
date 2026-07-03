@@ -5,7 +5,7 @@ import { test } from '@tests/__fixtures__/browser'
 import { expectRouteScreenshot } from '@tests/utils/file-routes'
 
 const agentSignupSteps = [
-	{ step: 'welcome', name: 'agent-signup-step-1-welcome' },
+	{ step: 'intro', name: 'agent-signup-step-1-intro' },
 	{ step: 'identity', name: 'agent-signup-step-2-identity' },
 	{ step: 'market', name: 'agent-signup-step-3-market' },
 	{ step: 'compliance', name: 'agent-signup-step-4-compliance' },

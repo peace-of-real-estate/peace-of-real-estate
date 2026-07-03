@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { z } from 'zod'
 
 import { WizardShell } from '@/components/signup/wizard-shell'
@@ -14,33 +14,26 @@ import {
 import { createLocalStorage } from '@/lib/utils/localstorage'
 import {
 	AgentCompliance,
+	AgentIntro,
 	AgentIdentity,
 	AgentMarket,
 	AgentPeacePact,
-	AgentWelcome,
 } from './-steps'
 import { AgentPreview, draftToPreviewProfile } from './-steps/step-6-preview'
-import { agentFlowSteps, stepOrder, type AgentFlowStep } from './-steps/shared'
+import { agentFlowSteps, type AgentFlowStep } from './-steps/shared'
 
 const signupSearchSchema = z.object({
 	step: z
-		.enum([
-			'welcome',
-			'identity',
-			'market',
-			'compliance',
-			'peacePact',
-			'preview',
-		])
-		.default('welcome')
-		.catch('welcome'),
+		.enum(['intro', 'identity', 'market', 'compliance', 'peacePact', 'preview'])
+		.default('intro')
+		.catch('intro'),
 })
 
 export const Route = createFileRoute('/(app)/agent/signup/')({
 	validateSearch: signupSearchSchema,
 	beforeLoad: async ({ search }) => {
 		const validSteps = [
-			'welcome',
+			'intro',
 			'identity',
 			'market',
 			'compliance',
@@ -48,7 +41,7 @@ export const Route = createFileRoute('/(app)/agent/signup/')({
 			'preview',
 		] as const
 		if (!validSteps.includes(search.step)) {
-			throw redirect({ to: '/agent/signup', search: { step: 'welcome' } })
+			throw redirect({ to: '/agent/signup', search: { step: 'intro' } })
 		}
 
 		const session = await getCurrentSession()
@@ -67,13 +60,10 @@ const agentDraftStorage = createLocalStorage<AgentDraft>('pre-agent-draft')
 function AgentSignupRoute() {
 	const { step } = Route.useSearch()
 	const navigate = useNavigate()
-	const currentIndex = stepOrder.indexOf(step as AgentFlowStep)
 	const [state, setState] = useState<AgentDraft>(() => {
 		return agentDraftStorage.load() ?? {}
 	})
-	const [direction, setDirection] = useState(1)
 	const [showLeaveDialog, setShowLeaveDialog] = useState(false)
-	const previousIndexRef = useRef(currentIndex)
 
 	const hasDraft =
 		state.firstName !== undefined ||
@@ -95,11 +85,6 @@ function AgentSignupRoute() {
 		}
 		void navigate({ to: '/' })
 	}
-
-	useEffect(() => {
-		setDirection(currentIndex >= previousIndexRef.current ? 1 : -1)
-		previousIndexRef.current = currentIndex
-	}, [currentIndex])
 
 	const goToStep = (nextStep: AgentFlowStep) => {
 		void navigate({
@@ -157,33 +142,29 @@ function AgentSignupRoute() {
 				onStepClick={(nextStep) => goToStep(nextStep as AgentFlowStep)}
 				completedStepIds={completedStepIds}
 			>
-				{step === 'welcome' ? (
-					<AgentWelcome onContinue={() => goToStep('identity')} />
+				{step === 'intro' ? (
+					<AgentIntro onContinue={() => goToStep('identity')} />
 				) : step === 'identity' ? (
 					<AgentIdentity
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('market')}
 					/>
 				) : step === 'market' ? (
 					<AgentMarket
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('compliance')}
 					/>
 				) : step === 'compliance' ? (
 					<AgentCompliance
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('peacePact')}
 					/>
 				) : (
 					<AgentPeacePact
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('preview')}
 					/>

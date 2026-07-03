@@ -13,12 +13,10 @@ import { StepHeader } from '@/components/signup/step-header'
 
 export function AgentCompliance({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: AgentDraft
-	direction: number
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
@@ -37,7 +35,7 @@ export function AgentCompliance({
 	}
 
 	return (
-		<AnimatedStepCard stepKey="compliance" direction={direction}>
+		<AnimatedStepCard stepKey="compliance">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader
