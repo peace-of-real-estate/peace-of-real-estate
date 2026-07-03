@@ -32,14 +32,6 @@ export const agentFlowSteps: {
 	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
 ]
 
-export const stepOrder: AgentFlowStep[] = [
-	'intro',
-	'identity',
-	'market',
-	'compliance',
-	'peacePact',
-]
-
 export const yearsLicensedOptions = [
 	{ slug: '0-2', label: '0-2 years' },
 	{ slug: '3-5', label: '3-5 years' },

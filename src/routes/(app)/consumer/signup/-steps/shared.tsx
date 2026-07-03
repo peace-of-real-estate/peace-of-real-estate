@@ -28,8 +28,6 @@ export const consumerFlowSteps: {
 	{ id: 'quiz', label: 'Preferences', icon: UserIcon },
 ]
 
-export const stepOrder: ConsumerFlowStep[] = ['intro', 'intent', 'home', 'quiz']
-
 export const timelineOptions = [
 	{ slug: 'exploring', label: 'Just exploring' },
 	{ slug: '1month', label: '1 month' },
