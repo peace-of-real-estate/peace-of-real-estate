@@ -32,12 +32,10 @@ export type {
 	AgentDraft,
 	AgentProfile,
 	AgentProfileCreateInput,
-	AgentProfileInsert,
 	AgentProfileUpdate,
 	ConsumerDraft,
 	ConsumerProfile,
 	ConsumerProfileCreateInput,
-	ConsumerProfileInsert,
 	ConsumerProfileUpdate,
 } from '@/lib/matching/profile.types'
 

@@ -39,12 +39,10 @@ export function isConsumerQuizComplete(state: ConsumerDraft): boolean {
 
 export function ConsumerQuiz({
 	state,
-	direction,
 	onUpdate,
 	onComplete,
 }: {
 	state: ConsumerDraft
-	direction: number
 	onUpdate: (patch: Partial<ConsumerDraft>) => void
 	onComplete: () => void
 }) {
@@ -54,7 +52,7 @@ export function ConsumerQuiz({
 	)
 
 	return (
-		<AnimatedStepCard stepKey="quiz" direction={direction}>
+		<AnimatedStepCard stepKey="quiz">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader

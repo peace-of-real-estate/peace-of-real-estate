@@ -19,11 +19,7 @@ import {
 	ConsumerSituation,
 } from './-steps'
 import { ConsumerPreview, draftToPreviewProfile } from './-steps/step-5-preview'
-import {
-	consumerFlowSteps,
-	stepOrder,
-	type ConsumerFlowStep,
-} from './-steps/shared'
+import { consumerFlowSteps, type ConsumerFlowStep } from './-steps/shared'
 import { isConsumerQuizComplete } from './-steps/step-4-quiz'
 
 const signupSearchSchema = z.object({
@@ -60,7 +56,6 @@ const consumerDraftStorage =
 function ConsumerSignupRoute() {
 	const { step } = Route.useSearch()
 	const navigate = useNavigate()
-	const currentIndex = stepOrder.indexOf(step as ConsumerFlowStep)
 	const [state, setState] = useState<ConsumerDraft>(() => {
 		return consumerDraftStorage.load() ?? { zipCodes: [] }
 	})
@@ -149,28 +144,24 @@ function ConsumerSignupRoute() {
 				{step === 'intro' ? (
 					<ConsumerSituation
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('intent')}
 					/>
 				) : step === 'intent' ? (
 					<ConsumerLocation
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('home')}
 					/>
 				) : step === 'home' ? (
 					<ConsumerHome
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onContinue={() => goToStep('quiz')}
 					/>
 				) : (
 					<ConsumerQuiz
 						state={state}
-						direction={direction}
 						onUpdate={updateState}
 						onComplete={() => goToStep('preview')}
 					/>

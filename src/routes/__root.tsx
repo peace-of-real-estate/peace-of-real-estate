@@ -1,6 +1,5 @@
 import { hasBetaAccess } from '@/lib/auth/beta'
 import { getCurrentSession } from '@/lib/auth/functions'
-import { signupPersonas, type Persona } from '@/lib/matching/signup'
 import type { QueryClient } from '@tanstack/react-query'
 import {
 	HeadContent,
