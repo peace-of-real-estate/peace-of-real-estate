@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { z } from 'zod'
 
 import { WizardShell } from '@/components/signup/wizard-shell'
@@ -71,9 +71,7 @@ function AgentSignupRoute() {
 	const [state, setState] = useState<AgentDraft>(() => {
 		return agentDraftStorage.load() ?? {}
 	})
-	const [direction, setDirection] = useState(1)
 	const [showLeaveDialog, setShowLeaveDialog] = useState(false)
-	const previousIndexRef = useRef(currentIndex)
 
 	const hasDraft =
 		state.firstName !== undefined ||
@@ -95,11 +93,6 @@ function AgentSignupRoute() {
 		}
 		void navigate({ to: '/' })
 	}
-
-	useEffect(() => {
-		setDirection(currentIndex >= previousIndexRef.current ? 1 : -1)
-		previousIndexRef.current = currentIndex
-	}, [currentIndex])
 
 	const goToStep = (nextStep: AgentFlowStep) => {
 		void navigate({

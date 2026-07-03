@@ -20,12 +20,10 @@ import {
 
 export function ConsumerSituation({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: ConsumerDraft
-	direction: number
 	onUpdate: (patch: Partial<ConsumerDraft>) => void
 	onContinue: () => void
 }) {
@@ -58,7 +56,7 @@ export function ConsumerSituation({
 	}
 
 	return (
-		<AnimatedStepCard stepKey="intro" direction={direction}>
+		<AnimatedStepCard stepKey="intro">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-8">
 					<StepHeader

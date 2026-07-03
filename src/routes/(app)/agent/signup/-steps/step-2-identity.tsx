@@ -14,12 +14,10 @@ import { StepHeader } from '@/components/signup/step-header'
 
 export function AgentIdentity({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: AgentDraft
-	direction: number
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
@@ -82,7 +80,7 @@ export function AgentIdentity({
 	}
 
 	return (
-		<AnimatedStepCard stepKey="identity" direction={direction}>
+		<AnimatedStepCard stepKey="identity">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<div className="flex items-start justify-between gap-4">

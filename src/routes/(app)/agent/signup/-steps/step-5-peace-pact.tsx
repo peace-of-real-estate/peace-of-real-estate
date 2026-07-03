@@ -13,12 +13,10 @@ import { StepHeader } from '@/components/signup/step-header'
 
 export function AgentPeacePact({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: AgentDraft
-	direction: number
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
@@ -36,7 +34,7 @@ export function AgentPeacePact({
 	}
 
 	return (
-		<AnimatedStepCard stepKey="peacePact" direction={direction}>
+		<AnimatedStepCard stepKey="peacePact">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader

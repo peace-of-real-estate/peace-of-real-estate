@@ -23,12 +23,10 @@ import { consumerConfig, getPropertyIcon } from './shared'
 
 export function ConsumerHome({
 	state,
-	direction,
 	onUpdate,
 	onContinue,
 }: {
 	state: ConsumerDraft
-	direction: number
 	onUpdate: (patch: Partial<ConsumerDraft>) => void
 	onContinue: () => void
 }) {
@@ -64,7 +62,7 @@ export function ConsumerHome({
 	) : null
 
 	return (
-		<AnimatedStepCard stepKey="home" direction={direction}>
+		<AnimatedStepCard stepKey="home">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-8">
 					<StepHeader
