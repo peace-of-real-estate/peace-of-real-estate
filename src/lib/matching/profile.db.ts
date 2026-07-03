@@ -8,6 +8,8 @@ export type ConsumerProfileStatus =
 
 export type RepresentationSide = 'buying' | 'selling' | 'both'
 
+export type Role = 'agent' | 'consumer'
+
 export const consumerProfileColumns = {
 	// Lifecycle
 	status: text().$type<ConsumerProfileStatus>().default('draft').notNull(),
