@@ -1,3 +1,5 @@
+import { SellerProfile } from '@/lib/matching/profile.types'
+
 export const mockSellerProfile = {
 	id: 'seller-1',
 	userId: 'user-1',
@@ -10,12 +12,19 @@ export const mockSellerProfile = {
 	estimatedHomeValue: '500000-750000',
 	propertyTypes: ['singleFamily'],
 	experienceLevel: 'firstTime',
-	preferredContactMethod: 'text',
+	quickCommunicationChannel: 'text',
+	updateDeliveryMethod: 'email',
 	involvementLevel: 'veryInvolved',
-	representationPreference: 'exclusive',
-	commissionComfort: 'explain',
+	saleMotivation: 'lifestyleChange',
+	successfulSaleLooksLike: 'strongPriceSmoothProcess',
+	agentDeliveryExpectations: ['pricedRight', 'honestStraightforward'],
+	homeConnection: 'goodMemories',
+	agentSilencePreference: 'milestones',
+	representationPreference: 'exclusiveRepresentationOnly',
+	responseTimeExpectation: 'within30Min',
+	commissionComfort: 'openOptions',
 	matchPriorities: null,
 	matchDetails: null,
 	createdAt: new Date(),
 	updatedAt: new Date(),
-}
+} satisfies SellerProfile
