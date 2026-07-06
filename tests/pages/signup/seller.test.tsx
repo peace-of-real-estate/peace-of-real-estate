@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import { sellerAnswerLabels } from '@/lib/matching/questions'
 
 async function clickSelector(id: string) {
 	await page.elementLocator(document.querySelector(id)!).click()
@@ -30,11 +31,16 @@ async function answerPreference(name: string) {
 }
 
 async function fillPreferencesStep() {
-	await answerPreference('Text')
-	await answerPreference('Very involved')
-	await answerPreference('Exclusive representation')
-	await answerPreference("I'm new, explain it to me")
-	await answerPreference("First time; I'll want guidance")
+	for (const config of Object.values(sellerAnswerLabels)) {
+		if (config.multiple) {
+			const optionLabels = Object.values(config.options)
+			await answerPreference(optionLabels[0])
+			await answerPreference(optionLabels[1])
+			await page.getByRole('button', { name: 'Next question' }).click()
+		} else {
+			await answerPreference(Object.values(config.options)[0])
+		}
+	}
 }
 
 describe('seller signup flow', () => {
@@ -50,9 +56,7 @@ describe('seller signup flow', () => {
 		await expectScreenshot(document.body, { name: 'step-2-home' })
 
 		await fillHomeStep()
-		await expectScreenshot(document.body, {
-			name: 'step-3-preferences',
-		})
+		await expectScreenshot(document.body, { name: 'step-3-preferences' })
 
 		await fillPreferencesStep()
 		await expectScreenshot(document.body, { name: 'step-4-preview' })
