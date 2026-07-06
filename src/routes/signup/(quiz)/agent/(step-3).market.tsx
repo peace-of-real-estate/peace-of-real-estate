@@ -137,6 +137,7 @@ function AgentMarket({
 					/>
 
 					<CityZipSelector
+						id="agent-market"
 						value={rawInitialLocation}
 						onChange={handleLocationChange}
 						zipCodes={selectedZipCodes}
