@@ -1,7 +1,6 @@
-import { setupServer, type SetupServer } from 'msw/node'
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { test as baseTest } from 'vite-plus/test'
+import { test as baseTest } from './server'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
 
@@ -30,23 +29,12 @@ export type Database = NodePgDatabase & {
 }
 
 export interface DbFixture {
-	server: SetupServer
-	_cleanup: void
 	db: Database
 	seedFunction: (db: Database) => Promise<void> | void
 }
 
 let dbConfig: DbConfig = {}
-let mswServer: SetupServer | undefined
 let seedFunction: (db: Database) => Promise<void> | void = async () => {}
-
-async function ensureMswServer(): Promise<SetupServer> {
-	if (!mswServer) {
-		const { default: handlers } = await import('@tests/__mocks__/handlers')
-		mswServer = setupServer(...handlers)
-	}
-	return mswServer
-}
 
 function findProjectRoot(start = process.cwd()) {
 	let directory = start
@@ -63,23 +51,12 @@ function findProjectRoot(start = process.cwd()) {
 }
 
 export const test = baseTest.extend<DbFixture>({
-	server: [
+	seedFunction: [
 		async ({}, use) => {
-			const server = await ensureMswServer()
-			server.listen({ onUnhandledRequest: 'bypass' })
-			await use(server)
-			server.close()
+			await use(seedFunction)
 		},
-		{ auto: true, scope: 'worker' },
+		{ scope: 'file' },
 	],
-	_cleanup: [
-		async ({ server }, use) => {
-			await use()
-			server.resetHandlers()
-		},
-		{ auto: true },
-	],
-	seedFunction: [async ({}, use) => use(seedFunction), { scope: 'file' }],
 	db: [
 		async ({ seedFunction }, use) => {
 			const { PostgreSqlContainer } = await import('@testcontainers/postgresql')

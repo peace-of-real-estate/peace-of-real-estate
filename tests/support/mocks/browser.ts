@@ -1,4 +1,7 @@
 import { vi } from 'vite-plus/test'
+import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
+import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
+import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
 type MockSession = unknown
 
@@ -53,67 +56,43 @@ vi.mock('@/routes/__root', async () => {
 })
 
 vi.mock('@/lib/matching/profile', async () => {
-	const actual = await vi.importActual<
-		typeof import('@/lib/matching/profile.types')
-	>('@/lib/matching/profile.types')
+	const actual = await vi.importActual<typeof import('@/lib/matching/profile')>(
+		'@/lib/matching/profile',
+	)
 	return {
 		...actual,
-		loadConsumerProfile: () =>
-			Promise.resolve({
-				id: 'consumer-1',
-				userId: 'user-1',
-				status: 'draft',
-				intent: 'buying',
-				city: 'Austin',
-				state: 'TX',
-				priceRange: '400000-750000',
-				propertyTypes: ['singleFamily'],
-				experienceLevel: 'firstTime',
-				preferredContactMethod: 'text',
-				involvementLevel: 'veryInvolved',
-				representationPreference: 'exclusive',
-				commissionComfort: 'explain',
-				matchPriorities: null,
-				matchDetails: null,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			}),
-		upsertConsumerProfile: () => Promise.resolve(),
+		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
+		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
 		loadAgentProfile: () => Promise.resolve(null),
-		updateAgentProfile: () => Promise.resolve(),
-		createConsumerProfileFromDraft: () => Promise.resolve({ success: true }),
+		loadBuyerAgentMatches: () => Promise.resolve(mockAgentMatches),
+		loadSellerAgentMatches: () => Promise.resolve(mockAgentMatches),
+		loadAgentMatches: () => Promise.resolve(mockAgentMatches),
+		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
+		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
 		completeAgentSignup: () => Promise.resolve({ success: true }),
-		loadAgentMatches: () =>
-			Promise.resolve([
-				{
-					id: 'agent-1',
-					name: 'Sarah Chen',
-					role: 'agent',
-					location: 'Austin, TX',
-					zipCodes: ['78701'],
-					fitScore: 96,
-					status: 'new',
-					date: '2026-04-21',
-					experience: '12 years',
-					agency: 'Horizon Realty Group',
-					specialties: ['First-time buyers', 'Luxury homes'],
-					about: 'Known for patient guidance and transparent communication.',
-					scores: {
-						'Working Style': 4.9,
-						Communication: 4.7,
-						Transparency: 4.8,
-						Fit: 4.9,
-					},
-					isTopMatch: true,
-				},
-			]),
+		updateAgentProfile: () => Promise.resolve(),
 	}
 })
 
-vi.mock('@/components/signup/questions', async () => {
+vi.mock('@/lib/geography/zip', async () => {
+	const actual = await vi.importActual<typeof import('@/lib/geography/zip')>(
+		'@/lib/geography/zip',
+	)
+	return {
+		...actual,
+		loadCitySuggestions: async () => ['Austin, TX'],
+		loadCityCenter: async () => ({ latitude: 30.2672, longitude: -97.7431 }),
+		loadZipCodeBoundaries: async () => ({
+			type: 'FeatureCollection',
+			features: [],
+		}),
+	}
+})
+
+vi.mock('@/lib/matching/questions', async () => {
 	const actual = await vi.importActual<
-		typeof import('@/components/signup/questions')
-	>('@/components/signup/questions')
+		typeof import('@/lib/matching/questions')
+	>('@/lib/matching/questions')
 	return {
 		...actual,
 		getAnswerSummary: (
