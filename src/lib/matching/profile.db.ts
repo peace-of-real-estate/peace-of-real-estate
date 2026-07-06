@@ -1,6 +1,6 @@
 import { boolean, text, timestamp } from 'drizzle-orm/pg-core'
 
-export type ConsumerProfileStatus =
+export type ProfileStatus =
 	| 'draft'
 	| 'essentials_submitted'
 	| 'active'
@@ -8,12 +8,11 @@ export type ConsumerProfileStatus =
 
 export type RepresentationSide = 'buying' | 'selling' | 'both'
 
-export const consumerProfileColumns = {
+export const clientProfileColumns = {
 	// Lifecycle
-	status: text().$type<ConsumerProfileStatus>().default('draft').notNull(),
+	status: text().$type<ProfileStatus>().default('draft').notNull(),
 
 	// Profile
-	intent: text().$type<RepresentationSide>().notNull(),
 	state: text(),
 	city: text(),
 	zipCodes: text('zip_codes').array().notNull().default([]),

@@ -22,7 +22,8 @@ import { db } from '../../../src/db/connection'
 import {
 	account,
 	agentProfiles,
-	consumerProfiles,
+	buyerProfiles,
+	sellerProfiles,
 	session,
 	user,
 	userEntitlements,
@@ -52,7 +53,8 @@ function generatePersona() {
 async function clearFakeData() {
 	console.log('Clearing existing seed data...')
 
-	await db.delete(consumerProfiles)
+	await db.delete(sellerProfiles)
+	await db.delete(buyerProfiles)
 	await db.delete(agentProfiles)
 	await db.delete(session)
 	await db.delete(account)

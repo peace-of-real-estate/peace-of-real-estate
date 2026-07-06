@@ -1,11 +1,11 @@
-import {
-	AGENT_PRICE_RANGES,
-	parsePriceRange,
-} from '@/components/signup/price-range'
+import { AGENT_PRICE_RANGES, parsePriceRange } from '@/lib/matching/price-range'
 import type {
 	AgentProfile,
-	ConsumerProfile,
+	BuyerProfile,
+	SellerProfile,
 } from '@/lib/matching/profile.types'
+
+type ClientProfile = BuyerProfile | SellerProfile
 
 export interface AgentMatchData {
 	id: string
@@ -70,12 +70,12 @@ function categoryWeight(
 }
 
 function hasAnyCompatible(
-	consumerValue: string | null | undefined,
+	clientValue: string | null | undefined,
 	compatibility: Record<string, string[]>,
 	agentValues: string[] | null | undefined,
 ): boolean {
-	if (!consumerValue || !agentValues || agentValues.length === 0) return false
-	const compatible = compatibility[consumerValue] ?? []
+	if (!clientValue || !agentValues || agentValues.length === 0) return false
+	const compatible = compatibility[clientValue] ?? []
 	return agentValues.some((value) => compatible.includes(value))
 }
 
@@ -88,21 +88,22 @@ function hasOverlap(
 }
 
 function priceRangeMatch(
-	consumerRange: string | null | undefined,
+	clientRange: string | null | undefined,
 	agentRange: string | null | undefined,
 ): boolean {
-	const consumer = parsePriceRange(consumerRange)
+	const client = parsePriceRange(clientRange)
 	const agentSlug = agentRange?.trim() ?? ''
 	const agent = AGENT_PRICE_RANGES[agentSlug]
 	if (!agent) return false
-	return consumer.min < agent.max && consumer.max > agent.min
+	return client.min < agent.max && client.max > agent.min
 }
 
 export function calculateFitScore(
 	agent: AgentProfile,
-	consumer?: ConsumerProfile,
+	client?: ClientProfile,
+	side: 'buying' | 'selling' = 'buying',
 ): { fitScore: number; scores: Record<ScoreBucket, number> } {
-	if (!consumer) return calculateFallbackScore(agent)
+	if (!client) return calculateFallbackScore(agent)
 
 	const buckets: Record<ScoreBucket, { points: number; max: number }> = {
 		'Working Style': { points: 0, max: 0 },
@@ -120,16 +121,16 @@ export function calculateFitScore(
 		max: number,
 		questionIds: string[],
 	) => {
-		const weight = categoryWeight(questionIds, consumer.matchPriorities)
+		const weight = categoryWeight(questionIds, client.matchPriorities)
 		weightedPoints += points * weight
 		weightedMax += max * weight
 		buckets[bucket].points += points
 		buckets[bucket].max += max
 	}
 
-	const consumerPropertyTypes = consumer.propertyTypes ?? []
+	const clientPropertyTypes = client.propertyTypes ?? []
 	const agentClientTypes = agent.bestClientTypes
-	const propertyClientMatches = consumerPropertyTypes.flatMap(
+	const propertyClientMatches = clientPropertyTypes.flatMap(
 		(type) => propertyTypeToClientType[type] ?? [],
 	)
 	add('Fit', hasOverlap(propertyClientMatches, agentClientTypes) ? 1 : 0, 1, [
@@ -139,7 +140,7 @@ export function calculateFitScore(
 	add(
 		'Fit',
 		hasAnyCompatible(
-			consumer.experienceLevel,
+			client.experienceLevel,
 			experienceCompatibility,
 			agentClientTypes,
 		)
@@ -151,8 +152,7 @@ export function calculateFitScore(
 
 	add(
 		'Fit',
-		agent.representationSide === 'both' ||
-			agent.representationSide === consumer.intent
+		agent.representationSide === 'both' || agent.representationSide === side
 			? 2
 			: 0,
 		2,
@@ -161,7 +161,7 @@ export function calculateFitScore(
 
 	add(
 		'Fit',
-		priceRangeMatch(consumer.priceRange, agent.typicalPriceRange) ? 2 : 0,
+		priceRangeMatch(client.priceRange, agent.typicalPriceRange) ? 2 : 0,
 		2,
 		['priceRange'],
 	)
@@ -171,8 +171,8 @@ export function calculateFitScore(
 		agent.zipCodes.some(
 			(area) =>
 				area &&
-				consumer.state &&
-				area.toLowerCase() === consumer.state.toLowerCase(),
+				client.state &&
+				area.toLowerCase() === client.state.toLowerCase(),
 		)
 			? 1
 			: 0,

@@ -127,15 +127,15 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: 'unit',
-					include: ['src/**/*.test.unit.ts'],
+					include: ['src/**/*.test.ts'],
 				},
 			},
 			{
 				extends: true,
 				test: {
 					name: 'server',
-					include: ['src/**/*.test.ts'],
-					testTimeout: 15_000,
+					include: ['src/**/*.{server,db}.ts'],
+					testTimeout: 5_000,
 					fileParallelism: false,
 				},
 			},
@@ -143,8 +143,8 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: 'browser',
-					include: ['src/**/*.test.tsx', 'tests/**/*.test.tsx'],
-					setupFiles: ['./tests/__mocks__/styles.ts'],
+					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
+					setupFiles: ['./tests/support/mocks/styles.ts'],
 					testTimeout: 20_000,
 					browser: {
 						instances: [{ browser: 'chromium' }],

@@ -1,0 +1,27 @@
+{
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1783336137118,
+			"tag": "0000_baseline",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1783336153357,
+			"tag": "0001_add_buyer_seller_profiles",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1783336162927,
+			"tag": "0002_split_consumer_profiles",
+			"breakpoints": true
+		}
+	]
+}
