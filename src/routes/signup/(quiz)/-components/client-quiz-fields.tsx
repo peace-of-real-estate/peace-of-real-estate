@@ -40,9 +40,8 @@ import {
 } from '@/lib/matching/price-range'
 import type {
 	BuyerDraft,
-	BuyerProfile,
+	ClientProfile,
 	SellerDraft,
-	SellerProfile,
 } from '@/lib/matching/profile'
 import {
 	clientAnswerLabels,
@@ -62,7 +61,7 @@ import { PriceInput } from './price-input'
 
 export type ClientSignupStep = 'location' | 'home' | 'preferences' | 'preview'
 export type ClientDraft = BuyerDraft | SellerDraft
-export type ClientProfile = BuyerProfile | SellerProfile
+export type ClientQuizProfile = ClientProfile
 
 const timelineOptions = [
 	{ slug: 'exploring', label: 'Just exploring' },

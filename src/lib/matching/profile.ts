@@ -21,11 +21,6 @@ export type {
 } from '@/lib/matching/profile.db'
 
 export {
-	agentProfileColumns,
-	clientProfileColumns,
-} from '@/lib/matching/profile.db'
-
-export {
 	agentProfileCreateSchema,
 	buyerProfileCreateSchema,
 	sellerProfileCreateSchema,
@@ -35,14 +30,25 @@ export type {
 	AgentDraft,
 	AgentProfile,
 	AgentProfileCreateInput,
+	AgentProfileUpdate,
+	BuyerClientProfile,
 	BuyerDraft,
 	BuyerProfile,
 	BuyerProfileCreateInput,
 	BuyerProfileUpdate,
+	ClientProfile,
+	SellerClientProfile,
 	SellerDraft,
 	SellerProfile,
 	SellerProfileCreateInput,
 	SellerProfileUpdate,
+} from '@/lib/matching/profile.types'
+
+export {
+	buyerClientProfileSchema,
+	isBuyerClientProfile,
+	isSellerClientProfile,
+	sellerClientProfileSchema,
 } from '@/lib/matching/profile.types'
 
 export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(

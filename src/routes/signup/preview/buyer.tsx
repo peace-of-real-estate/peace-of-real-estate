@@ -14,9 +14,7 @@ export const Route = createFileRoute('/signup/preview/buyer')({
 })
 
 function BuyerPreviewRoute() {
-	const profile = draftToClientPreviewProfile(
-		buyerDraftStorage.load() ?? { zipCodes: [] },
-	)
+	const profile = draftToClientPreviewProfile('buyer', buyerDraftStorage.load())
 
 	return (
 		<SignupPreviewShell
@@ -37,7 +35,7 @@ function BuyerPreviewRoute() {
 		>
 			<div className="mx-auto w-full max-w-2xl space-y-6">
 				<PreviewHeader />
-				<ClientProfilePreviewCard profile={profile} profileLabel="buyer" />
+				<ClientProfilePreviewCard profile={profile} />
 				<ClientMatchesPreview />
 			</div>
 		</SignupPreviewShell>

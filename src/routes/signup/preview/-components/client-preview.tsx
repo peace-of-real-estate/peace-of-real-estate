@@ -13,52 +13,31 @@ import {
 import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
 import { Card } from '@/components/ui/card'
 import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
-import type {
-	BuyerDraft,
-	BuyerProfile,
-	SellerDraft,
-	SellerProfile,
+import {
+	buyerClientProfileSchema,
+	sellerClientProfileSchema,
+	type ClientProfile,
 } from '@/lib/matching/profile'
 import {
 	clientAnswerLabels,
 	propertyTypeOptions,
 } from '@/lib/matching/questions'
 
-export type ClientProfile = BuyerProfile | SellerProfile
-
 export function draftToClientPreviewProfile(
-	draft: BuyerDraft | SellerDraft,
+	role: 'buyer' | 'seller',
+	draft: Record<string, unknown> | null | undefined,
 ): ClientProfile {
-	const now = new Date()
-	return {
-		id: 'preview',
-		userId: 'preview',
-		status: 'draft',
-		createdAt: now,
-		updatedAt: now,
-		state: draft.state ?? null,
-		city: draft.city ?? null,
-		zipCodes: draft.zipCodes ?? [],
-		timeline: draft.timeline ?? null,
-		priceRange: draft.priceRange ?? null,
-		estimatedHomeValue: null,
-		propertyTypes: draft.propertyTypes ?? null,
-		experienceLevel: draft.experienceLevel ?? null,
-		preferredContactMethod: draft.preferredContactMethod ?? null,
-		involvementLevel: draft.involvementLevel ?? null,
-		representationPreference: draft.representationPreference ?? null,
-		commissionComfort: draft.commissionComfort ?? null,
-		matchPriorities: draft.matchPriorities ?? null,
-		matchDetails: null,
-	} as ClientProfile
+	const input = draft ?? {}
+	if (role === 'buyer') {
+		return buyerClientProfileSchema.parse({ role, ...input })
+	}
+	return sellerClientProfileSchema.parse({ role, ...input })
 }
 
 export function ClientProfilePreviewCard({
 	profile,
-	profileLabel,
 }: {
 	profile: ClientProfile
-	profileLabel: 'buyer' | 'seller'
 }) {
 	const stateSvgPath = profile.state
 		? `/states/${profile.state}.svg`
@@ -67,7 +46,7 @@ export function ClientProfilePreviewCard({
 	const profileTitle =
 		profile.city ??
 		profile.state ??
-		(profileLabel === 'buyer' ? 'Buyer' : 'Seller')
+		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
 		<Card className="gap-0 rounded-2xl border-slate-200 bg-white p-0 shadow-sm">
