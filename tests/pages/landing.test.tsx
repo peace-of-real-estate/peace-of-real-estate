@@ -10,7 +10,7 @@ test('landing page renders', async () => {
 
 test('landing page profile type dialog opens', async () => {
 	await renderRoute({ path: '/' })
-	const cta = page.getByRole('button', { name: 'Find Your Agent' })
+	const cta = page.getByRole('button', { name: 'Find an Agent' })
 	await expect.element(cta).toBeVisible()
 	await cta.click()
 	await expect
