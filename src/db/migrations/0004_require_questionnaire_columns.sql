@@ -1,23 +1,26 @@
 -- Signup only inserts a profile row once every question is answered, so the
--- questionnaire columns become NOT NULL. Rows from earlier question sets are
--- missing answers and are removed; those users redo signup.
+-- questionnaire columns become NOT NULL. Rows from earlier question sets get
+-- a neutral default for unanswered questions; rows missing essentials that
+-- cannot be invented (location, price, property types) are removed.
 
 -- buyer_profiles
 DELETE FROM "buyer_profiles"
 WHERE "state" IS NULL
 	OR "city" IS NULL
-	OR "timeline" IS NULL
 	OR "price_range" IS NULL
-	OR "property_types" IS NULL
-	OR "involvement_level" IS NULL
-	OR "quick_communication_channel" IS NULL
-	OR "update_delivery_method" IS NULL
-	OR "commission_comfort" IS NULL
-	OR "response_time_expectation" IS NULL
-	OR "experience_level" IS NULL
-	OR "ideal_agent_relationship" IS NULL
-	OR "decision_making_need" IS NULL
-	OR "bidding_war_response" IS NULL;
+	OR "property_types" IS NULL;
+
+UPDATE "buyer_profiles" SET
+	"timeline" = COALESCE("timeline", 'exploring'),
+	"involvement_level" = COALESCE("involvement_level", 'keyDetails'),
+	"quick_communication_channel" = COALESCE("quick_communication_channel", 'either'),
+	"update_delivery_method" = COALESCE("update_delivery_method", 'email'),
+	"commission_comfort" = COALESCE("commission_comfort", 'openOptions'),
+	"response_time_expectation" = COALESCE("response_time_expectation", 'fewHours'),
+	"experience_level" = COALESCE("experience_level", 'experienced'),
+	"ideal_agent_relationship" = COALESCE("ideal_agent_relationship", 'trustedAdvisor'),
+	"decision_making_need" = COALESCE("decision_making_need", 'trustedPerspective'),
+	"bidding_war_response" = COALESCE("bidding_war_response", 'factsOptions');
 
 ALTER TABLE "buyer_profiles"
 	DROP COLUMN IF EXISTS "estimated_home_value",
@@ -41,20 +44,22 @@ ALTER TABLE "buyer_profiles"
 DELETE FROM "seller_profiles"
 WHERE "state" IS NULL
 	OR "city" IS NULL
-	OR "timeline" IS NULL
 	OR "price_range" IS NULL
-	OR "property_types" IS NULL
-	OR "involvement_level" IS NULL
-	OR "quick_communication_channel" IS NULL
-	OR "update_delivery_method" IS NULL
-	OR "commission_comfort" IS NULL
-	OR "response_time_expectation" IS NULL
-	OR "sale_motivation" IS NULL
-	OR "successful_sale_looks_like" IS NULL
-	OR "agent_delivery_expectations" IS NULL
-	OR "home_connection" IS NULL
-	OR "agent_silence_preference" IS NULL
-	OR "representation_preference" IS NULL;
+	OR "property_types" IS NULL;
+
+UPDATE "seller_profiles" SET
+	"timeline" = COALESCE("timeline", 'exploring'),
+	"involvement_level" = COALESCE("involvement_level", 'keepMeInformed'),
+	"quick_communication_channel" = COALESCE("quick_communication_channel", 'either'),
+	"update_delivery_method" = COALESCE("update_delivery_method", 'email'),
+	"commission_comfort" = COALESCE("commission_comfort", 'openOptions'),
+	"response_time_expectation" = COALESCE("response_time_expectation", 'fewHours'),
+	"sale_motivation" = COALESCE("sale_motivation", 'rightTime'),
+	"successful_sale_looks_like" = COALESCE("successful_sale_looks_like", 'strongPriceSmoothProcess'),
+	"agent_delivery_expectations" = COALESCE("agent_delivery_expectations", '{honestStraightforward}'),
+	"home_connection" = COALESCE("home_connection", 'goodMemories'),
+	"agent_silence_preference" = COALESCE("agent_silence_preference", 'milestones'),
+	"representation_preference" = COALESCE("representation_preference", 'exclusiveRepresentationOnly');
 
 ALTER TABLE "seller_profiles"
 	DROP COLUMN IF EXISTS "estimated_home_value",
@@ -77,15 +82,15 @@ ALTER TABLE "seller_profiles"
 	ALTER COLUMN "representation_preference" SET NOT NULL;
 
 -- agent_profiles
-DELETE FROM "agent_profiles"
-WHERE "client_description" IS NULL
-	OR "communication_frequency" IS NULL
-	OR "quick_communication_channel" IS NULL
-	OR "update_delivery_method" IS NULL
-	OR "difficult_deal_instinct" IS NULL
-	OR "response_time" IS NULL
-	OR "commission_approach" IS NULL
-	OR "unrepresented_buyer_approach" IS NULL;
+UPDATE "agent_profiles" SET
+	"client_description" = COALESCE("client_description", 'calmSteady'),
+	"communication_frequency" = COALESCE("communication_frequency", 'milestones'),
+	"quick_communication_channel" = COALESCE("quick_communication_channel", 'either'),
+	"update_delivery_method" = COALESCE("update_delivery_method", 'email'),
+	"difficult_deal_instinct" = COALESCE("difficult_deal_instinct", 'deEscalateFirst'),
+	"response_time" = COALESCE("response_time", 'fewHours'),
+	"commission_approach" = COALESCE("commission_approach", 'proactiveOpen'),
+	"unrepresented_buyer_approach" = COALESCE("unrepresented_buyer_approach", 'referSeparateBrokerage');
 
 ALTER TABLE "agent_profiles"
 	ALTER COLUMN "client_description" SET NOT NULL,
