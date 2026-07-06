@@ -3,10 +3,6 @@ import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 async function clickSelector(id: string) {
 	await page.elementLocator(document.querySelector(id)!).click()
 }
@@ -31,7 +27,6 @@ async function answerPreference(name: string) {
 	const option = page.getByRole('button', { name, exact: true })
 	await expect.element(option).toBeVisible()
 	await option.click()
-	await sleep(200)
 }
 
 async function fillPreferencesStep() {

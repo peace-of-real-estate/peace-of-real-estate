@@ -3,10 +3,6 @@ import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 async function clickSelector(id: string) {
 	await page.elementLocator(document.querySelector(id)!).click()
 }
@@ -60,26 +56,21 @@ describe('agent signup flow', () => {
 		await expectScreenshot(document.body, { name: 'step-1-intro' })
 
 		await page.getByRole('button', { name: 'Start' }).click()
-		await sleep(300)
 		await expectScreenshot(document.body, { name: 'step-2-identity' })
 
 		await fillIdentityStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
 		await expectScreenshot(document.body, { name: 'step-3-market' })
 
 		await fillMarketStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
 		await expectScreenshot(document.body, { name: 'step-4-compliance' })
 
 		await fillComplianceStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
 
 		await fillPeacePactStep()
 		await page.getByRole('button', { name: 'Sign & continue' }).click()
-		await sleep(300)
 		await expectScreenshot(document.body, { name: 'step-5-preview' })
 	})
 }, 20_000)
