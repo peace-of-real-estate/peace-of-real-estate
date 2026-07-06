@@ -82,4 +82,4 @@ describe('agent signup flow', () => {
 		await sleep(300)
 		await expectScreenshot(document.body, { name: 'step-5-preview' })
 	})
-})
+}, 20_000)

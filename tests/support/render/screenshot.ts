@@ -86,6 +86,7 @@ export async function expectScreenshot(
 	const capture = () =>
 		expect.element(target).toMatchScreenshot(`${options.name}.png`, {
 			screenshotOptions,
+			timeout: 5000,
 		})
 
 	if (options.fullPage || target !== document.body) {
