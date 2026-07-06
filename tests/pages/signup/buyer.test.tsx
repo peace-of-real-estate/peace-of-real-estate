@@ -32,7 +32,10 @@ async function answerPreference(name: string) {
 
 async function fillPreferencesStep() {
 	for (const config of Object.values(buyerAnswerLabels)) {
-		await answerPreference(Object.values(config.options)[0])
+		const [firstOption] = Object.values(config.options)
+		if (!firstOption)
+			throw new Error(`Question "${config.label}" has no options`)
+		await answerPreference(firstOption)
 	}
 }
 

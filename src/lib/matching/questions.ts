@@ -24,11 +24,6 @@ export const answersSchema: z.ZodType<Answers> = z.record(
 	answerValueSchema,
 )
 
-export type QuestionFlow = {
-	label: string
-	questions: Question[]
-}
-
 export function questionOptionEntries(question: Question): [string, string][] {
 	return Object.entries(question.options)
 }
@@ -83,19 +78,16 @@ export function isFreeForm(question: Question): boolean {
 	return question.freeForm === true
 }
 
-export function hasOptions(question: Question): boolean {
-	return Object.keys(question.options).length > 0
+type AnswerLabelConfig = {
+	title: string
+	label: string
+	options: Record<string, string>
+	multiple?: boolean
 }
 
-export const buyerAnswerLabels: Record<
-	string,
-	{
-		title: string
-		label: string
-		options: Record<string, string>
-		multiple?: boolean
-	}
-> = {
+export type AnswerLabels = Record<string, AnswerLabelConfig>
+
+export const buyerAnswerLabels: AnswerLabels = {
 	experienceLevel: {
 		title: 'How familiar does this process feel?',
 		label: 'Experience',
@@ -183,15 +175,7 @@ export const buyerAnswerLabels: Record<
 	},
 }
 
-export const sellerAnswerLabels: Record<
-	string,
-	{
-		title: string
-		label: string
-		options: Record<string, string>
-		multiple?: boolean
-	}
-> = {
+export const sellerAnswerLabels: AnswerLabels = {
 	saleMotivation: {
 		title: 'What is driving this sale?',
 		label: 'Motivation',
@@ -303,28 +287,7 @@ export const sellerAnswerLabels: Record<
 	},
 }
 
-export const clientAnswerLabels: Record<
-	string,
-	{
-		title: string
-		label: string
-		options: Record<string, string>
-		multiple?: boolean
-	}
-> = {
-	...buyerAnswerLabels,
-	...sellerAnswerLabels,
-}
-
-export const agentAnswerLabels: Record<
-	string,
-	{
-		title: string
-		label: string
-		options: Record<string, string>
-		multiple?: boolean
-	}
-> = {
+export const agentAnswerLabels: AnswerLabels = {
 	typicalPriceRange: {
 		title: 'What is your typical price range?',
 		label: 'Price range',

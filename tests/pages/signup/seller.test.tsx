@@ -32,13 +32,15 @@ async function answerPreference(name: string) {
 
 async function fillPreferencesStep() {
 	for (const config of Object.values(sellerAnswerLabels)) {
+		const [firstOption, secondOption] = Object.values(config.options)
+		if (!firstOption || !secondOption)
+			throw new Error(`Question "${config.label}" has fewer than two options`)
 		if (config.multiple) {
-			const optionLabels = Object.values(config.options)
-			await answerPreference(optionLabels[0])
-			await answerPreference(optionLabels[1])
+			await answerPreference(firstOption)
+			await answerPreference(secondOption)
 			await page.getByRole('button', { name: 'Next question' }).click()
 		} else {
-			await answerPreference(Object.values(config.options)[0])
+			await answerPreference(firstOption)
 		}
 	}
 }
