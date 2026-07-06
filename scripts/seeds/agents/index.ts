@@ -19,6 +19,7 @@ import {
 import { pickWeighted, sample } from './stats'
 
 import { db } from '../../../src/db/connection'
+import { agentAnswerLabels } from '../../../src/lib/matching/questions'
 import {
 	account,
 	agentProfiles,
@@ -29,6 +30,10 @@ import {
 	userEntitlements,
 } from '../../../src/db/tables'
 import { uploadAgentAvatar } from '../avatars'
+
+function pickAnswer(questionId: string) {
+	return pick(Object.keys(agentAnswerLabels[questionId]!.options))
+}
 
 function generatePersona() {
 	const priceTier = pickWeighted(PRICE_TIERS)
@@ -44,6 +49,14 @@ function generatePersona() {
 		yearsLicensed: approxLabel(YEARS_LABELS, years),
 		averageTransactions: approxLabel(TRANSACTION_LABELS, avgTrans),
 		employmentStatus: pick(EMPLOYMENT_STATUSES),
+		clientDescription: pickAnswer('clientDescription'),
+		communicationFrequency: pickAnswer('communicationFrequency'),
+		quickCommunicationChannel: pickAnswer('quickCommunicationChannel'),
+		updateDeliveryMethod: pickAnswer('updateDeliveryMethod'),
+		difficultDealInstinct: pickAnswer('difficultDealInstinct'),
+		responseTime: pickAnswer('responseTime'),
+		commissionApproach: pickAnswer('commissionApproach'),
+		unrepresentedBuyerApproach: pickAnswer('unrepresentedBuyerApproach'),
 		eoInsuranceStatus: pick(EO_INSURANCE_STATUSES),
 		peacePactSigned: Math.random() < 0.75,
 		usePaxWriter: Math.random() < 0.8,
@@ -118,6 +131,14 @@ async function insertAgent(location: City, now: Date) {
 		yearsLicensed: persona.yearsLicensed,
 		averageTransactions: persona.averageTransactions,
 		employmentStatus: persona.employmentStatus,
+		clientDescription: persona.clientDescription,
+		communicationFrequency: persona.communicationFrequency,
+		quickCommunicationChannel: persona.quickCommunicationChannel,
+		updateDeliveryMethod: persona.updateDeliveryMethod,
+		difficultDealInstinct: persona.difficultDealInstinct,
+		responseTime: persona.responseTime,
+		commissionApproach: persona.commissionApproach,
+		unrepresentedBuyerApproach: persona.unrepresentedBuyerApproach,
 		usePaxWriter: persona.usePaxWriter,
 		licenseAttested: true,
 		eoInsuranceStatus: persona.eoInsuranceStatus,

@@ -140,7 +140,7 @@ export function calculateFitScore(
 	add(
 		'Fit',
 		hasAnyCompatible(
-			client.experienceLevel,
+			'experienceLevel' in client ? client.experienceLevel : null,
 			experienceCompatibility,
 			agentClientTypes,
 		)

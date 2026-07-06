@@ -180,7 +180,7 @@ export function ClientLocationFields({
 							}
 							onUpdate({
 								city: cityState?.city ?? committedLocation.trim(),
-								state: cityState?.state,
+								...(cityState?.state ? { state: cityState.state } : {}),
 								zipCodes: selectedZipCodes,
 							})
 							onContinue()

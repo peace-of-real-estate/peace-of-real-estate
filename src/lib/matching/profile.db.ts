@@ -12,37 +12,42 @@ export const commonClientProfileColumns = {
 	// Lifecycle
 	status: text().$type<ProfileStatus>().default('draft').notNull(),
 
-	// Profile
-	state: text(),
-	city: text(),
+	// Profile — required before a profile row is created
+	state: text().notNull(),
+	city: text().notNull(),
 	zipCodes: text('zip_codes').array().notNull().default([]),
-	timeline: text(),
-	priceRange: text('price_range'),
-	estimatedHomeValue: text('estimated_home_value'),
-	propertyTypes: text('property_types').array(),
-	experienceLevel: text('experience_level'),
-	involvementLevel: text('involvement_level'),
-	quickCommunicationChannel: text('quick_communication_channel'),
-	updateDeliveryMethod: text('update_delivery_method'),
-	representationPreference: text('representation_preference'),
-	commissionComfort: text('commission_comfort'),
-	responseTimeExpectation: text('response_time_expectation'),
+	timeline: text().notNull(),
+	priceRange: text('price_range').notNull(),
+	propertyTypes: text('property_types').array().notNull(),
+
+	// Preferences quiz — asked of both buyers and sellers
+	involvementLevel: text('involvement_level').notNull(),
+	quickCommunicationChannel: text('quick_communication_channel').notNull(),
+	updateDeliveryMethod: text('update_delivery_method').notNull(),
+	commissionComfort: text('commission_comfort').notNull(),
+	responseTimeExpectation: text('response_time_expectation').notNull(),
+
+	// Match tuning — not collected during signup
 	matchPriorities: text('match_priorities').array(),
 	matchDetails: text('match_details'),
 }
 
 export const buyerSpecificProfileColumns = {
-	idealAgentRelationship: text('ideal_agent_relationship'),
-	decisionMakingNeed: text('decision_making_need'),
-	biddingWarResponse: text('bidding_war_response'),
+	experienceLevel: text('experience_level').notNull(),
+	idealAgentRelationship: text('ideal_agent_relationship').notNull(),
+	decisionMakingNeed: text('decision_making_need').notNull(),
+	biddingWarResponse: text('bidding_war_response').notNull(),
 }
 
 export const sellerSpecificProfileColumns = {
-	saleMotivation: text('sale_motivation'),
-	successfulSaleLooksLike: text('successful_sale_looks_like'),
-	agentDeliveryExpectations: text('agent_delivery_expectations').array(),
-	homeConnection: text('home_connection'),
-	agentSilencePreference: text('agent_silence_preference'),
+	saleMotivation: text('sale_motivation').notNull(),
+	successfulSaleLooksLike: text('successful_sale_looks_like').notNull(),
+	agentDeliveryExpectations: text('agent_delivery_expectations')
+		.array()
+		.notNull(),
+	homeConnection: text('home_connection').notNull(),
+	agentSilencePreference: text('agent_silence_preference').notNull(),
+	representationPreference: text('representation_preference').notNull(),
 }
 
 export const agentProfileColumns = {
@@ -72,14 +77,14 @@ export const agentProfileColumns = {
 	licenseProof: text('license_proof'),
 
 	// Work style
-	clientDescription: text('client_description'),
-	communicationFrequency: text('communication_frequency'),
-	quickCommunicationChannel: text('quick_communication_channel'),
-	updateDeliveryMethod: text('update_delivery_method'),
-	difficultDealInstinct: text('difficult_deal_instinct'),
-	responseTime: text('response_time'),
-	commissionApproach: text('commission_approach'),
-	unrepresentedBuyerApproach: text('unrepresented_buyer_approach'),
+	clientDescription: text('client_description').notNull(),
+	communicationFrequency: text('communication_frequency').notNull(),
+	quickCommunicationChannel: text('quick_communication_channel').notNull(),
+	updateDeliveryMethod: text('update_delivery_method').notNull(),
+	difficultDealInstinct: text('difficult_deal_instinct').notNull(),
+	responseTime: text('response_time').notNull(),
+	commissionApproach: text('commission_approach').notNull(),
+	unrepresentedBuyerApproach: text('unrepresented_buyer_approach').notNull(),
 
 	// Compliance
 	usePaxWriter: boolean('use_pax_writer').default(true).notNull(),
