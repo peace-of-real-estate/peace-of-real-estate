@@ -88,26 +88,3 @@ vi.mock('@/lib/geography/zip', async () => {
 		}),
 	}
 })
-
-vi.mock('@/lib/matching/questions', async () => {
-	const actual = await vi.importActual<
-		typeof import('@/lib/matching/questions')
-	>('@/lib/matching/questions')
-	return {
-		...actual,
-		getAnswerSummary: (
-			question: { options?: Record<string, string> },
-			answer: unknown,
-		) => {
-			if (typeof answer === 'string')
-				return question.options?.[answer] ?? 'Not answered'
-			if (Array.isArray(answer)) {
-				return answer
-					.map((index) => question.options?.[index])
-					.filter(Boolean)
-					.join(', ')
-			}
-			return typeof answer === 'string' ? answer : 'Not answered'
-		},
-	}
-})
