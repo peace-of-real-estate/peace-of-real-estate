@@ -13,10 +13,10 @@ import { sql } from 'drizzle-orm'
 
 import {
 	agentProfileColumns,
-	consumerProfileColumns,
+	clientProfileColumns,
 } from '@/lib/matching/profile.db'
 
-type EntitlementKey = 'consumer_lifetime_premium' | 'agent_subscription'
+type EntitlementKey = 'client_lifetime_premium' | 'agent_subscription'
 
 type EntitlementSource = 'manual' | 'stripe_checkout' | 'stripe_subscription'
 
@@ -138,29 +138,48 @@ export const verification = pgTable(
 	],
 )
 
-export const consumerProfiles = pgTable(
-	'consumer_profiles',
+export const buyerProfiles = pgTable(
+	'buyer_profiles',
 	{
 		id: text().primaryKey().notNull(),
 		userId: text('user_id').notNull(),
-		...consumerProfileColumns,
+		...clientProfileColumns,
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 	},
 	(table) => [
-		uniqueIndex('consumer_profiles_user_id_index').on(table.userId),
+		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
-			name: 'consumer_profiles_user_id_fk',
+			name: 'buyer_profiles_user_id_fk',
 		}),
 		check(
-			'consumer_profiles_status_check',
+			'buyer_profiles_status_check',
 			sql`${table.status} in ('draft', 'essentials_submitted', 'active', 'enriched')`,
 		),
+	],
+)
+
+export const sellerProfiles = pgTable(
+	'seller_profiles',
+	{
+		id: text().primaryKey().notNull(),
+		userId: text('user_id').notNull(),
+		...clientProfileColumns,
+		createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+	},
+	(table) => [
+		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: 'seller_profiles_user_id_fk',
+		}),
 		check(
-			'consumer_profiles_intent_check',
-			sql`${table.intent} in ('buying', 'selling', 'both')`,
+			'seller_profiles_status_check',
+			sql`${table.status} in ('draft', 'essentials_submitted', 'active', 'enriched')`,
 		),
 	],
 )

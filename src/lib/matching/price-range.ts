@@ -1,0 +1,69 @@
+export type PriceRange = {
+	min: number
+	max: number
+}
+
+export const PRICE_MIN = 0
+export const PRICE_MAX = 2_000_000
+export const PRICE_STEP = 50_000
+export const DEFAULT_PRICE_RANGE: PriceRange = { min: 400_000, max: 600_000 }
+
+export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
+	under400k: { min: 0, max: 400_000 },
+	'400kTo750k': { min: 400_000, max: 750_000 },
+	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
+	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
+}
+
+export function parsePriceRange(value: string | undefined | null): PriceRange {
+	if (!value) return { ...DEFAULT_PRICE_RANGE }
+	const [minRaw, maxRaw] = value.split('-')
+	const min = Number.parseInt(minRaw?.replace(/\D/g, '') ?? '', 10)
+	const max = Number.parseInt(maxRaw?.replace(/\D/g, '') ?? '', 10)
+	if (Number.isNaN(min) || Number.isNaN(max)) return { ...DEFAULT_PRICE_RANGE }
+	return {
+		min: Math.max(PRICE_MIN, Math.min(min, max)),
+		max: Math.min(PRICE_MAX, Math.max(min, max)),
+	}
+}
+
+export function serializePriceRange(range: PriceRange): string {
+	return `${range.min}-${range.max}`
+}
+
+export function formatPriceRange(range: PriceRange): string {
+	return `${formatPriceCompact(range.min)} - ${formatPriceCompact(range.max)}`
+}
+
+export function formatPrice(value: number): string {
+	return `$${value.toLocaleString()}`
+}
+
+export function formatPriceCompact(value: number): string {
+	if (value >= 1_000_000) {
+		const millions = value / 1_000_000
+		return `$${millions % 1 === 0 ? millions : millions.toFixed(1)}M`
+	}
+	return `$${value / 1000}k`
+}
+
+export function parseRawPrice(value: string): number | undefined {
+	const digits = value.replace(/\D/g, '')
+	const parsed = Number.parseInt(digits, 10)
+	return Number.isNaN(parsed) ? undefined : parsed
+}
+
+export function clampPrice(value: number): number {
+	return Math.max(PRICE_MIN, Math.min(value, PRICE_MAX))
+}
+
+export function priceRangeOverlaps(
+	clientRange: string | undefined | null,
+	agentRange: string | undefined | null,
+): boolean {
+	const client = parsePriceRange(clientRange)
+	const agentSlug = agentRange?.trim() ?? ''
+	const agent = AGENT_PRICE_RANGES[agentSlug]
+	if (!agent) return false
+	return client.min < agent.max && client.max > agent.min
+}

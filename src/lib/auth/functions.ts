@@ -23,19 +23,19 @@ export async function redirectAuthenticatedUsers() {
 	const session = await getCurrentSession()
 
 	if (session) {
-		throw redirect({ to: '/consumer/dashboard' })
+		throw redirect({ to: '/buyer' })
 	}
 }
 
 export async function redirectUnauthenticatedUsers({
-	redirectTo = '/consumer/dashboard/matches',
+	redirectTo = '/buyer/matches',
 }: {
 	redirectTo?: string
 } = {}) {
 	const session = await getCurrentSession()
 
 	if (!session) {
-		throw redirect({ to: '/login', search: { redirect: redirectTo } })
+		throw redirect({ to: '/auth/login', search: { redirect: redirectTo } })
 	}
 
 	return session

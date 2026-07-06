@@ -29,23 +29,23 @@ export const Route = createRootRouteWithContext<{
 	beforeLoad: async ({ location }) => {
 		const isBetaUser = hasBetaAccess()
 
-		if (!isBetaUser && location.pathname !== '/beta') {
-			throw redirect({ to: '/beta' })
+		if (!isBetaUser && location.pathname !== '/auth/beta') {
+			throw redirect({ to: '/auth/beta' })
 		}
 
-		if (isBetaUser && location.pathname === '/beta') {
+		if (isBetaUser && location.pathname === '/auth/beta') {
 			throw redirect({ to: '/' })
 		}
 
 		const session = await getCurrentSession()
-		const protectedPrefixes = ['/agent/dashboard/', '/consumer/dashboard/']
+		const protectedPrefixes = ['/agent/', '/buyer/', '/seller/']
 
 		if (
 			!session &&
 			protectedPrefixes.some((prefix) => location.pathname.startsWith(prefix))
 		) {
 			throw redirect({
-				to: '/login',
+				to: '/auth/login',
 				search: { redirect: location.pathname },
 			})
 		}

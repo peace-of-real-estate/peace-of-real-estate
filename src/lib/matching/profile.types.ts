@@ -1,23 +1,13 @@
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
-import { agentProfiles, consumerProfiles } from '@/db/tables'
+import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
 
-export type ConsumerProfile = typeof consumerProfiles.$inferSelect
+export type BuyerProfile = typeof buyerProfiles.$inferSelect
+
+export type SellerProfile = typeof sellerProfiles.$inferSelect
 
 export type AgentProfile = typeof agentProfiles.$inferSelect
-
-const consumerProfileCreateSchema = createInsertSchema(consumerProfiles)
-	.omit({
-		id: true,
-		userId: true,
-		createdAt: true,
-		updatedAt: true,
-	})
-	.extend({
-		intent: z.enum(['buying', 'selling', 'both']),
-		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
-	})
 
 const agentProfileCreateSchema = createInsertSchema(agentProfiles)
 	.omit({
@@ -30,18 +20,48 @@ const agentProfileCreateSchema = createInsertSchema(agentProfiles)
 		representationSide: z.enum(['buying', 'selling', 'both']),
 	})
 
-export { consumerProfileCreateSchema, agentProfileCreateSchema }
+const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
+	})
 
-export type ConsumerProfileCreateInput = z.infer<
-	typeof consumerProfileCreateSchema
->
+const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
+	})
+
+export {
+	agentProfileCreateSchema,
+	buyerProfileCreateSchema,
+	sellerProfileCreateSchema,
+}
+
+export type BuyerProfileCreateInput = z.infer<typeof buyerProfileCreateSchema>
+
+export type SellerProfileCreateInput = z.infer<typeof sellerProfileCreateSchema>
 
 export type AgentProfileCreateInput = z.infer<typeof agentProfileCreateSchema>
 
-export type ConsumerProfileUpdate = Partial<ConsumerProfileCreateInput>
+export type BuyerProfileUpdate = Partial<BuyerProfileCreateInput>
+
+export type SellerProfileUpdate = Partial<SellerProfileCreateInput>
 
 export type AgentProfileUpdate = Partial<AgentProfileCreateInput>
 
-export type ConsumerDraft = ConsumerProfileUpdate
+export type BuyerDraft = BuyerProfileUpdate
+
+export type SellerDraft = SellerProfileUpdate
 
 export type AgentDraft = Partial<AgentProfileCreateInput>
