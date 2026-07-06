@@ -97,7 +97,7 @@ function LandingFooter() {
 				</p>
 				<div className="flex gap-6">
 					<Link
-						to="/signup/agent/intro"
+						to="/signup/agent"
 						className="text-muted-foreground hover:text-foreground text-xs transition-colors"
 					>
 						Agent Signup
@@ -156,7 +156,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 								className="h-12 rounded-xl px-5 text-base font-medium"
 								asChild
 							>
-								<Link to="/signup/agent/intro">I am an Agent</Link>
+								<Link to="/signup/agent">I am an Agent</Link>
 							</Button>
 						</div>
 

@@ -66,7 +66,7 @@ function SignupCompleteRoute() {
 			const draft = agentDraftStorage.load()
 			if (!draft) {
 				setMessage('We could not find your signup answers.')
-				void navigate({ to: '/signup/agent/intro' })
+				void navigate({ to: '/signup/agent' })
 				return
 			}
 

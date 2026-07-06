@@ -65,7 +65,7 @@ function AgentCompliance({
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader
-						stepNumber={3}
+						stepNumber={4}
 						totalSteps={5}
 						title="Compliance"
 						icon={ShieldCheckIcon}
