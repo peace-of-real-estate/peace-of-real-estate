@@ -25,6 +25,8 @@
 		"db:init": "tsx scripts/init.ts",
 		"db:seed": "tsx scripts/seed.ts",
 		"db:push": "drizzle-kit push",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
 		"prepare": "vp config --hooks-only",
 		"update-pnpm": "corepack use pnpm@latest",
 		"knip": "knip"
