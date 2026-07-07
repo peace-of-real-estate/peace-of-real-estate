@@ -26,9 +26,9 @@ import { bestClientTypeLabels } from '@/lib/matching/questions'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 export type AgentFlowStep =
-	| 'intro'
 	| 'identity'
 	| 'market'
+	| 'workStyle'
 	| 'compliance'
 	| 'peacePact'
 	| 'preview'
@@ -39,9 +39,9 @@ export const agentDraftStorage =
 	createLocalStorage<AgentDraft>('pre-agent-draft')
 
 const agentFlowSteps = [
-	{ id: 'intro', label: 'Start', icon: UserIcon },
 	{ id: 'identity', label: 'Identity', icon: UserIcon },
 	{ id: 'market', label: 'Market', icon: MapPinIcon },
+	{ id: 'workStyle', label: 'Work Style', icon: ChartLineIcon },
 	{ id: 'compliance', label: 'Compliance', icon: ShieldCheckIcon },
 	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
 ] satisfies SignupWizardStep<Exclude<AgentFlowStep, 'preview'>>[]
@@ -75,10 +75,13 @@ export const averageTransactionsOptions = [
 ] as const
 
 export const Route = createFileRoute('/signup/(quiz)/agent')({
-	beforeLoad: async () => {
+	beforeLoad: async ({ location }) => {
 		const session = await getCurrentSession()
 		if (session && (await loadAgentProfile())) {
 			throw redirect({ to: '/agent/introductions' })
+		}
+		if (location.pathname === '/signup/agent') {
+			throw redirect({ to: '/signup/agent/identity' })
 		}
 	},
 	component: AgentWizardRoute,
@@ -92,11 +95,13 @@ function AgentWizardRoute() {
 		? 'identity'
 		: pathname.endsWith('/market')
 			? 'market'
-			: pathname.endsWith('/compliance')
-				? 'compliance'
-				: pathname.endsWith('/peace-pact')
-					? 'peacePact'
-					: 'intro'
+			: pathname.endsWith('/work-style')
+				? 'workStyle'
+				: pathname.endsWith('/compliance')
+					? 'compliance'
+					: pathname.endsWith('/peace-pact')
+						? 'peacePact'
+						: 'identity'
 
 	return (
 		<SignupWizardShell
@@ -123,12 +128,21 @@ function AgentWizardRoute() {
 									draft.typicalPriceRange &&
 									draft.representationSide,
 								)
+							case 'workStyle':
+								return Boolean(
+									draft.clientDescription &&
+									draft.communicationFrequency &&
+									draft.quickCommunicationChannel &&
+									draft.updateDeliveryMethod &&
+									draft.difficultDealInstinct &&
+									draft.responseTime &&
+									draft.commissionApproach &&
+									draft.unrepresentedBuyerApproach,
+								)
 							case 'compliance':
 								return Boolean(draft.licenseAttested && draft.eoInsuranceStatus)
 							case 'peacePact':
 								return Boolean(draft.peacePactSigned)
-							case 'intro':
-								return false
 						}
 					})
 					.map((step) => step.id)
@@ -139,6 +153,7 @@ function AgentWizardRoute() {
 
 export function stepPath(step: AgentFlowStep) {
 	if (step === 'preview') return '/signup/preview/agent'
+	if (step === 'workStyle') return 'work-style'
 	return step === 'peacePact' ? 'peace-pact' : step
 }
 

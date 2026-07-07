@@ -5,6 +5,7 @@ import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import babel from '@rolldown/plugin-babel'
 import svgr from 'vite-plugin-svgr'
+import { config } from 'dotenv'
 import { resolve } from 'node:path'
 import { defineConfig, type UserConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
@@ -83,77 +84,116 @@ const lint = {
 
 const root = import.meta.dirname
 
-export default defineConfig({
-	root,
-	resolve: {
-		tsconfigPaths: true,
-		dedupe: ['react', 'react-dom'],
-		alias: [
-			{ find: '@', replacement: resolve(root, 'src') },
-			{ find: '@tests', replacement: resolve(root, 'tests') },
+function normalizeEnvironmentName(raw: string) {
+	return /(?:^|-)pr-\d+$/.test(raw) ? 'staging' : raw
+}
+
+function loadPublicFileEnv(mode: string) {
+	const environmentName = normalizeEnvironmentName(
+		process.env.RAILWAY_ENVIRONMENT_NAME ?? process.env.APP_ENV ?? mode,
+	)
+	const fileEnvironment: NodeJS.ProcessEnv = {}
+
+	config({
+		path: [
+			resolve(root, '.env'),
+			resolve(root, '.env.local'),
+			resolve(root, `.env.${environmentName}`),
+			resolve(root, `.env.${environmentName}.local`),
 		],
-	},
-	optimizeDeps: {
-		include: [
-			'vite-plus/test',
-			'vite-plus/test/browser',
-			'vitest-browser-react',
+		quiet: true,
+		override: true,
+		processEnv: fileEnvironment,
+	})
+
+	for (const [key, value] of Object.entries(fileEnvironment)) {
+		if (key.startsWith('VITE_') && value !== undefined) {
+			process.env[key] = value
+		}
+	}
+}
+
+export default defineConfig(({ mode }) => {
+	loadPublicFileEnv(mode)
+
+	return {
+		root,
+		resolve: {
+			tsconfigPaths: true,
+			dedupe: ['react', 'react-dom'],
+			alias: [
+				{ find: '@', replacement: resolve(root, 'src') },
+				{ find: '@tests', replacement: resolve(root, 'tests') },
+			],
+		},
+		optimizeDeps: {
+			include: [
+				'vite-plus/test',
+				'vite-plus/test/browser',
+				'vitest-browser-react',
+			],
+		},
+		plugins: [
+			tanstackStart({
+				router: { routeFileIgnorePattern: '(\\.test\\.tsx$|__screenshots__)' },
+			}),
+			...(process.env.VITEST === 'true'
+				? []
+				: [devtools({ injectSource: { enabled: false } }), nitro()]),
+			tailwindcss(),
+			viteReact(),
+			babel({ presets: [reactCompilerPreset()] }),
+			svgr({
+				include: '**/*.svg',
+				svgrOptions: { exportType: 'default' },
+			}),
 		],
-	},
-	plugins: [
-		tanstackStart({
-			router: { routeFileIgnorePattern: '(\\.test\\.tsx$|__screenshots__)' },
-		}),
-		...(process.env.VITEST === 'true'
-			? []
-			: [devtools({ injectSource: { enabled: false } }), nitro()]),
-		tailwindcss(),
-		viteReact(),
-		babel({ presets: [reactCompilerPreset()] }),
-		svgr({
-			include: '**/*.svg',
-			svgrOptions: { exportType: 'default' },
-		}),
-	],
-	fmt: fmt,
-	lint: lint,
-	staged: {
-		'*': 'vp check --fix',
-	},
-	test: {
-		passWithNoTests: true,
-		projects: [
-			{
-				extends: true,
-				test: {
-					name: 'unit',
-					include: ['src/**/*.test.ts'],
-				},
-			},
-			{
-				extends: true,
-				test: {
-					name: 'server',
-					include: ['src/**/*.{server,db}.ts'],
-					testTimeout: 5_000,
-					fileParallelism: false,
-				},
-			},
-			{
-				extends: true,
-				test: {
-					name: 'browser',
-					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
-					setupFiles: ['./tests/support/mocks/styles.ts'],
-					testTimeout: 20_000,
-					browser: {
-						instances: [{ browser: 'chromium' }],
-						provider: playwright(),
-						enabled: true,
-						headless: true,
+		fmt: fmt,
+		lint: lint,
+		staged: {
+			'*': 'vp check --fix',
+		},
+		test: {
+			passWithNoTests: true,
+			// CI adds the official HTML report plus a single-file visual diff
+			// page; both get uploaded as artifacts when tests fail
+			reporters: process.env.CI
+				? ['default', 'html', './tests/support/visual-diff-reporter.ts']
+				: ['default'],
+			projects: [
+				{
+					extends: true,
+					test: {
+						name: 'unit',
+						include: ['src/**/*.test.ts'],
 					},
 				},
-			},
-		],
-	},
+				{
+					extends: true,
+					test: {
+						name: 'server',
+						include: ['src/**/*.{server,db}.ts'],
+						testTimeout: 5_000,
+					},
+				},
+				{
+					extends: true,
+					test: {
+						name: 'browser',
+						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
+						setupFiles: ['./tests/support/mocks/styles.ts'],
+						// fail fast locally, but let CI collect every screenshot diff
+						bail: process.env.CI ? 0 : 1,
+						testTimeout: process.env.CI ? 60_000 : 20_000,
+						browser: {
+							instances: [{ browser: 'chromium' }],
+							provider: playwright(),
+							enabled: true,
+							headless: true,
+						},
+					},
+				},
+			],
+		},
+	}
 })

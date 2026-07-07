@@ -1,4 +1,3 @@
-import { AGENT_PRICE_RANGES, parsePriceRange } from '@/lib/matching/price-range'
 import type {
 	AgentProfile,
 	BuyerProfile,
@@ -32,189 +31,573 @@ export interface AgentMatchData {
 	}
 	isTopMatch?: boolean
 	avatar?: string
+	debug?: MatchDebugInfo
 }
 
-type ScoreBucket = 'Working Style' | 'Communication' | 'Transparency' | 'Fit'
+export type ScoreBucket = 'Location' | 'Price Fit' | 'Client Fit'
 
-const DEFAULT_BUCKET_SCORES: Record<ScoreBucket, number> = {
-	'Working Style': 3.8,
-	Communication: 3.8,
-	Transparency: 3.8,
-	Fit: 3.8,
+/**
+ * Experience and trust signals are intentionally not scoring dimensions:
+ * trust attestations (peace pact, license, E&O) are required at signup, so
+ * they cannot differentiate agents, and years licensed / volume said little
+ * about fit for a specific client.
+ */
+export type DimensionId = 'location' | 'priceFit' | 'clientFit'
+
+/** One row of a dimension's client-vs-agent comparison table. */
+export interface SubCheck {
+	label: string
+	client: string
+	agent: string
+	passed: boolean | null
+	effect: string
 }
 
-const experienceCompatibility: Record<string, string[]> = {
-	firstTime: ['firstTime'],
-	experienced: ['moveUp', 'relocation', 'investor', 'condoTownhome'],
-	veryExperienced: ['luxury', 'investor', 'landMultiFamily'],
+export interface DimensionTrace {
+	id: DimensionId
+	label: string
+	baseWeight: number
+	weight: number
+	boosted: boolean
+	score: number
+	contribution: number
+	explanation: string
+	checks: SubCheck[]
 }
 
-const propertyTypeToClientType: Record<string, string[]> = {
-	singleFamily: ['firstTime', 'moveUp', 'seller'],
-	condoTownhome: ['condoTownhome', 'moveUp', 'seller'],
+export interface DisqualifierTrace {
+	id: string
+	label: string
+	disqualified: boolean
+	detail: string
+}
+
+export interface ScoreTrace {
+	mode: 'client-scored' | 'fallback'
+	side: 'buying' | 'selling'
+	matchPriorities: string[]
+	disqualifiers: DisqualifierTrace[]
+	disqualified: boolean
+	dimensions: DimensionTrace[]
+	/** Weighted dimension total before the disqualifier gate is applied. */
+	computedScore: number
+	/** computedScore, or 0 if any hard disqualifier fired. */
+	fitScore: number
+	formula: string
+	fallback?: {
+		present: string[]
+		missing: string[]
+	}
+}
+
+export interface MatchDebugInfo {
+	rank: number
+	totalAgents: number
+	qualifiedCount: number
+	scoreDistribution: { range: string; count: number }[]
+	trace: ScoreTrace
+	agentProfile: AgentProfile
+	clientProfile: ClientProfile | null
+}
+
+export interface FitScoreResult {
+	fitScore: number
+	scores: Record<ScoreBucket, number>
+	disqualified: boolean
+	trace: ScoreTrace
+}
+
+const BASE_WEIGHTS: Record<DimensionId, number> = {
+	location: 40,
+	priceFit: 35,
+	clientFit: 25,
+}
+
+const DIMENSION_LABELS: Record<DimensionId, string> = {
+	location: 'Location',
+	priceFit: 'Price fit',
+	clientFit: 'Client-type fit',
+}
+
+/**
+ * matchPriorities stores client question ids; each maps to the scoring
+ * dimension it should boost (×1.5, then weights renormalize to 100).
+ */
+const PRIORITY_TO_DIMENSION: Record<string, DimensionId> = {
+	priceRange: 'priceFit',
+	propertyTypes: 'clientFit',
+	state: 'location',
+	city: 'location',
+	zipCodes: 'location',
+}
+
+const PRIORITY_BOOST = 1.5
+
+/** Buyer property-type slugs → agent bestClientTypes slugs that serve them. */
+const propertyTypeToClientTypes: Record<string, string[]> = {
+	singleFamily: ['firstTime', 'moveUp'],
+	condoTownhome: ['condoTownhome', 'moveUp'],
 	multiFamily: ['landMultiFamily', 'investor'],
 	land: ['landMultiFamily', 'investor'],
 }
 
-function toStars(points: number, maxPoints: number): number {
-	if (maxPoints === 0) return 3.8
-	return Number((3 + (points / maxPoints) * 2).toFixed(1))
+const LUXURY_PRICE_FLOOR = 1_000_000
+
+export interface PriceRangeValue {
+	min: number
+	max: number
 }
 
-function categoryWeight(
-	questionIds: string[],
-	priorities: string[] | null | undefined,
+/**
+ * Strict parser for the app's serialized "min-max" price format
+ * (see serializePriceRange in price-range.ts). Returns undefined for
+ * anything else so callers can trace unparseable data instead of
+ * silently substituting defaults.
+ */
+export function parseSerializedPriceRange(
+	value: string | null | undefined,
+): PriceRangeValue | undefined {
+	const match = value?.trim().match(/^(\d+)-(\d+)$/)
+	if (!match) return undefined
+	const first = Number.parseInt(match[1]!, 10)
+	const second = Number.parseInt(match[2]!, 10)
+	return {
+		min: Math.min(first, second),
+		max: Math.max(first, second),
+	}
+}
+
+/**
+ * Fraction of the client's price range that the agent's typical range
+ * covers, in [0, 1]. A point range (min === max) scores 1 when the agent
+ * covers that price.
+ */
+export function priceOverlapRatio(
+	client: PriceRangeValue,
+	agent: PriceRangeValue,
 ): number {
-	if (!priorities || priorities.length === 0) return 1
-	return priorities.some((id) => questionIds.includes(id)) ? 1.5 : 1
+	const overlap =
+		Math.min(client.max, agent.max) - Math.max(client.min, agent.min)
+	const span = client.max - client.min
+	if (span <= 0) return overlap >= 0 ? 1 : 0
+	return Math.max(0, Math.min(1, overlap / span))
 }
 
-function hasAnyCompatible(
-	clientValue: string | null | undefined,
-	compatibility: Record<string, string[]>,
-	agentValues: string[] | null | undefined,
-): boolean {
-	if (!clientValue || !agentValues || agentValues.length === 0) return false
-	const compatible = compatibility[clientValue] ?? []
-	return agentValues.some((value) => compatible.includes(value))
+function formatList(values: string[] | null | undefined): string {
+	if (!values || values.length === 0) return '(none)'
+	return values.join(', ')
 }
 
-function hasOverlap(
-	a: string[] | null | undefined,
-	b: string[] | null | undefined,
-): boolean {
-	if (!a || a.length === 0 || !b || b.length === 0) return false
-	return a.some((value) => b.includes(value))
+function formatPriceRangeValue(range: PriceRangeValue): string {
+	return `$${range.min.toLocaleString()}–$${range.max.toLocaleString()}`
 }
 
-function priceRangeMatch(
-	clientRange: string | null | undefined,
-	agentRange: string | null | undefined,
-): boolean {
-	const client = parsePriceRange(clientRange)
-	const agentSlug = agentRange?.trim() ?? ''
-	const agent = AGENT_PRICE_RANGES[agentSlug]
-	if (!agent) return false
-	return client.min < agent.max && client.max > agent.min
+function clamp01(value: number): number {
+	return Math.max(0, Math.min(1, value))
+}
+
+function round2(value: number): number {
+	return Number(value.toFixed(2))
+}
+
+interface DimensionResult {
+	score: number
+	explanation: string
+	checks: SubCheck[]
+}
+
+export function scoreLocation(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const clientZips = client.zipCodes ?? []
+	const zipOverlap = agent.zipCodes.filter((zip) => clientZips.includes(zip))
+	const sameState = Boolean(
+		client.state &&
+		agent.state &&
+		client.state.toLowerCase() === agent.state.toLowerCase(),
+	)
+	const sameCity =
+		sameState &&
+		Boolean(
+			client.city &&
+			agent.city &&
+			client.city.toLowerCase() === agent.city.toLowerCase(),
+		)
+
+	let score = 0
+	let explanation = 'no geographic overlap'
+	if (zipOverlap.length > 0) {
+		score = 1
+		explanation = `agent serves ${zipOverlap.length} of the client's zip codes`
+	} else if (sameCity) {
+		score = 0.75
+		explanation = 'same city, no shared zip codes'
+	} else if (sameState) {
+		score = 0.4
+		explanation = 'same state, different city'
+	}
+
+	return {
+		score,
+		explanation,
+		checks: [
+			{
+				label: 'zip codes',
+				client: formatList(clientZips),
+				agent: formatList(agent.zipCodes),
+				passed: zipOverlap.length > 0,
+				effect:
+					zipOverlap.length > 0
+						? `share ${formatList(zipOverlap)} → score 1.0`
+						: 'no shared zips',
+			},
+			{
+				label: 'city',
+				client: client.city ?? '(none)',
+				agent: agent.city,
+				passed: sameCity,
+				effect: sameCity ? 'score ≥ 0.75' : '—',
+			},
+			{
+				label: 'state',
+				client: client.state ?? '(none)',
+				agent: agent.state,
+				passed: sameState,
+				effect: sameState ? 'score ≥ 0.4' : '—',
+			},
+		],
+	}
+}
+
+export function scorePriceFit(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const clientRange = parseSerializedPriceRange(client.priceRange)
+	const agentRange = parseSerializedPriceRange(agent.typicalPriceRange)
+
+	const clientCell = clientRange
+		? formatPriceRangeValue(clientRange)
+		: client.priceRange
+			? `"${client.priceRange}" (unparseable)`
+			: '(none)'
+	const agentCell = agentRange
+		? formatPriceRangeValue(agentRange)
+		: agent.typicalPriceRange
+			? `"${agent.typicalPriceRange}" (unparseable)`
+			: '(none)'
+
+	if (!clientRange || !agentRange) {
+		return {
+			score: 0,
+			explanation: !clientRange
+				? 'client price range missing or unparseable'
+				: 'agent price range unparseable (expected serialized "min-max")',
+			checks: [
+				{
+					label: 'price range',
+					client: clientCell,
+					agent: agentCell,
+					passed: false,
+					effect: 'cannot score → 0',
+				},
+			],
+		}
+	}
+
+	const ratio = priceOverlapRatio(clientRange, agentRange)
+	return {
+		score: ratio,
+		explanation:
+			ratio > 0
+				? `agent covers ${Math.round(ratio * 100)}% of the client's price range`
+				: 'price ranges do not overlap',
+		checks: [
+			{
+				label: 'price range',
+				client: clientCell,
+				agent: agentCell,
+				passed: ratio > 0,
+				effect: `covers ${Math.round(ratio * 100)}% → score ${round2(ratio)}`,
+			},
+		],
+	}
+}
+
+/**
+ * Maps each expected agent bestClientTypes slug to the client signals that
+ * produced it (side, property types, budget).
+ */
+function expectedClientTypeSources(
+	client: ClientProfile,
+	side: 'buying' | 'selling',
+): Map<string, string[]> {
+	const sources = new Map<string, string[]>()
+	const add = (slug: string, source: string) => {
+		const existing = sources.get(slug)
+		if (existing) existing.push(source)
+		else sources.set(slug, [source])
+	}
+
+	if (side === 'selling') add('seller', 'selling side')
+	for (const propertyType of client.propertyTypes ?? []) {
+		for (const slug of propertyTypeToClientTypes[propertyType] ?? []) {
+			add(slug, propertyType)
+		}
+	}
+	const clientRange = parseSerializedPriceRange(client.priceRange)
+	if (clientRange && clientRange.min >= LUXURY_PRICE_FLOOR) {
+		add('luxury', 'budget ≥ $1M')
+	}
+	return sources
+}
+
+/**
+ * Derives the agent bestClientTypes slugs a client should be served by,
+ * from their property types, side, and budget.
+ */
+export function deriveExpectedClientTypes(
+	client: ClientProfile,
+	side: 'buying' | 'selling',
+): string[] {
+	return [...expectedClientTypeSources(client, side).keys()]
+}
+
+export function scoreClientFit(
+	client: ClientProfile,
+	agent: AgentProfile,
+	side: 'buying' | 'selling',
+): DimensionResult {
+	const sources = expectedClientTypeSources(client, side)
+	const expected = [...sources.keys()]
+	const agentTypes = agent.bestClientTypes
+	const matched = expected.filter((slug) => agentTypes.includes(slug))
+
+	if (expected.length === 0) {
+		return {
+			score: 0.5,
+			explanation: 'client has no property types or side signals — neutral 0.5',
+			checks: [
+				{
+					label: 'client signals',
+					client: '(none)',
+					agent: formatList(agentTypes),
+					passed: null,
+					effect: 'neutral 0.5',
+				},
+			],
+		}
+	}
+
+	const score = matched.length / expected.length
+	return {
+		score,
+		explanation: `agent serves ${matched.length} of ${expected.length} expected client types`,
+		checks: expected.map((slug) => ({
+			label: slug,
+			client: `expected — from ${(sources.get(slug) ?? []).join(', ')}`,
+			agent: agentTypes.includes(slug) ? 'serves' : 'not served',
+			passed: agentTypes.includes(slug),
+			effect: `1/${expected.length}`,
+		})),
+	}
+}
+
+/**
+ * Applies matchPriorities boosts to the base weights and renormalizes so
+ * the weights always sum to 100.
+ */
+export function resolveDimensionWeights(
+	priorities: string[] | null | undefined,
+): { weights: Record<DimensionId, number>; boosted: Set<DimensionId> } {
+	const boosted = new Set<DimensionId>()
+	for (const priority of priorities ?? []) {
+		const dimension = PRIORITY_TO_DIMENSION[priority]
+		if (dimension) boosted.add(dimension)
+	}
+
+	const raw = Object.fromEntries(
+		Object.entries(BASE_WEIGHTS).map(([id, weight]) => [
+			id,
+			boosted.has(id as DimensionId) ? weight * PRIORITY_BOOST : weight,
+		]),
+	) as Record<DimensionId, number>
+
+	const total = Object.values(raw).reduce((sum, weight) => sum + weight, 0)
+	const weights = Object.fromEntries(
+		Object.entries(raw).map(([id, weight]) => [id, (weight / total) * 100]),
+	) as Record<DimensionId, number>
+
+	return { weights, boosted }
+}
+
+function evaluateDisqualifiers(
+	client: ClientProfile,
+	agent: AgentProfile,
+	side: 'buying' | 'selling',
+): DisqualifierTrace[] {
+	const sideMismatch =
+		agent.representationSide !== 'both' && agent.representationSide !== side
+	const stateKnown = Boolean(client.state)
+	const stateMismatch = Boolean(
+		client.state &&
+		agent.state &&
+		client.state.toLowerCase() !== agent.state.toLowerCase(),
+	)
+
+	return [
+		{
+			id: 'representationSide',
+			label: 'Representation side',
+			disqualified: sideMismatch,
+			detail: `client needs "${side}", agent works "${agent.representationSide}"`,
+		},
+		{
+			id: 'state',
+			label: 'State',
+			disqualified: stateMismatch,
+			detail: stateKnown
+				? `client in ${client.state}, agent in ${agent.state}`
+				: 'client state unknown — not enforced',
+		},
+	]
+}
+
+function toStars(score: number): number {
+	return Number((1 + clamp01(score) * 4).toFixed(1))
 }
 
 export function calculateFitScore(
 	agent: AgentProfile,
 	client?: ClientProfile,
 	side: 'buying' | 'selling' = 'buying',
-): { fitScore: number; scores: Record<ScoreBucket, number> } {
-	if (!client) return calculateFallbackScore(agent)
+): FitScoreResult {
+	if (!client) return calculateFallbackScore(agent, side)
 
-	const buckets: Record<ScoreBucket, { points: number; max: number }> = {
-		'Working Style': { points: 0, max: 0 },
-		Communication: { points: 0, max: 0 },
-		Transparency: { points: 0, max: 0 },
-		Fit: { points: 0, max: 0 },
+	const { weights, boosted } = resolveDimensionWeights(client.matchPriorities)
+
+	const results: Record<DimensionId, DimensionResult> = {
+		location: scoreLocation(client, agent),
+		priceFit: scorePriceFit(client, agent),
+		clientFit: scoreClientFit(client, agent, side),
 	}
 
-	let weightedPoints = 0
-	let weightedMax = 0
+	const dimensions = (Object.keys(BASE_WEIGHTS) as DimensionId[]).map(
+		(id): DimensionTrace => ({
+			id,
+			label: DIMENSION_LABELS[id],
+			baseWeight: BASE_WEIGHTS[id],
+			weight: round2(weights[id]),
+			boosted: boosted.has(id),
+			score: round2(results[id].score),
+			contribution: round2(weights[id] * results[id].score),
+			explanation: results[id].explanation,
+			checks: results[id].checks,
+		}),
+	)
 
-	const add = (
-		bucket: ScoreBucket,
-		points: number,
-		max: number,
-		questionIds: string[],
-	) => {
-		const weight = categoryWeight(questionIds, client.matchPriorities)
-		weightedPoints += points * weight
-		weightedMax += max * weight
-		buckets[bucket].points += points
-		buckets[bucket].max += max
+	const computedScore = Math.max(
+		0,
+		Math.min(
+			100,
+			Math.round(
+				dimensions.reduce((sum, dimension) => sum + dimension.contribution, 0),
+			),
+		),
+	)
+
+	const disqualifiers = evaluateDisqualifiers(client, agent, side)
+	const disqualified = disqualifiers.some((entry) => entry.disqualified)
+	// A disqualified agent is not a match, full stop — the underlying
+	// dimension total is kept in computedScore for debugging only.
+	const fitScore = disqualified ? 0 : computedScore
+
+	const scores: Record<ScoreBucket, number> = {
+		Location: toStars(results.location.score),
+		'Price Fit': toStars(results.priceFit.score),
+		'Client Fit': toStars(results.clientFit.score),
 	}
 
-	const clientPropertyTypes = client.propertyTypes ?? []
-	const agentClientTypes = agent.bestClientTypes
-	const propertyClientMatches = clientPropertyTypes.flatMap(
-		(type) => propertyTypeToClientType[type] ?? [],
-	)
-	add('Fit', hasOverlap(propertyClientMatches, agentClientTypes) ? 1 : 0, 1, [
-		'propertyTypes',
-	])
-
-	add(
-		'Fit',
-		hasAnyCompatible(
-			client.experienceLevel,
-			experienceCompatibility,
-			agentClientTypes,
-		)
-			? 1
-			: 0,
-		1,
-		['experienceLevel'],
-	)
-
-	add(
-		'Fit',
-		agent.representationSide === 'both' || agent.representationSide === side
-			? 2
-			: 0,
-		2,
-		['representationSide'],
-	)
-
-	add(
-		'Fit',
-		priceRangeMatch(client.priceRange, agent.typicalPriceRange) ? 2 : 0,
-		2,
-		['priceRange'],
-	)
-
-	add(
-		'Fit',
-		agent.zipCodes.some(
-			(area) =>
-				area &&
-				client.state &&
-				area.toLowerCase() === client.state.toLowerCase(),
-		)
-			? 1
-			: 0,
-		1,
-		['state'],
-	)
-
-	const peacePactBonus = agent.peacePactSigned ? 3 : 0
-	const fitScore =
-		weightedMax > 0
-			? Math.min(
-					100,
-					Math.round((weightedPoints / weightedMax) * 97 + peacePactBonus),
-				)
-			: calculateFallbackScore(agent).fitScore
+	const dimensionFormula = `round(${dimensions
+		.map((dimension) => `${round2(dimension.weight)} × ${dimension.score}`)
+		.join(' + ')}) = ${computedScore}`
 
 	return {
 		fitScore,
-		scores: Object.fromEntries(
-			Object.entries(buckets).map(([bucket, result]) => [
-				bucket,
-				result.max > 0
-					? toStars(result.points, result.max)
-					: DEFAULT_BUCKET_SCORES[bucket as ScoreBucket],
-			]),
-		) as Record<ScoreBucket, number>,
+		scores,
+		disqualified,
+		trace: {
+			mode: 'client-scored',
+			side,
+			matchPriorities: client.matchPriorities ?? [],
+			disqualifiers,
+			disqualified,
+			dimensions,
+			computedScore,
+			fitScore,
+			formula: disqualified
+				? `disqualified (${disqualifiers
+						.filter((entry) => entry.disqualified)
+						.map((entry) => entry.label)
+						.join(', ')}) — dimensions ${dimensionFormula} → fitScore = 0`
+				: dimensionFormula,
+		},
 	}
 }
 
-function calculateFallbackScore(agent: AgentProfile): {
-	fitScore: number
-	scores: Record<ScoreBucket, number>
-} {
-	const fit = [
-		agent.representationSide,
-		agent.typicalPriceRange,
-		agent.bestClientTypes.length ? 'client-types' : null,
-		agent.peacePactSigned ? 'peace-pact' : null,
-	].filter((value): value is string => typeof value === 'string').length
+/**
+ * No client profile to score against: rank agents by profile completeness
+ * so the list is still stable and explainable.
+ */
+function calculateFallbackScore(
+	agent: AgentProfile,
+	side: 'buying' | 'selling',
+): FitScoreResult {
+	const checks = [
+		{
+			label: 'representationSide set',
+			present: Boolean(agent.representationSide),
+		},
+		{
+			label: 'typicalPriceRange parseable',
+			present: Boolean(parseSerializedPriceRange(agent.typicalPriceRange)),
+		},
+		{
+			label: 'bestClientTypes non-empty',
+			present: agent.bestClientTypes.length > 0,
+		},
+		{ label: 'zipCodes non-empty', present: agent.zipCodes.length > 0 },
+	]
+	const present = checks.filter((check) => check.present)
+	const completeness = present.length / checks.length
+	const fitScore = Math.round(completeness * 100)
+	const stars = toStars(completeness)
 
 	return {
-		fitScore: Math.round((fit / 4) * 100),
-		scores: DEFAULT_BUCKET_SCORES,
+		fitScore,
+		scores: {
+			Location: stars,
+			'Price Fit': stars,
+			'Client Fit': stars,
+		},
+		disqualified: false,
+		trace: {
+			mode: 'fallback',
+			side,
+			matchPriorities: [],
+			disqualifiers: [],
+			disqualified: false,
+			dimensions: [],
+			computedScore: fitScore,
+			fitScore,
+			formula: `no client profile — completeness fallback: round(${present.length} / ${checks.length} × 100) = ${fitScore}`,
+			fallback: {
+				present: present.map((check) => check.label),
+				missing: checks
+					.filter((check) => !check.present)
+					.map((check) => check.label),
+			},
+		},
 	}
 }

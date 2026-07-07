@@ -24,6 +24,7 @@ function BuyerPreferencesRoute() {
 			state={state}
 			onUpdate={updateState}
 			onComplete={() => goToStep('preview')}
+			clientRole="buyer"
 		/>
 	)
 }

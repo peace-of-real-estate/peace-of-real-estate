@@ -97,7 +97,7 @@ function LandingFooter() {
 				</p>
 				<div className="flex gap-6">
 					<Link
-						to="/signup/agent/intro"
+						to="/signup/agent"
 						className="text-muted-foreground hover:text-foreground text-xs transition-colors"
 					>
 						Agent Signup
@@ -156,7 +156,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 								className="h-12 rounded-xl px-5 text-base font-medium"
 								asChild
 							>
-								<Link to="/signup/agent/intro">I am an Agent</Link>
+								<Link to="/signup/agent">I am an Agent</Link>
 							</Button>
 						</div>
 
@@ -281,21 +281,20 @@ function HowItWorksSection() {
 			<div className="mx-auto max-w-6xl px-6 lg:px-10">
 				<div className="mb-12 text-center md:mb-14">
 					<h2 className="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
-						How It Works (3 Steps)
+						How It Works
 					</h2>
+					<p className="text-muted-foreground mt-3 text-lg">
+						Three simple steps to your perfect agent match
+					</p>
 				</div>
 
 				<div className="grid gap-8 md:grid-cols-3">
 					{howItWorksSteps.map((step) => (
 						<div
 							key={step.id}
-							className="border-border bg-card relative flex flex-col items-center rounded-2xl border p-6 text-center shadow-sm"
+							className="border-border bg-card relative flex flex-col items-center rounded-2xl border p-6 text-center shadow-sm transition-shadow hover:shadow-md"
 						>
-							<div className="bg-primary text-primary-foreground mb-5 flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold shadow-sm">
-								{step.id}
-							</div>
-
-							<div className="mb-5 flex h-36 w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--background)]">
+							<div className="mb-5 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl">
 								<img
 									src={step.image}
 									alt=""
@@ -303,12 +302,19 @@ function HowItWorksSection() {
 								/>
 							</div>
 
-							<h3 className="font-heading text-foreground text-lg font-semibold">
-								{step.title}
-							</h3>
-							<p className="text-muted-foreground mt-2 max-w-xs text-sm leading-relaxed">
-								{step.description}
-							</p>
+							<div className="flex items-start gap-3">
+								<div className="bg-primary text-primary-foreground mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm">
+									{step.id}
+								</div>
+								<div className="text-left">
+									<h3 className="font-heading text-foreground text-base leading-tight font-semibold">
+										{step.title}
+									</h3>
+									<p className="text-muted-foreground mt-0.5 text-sm leading-snug">
+										{step.description}
+									</p>
+								</div>
+							</div>
 						</div>
 					))}
 				</div>

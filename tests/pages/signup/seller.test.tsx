@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
-
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms))
-}
+import { sellerAnswerLabels } from '@/lib/matching/questions'
 
 async function clickSelector(id: string) {
 	await page.elementLocator(document.querySelector(id)!).click()
@@ -31,15 +28,21 @@ async function answerPreference(name: string) {
 	const option = page.getByRole('button', { name, exact: true })
 	await expect.element(option).toBeVisible()
 	await option.click()
-	await sleep(200)
 }
 
 async function fillPreferencesStep() {
-	await answerPreference('Text')
-	await answerPreference('Very involved')
-	await answerPreference('Exclusive representation')
-	await answerPreference("I'm new, explain it to me")
-	await answerPreference("First time; I'll want guidance")
+	for (const config of Object.values(sellerAnswerLabels)) {
+		const [firstOption, secondOption] = Object.values(config.options)
+		if (!firstOption || !secondOption)
+			throw new Error(`Question "${config.label}" has fewer than two options`)
+		if (config.multiple) {
+			await answerPreference(firstOption)
+			await answerPreference(secondOption)
+			await page.getByRole('button', { name: 'Next question' }).click()
+		} else {
+			await answerPreference(firstOption)
+		}
+	}
 }
 
 describe('seller signup flow', () => {
@@ -55,9 +58,7 @@ describe('seller signup flow', () => {
 		await expectScreenshot(document.body, { name: 'step-2-home' })
 
 		await fillHomeStep()
-		await expectScreenshot(document.body, {
-			name: 'step-3-preferences',
-		})
+		await expectScreenshot(document.body, { name: 'step-3-preferences' })
 
 		await fillPreferencesStep()
 		await expectScreenshot(document.body, { name: 'step-4-preview' })

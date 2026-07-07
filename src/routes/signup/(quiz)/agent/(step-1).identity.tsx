@@ -20,7 +20,7 @@ import {
 	type AgentFlowStep,
 } from './route'
 
-export const Route = createFileRoute('/signup/(quiz)/agent/(step-2)/identity')({
+export const Route = createFileRoute('/signup/(quiz)/agent/(step-1)/identity')({
 	component: AgentIdentityRoute,
 })
 

@@ -11,7 +11,7 @@ import {
 	type SignupWizardStep,
 } from '../-components/signup-wizard-shell'
 import {
-	isClientPreferencesComplete,
+	isSellerPreferencesComplete,
 	type ClientDraft,
 	type ClientSignupStep,
 } from '../-components/client-quiz-fields'
@@ -65,7 +65,8 @@ function SellerWizardRoute() {
 				step === 'preview' ? '/signup/preview/seller' : step
 			}
 			getHasDraft={(draft) =>
-				draft.city !== undefined || draft.preferredContactMethod !== undefined
+				draft.city !== undefined ||
+				draft.quickCommunicationChannel !== undefined
 			}
 			getCompletedStepIds={(draft) =>
 				sellerSteps
@@ -76,7 +77,7 @@ function SellerWizardRoute() {
 							case 'home':
 								return Boolean(draft.priceRange && draft.propertyTypes?.length)
 							case 'preferences':
-								return isClientPreferencesComplete(draft)
+								return isSellerPreferencesComplete(draft)
 						}
 					})
 					.map((step) => step.id)

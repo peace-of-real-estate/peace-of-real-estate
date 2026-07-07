@@ -3,10 +3,6 @@ import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 async function clickSelector(id: string) {
 	await page.elementLocator(document.querySelector(id)!).click()
 }
@@ -31,9 +27,29 @@ async function fillMarketStep() {
 	await page.getByRole('button', { name: 'Buyers', exact: true }).click()
 	await page
 		.getByRole('button', {
-			name: 'First-time buyers who need guidance through the entire process',
+			name: 'First-time buyers',
 		})
 		.click()
+}
+
+async function fillWorkStyleStep() {
+	await page.getByRole('button', { name: 'Strategic & data-driven' }).click()
+	await page
+		.getByRole('button', { name: 'Regular scheduled check-ins' })
+		.click()
+	await page.getByRole('button', { name: 'Text' }).click()
+	await page.getByRole('button', { name: 'Email', exact: true }).click()
+	await page.getByRole('button', { name: 'Facts fast' }).click()
+	await page.getByRole('button', { name: 'Within 10 min' }).click()
+	await page
+		.getByRole('button', { name: 'Proactive & open to discussion' })
+		.click()
+	await page
+		.getByRole('button', {
+			name: 'Represent seller only, buyer unrepresented (disclosed)',
+		})
+		.click()
+	await page.getByRole('button', { name: 'Skip' }).click()
 }
 
 async function fillComplianceStep() {
@@ -56,30 +72,27 @@ describe('agent signup flow', () => {
 	})
 
 	test('walkthrough screenshots', async () => {
-		await renderRoute({ path: '/signup/agent/intro' })
-		await expectScreenshot(document.body, { name: 'step-1-intro' })
-
-		await page.getByRole('button', { name: 'Start' }).click()
-		await sleep(300)
-		await expectScreenshot(document.body, { name: 'step-2-identity' })
+		await renderRoute({ path: '/signup/agent/identity' })
+		await expectScreenshot(document.body, { name: 'step-1-identity' })
 
 		await fillIdentityStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
-		await expectScreenshot(document.body, { name: 'step-3-market' })
+		await expectScreenshot(document.body, { name: 'step-2-market' })
 
 		await fillMarketStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
+		await expectScreenshot(document.body, { name: 'step-3-work-style' })
+
+		await fillWorkStyleStep()
 		await expectScreenshot(document.body, { name: 'step-4-compliance' })
 
 		await fillComplianceStep()
 		await page.getByRole('button', { name: 'Continue' }).click()
-		await sleep(300)
+		await expectScreenshot(document.body, { name: 'step-5-peace-pact' })
 
 		await fillPeacePactStep()
 		await page.getByRole('button', { name: 'Sign & continue' }).click()
-		await sleep(300)
-		await expectScreenshot(document.body, { name: 'step-5-preview' })
+
+		await expectScreenshot(document.body, { name: 'step-6-preview' })
 	})
 })

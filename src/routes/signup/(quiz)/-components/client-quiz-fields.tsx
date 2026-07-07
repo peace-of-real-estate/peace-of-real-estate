@@ -40,14 +40,14 @@ import {
 } from '@/lib/matching/price-range'
 import type {
 	BuyerDraft,
-	BuyerProfile,
+	ClientProfile,
 	SellerDraft,
-	SellerProfile,
 } from '@/lib/matching/profile'
 import {
-	clientAnswerLabels,
+	buyerAnswerLabels,
 	propertyTypeOptions,
 	questionOptionEntries,
+	sellerAnswerLabels,
 	type AnswerValue,
 	type Question,
 } from '@/lib/matching/questions'
@@ -62,7 +62,7 @@ import { PriceInput } from './price-input'
 
 export type ClientSignupStep = 'location' | 'home' | 'preferences' | 'preview'
 export type ClientDraft = BuyerDraft | SellerDraft
-export type ClientProfile = BuyerProfile | SellerProfile
+export type ClientQuizProfile = ClientProfile
 
 const timelineOptions = [
 	{ slug: 'exploring', label: 'Just exploring' },
@@ -80,19 +80,49 @@ const timelineOptions = [
 	{ slug: '12monthsPlus', label: '12+ months' },
 ] as const
 
-const quizFields = [
-	'preferredContactMethod',
-	'involvementLevel',
-	'representationPreference',
-	'commissionComfort',
+const buyerQuizFields = [
 	'experienceLevel',
-] as const satisfies readonly (keyof ClientDraft)[]
+	'idealAgentRelationship',
+	'decisionMakingNeed',
+	'biddingWarResponse',
+	'quickCommunicationChannel',
+	'updateDeliveryMethod',
+	'involvementLevel',
+	'responseTimeExpectation',
+	'commissionComfort',
+] as const satisfies readonly (keyof BuyerDraft)[]
 
-const questions = Object.entries(clientAnswerLabels).map(([id, config]) => ({
-	id,
-	title: config.title,
-	options: config.options,
-})) satisfies Question[]
+const sellerQuizFields = [
+	'saleMotivation',
+	'successfulSaleLooksLike',
+	'involvementLevel',
+	'quickCommunicationChannel',
+	'updateDeliveryMethod',
+	'agentDeliveryExpectations',
+	'homeConnection',
+	'agentSilencePreference',
+	'representationPreference',
+	'responseTimeExpectation',
+	'commissionComfort',
+] as const satisfies readonly (keyof SellerDraft)[]
+
+const buyerQuestions = Object.entries(buyerAnswerLabels).map(
+	([id, config]) => ({
+		id,
+		title: config.title,
+		options: config.options,
+		multiple: config.multiple,
+	}),
+) satisfies Question[]
+
+const sellerQuestions = Object.entries(sellerAnswerLabels).map(
+	([id, config]) => ({
+		id,
+		title: config.title,
+		options: config.options,
+		multiple: config.multiple,
+	}),
+) satisfies Question[]
 
 export function ClientLocationFields({
 	state,
@@ -150,7 +180,7 @@ export function ClientLocationFields({
 							}
 							onUpdate({
 								city: cityState?.city ?? committedLocation.trim(),
-								state: cityState?.state,
+								...(cityState?.state ? { state: cityState.state } : {}),
 								zipCodes: selectedZipCodes,
 							})
 							onContinue()
@@ -356,12 +386,16 @@ export function ClientPreferencesFields({
 	state,
 	onUpdate,
 	onComplete,
+	clientRole,
 }: {
 	state: ClientDraft
 	onUpdate: (patch: Partial<ClientDraft>) => void
 	onComplete: () => void
+	clientRole: 'buyer' | 'seller'
 }) {
-	const answers = extractAnswers(state)
+	const isBuyer = clientRole === 'buyer'
+	const questions = isBuyer ? buyerQuestions : sellerQuestions
+	const answers = extractAnswers(state, questions)
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() =>
 		getNextUnansweredQuestionIndex(questions, answers),
 	)
@@ -385,12 +419,12 @@ export function ClientPreferencesFields({
 						)}
 						showTitle={false}
 					/>
-					<ClientQuestionFlow
+					<QuestionFlow
 						questions={questions}
 						answers={answers}
 						currentQuestionIndex={currentQuestionIndex}
 						onAnswersChange={(nextAnswers) =>
-							onUpdate(answersToProfileUpdate(nextAnswers))
+							onUpdate(answersToProfileUpdate(nextAnswers, questions))
 						}
 						onQuestionIndexChange={setCurrentQuestionIndex}
 						onComplete={onComplete}
@@ -401,8 +435,12 @@ export function ClientPreferencesFields({
 	)
 }
 
-export function isClientPreferencesComplete(state: ClientDraft): boolean {
-	return quizFields.every((field) => state[field] !== undefined)
+export function isBuyerPreferencesComplete(state: BuyerDraft): boolean {
+	return buyerQuizFields.every((field) => state[field] !== undefined)
+}
+
+export function isSellerPreferencesComplete(state: SellerDraft): boolean {
+	return sellerQuizFields.every((field) => state[field] !== undefined)
 }
 
 function ContinueButton({
@@ -471,7 +509,10 @@ function FieldSection({
 	)
 }
 
-function extractAnswers(draft: ClientDraft): Record<string, AnswerValue> {
+function extractAnswers(
+	draft: ClientDraft,
+	questions: Question[],
+): Record<string, AnswerValue> {
 	const answers: Record<string, AnswerValue> = {}
 	for (const question of questions) {
 		const value = draft[question.id as keyof ClientDraft]
@@ -483,6 +524,7 @@ function extractAnswers(draft: ClientDraft): Record<string, AnswerValue> {
 
 function answersToProfileUpdate(
 	answers: Record<string, AnswerValue>,
+	questions: Question[],
 ): Partial<ClientDraft> {
 	const update: Partial<ClientDraft> = {}
 	for (const question of questions) {
@@ -623,7 +665,7 @@ type ClientQuestionFlowProps = {
 	onComplete: () => void
 }
 
-function ClientQuestionFlow({
+export function QuestionFlow({
 	questions,
 	answers,
 	currentQuestionIndex,
@@ -809,16 +851,37 @@ function ClientQuestionFlow({
 					{currentQuestion.allowSkip ? (
 						<button
 							type="button"
-							onClick={() =>
+							onClick={() => {
 								updateAnswers((prev) => ({
 									...prev,
 									[currentQuestion.id]: null,
 								}))
-							}
+								if (isLastQuestion) {
+									complete()
+								} else {
+									advance()
+								}
+							}}
 							className="text-muted-foreground hover:text-foreground text-xs underline"
 						>
 							Skip
 						</button>
+					) : null}
+					{currentQuestion.freeForm ? (
+						<Button
+							onClick={isLastQuestion ? complete : advance}
+							disabled={isTransitioning}
+							size="lg"
+							className={cn(
+								'w-full gap-2 rounded-4xl px-8 py-6 text-base transition-all duration-300',
+								canAdvance
+									? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg'
+									: 'bg-muted text-muted-foreground',
+							)}
+						>
+							{isLastQuestion ? 'Finish' : 'Continue'}
+							<ArrowRight className="h-5 w-5" />
+						</Button>
 					) : null}
 				</motion.div>
 			</AnimatePresence>
@@ -937,10 +1000,10 @@ function getOptionIcon(question: Question, label: string) {
 	const prompt = question.title.toLowerCase()
 	const text = label.toLowerCase()
 	if (text.startsWith('text')) return MessageSquare
-	if (text.startsWith('call')) return Phone
+	if (text.startsWith('phone')) return Phone
 	if (text.startsWith('email')) return Mail
 	if (prompt.includes('documents') && text.startsWith('scheduled')) return Phone
-	if (prompt.includes('representation') && text.includes('access')) return Globe
+	if (prompt.includes('representation') && text.includes('broad')) return Globe
 	if (prompt.includes('representation') && text.includes('exclusive'))
 		return Lock
 	return null
@@ -949,7 +1012,12 @@ function getOptionIcon(question: Question, label: string) {
 function getInvolvementLevel(label: string) {
 	const text = label.toLowerCase()
 	if (text.includes('very involved')) return 3
-	if (text.includes('key details') || text.includes('details only')) return 2
+	if (
+		text.includes('keep me informed') ||
+		text.includes('key details') ||
+		text.includes('details only')
+	)
+		return 2
 	if (text.includes('hands off')) return 1
 	return 1
 }

@@ -64,7 +64,7 @@ function AgentPeacePact({
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
 					<StepHeader
-						stepNumber={4}
+						stepNumber={5}
 						totalSteps={5}
 						title="Peace Pact"
 						icon={ScrollIcon}

@@ -18,6 +18,7 @@ const agentProfileCreateSchema = createInsertSchema(agentProfiles)
 	})
 	.extend({
 		representationSide: z.enum(['buying', 'selling', 'both']),
+		role: z.literal('agent'),
 	})
 
 const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
@@ -29,6 +30,7 @@ const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
 	})
 	.extend({
 		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
+		role: z.literal('buyer'),
 	})
 
 const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
@@ -40,6 +42,7 @@ const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
 	})
 	.extend({
 		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
+		role: z.literal('seller'),
 	})
 
 export {
@@ -60,8 +63,48 @@ export type SellerProfileUpdate = Partial<SellerProfileCreateInput>
 
 export type AgentProfileUpdate = Partial<AgentProfileCreateInput>
 
-export type BuyerDraft = BuyerProfileUpdate
+export type BuyerDraft = Omit<BuyerProfileUpdate, 'role'>
 
-export type SellerDraft = SellerProfileUpdate
+export type SellerDraft = Omit<SellerProfileUpdate, 'role'>
 
 export type AgentDraft = Partial<AgentProfileCreateInput>
+
+export type BuyerClientProfile = Omit<
+	BuyerProfile,
+	'id' | 'userId' | 'createdAt' | 'updatedAt'
+> & {
+	role: 'buyer'
+}
+
+export type SellerClientProfile = Omit<
+	SellerProfile,
+	'id' | 'userId' | 'createdAt' | 'updatedAt'
+> & {
+	role: 'seller'
+}
+
+export type ClientProfile = BuyerClientProfile | SellerClientProfile
+
+export const buyerClientProfileSchema = buyerProfileCreateSchema
+	.partial()
+	.extend({
+		role: z.literal('buyer'),
+	}) as z.ZodType<BuyerClientProfile>
+
+export const sellerClientProfileSchema = sellerProfileCreateSchema
+	.partial()
+	.extend({
+		role: z.literal('seller'),
+	}) as z.ZodType<SellerClientProfile>
+
+export function isBuyerClientProfile(
+	profile: ClientProfile,
+): profile is BuyerClientProfile {
+	return profile.role === 'buyer'
+}
+
+export function isSellerClientProfile(
+	profile: ClientProfile,
+): profile is SellerClientProfile {
+	return profile.role === 'seller'
+}

@@ -3,6 +3,7 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/figtree';
 @import '@fontsource-variable/dm-sans';
+@import '@fontsource-variable/jetbrains-mono';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -65,7 +66,9 @@
 	/* Typography */
 	--font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
 	--font-serif: Georgia, Cambria, 'Times New Roman', Times, serif;
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	--font-mono:
+		'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco,
+		Consolas, monospace;
 	--font-family-sans: var(--font-sans);
 	--font-family-heading: 'DM Sans Variable', var(--font-sans);
 	--font-family-mono: var(--font-mono);

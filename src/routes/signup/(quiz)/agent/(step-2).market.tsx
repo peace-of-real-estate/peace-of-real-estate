@@ -35,7 +35,7 @@ import {
 } from './route'
 import { bestClientTypeLabels } from '@/lib/matching/questions'
 
-export const Route = createFileRoute('/signup/(quiz)/agent/(step-3)/market')({
+export const Route = createFileRoute('/signup/(quiz)/agent/(step-2)/market')({
 	component: AgentMarketRoute,
 })
 
@@ -49,7 +49,7 @@ function AgentMarketRoute() {
 		<AgentMarket
 			state={state}
 			onUpdate={updateState}
-			onContinue={() => goToStep('compliance')}
+			onContinue={() => goToStep('workStyle')}
 		/>
 	)
 }

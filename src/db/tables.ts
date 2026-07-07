@@ -13,7 +13,9 @@ import { sql } from 'drizzle-orm'
 
 import {
 	agentProfileColumns,
-	clientProfileColumns,
+	buyerSpecificProfileColumns,
+	commonClientProfileColumns,
+	sellerSpecificProfileColumns,
 } from '@/lib/matching/profile.db'
 
 type EntitlementKey = 'client_lifetime_premium' | 'agent_subscription'
@@ -143,7 +145,8 @@ export const buyerProfiles = pgTable(
 	{
 		id: text().primaryKey().notNull(),
 		userId: text('user_id').notNull(),
-		...clientProfileColumns,
+		...commonClientProfileColumns,
+		...buyerSpecificProfileColumns,
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 	},
@@ -166,7 +169,8 @@ export const sellerProfiles = pgTable(
 	{
 		id: text().primaryKey().notNull(),
 		userId: text('user_id').notNull(),
-		...clientProfileColumns,
+		...commonClientProfileColumns,
+		...sellerSpecificProfileColumns,
 		createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
 		updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 	},

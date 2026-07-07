@@ -1,19 +1,26 @@
+import { BuyerProfile } from '@/lib/matching/profile.types'
+
 export const mockBuyerProfile = {
 	id: 'consumer-1',
 	userId: 'user-1',
 	status: 'draft',
-	intent: 'buying',
-	city: 'Austin',
 	state: 'TX',
+	city: 'Austin',
+	zipCodes: [],
+	timeline: 'exploring',
 	priceRange: '400000-750000',
 	propertyTypes: ['singleFamily'],
 	experienceLevel: 'firstTime',
-	preferredContactMethod: 'text',
+	quickCommunicationChannel: 'text',
+	updateDeliveryMethod: 'email',
 	involvementLevel: 'veryInvolved',
-	representationPreference: 'exclusive',
-	commissionComfort: 'explain',
+	idealAgentRelationship: 'trustedAdvisor',
+	decisionMakingNeed: 'numbersData',
+	biddingWarResponse: 'factsOptions',
+	responseTimeExpectation: 'within30Min',
+	commissionComfort: 'openOptions',
 	matchPriorities: null,
 	matchDetails: null,
 	createdAt: new Date(),
 	updatedAt: new Date(),
-}
+} satisfies BuyerProfile
