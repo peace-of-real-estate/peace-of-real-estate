@@ -94,5 +94,5 @@ describe('agent signup flow', () => {
 		await page.getByRole('button', { name: 'Sign & continue' }).click()
 
 		await expectScreenshot(document.body, { name: 'step-6-preview' })
-	}, 20_000)
+	})
 })
