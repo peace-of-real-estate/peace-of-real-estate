@@ -122,7 +122,6 @@ export default defineConfig({
 	},
 	test: {
 		passWithNoTests: true,
-		bail: 4,
 		projects: [
 			{
 				extends: true,
@@ -146,7 +145,8 @@ export default defineConfig({
 					name: 'browser',
 					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 					setupFiles: ['./tests/support/mocks/styles.ts'],
-					testTimeout: 20_000,
+					bail: 1,
+					testTimeout: process.env.CI ? 60_000 : 20_000,
 					browser: {
 						instances: [{ browser: 'chromium' }],
 						provider: playwright(),
