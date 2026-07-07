@@ -42,6 +42,7 @@ import {
 import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
 
 import { resolveStateCode } from '@/lib/geography/states'
+import { clientEnv } from '@/env'
 
 type ClientRole = 'buyer' | 'seller'
 
@@ -151,7 +152,7 @@ export function ClientMatches({
 								No matches available yet.
 							</p>
 						</Card>
-					) : import.meta.env.VITE_MATCH_DEBUG === 'true' ? (
+					) : clientEnv.VITE_MATCH_DEBUG === 'true' ? (
 						<MatchDebugPanel matches={matches} />
 					) : (
 						<MatchList matches={matches} />
