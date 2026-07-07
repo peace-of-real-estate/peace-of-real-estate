@@ -122,6 +122,7 @@ export default defineConfig({
 	},
 	test: {
 		passWithNoTests: true,
+		bail: 4,
 		projects: [
 			{
 				extends: true,
