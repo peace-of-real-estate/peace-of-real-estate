@@ -1,3 +1,5 @@
+import { serializePriceRange } from '../../../src/lib/matching/price-range'
+import { bestClientTypeLabels } from '../../../src/lib/matching/questions'
 import type { WeightedOption } from './stats'
 
 export const FIRST_NAMES = [
@@ -394,13 +396,43 @@ export const STREETS = [
 	'Ash Blvd',
 ] as const
 
-export const PRICE_BY_TIER: Record<string, string[]> = {
-	entry: ['$100k - $250k', '$150k - $350k', '$200k - $400k'],
-	mid: ['$250k - $500k', '$300k - $600k', '$400k - $750k', '$500k - $750k'],
-	premium: ['$500k - $1M', '$750k - $1.5M', '$1M - $2M'],
-	luxury: ['$1M - $3M', '$2M - $5M', '$3M - $7M', '$5M+'],
-	investor: ['$200k - $500k', '$300k - $1M', '$500k - $3M', '$1M - $5M'],
+// Stored in the app's serialized "min-max" format (see serializePriceRange),
+// matching what the agent signup market step writes. Values stay within the
+// app's 0–2M price slider bounds.
+const PRICE_RANGES_BY_TIER: Record<string, { min: number; max: number }[]> = {
+	entry: [
+		{ min: 100_000, max: 250_000 },
+		{ min: 150_000, max: 350_000 },
+		{ min: 200_000, max: 400_000 },
+	],
+	mid: [
+		{ min: 250_000, max: 500_000 },
+		{ min: 300_000, max: 600_000 },
+		{ min: 400_000, max: 750_000 },
+		{ min: 500_000, max: 750_000 },
+	],
+	premium: [
+		{ min: 500_000, max: 1_000_000 },
+		{ min: 750_000, max: 1_500_000 },
+		{ min: 1_000_000, max: 2_000_000 },
+	],
+	luxury: [
+		{ min: 1_000_000, max: 2_000_000 },
+		{ min: 1_500_000, max: 2_000_000 },
+	],
+	investor: [
+		{ min: 200_000, max: 500_000 },
+		{ min: 300_000, max: 1_000_000 },
+		{ min: 500_000, max: 2_000_000 },
+	],
 }
+
+export const PRICE_BY_TIER: Record<string, string[]> = Object.fromEntries(
+	Object.entries(PRICE_RANGES_BY_TIER).map(([tier, ranges]) => [
+		tier,
+		ranges.map((range) => serializePriceRange(range)),
+	]),
+)
 
 export const YEARS_LABELS: Record<number, string> = {
 	1: 'Less than 1 year',
@@ -439,23 +471,12 @@ export const PRICE_TIERS: WeightedOption<keyof typeof PRICE_BY_TIER>[] = [
 	{ value: 'investor', weight: 8 },
 ]
 
-export const CLIENT_TYPES = [
-	'First-time Buyers',
-	'Sellers',
-	'Relocation',
-	'Luxury',
-	'Investors',
-	'New Construction',
-	'Property Management',
-	'Seniors',
-	'Staging',
-	'Marketing',
-	'Land',
-	'Commercial',
-	'International',
-	'Military',
-	'Buyers',
-]
+// Slugs from bestClientTypeLabels — the format the agent signup market step
+// writes to bestClientTypes. 'other' is excluded because it carries no
+// matching signal.
+export const CLIENT_TYPES = Object.keys(bestClientTypeLabels).filter(
+	(slug) => slug !== 'other',
+)
 
 export const EMPLOYMENT_STATUSES = [
 	'Salesperson',

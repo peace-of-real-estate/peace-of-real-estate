@@ -13,10 +13,9 @@ export const mockAgentMatches = [
 		specialties: ['First-time buyers', 'Luxury homes'],
 		about: 'Known for patient guidance and transparent communication.',
 		scores: {
-			'Working Style': 4.9,
-			Communication: 4.7,
-			Transparency: 4.8,
-			Fit: 4.9,
+			Location: 4.9,
+			'Price Fit': 4.7,
+			'Client Fit': 4.8,
 		},
 		isTopMatch: true,
 	},
@@ -38,10 +37,9 @@ export const mockHttpAgentMatches = [
 		about:
 			'Known for patient guidance and transparent communication through complex purchases.',
 		scores: {
-			'Working Style': 4.9,
-			Communication: 4.7,
-			Transparency: 4.8,
-			Fit: 4.9,
+			Location: 4.9,
+			'Price Fit': 4.7,
+			'Client Fit': 4.8,
 		},
 		contact: {
 			phone: '(512) 555-0198',
@@ -69,10 +67,10 @@ export const mockHttpAgentMatches = [
 		about:
 			'Efficient, data-driven agent who keeps timelines clear and decisions practical.',
 		scores: {
-			'Working Style': 4.6,
-			Communication: 4.4,
-			Transparency: 4.5,
-			Fit: 4.4,
+			Location: 4.6,
+			'Price Fit': 4.4,
+			'Client Fit': 4.5,
+			'Experience & Trust': 4.4,
 		},
 	},
 ]
