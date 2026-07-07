@@ -16,19 +16,24 @@ jobs:
       github.event.deployment_status.state == 'success' &&
       contains(github.event.deployment.environment, 'pr-')
     runs-on: ubuntu-latest
-    env:
-      BASE_URL:
-        ${{ github.event.deployment_status.environment_url ||
-        github.event.deployment_status.target_url }}
     steps:
-      # Railway doesn't document which URL field it populates; keep this
-      # around until a few real runs confirm BASE_URL resolves correctly.
-      - name: Dump deployment event
-        run: cat "$GITHUB_EVENT_PATH"
+      # Railway reports dashboard URLs in deployment_status URL fields. The
+      # public service URL follows service-environment.up.railway.app.
+      - name: Resolve deployment URL
+        env:
+          DEPLOYMENT_ENVIRONMENT: ${{ github.event.deployment.environment }}
+        run: |
+          service="${DEPLOYMENT_ENVIRONMENT%%/*}"
+          environment="${DEPLOYMENT_ENVIRONMENT##*/}"
+          service="${service//[[:space:]]/}"
+          environment="${environment//[[:space:]]/}"
+          base_url="https://${service}-${environment}.up.railway.app"
+          echo "BASE_URL=$base_url" >> "$GITHUB_ENV"
+          echo "Testing against $base_url"
       - name: Check deployment URL
         run: |
           if [ -z "$BASE_URL" ]; then
-            echo "No environment_url/target_url on deployment_status event; see dumped event above." >&2
+            echo "No deployment URL was resolved." >&2
             exit 1
           fi
           echo "Testing against $BASE_URL"
