@@ -23,6 +23,7 @@ import {
 	DashboardPageMobileNav,
 } from '@/routes/(dashboard)/-components/dashboard'
 import { MatchDebugPanel } from '@/routes/(dashboard)/-components/match-debug-panel'
+import { MatchList } from '@/routes/(dashboard)/-components/match-list'
 import { authClient } from '@/lib/auth/client'
 import {
 	loadBuyerAgentMatches,
@@ -150,8 +151,10 @@ export function ClientMatches({
 								No matches available yet.
 							</p>
 						</Card>
-					) : (
+					) : import.meta.env.VITE_MATCH_DEBUG === 'true' ? (
 						<MatchDebugPanel matches={matches} />
+					) : (
+						<MatchList matches={matches} />
 					)}
 				</div>
 			</div>

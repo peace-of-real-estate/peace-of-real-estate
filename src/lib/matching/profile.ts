@@ -181,8 +181,22 @@ export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
 	},
 )
 
-export const loadBuyerAgentMatches = createServerFn({ method: 'GET' }).handler(
-	async (): Promise<AgentMatchData[]> => {
+type MatchPageParam = { offset: number; limit: number }
+
+const defaultMatchPageParam: MatchPageParam = { offset: 0, limit: 10 }
+
+function resolveMatchPageParam(
+	data: MatchPageParam | undefined,
+): MatchPageParam {
+	return {
+		offset: data?.offset ?? defaultMatchPageParam.offset,
+		limit: data?.limit ?? defaultMatchPageParam.limit,
+	}
+}
+
+export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
+	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 
 		const [profile] = await db
@@ -191,12 +205,12 @@ export const loadBuyerAgentMatches = createServerFn({ method: 'GET' }).handler(
 			.where(eq(buyerProfiles.userId, userId))
 			.limit(1)
 
-		return loadAgentMatchesForProfile(profile, 'buying')
-	},
-)
+		return loadAgentMatchesForProfile(profile, 'buying', data)
+	})
 
-export const loadSellerAgentMatches = createServerFn({ method: 'GET' }).handler(
-	async (): Promise<AgentMatchData[]> => {
+export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
+	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 
 		const [profile] = await db
@@ -205,13 +219,13 @@ export const loadSellerAgentMatches = createServerFn({ method: 'GET' }).handler(
 			.where(eq(sellerProfiles.userId, userId))
 			.limit(1)
 
-		return loadAgentMatchesForProfile(profile, 'selling')
-	},
-)
+		return loadAgentMatchesForProfile(profile, 'selling', data)
+	})
 
 async function loadAgentMatchesForProfile(
 	profile: BuyerProfile | SellerProfile | undefined,
 	side: 'buying' | 'selling',
+	pageParam: MatchPageParam = defaultMatchPageParam,
 ): Promise<AgentMatchData[]> {
 	const results = await db
 		.select({
@@ -237,7 +251,8 @@ async function loadAgentMatchesForProfile(
 	const qualified = scored.filter(({ score }) => !score.disqualified)
 	qualified.sort(byComputedScore)
 
-	const top = [...scored].sort(byComputedScore).slice(0, 20)
+	const { offset, limit } = pageParam
+	const top = [...scored].sort(byComputedScore).slice(offset, offset + limit)
 
 	const scoreDistribution = buildScoreDistribution(
 		scored.map(({ score }) => score),
@@ -271,7 +286,7 @@ async function loadAgentMatchesForProfile(
 					satisfaction: row.agent.peacePactSigned ? 4.9 : 4.7,
 				},
 				debug: {
-					rank: index + 1,
+					rank: offset + index + 1,
 					totalAgents: scored.length,
 					qualifiedCount: qualified.length,
 					scoreDistribution,
