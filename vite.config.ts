@@ -174,7 +174,6 @@ export default defineConfig(({ mode }) => {
 						name: 'server',
 						include: ['src/**/*.{server,db}.ts'],
 						testTimeout: 5_000,
-						fileParallelism: false,
 					},
 				},
 				{
