@@ -16,7 +16,7 @@ import {
 	type City,
 } from './mocks'
 
-import { pickWeighted, sample } from './stats'
+import { pickWeighted, sample, type WeightedOption } from './stats'
 
 import { db } from '../../../src/db/connection'
 import { agentAnswerLabels } from '../../../src/lib/matching/questions'
@@ -127,7 +127,7 @@ async function insertAgent(location: City, now: Date) {
 		businessAddress: buildAddress(location),
 		billingAddress: buildAddress(location),
 		licenseNumberState: `LIC-${randInt(100000, 999999)}-${location.state}`,
-		zipCodes: location.zips.slice(0, 3),
+		zipCodes: pickZipCodes(location),
 		yearsLicensed: persona.yearsLicensed,
 		averageTransactions: persona.averageTransactions,
 		employmentStatus: persona.employmentStatus,
@@ -152,17 +152,43 @@ async function insertAgent(location: City, now: Date) {
 	})
 }
 
+const PRIORITY_CITIES = new Set([
+	'New York',
+	'Los Angeles',
+	'Chicago',
+	'Houston',
+	'Phoenix',
+	'Philadelphia',
+	'San Antonio',
+	'San Diego',
+	'Dallas',
+	'San Jose',
+	'Baltimore',
+])
+
+const CITY_WEIGHTS: WeightedOption<City>[] = CITIES.map((city) => ({
+	value: city,
+	weight: PRIORITY_CITIES.has(city.city) ? 3 : 1,
+}))
+
+function pickCity(): City {
+	return pickWeighted(CITY_WEIGHTS)
+}
+
+function pickZipCodes(location: City): string[] {
+	const count = Math.min(randInt(3, 5), location.zips.length)
+	return sample(location.zips, count)
+}
+
 export async function seedAgents(count: number) {
 	const now = new Date()
 
 	await clearFakeData()
 
-	console.log(`Seeding ${count} agents in Baltimore...`)
-
-	const baltimore = CITIES.find((city) => city.city === 'Baltimore')!
+	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
 
 	for (let i = 0; i < count; i++) {
-		await insertAgent(baltimore, now)
+		await insertAgent(pickCity(), now)
 
 		if ((i + 1) % 50 === 0 || i === count - 1) {
 			console.log(`  ${i + 1}/${count} agents seeded`)
