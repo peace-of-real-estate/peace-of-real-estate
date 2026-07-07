@@ -179,6 +179,7 @@ export default defineConfig(({ mode }) => {
 						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 						setupFiles: ['./tests/support/mocks/styles.ts'],
 						bail: 1,
+						fileParallelism: false,
 						testTimeout: process.env.CI ? 60_000 : 20_000,
 						browser: {
 							instances: [{ browser: 'chromium' }],
