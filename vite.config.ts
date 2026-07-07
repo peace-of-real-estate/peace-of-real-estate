@@ -155,6 +155,11 @@ export default defineConfig(({ mode }) => {
 		},
 		test: {
 			passWithNoTests: true,
+			// CI adds the official HTML report plus a single-file visual diff
+			// page; both get uploaded as artifacts when tests fail
+			reporters: process.env.CI
+				? ['default', 'html', './tests/support/visual-diff-reporter.ts']
+				: ['default'],
 			projects: [
 				{
 					extends: true,
@@ -178,8 +183,8 @@ export default defineConfig(({ mode }) => {
 						name: 'browser',
 						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 						setupFiles: ['./tests/support/mocks/styles.ts'],
-						bail: 1,
-						fileParallelism: false,
+						// fail fast locally, but let CI collect every screenshot diff
+						bail: process.env.CI ? 0 : 1,
 						testTimeout: process.env.CI ? 60_000 : 20_000,
 						browser: {
 							instances: [{ browser: 'chromium' }],
