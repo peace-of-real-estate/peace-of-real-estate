@@ -1,6 +1,6 @@
 import { useState, type ElementType, type ReactNode } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { HelpCircle, LogOut, MessageSquare } from 'lucide-react'
+import { HelpCircle, LogOut } from 'lucide-react'
 
 import { authClient } from '@/lib/auth/client'
 import { cn } from '@/lib/utils/ui'
@@ -75,19 +75,15 @@ export type DashboardSidebarProps = {
 	profileLabel: string
 	profileHint?: string
 	aiItems?: SidebarItem[]
+	userRole?: 'buyer' | 'seller' | 'agent'
 }
 
 export function DashboardSidebar({
 	items,
 	profileLabel,
 	profileHint,
-	aiItems = [
-		{
-			label: 'Practice Negotiating',
-			icon: MessageSquare,
-			href: '/buyer/practice-negotiating',
-		},
-	],
+	aiItems = [],
+	userRole = 'buyer',
 }: DashboardSidebarProps) {
 	const router = useRouterState()
 	const currentPath = router.location.pathname
@@ -116,7 +112,13 @@ export function DashboardSidebar({
 		})
 	}
 
-	const homeHref = isAuthenticated ? '/buyer' : '/auth/login'
+	const homeHref = isAuthenticated
+		? userRole === 'seller'
+			? '/seller/matches'
+			: userRole === 'agent'
+				? '/agent/introductions'
+				: '/buyer/matches'
+		: '/auth/login'
 
 	const renderItem = (item: SidebarItem) => {
 		const Icon = item.icon
@@ -346,9 +348,6 @@ function SupportDialog({
 					</DialogClose>
 					<Button asChild>
 						<a href={`mailto:${supportEmail}`}>Open email</a>
-					</Button>
-					<Button type="button" onClick={() => onOpenChange(false)}>
-						Submit report
 					</Button>
 				</DialogFooter>
 			</DialogContent>

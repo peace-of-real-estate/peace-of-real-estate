@@ -31,6 +31,8 @@ function SellerDashboardLayout() {
 			sidebar={
 				<DashboardSidebar
 					items={sellerItems}
+					aiItems={[]}
+					userRole="seller"
 					profileLabel="Your account"
 					profileHint="Create a profile to save matches"
 				/>

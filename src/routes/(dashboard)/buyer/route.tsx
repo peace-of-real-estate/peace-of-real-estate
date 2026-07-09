@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { ArrowRightLeft, Search, Users } from 'lucide-react'
+import { ArrowRightLeft, MessageSquare, Search, Users } from 'lucide-react'
 
 import {
 	DashboardShell,
@@ -25,12 +25,22 @@ const buyerItems: SidebarItem[] = [
 	},
 ]
 
+const buyerAiItems: SidebarItem[] = [
+	{
+		label: 'Practice Negotiating',
+		icon: MessageSquare,
+		href: '/buyer/practice-negotiating',
+	},
+]
+
 function BuyerDashboardLayout() {
 	return (
 		<DashboardShell
 			sidebar={
 				<DashboardSidebar
 					items={buyerItems}
+					aiItems={buyerAiItems}
+					userRole="buyer"
 					profileLabel="Your account"
 					profileHint="Create a profile to save matches"
 				/>
