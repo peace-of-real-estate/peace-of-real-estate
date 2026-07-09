@@ -46,11 +46,13 @@ import type {
 import {
 	answerValueSchema,
 	buyerAnswerLabels,
+	buyerAnswerSchema,
 	optionKeys,
 	propertyTypeOptions,
 	propertyTypesSchema,
 	questionOptionEntries,
 	sellerAnswerLabels,
+	sellerAnswerSchema,
 	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
@@ -85,31 +87,9 @@ const timelineOptions = [
 	{ slug: '12monthsPlus', label: '12+ months' },
 ] as const
 
-const buyerQuizFields = [
-	'experienceLevel',
-	'idealAgentRelationship',
-	'decisionMakingNeed',
-	'biddingWarResponse',
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'involvementLevel',
-	'responseTimeExpectation',
-	'commissionComfort',
-] as const satisfies readonly (keyof BuyerDraft)[]
+const buyerQuizFields = Object.keys(buyerAnswerSchema.shape)
 
-const sellerQuizFields = [
-	'saleMotivation',
-	'successfulSaleLooksLike',
-	'involvementLevel',
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'agentDeliveryExpectations',
-	'homeConnection',
-	'agentSilencePreference',
-	'representationPreference',
-	'responseTimeExpectation',
-	'commissionComfort',
-] as const satisfies readonly (keyof SellerDraft)[]
+const sellerQuizFields = Object.keys(sellerAnswerSchema.shape)
 
 const buyerQuestions = Object.entries(buyerAnswerLabels).map(
 	([id, config]: [string, AnswerLabelConfig]) => ({
@@ -441,11 +421,15 @@ export function ClientPreferencesFields({
 }
 
 export function isBuyerPreferencesComplete(state: BuyerDraft): boolean {
-	return buyerQuizFields.every((field) => state[field] !== undefined)
+	return buyerQuizFields.every(
+		(field) => Reflect.get(state, field) !== undefined,
+	)
 }
 
 export function isSellerPreferencesComplete(state: SellerDraft): boolean {
-	return sellerQuizFields.every((field) => state[field] !== undefined)
+	return sellerQuizFields.every(
+		(field) => Reflect.get(state, field) !== undefined,
+	)
 }
 
 function ContinueButton({
