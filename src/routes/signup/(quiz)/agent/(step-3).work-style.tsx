@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { AgentDraft } from '@/lib/matching/profile'
 import {
 	agentAnswerLabels,
+	isAnswerValue,
 	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
@@ -132,9 +133,9 @@ function extractAnswers(
 ): Record<string, AnswerValue> {
 	const result: Record<string, AnswerValue> = {}
 	for (const question of questionList) {
-		const value = draft[question.id as keyof AgentDraft]
-		if (value !== undefined && value !== null)
-			result[question.id] = value as AnswerValue
+		if (!Object.hasOwn(draft, question.id)) continue
+		const value = Reflect.get(draft, question.id)
+		if (isAnswerValue(value)) result[question.id] = value
 	}
 	return result
 }
@@ -143,11 +144,10 @@ function answersToProfileUpdate(
 	answerMap: Record<string, AnswerValue>,
 	questionList: Question[],
 ): Partial<AgentDraft> {
-	const update: Partial<AgentDraft> = {}
+	const update: Partial<AgentDraft> & Record<string, AnswerValue> = {}
 	for (const question of questionList) {
 		const value = answerMap[question.id]
-		if (value !== undefined && value !== null)
-			update[question.id as keyof AgentDraft] = value as never
+		if (value !== undefined && value !== null) update[question.id] = value
 	}
 	return update
 }

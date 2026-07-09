@@ -54,6 +54,10 @@ const lint = {
 	rules: {
 		'no-empty-pattern': 'off',
 		'no-console': ['error', { allow: ['warn', 'error'] }],
+		'typescript/consistent-type-assertions': [
+			'error',
+			{ assertionStyle: 'never' },
+		],
 	},
 	overrides: [
 		{

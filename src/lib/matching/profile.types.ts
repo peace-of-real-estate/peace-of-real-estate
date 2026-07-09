@@ -85,12 +85,14 @@ export type SellerClientProfile = Omit<
 
 export type ClientProfile = BuyerClientProfile | SellerClientProfile
 
+// oxlint-disable-next-line typescript/consistent-type-assertions
 export const buyerClientProfileSchema = buyerProfileCreateSchema
 	.partial()
 	.extend({
 		role: z.literal('buyer'),
 	}) as z.ZodType<BuyerClientProfile>
 
+// oxlint-disable-next-line typescript/consistent-type-assertions
 export const sellerClientProfileSchema = sellerProfileCreateSchema
 	.partial()
 	.extend({

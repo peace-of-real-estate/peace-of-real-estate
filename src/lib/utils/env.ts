@@ -46,18 +46,20 @@ export function createEnv<T extends object>(schema: EnvSchema<T>): T {
 		return parsed
 	}
 
-	return new Proxy({} as Record<PropertyKey, unknown>, {
+	const handler: ProxyHandler<T> = {
 		get(_target, property, receiver) {
-			return Reflect.get(parseEnv() as object, property, receiver)
+			return Reflect.get(parseEnv(), property, receiver)
 		},
 		has(_target, property) {
-			return property in (parseEnv() as object)
+			return property in parseEnv()
 		},
 		ownKeys() {
-			return Reflect.ownKeys(parseEnv() as object)
+			return Reflect.ownKeys(parseEnv())
 		},
 		getOwnPropertyDescriptor(_target, property) {
-			return Object.getOwnPropertyDescriptor(parseEnv() as object, property)
+			return Object.getOwnPropertyDescriptor(parseEnv(), property)
 		},
-	}) as T
+	}
+
+	return new Proxy<T>(Object.create(null), handler)
 }

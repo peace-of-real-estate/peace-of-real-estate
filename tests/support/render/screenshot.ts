@@ -25,9 +25,9 @@ export function resetScreenshotHarness(viewport: {
 	width: number
 	height: number
 }) {
-	const frame = window.frameElement as HTMLIFrameElement | null
+	const frame = window.frameElement
 
-	if (frame) {
+	if (frame instanceof HTMLIFrameElement) {
 		frame.style.width = `${viewport.width}px`
 		frame.style.height = `${viewport.height}px`
 	}

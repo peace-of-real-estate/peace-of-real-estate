@@ -35,6 +35,7 @@ import type { BuyerProfile, SellerProfile } from '@/lib/matching/profile'
 import type { AgentMatchData } from '@/lib/matching/scoring'
 import {
 	buyerAnswerLabels,
+	isPropertyTypeSlug,
 	propertyTypeOptions,
 	sellerAnswerLabels,
 	type AnswerLabels,
@@ -260,7 +261,7 @@ function getPreferenceSummaryItems(
 					value: profile.propertyTypes
 						.map(
 							(type) =>
-								propertyTypeOptions[type as keyof typeof propertyTypeOptions] ??
+								(isPropertyTypeSlug(type) ? propertyTypeOptions[type] : null) ??
 								type,
 						)
 						.join(', '),
@@ -268,9 +269,8 @@ function getPreferenceSummaryItems(
 			: null,
 	]
 
-	const answers = profile as Record<string, unknown>
 	const answerItems = Object.entries(answerLabels).map(([id, config]) => {
-		const answer = answers[id]
+		const answer = Reflect.get(profile, id)
 		if (Array.isArray(answer)) {
 			const value = answer
 				.map((slug: string) => config.options[slug] ?? slug)

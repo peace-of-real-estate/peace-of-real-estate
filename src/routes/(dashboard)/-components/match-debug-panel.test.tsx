@@ -167,7 +167,9 @@ async function renderPanel(panelMatches: AgentMatchData[]) {
 			</div>
 		),
 	})
-	return document.querySelector('.max-w-4xl') as HTMLElement
+	const element = document.querySelector<HTMLElement>('.max-w-4xl')
+	if (!element) throw new Error('Panel container not found')
+	return element
 }
 
 /** Expands the nth top-level match row (native <details>, uncontrolled). */

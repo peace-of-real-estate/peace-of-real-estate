@@ -45,6 +45,7 @@ import type {
 } from '@/lib/matching/profile'
 import {
 	buyerAnswerLabels,
+	isAnswerValue,
 	optionKeys,
 	propertyTypeOptions,
 	propertyTypesSchema,
@@ -519,9 +520,9 @@ function extractAnswers(
 ): Record<string, AnswerValue> {
 	const answers: Record<string, AnswerValue> = {}
 	for (const question of questions) {
-		const value = draft[question.id as keyof ClientDraft]
-		if (value !== undefined && value !== null)
-			answers[question.id] = value as AnswerValue
+		if (!Object.hasOwn(draft, question.id)) continue
+		const value = Reflect.get(draft, question.id)
+		if (isAnswerValue(value)) answers[question.id] = value
 	}
 	return answers
 }
@@ -530,11 +531,10 @@ function answersToProfileUpdate(
 	answers: Record<string, AnswerValue>,
 	questions: Question[],
 ): Partial<ClientDraft> {
-	const update: Partial<ClientDraft> = {}
+	const update: Partial<ClientDraft> & Record<string, AnswerValue> = {}
 	for (const question of questions) {
 		const value = answers[question.id]
-		if (value !== undefined && value !== null)
-			update[question.id as keyof ClientDraft] = value as never
+		if (value !== undefined && value !== null) update[question.id] = value
 	}
 	return update
 }

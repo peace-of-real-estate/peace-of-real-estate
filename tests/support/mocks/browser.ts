@@ -5,8 +5,8 @@ import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
 type MockSession = unknown
 
-const authState = vi.hoisted(() => ({
-	session: null as MockSession,
+const authState = vi.hoisted<{ session: MockSession }>(() => ({
+	session: null,
 }))
 
 export function setMockSession(session: MockSession) {

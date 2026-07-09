@@ -21,7 +21,7 @@ import { pickWeighted, sample, type WeightedOption } from './stats'
 import { db } from '../../../src/db/connection'
 import {
 	agentAnswerLabels,
-	getAnswerLabel,
+	optionKeys,
 } from '../../../src/lib/matching/questions'
 import type { AgentProfile } from '../../../src/lib/matching/profile.types'
 import {
@@ -35,9 +35,12 @@ import {
 } from '../../../src/db/tables'
 import { uploadAgentAvatar } from '../avatars'
 
-function pickAnswer(questionId: string) {
-	const label = getAnswerLabel(agentAnswerLabels, questionId)
-	return pick(Object.keys(label!.options))
+function pickAnswer<K extends keyof typeof agentAnswerLabels>(
+	questionId: K,
+): keyof (typeof agentAnswerLabels)[K]['options'] {
+	const label = agentAnswerLabels[questionId]
+	if (!label) throw new Error(`Unknown answer key: ${String(questionId)}`)
+	return pick(optionKeys(label.options))
 }
 
 // Fields required to seed an agent profile. All values are generated from valid
@@ -88,7 +91,7 @@ function generatePersona(): AgentPersona {
 		eoInsuranceStatus: pick(EO_INSURANCE_STATUSES),
 		peacePactSigned: Math.random() < 0.75,
 		usePaxWriter: Math.random() < 0.8,
-	} as AgentPersona
+	}
 }
 
 async function clearFakeData() {

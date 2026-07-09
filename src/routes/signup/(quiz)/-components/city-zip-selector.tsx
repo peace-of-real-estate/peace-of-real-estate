@@ -364,19 +364,27 @@ function expandBoundsFromRing(bounds: BBox, ring: unknown) {
 	}
 }
 
+function isPolygonCoordinates(value: unknown): value is number[][][] {
+	return (
+		Array.isArray(value) &&
+		Array.isArray(value[0]) &&
+		Array.isArray(value[0][0])
+	)
+}
+
 function expandBoundsFromPolygon(
 	bounds: BBox,
 	coordinates: number[][][] | number[][][][],
 ) {
 	if (!Array.isArray(coordinates)) return
 
-	for (const ringOrPart of coordinates) {
-		if (Array.isArray(ringOrPart) && Array.isArray(ringOrPart[0])) {
-			if (Array.isArray(ringOrPart[0][0])) {
-				expandBoundsFromPolygon(bounds, ringOrPart as number[][][])
-			} else {
-				expandBoundsFromRing(bounds, ringOrPart)
-			}
+	if (isPolygonCoordinates(coordinates)) {
+		for (const ring of coordinates) {
+			expandBoundsFromRing(bounds, ring)
+		}
+	} else {
+		for (const polygon of coordinates) {
+			expandBoundsFromPolygon(bounds, polygon)
 		}
 	}
 }

@@ -50,10 +50,12 @@ const agentFlowSteps = [
 	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
 ] satisfies SignupWizardStep<Exclude<AgentFlowStep, 'preview'>>[]
 
+const representationSides: RepresentationSide[] = ['buying', 'selling', 'both']
+
 export const agentConfig = {
 	basePath: '/signup/agent',
 	label: 'Agent',
-	intentOptions: ['buying', 'selling', 'both'] as RepresentationSide[],
+	intentOptions: representationSides,
 	clientOptions: optionKeys(bestClientTypeOptions),
 	accent: 'amber',
 } satisfies {

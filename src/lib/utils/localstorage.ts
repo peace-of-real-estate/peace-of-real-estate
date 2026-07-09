@@ -3,8 +3,9 @@ export function readLocalStorage<T>(key: string): T | null {
 	try {
 		const raw = window.localStorage.getItem(key)
 		if (!raw) return null
-		const parsed = JSON.parse(raw) as unknown
+		const parsed: unknown = JSON.parse(raw)
 		if (parsed && typeof parsed === 'object') {
+			// oxlint-disable-next-line typescript/consistent-type-assertions
 			return parsed as T
 		}
 		return null

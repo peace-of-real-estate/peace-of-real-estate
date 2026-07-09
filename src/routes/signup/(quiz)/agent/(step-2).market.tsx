@@ -79,11 +79,7 @@ export function AgentMarket({
 	const [priceRange, setPriceRange] = useState(initialRange)
 	const [representationSide, setRepresentationSide] = useState<
 		RepresentationSide | ''
-	>(
-		state.representationSide
-			? (state.representationSide as RepresentationSide)
-			: '',
-	)
+	>(state.representationSide ? state.representationSide : '')
 	const [bestClientTypes, setBestClientTypes] = useState<
 		z.infer<typeof bestClientTypesSchema>
 	>(state.bestClientTypes ?? [])
@@ -116,6 +112,7 @@ export function AgentMarket({
 			setHasTriedContinue(true)
 			return
 		}
+		if (!representationSide) return
 
 		const locationUpdate = cityState
 			? { city: cityState.city, state: cityState.state }
@@ -124,7 +121,7 @@ export function AgentMarket({
 			...locationUpdate,
 			zipCodes: selectedZipCodes,
 			typicalPriceRange: serializePriceRange(priceRange),
-			representationSide: representationSide as RepresentationSide,
+			representationSide,
 			bestClientTypes,
 		})
 		onContinue()

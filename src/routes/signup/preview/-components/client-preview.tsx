@@ -20,6 +20,7 @@ import {
 } from '@/lib/matching/profile'
 import {
 	buyerAnswerLabels,
+	isPropertyTypeSlug,
 	propertyTypeOptions,
 	sellerAnswerLabels,
 } from '@/lib/matching/questions'
@@ -176,7 +177,7 @@ function getProfileStats(profile: ClientProfile) {
 			value: profile.propertyTypes
 				.map(
 					(type) =>
-						propertyTypeOptions[type as keyof typeof propertyTypeOptions] ??
+						(isPropertyTypeSlug(type) ? propertyTypeOptions[type] : null) ??
 						type,
 				)
 				.join(', '),
@@ -185,11 +186,7 @@ function getProfileStats(profile: ClientProfile) {
 	const isBuyer = 'idealAgentRelationship' in profile
 	const labels = isBuyer ? buyerAnswerLabels : sellerAnswerLabels
 	for (const [id, config] of Object.entries(labels)) {
-		const value = profile[id as keyof ClientProfile] as
-			| string
-			| string[]
-			| null
-			| undefined
+		const value = Reflect.get(profile, id)
 		if (value === undefined || value === null || value === '__skipped__')
 			continue
 		stats.push({ label: config.label, value: formatAnswer(value, labels) })

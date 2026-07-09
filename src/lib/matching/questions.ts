@@ -19,6 +19,10 @@ export const answerValueSchema: z.ZodType<AnswerValue> = z.union([
 	z.null(),
 ])
 
+export function isAnswerValue(value: unknown): value is AnswerValue {
+	return typeof value === 'string' || Array.isArray(value) || value === null
+}
+
 export const answersSchema: z.ZodType<Answers> = z.record(
 	z.string(),
 	answerValueSchema,
@@ -81,6 +85,8 @@ export function isFreeForm(question: Question): boolean {
 export function optionKeys<const T extends Record<string, string>>(
 	options: T,
 ): [keyof T & string, ...(keyof T & string)[]] {
+	// Object.keys returns string[]; this tuple shape is guaranteed by the caller.
+	// oxlint-disable-next-line typescript/consistent-type-assertions
 	return Object.keys(options) as [keyof T & string, ...(keyof T & string)[]]
 }
 
@@ -406,6 +412,10 @@ export const propertyTypeOptions = {
 } as const
 
 export type PropertyTypeSlug = keyof typeof propertyTypeOptions
+
+export function isPropertyTypeSlug(type: string): type is PropertyTypeSlug {
+	return Object.hasOwn(propertyTypeOptions, type)
+}
 
 export const propertyTypesSchema = z.array(
 	z.enum(optionKeys(propertyTypeOptions)),
