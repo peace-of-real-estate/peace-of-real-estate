@@ -23,7 +23,7 @@ export async function redirectAuthenticatedUsers() {
 	const session = await getCurrentSession()
 
 	if (session) {
-		throw redirect({ to: '/buyer' })
+		throw redirect({ to: '/buyer/matches' })
 	}
 }
 
