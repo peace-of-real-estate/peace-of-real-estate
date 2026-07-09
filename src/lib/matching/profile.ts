@@ -140,7 +140,9 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 	})
 
 export const completeAgentSignup = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => agentProfileCreateSchema.parse(data))
+	.validator((data: unknown) =>
+		agentProfileCreateSchema.omit({ role: true }).parse(data),
+	)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const now = new Date()

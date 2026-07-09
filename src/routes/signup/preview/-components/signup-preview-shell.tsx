@@ -25,8 +25,10 @@ export type SignupFormProps<TData = unknown> = {
 	idPrefix?: string
 	redirect: string
 	oauthRedirect?: string
+	quizPath: string
 	createProfile: (payload: { data: TData }) => Promise<unknown>
 	loadDraft: () => TData | null
+	validateDraft: (draft: TData) => boolean
 	clearDraft: () => void
 	submitLabel?: string
 	showTerms?: boolean
@@ -36,8 +38,10 @@ function SignupForm<TData>({
 	idPrefix = 'signup',
 	redirect,
 	oauthRedirect = redirect,
+	quizPath,
 	createProfile,
 	loadDraft,
+	validateDraft,
 	clearDraft,
 	submitLabel = 'Create my account',
 	showTerms = true,
@@ -62,6 +66,14 @@ function SignupForm<TData>({
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		if (isSubmitting) return
+
+		const draft = loadDraft()
+		if (!draft || !validateDraft(draft)) {
+			toast.error('Please complete your profile before creating an account.')
+			await navigate({ to: quizPath })
+			return
+		}
+
 		setIsSubmitting(true)
 
 		try {
@@ -72,11 +84,8 @@ function SignupForm<TData>({
 			})
 			if (error) throw error
 
-			const draft = loadDraft()
-			if (draft) {
-				await createProfile({ data: draft })
-				clearDraft()
-			}
+			await createProfile({ data: draft })
+			clearDraft()
 
 			await navigate({ to: redirect })
 		} catch (error) {

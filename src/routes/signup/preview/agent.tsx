@@ -120,8 +120,12 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 		<SignupPreviewShell
 			redirect="/agent/introductions"
 			oauthRedirect="/auth/complete?role=agent"
+			quizPath="/signup/agent/identity"
 			createProfile={completeAgentSignup}
 			loadDraft={agentDraftStorage.load}
+			validateDraft={(draft) =>
+				agentProfileCreateSchema.omit({ role: true }).safeParse(draft).success
+			}
 			clearDraft={agentDraftStorage.clear}
 			submitLabel="Activate profile"
 			showTerms={false}
