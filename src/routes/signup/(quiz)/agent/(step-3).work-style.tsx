@@ -12,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { AgentDraft } from '@/lib/matching/profile'
 import {
 	agentAnswerLabels,
-	isAnswerValue,
+	answerValueSchema,
 	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
@@ -135,7 +135,8 @@ function extractAnswers(
 	for (const question of questionList) {
 		if (!Object.hasOwn(draft, question.id)) continue
 		const value = Reflect.get(draft, question.id)
-		if (isAnswerValue(value)) result[question.id] = value
+		const parsed = answerValueSchema.safeParse(value)
+		if (parsed.success) result[question.id] = parsed.data
 	}
 	return result
 }

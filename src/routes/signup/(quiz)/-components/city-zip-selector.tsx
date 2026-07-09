@@ -12,6 +12,7 @@ import type {
 	MapRef,
 } from 'react-map-gl/maplibre'
 import type { StyleSpecification } from 'maplibre-gl'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -364,27 +365,29 @@ function expandBoundsFromRing(bounds: BBox, ring: unknown) {
 	}
 }
 
-function isPolygonCoordinates(value: unknown): value is number[][][] {
-	return (
-		Array.isArray(value) &&
-		Array.isArray(value[0]) &&
-		Array.isArray(value[0][0])
-	)
-}
+const pointSchema = z.tuple([z.number(), z.number()])
+const ringSchema = z.array(pointSchema)
+const polygonSchema = z.array(ringSchema)
+const multiPolygonSchema = z.array(polygonSchema)
 
 function expandBoundsFromPolygon(
 	bounds: BBox,
 	coordinates: number[][][] | number[][][][],
 ) {
-	if (!Array.isArray(coordinates)) return
-
-	if (isPolygonCoordinates(coordinates)) {
-		for (const ring of coordinates) {
+	const polygon = polygonSchema.safeParse(coordinates)
+	if (polygon.success) {
+		for (const ring of polygon.data) {
 			expandBoundsFromRing(bounds, ring)
 		}
-	} else {
-		for (const polygon of coordinates) {
-			expandBoundsFromPolygon(bounds, polygon)
+		return
+	}
+
+	const multiPolygon = multiPolygonSchema.safeParse(coordinates)
+	if (multiPolygon.success) {
+		for (const polygon of multiPolygon.data) {
+			for (const ring of polygon) {
+				expandBoundsFromRing(bounds, ring)
+			}
 		}
 	}
 }

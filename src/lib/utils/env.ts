@@ -4,7 +4,7 @@ type EnvSchema<T extends object> = {
 	parse(input: unknown): T
 }
 
-function isUsableEnvValue(value: string | undefined): value is string {
+function isUsableEnvValue(value: string | undefined): boolean {
 	return value !== undefined && value.trim() !== ''
 }
 

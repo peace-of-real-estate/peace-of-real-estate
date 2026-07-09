@@ -98,15 +98,3 @@ export const sellerClientProfileSchema = sellerProfileCreateSchema
 	.extend({
 		role: z.literal('seller'),
 	}) as z.ZodType<SellerClientProfile>
-
-export function isBuyerClientProfile(
-	profile: ClientProfile,
-): profile is BuyerClientProfile {
-	return profile.role === 'buyer'
-}
-
-export function isSellerClientProfile(
-	profile: ClientProfile,
-): profile is SellerClientProfile {
-	return profile.role === 'seller'
-}

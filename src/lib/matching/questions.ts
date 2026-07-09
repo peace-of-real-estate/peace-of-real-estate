@@ -19,10 +19,6 @@ export const answerValueSchema: z.ZodType<AnswerValue> = z.union([
 	z.null(),
 ])
 
-export function isAnswerValue(value: unknown): value is AnswerValue {
-	return typeof value === 'string' || Array.isArray(value) || value === null
-}
-
 export const answersSchema: z.ZodType<Answers> = z.record(
 	z.string(),
 	answerValueSchema,
@@ -66,9 +62,12 @@ export function getMultiSelectSummary(
 ): string[] {
 	if (answer === undefined || answer === null) return []
 	if (Array.isArray(answer)) {
-		return answer
-			.map((slug) => question.options[slug])
-			.filter((label): label is string => typeof label === 'string')
+		const labels: string[] = []
+		for (const slug of answer) {
+			const label = question.options[slug]
+			if (label) labels.push(label)
+		}
+		return labels
 	}
 	const label = question.options[answer]
 	return label ? [label] : []
@@ -413,8 +412,11 @@ export const propertyTypeOptions = {
 
 export type PropertyTypeSlug = keyof typeof propertyTypeOptions
 
-export function isPropertyTypeSlug(type: string): type is PropertyTypeSlug {
-	return Object.hasOwn(propertyTypeOptions, type)
+const propertyTypeSlugSchema = z.enum(optionKeys(propertyTypeOptions))
+
+export function getPropertyTypeLabel(type: string): string {
+	const parsed = propertyTypeSlugSchema.safeParse(type)
+	return parsed.success ? propertyTypeOptions[parsed.data] : type
 }
 
 export const propertyTypesSchema = z.array(

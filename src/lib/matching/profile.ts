@@ -46,8 +46,6 @@ export type {
 
 export {
 	buyerClientProfileSchema,
-	isBuyerClientProfile,
-	isSellerClientProfile,
 	sellerClientProfileSchema,
 } from '@/lib/matching/profile.types'
 

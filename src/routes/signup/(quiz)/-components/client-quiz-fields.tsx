@@ -44,8 +44,8 @@ import type {
 	SellerDraft,
 } from '@/lib/matching/profile'
 import {
+	answerValueSchema,
 	buyerAnswerLabels,
-	isAnswerValue,
 	optionKeys,
 	propertyTypeOptions,
 	propertyTypesSchema,
@@ -522,7 +522,8 @@ function extractAnswers(
 	for (const question of questions) {
 		if (!Object.hasOwn(draft, question.id)) continue
 		const value = Reflect.get(draft, question.id)
-		if (isAnswerValue(value)) answers[question.id] = value
+		const parsed = answerValueSchema.safeParse(value)
+		if (parsed.success) answers[question.id] = parsed.data
 	}
 	return answers
 }

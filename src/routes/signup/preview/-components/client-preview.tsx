@@ -20,8 +20,7 @@ import {
 } from '@/lib/matching/profile'
 import {
 	buyerAnswerLabels,
-	isPropertyTypeSlug,
-	propertyTypeOptions,
+	getPropertyTypeLabel,
 	sellerAnswerLabels,
 } from '@/lib/matching/questions'
 
@@ -175,11 +174,7 @@ function getProfileStats(profile: ClientProfile) {
 		stats.push({
 			label: 'Home Type',
 			value: profile.propertyTypes
-				.map(
-					(type) =>
-						(isPropertyTypeSlug(type) ? propertyTypeOptions[type] : null) ??
-						type,
-				)
+				.map((type) => getPropertyTypeLabel(type))
 				.join(', '),
 		})
 

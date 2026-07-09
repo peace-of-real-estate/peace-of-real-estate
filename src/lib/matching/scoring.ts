@@ -48,9 +48,7 @@ export type ScoreBucket = 'Location' | 'Price Fit' | 'Client Fit'
  */
 export type DimensionId = 'location' | 'priceFit' | 'clientFit'
 
-function isDimensionId(id: string): id is DimensionId {
-	return id in BASE_WEIGHTS
-}
+const DIMENSION_IDS: DimensionId[] = ['location', 'priceFit', 'clientFit']
 
 /** One row of a dimension's client-vs-agent comparison table. */
 export interface SubCheck {
@@ -429,18 +427,16 @@ export function resolveDimensionWeights(
 	}
 
 	const raw: Record<DimensionId, number> = { ...BASE_WEIGHTS }
-	for (const [id, weight] of Object.entries(BASE_WEIGHTS)) {
-		if (isDimensionId(id)) {
-			raw[id] = boosted.has(id) ? weight * PRIORITY_BOOST : weight
-		}
+	for (const id of DIMENSION_IDS) {
+		const weight = BASE_WEIGHTS[id]
+		raw[id] = boosted.has(id) ? weight * PRIORITY_BOOST : weight
 	}
 
 	const total = Object.values(raw).reduce((sum, weight) => sum + weight, 0)
 	const weights: Record<DimensionId, number> = { ...raw }
-	for (const [id, weight] of Object.entries(raw)) {
-		if (isDimensionId(id)) {
-			weights[id] = (weight / total) * 100
-		}
+	for (const id of DIMENSION_IDS) {
+		const weight = raw[id]
+		weights[id] = (weight / total) * 100
 	}
 
 	return { weights, boosted }
@@ -497,21 +493,19 @@ export function calculateFitScore(
 		clientFit: scoreClientFit(client, agent, side),
 	}
 
-	const dimensions = Object.keys(BASE_WEIGHTS)
-		.filter(isDimensionId)
-		.map(
-			(id): DimensionTrace => ({
-				id,
-				label: DIMENSION_LABELS[id],
-				baseWeight: BASE_WEIGHTS[id],
-				weight: round2(weights[id]),
-				boosted: boosted.has(id),
-				score: round2(results[id].score),
-				contribution: round2(weights[id] * results[id].score),
-				explanation: results[id].explanation,
-				checks: results[id].checks,
-			}),
-		)
+	const dimensions = DIMENSION_IDS.map(
+		(id): DimensionTrace => ({
+			id,
+			label: DIMENSION_LABELS[id],
+			baseWeight: BASE_WEIGHTS[id],
+			weight: round2(weights[id]),
+			boosted: boosted.has(id),
+			score: round2(results[id].score),
+			contribution: round2(weights[id] * results[id].score),
+			explanation: results[id].explanation,
+			checks: results[id].checks,
+		}),
+	)
 
 	const computedScore = Math.max(
 		0,

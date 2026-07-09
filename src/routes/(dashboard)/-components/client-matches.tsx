@@ -35,8 +35,7 @@ import type { BuyerProfile, SellerProfile } from '@/lib/matching/profile'
 import type { AgentMatchData } from '@/lib/matching/scoring'
 import {
 	buyerAnswerLabels,
-	isPropertyTypeSlug,
-	propertyTypeOptions,
+	getPropertyTypeLabel,
 	sellerAnswerLabels,
 	type AnswerLabels,
 } from '@/lib/matching/questions'
@@ -259,11 +258,7 @@ function getPreferenceSummaryItems(
 			? {
 					label: 'Home Type',
 					value: profile.propertyTypes
-						.map(
-							(type) =>
-								(isPropertyTypeSlug(type) ? propertyTypeOptions[type] : null) ??
-								type,
-						)
+						.map((type) => getPropertyTypeLabel(type))
 						.join(', '),
 				}
 			: null,
@@ -281,7 +276,9 @@ function getPreferenceSummaryItems(
 		return { label: config.label, value: config.options[answer] ?? answer }
 	})
 
-	return [...profileItems, ...answerItems].filter(
-		(item): item is { label: string; value: string } => item !== null,
-	)
+	const items: { label: string; value: string }[] = []
+	for (const item of [...profileItems, ...answerItems]) {
+		if (item) items.push(item)
+	}
+	return items
 }

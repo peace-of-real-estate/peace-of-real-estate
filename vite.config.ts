@@ -46,6 +46,7 @@ const lint = {
 		'node',
 		'promise',
 	],
+	jsPlugins: [{ name: 'eslint-js', specifier: 'oxlint-plugin-eslint' }],
 	categories: {},
 	options: {
 		typeAware: true,
@@ -57,6 +58,14 @@ const lint = {
 		'typescript/consistent-type-assertions': [
 			'error',
 			{ assertionStyle: 'never' },
+		],
+		'eslint-js/no-restricted-syntax': [
+			'error',
+			{
+				selector: 'TSTypePredicate[asserts=false]',
+				message:
+					'Type predicates are not allowed. Use runtime validation instead.',
+			},
 		],
 	},
 	overrides: [
