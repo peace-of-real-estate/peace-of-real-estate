@@ -33,12 +33,7 @@ vi.mock('@/lib/auth/functions', () => ({
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
 }))
 
-vi.mock('@/lib/premium', () => ({
-	isUserPremium: () => false,
-	upgradeToPremium: () => ({ success: true }),
-}))
-
-vi.mock('@/lib/beta', () => ({
+vi.mock('@/lib/auth/beta', () => ({
 	authenticateBeta: async () => ({ success: true }),
 	hasBetaAccess: () => true,
 }))

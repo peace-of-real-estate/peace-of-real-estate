@@ -26,7 +26,7 @@ type RenderedRoute = {
 	queryClient: ReturnType<typeof createTestQueryClient>
 }
 
-const protectedPathPrefixes = ['/agent/dashboard', '/consumer/dashboard']
+const protectedPathPrefixes = ['/agent/', '/buyer/', '/seller/']
 
 function resolveRoutePath({ path, name }: RouteTestOptions) {
 	if (path) return path
