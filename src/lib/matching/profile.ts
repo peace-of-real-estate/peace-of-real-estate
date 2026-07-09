@@ -250,7 +250,7 @@ async function loadAgentMatchesForProfile(
 	qualified.sort(byComputedScore)
 
 	const { offset, limit } = pageParam
-	const top = [...scored].sort(byComputedScore).slice(offset, offset + limit)
+	const top = qualified.slice(offset, offset + limit)
 
 	const scoreDistribution = buildScoreDistribution(
 		scored.map(({ score }) => score),
