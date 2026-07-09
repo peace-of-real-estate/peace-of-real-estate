@@ -45,12 +45,16 @@ import type {
 } from '@/lib/matching/profile'
 import {
 	buyerAnswerLabels,
+	optionKeys,
 	propertyTypeOptions,
+	propertyTypesSchema,
 	questionOptionEntries,
 	sellerAnswerLabels,
+	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
 } from '@/lib/matching/questions'
+import type { z } from 'zod'
 import { cn } from '@/lib/utils/ui'
 import {
 	AnimatedStepCard,
@@ -107,7 +111,7 @@ const sellerQuizFields = [
 ] as const satisfies readonly (keyof SellerDraft)[]
 
 const buyerQuestions = Object.entries(buyerAnswerLabels).map(
-	([id, config]) => ({
+	([id, config]: [string, AnswerLabelConfig]) => ({
 		id,
 		title: config.title,
 		options: config.options,
@@ -116,7 +120,7 @@ const buyerQuestions = Object.entries(buyerAnswerLabels).map(
 ) satisfies Question[]
 
 const sellerQuestions = Object.entries(sellerAnswerLabels).map(
-	([id, config]) => ({
+	([id, config]: [string, AnswerLabelConfig]) => ({
 		id,
 		title: config.title,
 		options: config.options,
@@ -206,9 +210,9 @@ export function ClientHomeFields({
 	const [priceRange, setPriceRange] = useState(
 		parsePriceRange(state.priceRange),
 	)
-	const [propertyTypes, setPropertyTypes] = useState<string[]>(
-		state.propertyTypes ?? [],
-	)
+	const [propertyTypes, setPropertyTypes] = useState<
+		z.infer<typeof propertyTypesSchema>
+	>(state.propertyTypes ?? [])
 	const [hasDeadline, setHasDeadline] = useState(
 		state.timeline ? state.timeline !== 'exploring' : false,
 	)
@@ -306,11 +310,11 @@ export function ClientHomeFields({
 							}
 						>
 							<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-								{Object.entries(propertyTypeOptions).map(([option, label]) => (
+								{optionKeys(propertyTypeOptions).map((option) => (
 									<SelectionCard
 										key={option}
 										icon={Home}
-										title={label}
+										title={propertyTypeOptions[option]}
 										selected={propertyTypes.includes(option)}
 										variant="solid"
 										layout="vertical"

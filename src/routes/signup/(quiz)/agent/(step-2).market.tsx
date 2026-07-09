@@ -33,7 +33,12 @@ import {
 	getRepresentationLabel,
 	type AgentFlowStep,
 } from './route'
-import { bestClientTypeLabels } from '@/lib/matching/questions'
+import {
+	bestClientTypeLabels,
+	bestClientTypesSchema,
+	type BestClientTypeSlug,
+} from '@/lib/matching/questions'
+import type { z } from 'zod'
 
 export const Route = createFileRoute('/signup/(quiz)/agent/(step-2)/market')({
 	component: AgentMarketRoute,
@@ -54,7 +59,7 @@ function AgentMarketRoute() {
 	)
 }
 
-function AgentMarket({
+export function AgentMarket({
 	state,
 	onUpdate,
 	onContinue,
@@ -79,9 +84,9 @@ function AgentMarket({
 			? (state.representationSide as RepresentationSide)
 			: '',
 	)
-	const [bestClientTypes, setBestClientTypes] = useState<string[]>(
-		state.bestClientTypes ?? [],
-	)
+	const [bestClientTypes, setBestClientTypes] = useState<
+		z.infer<typeof bestClientTypesSchema>
+	>(state.bestClientTypes ?? [])
 
 	const marketComplete = committedLocation.trim().length >= 2
 	const priceComplete =
@@ -98,7 +103,7 @@ function AgentMarket({
 		setSelectedZipCodes(zipCodes)
 	}
 
-	const toggleClientType = (option: string) => {
+	const toggleClientType = (option: BestClientTypeSlug) => {
 		setBestClientTypes((current) =>
 			current.includes(option)
 				? current.filter((item) => item !== option)

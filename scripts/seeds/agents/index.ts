@@ -19,7 +19,11 @@ import {
 import { pickWeighted, sample, type WeightedOption } from './stats'
 
 import { db } from '../../../src/db/connection'
-import { agentAnswerLabels } from '../../../src/lib/matching/questions'
+import {
+	agentAnswerLabels,
+	getAnswerLabel,
+} from '../../../src/lib/matching/questions'
+import type { AgentProfile } from '../../../src/lib/matching/profile.types'
 import {
 	account,
 	agentProfiles,
@@ -32,10 +36,34 @@ import {
 import { uploadAgentAvatar } from '../avatars'
 
 function pickAnswer(questionId: string) {
-	return pick(Object.keys(agentAnswerLabels[questionId]!.options))
+	const label = getAnswerLabel(agentAnswerLabels, questionId)
+	return pick(Object.keys(label!.options))
 }
 
-function generatePersona() {
+// Fields required to seed an agent profile. All values are generated from valid
+// option sets, so the cast is safe.
+type AgentPersona = {
+	representationSide: AgentProfile['representationSide']
+	typicalPriceRange: string
+	bestClientTypes: AgentProfile['bestClientTypes']
+	notFitFor: AgentProfile['notFitFor']
+	yearsLicensed: string
+	averageTransactions: string
+	employmentStatus: string
+	clientDescription: AgentProfile['clientDescription']
+	communicationFrequency: AgentProfile['communicationFrequency']
+	quickCommunicationChannel: AgentProfile['quickCommunicationChannel']
+	updateDeliveryMethod: AgentProfile['updateDeliveryMethod']
+	difficultDealInstinct: AgentProfile['difficultDealInstinct']
+	responseTime: AgentProfile['responseTime']
+	commissionApproach: AgentProfile['commissionApproach']
+	unrepresentedBuyerApproach: AgentProfile['unrepresentedBuyerApproach']
+	eoInsuranceStatus: string
+	peacePactSigned: boolean
+	usePaxWriter: boolean
+}
+
+function generatePersona(): AgentPersona {
 	const priceTier = pickWeighted(PRICE_TIERS)
 	const years = randInt(1, 30)
 	const avgTrans = randInt(3, 60)
@@ -60,7 +88,7 @@ function generatePersona() {
 		eoInsuranceStatus: pick(EO_INSURANCE_STATUSES),
 		peacePactSigned: Math.random() < 0.75,
 		usePaxWriter: Math.random() < 0.8,
-	}
+	} as AgentPersona
 }
 
 async function clearFakeData() {

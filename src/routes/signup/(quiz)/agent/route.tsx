@@ -22,7 +22,11 @@ import {
 import type { AgentDraft, RepresentationSide } from '@/lib/matching/profile'
 import { getCurrentSession } from '@/lib/auth/functions'
 import { loadAgentProfile } from '@/lib/matching/profile'
-import { bestClientTypeLabels } from '@/lib/matching/questions'
+import {
+	bestClientTypeOptions,
+	optionKeys,
+	type BestClientTypeSlug,
+} from '@/lib/matching/questions'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 export type AgentFlowStep =
@@ -50,13 +54,13 @@ export const agentConfig = {
 	basePath: '/signup/agent',
 	label: 'Agent',
 	intentOptions: ['buying', 'selling', 'both'] as RepresentationSide[],
-	clientOptions: Object.keys(bestClientTypeLabels),
+	clientOptions: optionKeys(bestClientTypeOptions),
 	accent: 'amber',
 } satisfies {
 	basePath: '/signup/agent'
 	label: string
 	intentOptions: RepresentationSide[]
-	clientOptions: string[]
+	clientOptions: BestClientTypeSlug[]
 	accent: 'amber'
 }
 

@@ -3,7 +3,7 @@ import { z } from 'zod'
 export type Question = {
 	id: string
 	title: string
-	options: Record<string, string>
+	options: Readonly<Record<string, string>>
 	multiple?: boolean | undefined
 	freeForm?: boolean | undefined
 	allowSkip?: boolean | undefined
@@ -78,16 +78,29 @@ export function isFreeForm(question: Question): boolean {
 	return question.freeForm === true
 }
 
-type AnswerLabelConfig = {
+export function optionKeys<const T extends Record<string, string>>(
+	options: T,
+): [keyof T & string, ...(keyof T & string)[]] {
+	return Object.keys(options) as [keyof T & string, ...(keyof T & string)[]]
+}
+
+export type AnswerLabelConfig = {
 	title: string
 	label: string
-	options: Record<string, string>
+	options: Readonly<Record<string, string>>
 	multiple?: boolean
 }
 
 export type AnswerLabels = Record<string, AnswerLabelConfig>
 
-export const buyerAnswerLabels: AnswerLabels = {
+export function getAnswerLabel(
+	labels: AnswerLabels,
+	questionId: string,
+): AnswerLabelConfig | undefined {
+	return labels[questionId]
+}
+
+export const buyerAnswerLabels = {
 	experienceLevel: {
 		title: 'How familiar does this process feel?',
 		label: 'Experience',
@@ -95,7 +108,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			firstTime: "First time; I'll want guidance",
 			experienced: "I've done this before, but want help staying on track",
 			veryExperienced: 'I know the process and want a strong operator',
-		},
+		} as const,
 	},
 	idealAgentRelationship: {
 		title: 'What does your ideal agent relationship look like?',
@@ -104,7 +117,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			trustedAdvisor: 'Trusted advisor',
 			thinkingPartner: 'Thinking partner (collaborator)',
 			skilledExecutor: 'Skilled executor',
-		},
+		} as const,
 	},
 	decisionMakingNeed: {
 		title: 'What do you need most to make a big decision?',
@@ -114,7 +127,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			timeAndSpace: 'Time and space',
 			trustedPerspective: 'A trusted perspective',
 			gutFeeling: 'A gut feeling',
-		},
+		} as const,
 	},
 	biddingWarResponse: {
 		title: 'After losing a bidding war, what do you need from your agent?',
@@ -124,7 +137,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			space: 'Space to step back',
 			reassurance: 'Reassurance',
 			calmPresence: 'Calm, steady presence',
-		},
+		} as const,
 	},
 	quickCommunicationChannel: {
 		title: 'How do you prefer quick back-and-forth communication?',
@@ -133,7 +146,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			text: 'Text',
 			phone: 'Phone',
 			either: 'Either is fine',
-		},
+		} as const,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you prefer updates, timelines, and documents?',
@@ -142,7 +155,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			email: 'Email',
 			textWithAttachments: 'Text with attachments',
 			phoneThenEmailRecap: 'Phone call then email recap',
-		},
+		} as const,
 	},
 	involvementLevel: {
 		title: 'How involved do you want to be?',
@@ -151,7 +164,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			veryInvolved: 'Very involved',
 			keyDetails: 'Key details only',
 			handsOff: 'Hands off',
-		},
+		} as const,
 	},
 	responseTimeExpectation: {
 		title: 'How quickly do you expect a response?',
@@ -161,7 +174,7 @@ export const buyerAnswerLabels: AnswerLabels = {
 			within30Min: '30 min',
 			fewHours: 'A few hours',
 			within24Hours: '24 hours',
-		},
+		} as const,
 	},
 	commissionComfort: {
 		title: 'How do you plan to handle commission with your agent?',
@@ -171,11 +184,11 @@ export const buyerAnswerLabels: AnswerLabels = {
 			openOptions: 'Open but want options first',
 			payFairRate: 'Will pay fair rate, not a concern',
 			dontUnderstand: "Don't understand it yet",
-		},
+		} as const,
 	},
-}
+} satisfies AnswerLabels
 
-export const sellerAnswerLabels: AnswerLabels = {
+export const sellerAnswerLabels = {
 	saleMotivation: {
 		title: 'What is driving this sale?',
 		label: 'Motivation',
@@ -186,7 +199,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			rightTime: 'Right time',
 			majorTransition: 'Major personal transition',
 			other: 'Other',
-		},
+		} as const,
 	},
 	successfulSaleLooksLike: {
 		title: 'What does a successful sale look like to you?',
@@ -196,7 +209,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			strongPriceSmoothProcess: 'Strong price + smooth process',
 			speedCertainty: 'Speed & certainty',
 			mustCloseByDate: 'Must close by a specific date',
-		},
+		} as const,
 	},
 	involvementLevel: {
 		title: 'How involved do you want to be?',
@@ -205,7 +218,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			veryInvolved: 'Very involved',
 			keepMeInformed: 'Keep me informed',
 			handsOff: 'Hands off',
-		},
+		} as const,
 	},
 	quickCommunicationChannel: {
 		title: 'How do you prefer quick back-and-forth communication?',
@@ -214,7 +227,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			text: 'Text',
 			phone: 'Phone',
 			either: 'Either is fine',
-		},
+		} as const,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you prefer updates, timelines, and documents?',
@@ -223,7 +236,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			email: 'Email',
 			textWithAttachments: 'Text with attachments',
 			phoneThenEmailRecap: 'Phone call then email recap',
-		},
+		} as const,
 	},
 	agentDeliveryExpectations: {
 		title: 'What would make you feel your agent delivered? (choose up to 2)',
@@ -235,7 +248,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			reachableResponsive: 'Reachable & responsive',
 			keptItCalm: 'Kept it calm',
 			honestStraightforward: 'Honest & straightforward',
-		},
+		} as const,
 		multiple: true,
 	},
 	homeConnection: {
@@ -246,7 +259,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			goodMemories: 'Good memories, ready to move on',
 			partOfIdentity: 'Part of my identity',
 			complicated: 'Complicated/emotionally difficult',
-		},
+		} as const,
 	},
 	agentSilencePreference: {
 		title: 'When not hearing from your agent, what do you prefer?',
@@ -255,7 +268,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			scheduled: 'Regular scheduled check-ins',
 			milestones: 'Updates at key milestones',
 			clientLed: "I'll reach out when needed",
-		},
+		} as const,
 	},
 	representationPreference: {
 		title: 'Which matters more to you?',
@@ -263,7 +276,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 		options: {
 			broadConnections: 'Broad connections (even with competing loyalties)',
 			exclusiveRepresentationOnly: 'Exclusive representation only',
-		},
+		} as const,
 	},
 	responseTimeExpectation: {
 		title: 'How quickly do you expect a response?',
@@ -273,7 +286,7 @@ export const sellerAnswerLabels: AnswerLabels = {
 			within30Min: '30 min',
 			fewHours: 'A few hours',
 			within24Hours: '24 hours',
-		},
+		} as const,
 	},
 	commissionComfort: {
 		title: 'How do you plan to handle listing-agent commission?',
@@ -283,21 +296,11 @@ export const sellerAnswerLabels: AnswerLabels = {
 			openOptions: 'Open but want options first',
 			payFairRate: 'Will pay fair rate, not a concern',
 			dontUnderstand: "Don't understand it yet",
-		},
+		} as const,
 	},
-}
+} satisfies AnswerLabels
 
-export const agentAnswerLabels: AnswerLabels = {
-	typicalPriceRange: {
-		title: 'What is your typical price range?',
-		label: 'Price range',
-		options: {
-			under400k: 'Under $400k',
-			'400kTo750k': '$400k–$750k',
-			'750kTo1_5M': '$750k–$1.5M',
-			'1_5MPlus': '$1.5M and above',
-		},
-	},
+export const agentAnswerLabels = {
 	clientDescription: {
 		title: 'How would clients describe working with you?',
 		label: 'Client description',
@@ -306,7 +309,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			calmSteady: 'Calm & steady',
 			warmRelational: 'Warm & relational',
 			efficientDecisive: 'Efficient & decisive',
-		},
+		} as const,
 	},
 	communicationFrequency: {
 		title: 'How often do you communicate during a transaction?',
@@ -315,7 +318,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			scheduled: 'Regular scheduled check-ins',
 			milestones: 'At key milestones',
 			clientLed: 'Client-led pace',
-		},
+		} as const,
 	},
 	quickCommunicationChannel: {
 		title: 'Preferred quick back-and-forth channel?',
@@ -324,7 +327,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			text: 'Text',
 			phone: 'Phone',
 			either: 'Either is fine',
-		},
+		} as const,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you deliver updates, timelines, documents?',
@@ -333,7 +336,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			email: 'Email',
 			textWithAttachments: 'Text with attachments',
 			phoneThenEmailRecap: 'Phone call then email recap',
-		},
+		} as const,
 	},
 	difficultDealInstinct: {
 		title: 'Instinct when a deal gets difficult?',
@@ -343,7 +346,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			slowItDown: 'Slow it down',
 			takeControl: 'Take control',
 			deEscalateFirst: 'De-escalate first',
-		},
+		} as const,
 	},
 	responseTime: {
 		title: 'How quickly do you typically respond to clients?',
@@ -353,7 +356,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			within30Min: '30 min',
 			fewHours: 'A few hours',
 			within24Hours: '24 hours',
-		},
+		} as const,
 	},
 	commissionApproach: {
 		title: 'How do you approach commission conversations?',
@@ -363,7 +366,7 @@ export const agentAnswerLabels: AnswerLabels = {
 			proactiveOpen: 'Proactive & open to discussion',
 			reactiveFixed: 'Reactive & fixed rate',
 			reactiveOpen: 'Reactive & open',
-		},
+		} as const,
 	},
 	unrepresentedBuyerApproach: {
 		title: 'Unrepresented buyer approaches your listing — what do you do?',
@@ -374,11 +377,11 @@ export const agentAnswerLabels: AnswerLabels = {
 				'Represent seller only, buyer unrepresented (disclosed)',
 			anotherAgentInBrokerage:
 				'Another agent at your brokerage represents buyer (disclosed)',
-		},
+		} as const,
 	},
-}
+} satisfies AnswerLabels
 
-export const bestClientTypeLabels: Record<string, string> = {
+export const bestClientTypeOptions = {
 	firstTime: 'First-time buyers',
 	moveUp: 'Move-up or downsizing',
 	relocation: 'Relocation',
@@ -388,7 +391,12 @@ export const bestClientTypeLabels: Record<string, string> = {
 	seller: 'Sellers & listings',
 	condoTownhome: 'Condos & townhomes',
 	other: 'Other',
-}
+} as const
+
+export const bestClientTypeLabels: Record<string, string> =
+	bestClientTypeOptions
+
+export type BestClientTypeSlug = keyof typeof bestClientTypeOptions
 
 export const propertyTypeOptions = {
 	singleFamily: 'Single-Family',
@@ -396,3 +404,100 @@ export const propertyTypeOptions = {
 	multiFamily: 'Multi-family',
 	land: 'Land',
 } as const
+
+export type PropertyTypeSlug = keyof typeof propertyTypeOptions
+
+export const propertyTypesSchema = z.array(
+	z.enum(optionKeys(propertyTypeOptions)),
+)
+
+export const bestClientTypesSchema = z.array(
+	z.enum(optionKeys(bestClientTypeOptions)),
+)
+
+export const buyerAnswerSchema = z.object({
+	experienceLevel: z.enum(
+		optionKeys(buyerAnswerLabels.experienceLevel.options),
+	),
+	idealAgentRelationship: z.enum(
+		optionKeys(buyerAnswerLabels.idealAgentRelationship.options),
+	),
+	decisionMakingNeed: z.enum(
+		optionKeys(buyerAnswerLabels.decisionMakingNeed.options),
+	),
+	biddingWarResponse: z.enum(
+		optionKeys(buyerAnswerLabels.biddingWarResponse.options),
+	),
+	quickCommunicationChannel: z.enum(
+		optionKeys(buyerAnswerLabels.quickCommunicationChannel.options),
+	),
+	updateDeliveryMethod: z.enum(
+		optionKeys(buyerAnswerLabels.updateDeliveryMethod.options),
+	),
+	involvementLevel: z.enum(
+		optionKeys(buyerAnswerLabels.involvementLevel.options),
+	),
+	responseTimeExpectation: z.enum(
+		optionKeys(buyerAnswerLabels.responseTimeExpectation.options),
+	),
+	commissionComfort: z.enum(
+		optionKeys(buyerAnswerLabels.commissionComfort.options),
+	),
+})
+
+export const sellerAnswerSchema = z.object({
+	saleMotivation: z.enum(optionKeys(sellerAnswerLabels.saleMotivation.options)),
+	successfulSaleLooksLike: z.enum(
+		optionKeys(sellerAnswerLabels.successfulSaleLooksLike.options),
+	),
+	involvementLevel: z.enum(
+		optionKeys(sellerAnswerLabels.involvementLevel.options),
+	),
+	quickCommunicationChannel: z.enum(
+		optionKeys(sellerAnswerLabels.quickCommunicationChannel.options),
+	),
+	updateDeliveryMethod: z.enum(
+		optionKeys(sellerAnswerLabels.updateDeliveryMethod.options),
+	),
+	agentDeliveryExpectations: z.array(
+		z.enum(optionKeys(sellerAnswerLabels.agentDeliveryExpectations.options)),
+	),
+	homeConnection: z.enum(optionKeys(sellerAnswerLabels.homeConnection.options)),
+	agentSilencePreference: z.enum(
+		optionKeys(sellerAnswerLabels.agentSilencePreference.options),
+	),
+	representationPreference: z.enum(
+		optionKeys(sellerAnswerLabels.representationPreference.options),
+	),
+	responseTimeExpectation: z.enum(
+		optionKeys(sellerAnswerLabels.responseTimeExpectation.options),
+	),
+	commissionComfort: z.enum(
+		optionKeys(sellerAnswerLabels.commissionComfort.options),
+	),
+})
+
+export const agentAnswerSchema = z.object({
+	clientDescription: z.enum(
+		optionKeys(agentAnswerLabels.clientDescription.options),
+	),
+	communicationFrequency: z.enum(
+		optionKeys(agentAnswerLabels.communicationFrequency.options),
+	),
+	quickCommunicationChannel: z.enum(
+		optionKeys(agentAnswerLabels.quickCommunicationChannel.options),
+	),
+	updateDeliveryMethod: z.enum(
+		optionKeys(agentAnswerLabels.updateDeliveryMethod.options),
+	),
+	difficultDealInstinct: z.enum(
+		optionKeys(agentAnswerLabels.difficultDealInstinct.options),
+	),
+	responseTime: z.enum(optionKeys(agentAnswerLabels.responseTime.options)),
+	commissionApproach: z.enum(
+		optionKeys(agentAnswerLabels.commissionApproach.options),
+	),
+	unrepresentedBuyerApproach: z.enum(
+		optionKeys(agentAnswerLabels.unrepresentedBuyerApproach.options),
+	),
+})

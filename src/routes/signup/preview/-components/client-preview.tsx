@@ -35,6 +35,22 @@ export function draftToClientPreviewProfile(
 	return sellerClientProfileSchema.parse({ role, ...input })
 }
 
+export function ClientPreviewHeader({ title }: { title: string }) {
+	return (
+		<div>
+			<span className="mb-2 inline-flex rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold tracking-[0.16em] text-amber-900 uppercase">
+				Preview
+			</span>
+			<h2 className="font-heading text-3xl tracking-tight text-slate-950 md:text-4xl">
+				{title}
+			</h2>
+			<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
+				Based on your quiz answers.
+			</p>
+		</div>
+	)
+}
+
 export function ClientProfilePreviewCard({
 	profile,
 }: {

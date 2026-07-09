@@ -1,5 +1,8 @@
 import { serializePriceRange } from '../../../src/lib/matching/price-range'
-import { bestClientTypeLabels } from '../../../src/lib/matching/questions'
+import {
+	bestClientTypeLabels,
+	type BestClientTypeSlug,
+} from '../../../src/lib/matching/questions'
 import type { WeightedOption } from './stats'
 
 export const FIRST_NAMES = [
@@ -1400,7 +1403,7 @@ export const PRICE_TIERS: WeightedOption<keyof typeof PRICE_BY_TIER>[] = [
 // matching signal.
 export const CLIENT_TYPES = Object.keys(bestClientTypeLabels).filter(
 	(slug) => slug !== 'other',
-)
+) as BestClientTypeSlug[]
 
 export const EMPLOYMENT_STATUSES = [
 	'Salesperson',

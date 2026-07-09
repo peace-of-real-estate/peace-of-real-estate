@@ -1,98 +1,153 @@
-import { beforeEach, describe, expect, test } from 'vitest'
-import { page } from 'vite-plus/test/browser'
-import { renderRoute } from '@tests/support/render/route'
+import { describe, test } from 'vitest'
+import type { z } from 'zod'
+import {
+	UserIcon,
+	MapPinIcon,
+	ChartLineIcon,
+	ShieldCheckIcon,
+	ScrollIcon,
+} from '@phosphor-icons/react'
+
+import { renderComponent } from '@tests/support/render/component'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import {
+	AgentPreview,
+	draftToPreviewProfile,
+} from '@/routes/signup/preview/agent'
+import { AgentIdentity } from '@/routes/signup/(quiz)/agent/(step-1).identity'
+import { AgentMarket } from '@/routes/signup/(quiz)/agent/(step-2).market'
+import { AgentWorkStyle } from '@/routes/signup/(quiz)/agent/(step-3).work-style'
+import { AgentCompliance } from '@/routes/signup/(quiz)/agent/(step-4).compliance'
+import { AgentPeacePact } from '@/routes/signup/(quiz)/agent/(step-5).peace-pact'
+import { WizardChrome } from '@/routes/signup/(quiz)/-components/signup-wizard-shell'
+import {
+	agentAnswerSchema,
+	bestClientTypesSchema,
+} from '@/lib/matching/questions'
 
-async function clickSelector(id: string) {
-	await page.elementLocator(document.querySelector(id)!).click()
+type AgentPreviewFixture = z.infer<typeof agentAnswerSchema> & {
+	firstName?: string
+	lastName?: string
+	brokerageName?: string
+	city?: string
+	state?: string
+	zipCodes?: string[]
+	typicalPriceRange?: string
+	representationSide?: 'buying' | 'selling' | 'both'
+	bestClientTypes?: z.infer<typeof bestClientTypesSchema>
+	yearsLicensed?: string
+	averageTransactions?: string
+	eoInsuranceStatus?: string
 }
 
-async function fillIdentityStep() {
-	await page.getByRole('textbox', { name: 'First name' }).fill('Alex')
-	await page.getByRole('textbox', { name: 'Last name' }).fill('Morgan')
-	await page
-		.getByRole('textbox', { name: 'Brokerage name' })
-		.fill('PRE Realty Group')
-	await page
-		.getByRole('textbox', { name: 'License number & state' })
-		.fill('TX-12345678')
-}
+const agentSteps = [
+	{ id: 'identity', label: 'Identity', icon: UserIcon },
+	{ id: 'market', label: 'Market', icon: MapPinIcon },
+	{ id: 'workStyle', label: 'Work Style', icon: ChartLineIcon },
+	{ id: 'compliance', label: 'Compliance', icon: ShieldCheckIcon },
+	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
+]
 
-async function fillMarketStep() {
-	await clickSelector('#agent-market')
-	const searchInput = page.getByPlaceholder('Search city')
-	await expect.element(searchInput).toBeVisible()
-	await searchInput.fill('Austin')
-	await page.getByRole('option').first().click()
-	await page.getByRole('button', { name: 'Buyers', exact: true }).click()
-	await page
-		.getByRole('button', {
-			name: 'First-time buyers',
-		})
-		.click()
-}
-
-async function fillWorkStyleStep() {
-	await page.getByRole('button', { name: 'Strategic & data-driven' }).click()
-	await page
-		.getByRole('button', { name: 'Regular scheduled check-ins' })
-		.click()
-	await page.getByRole('button', { name: 'Text' }).click()
-	await page.getByRole('button', { name: 'Email', exact: true }).click()
-	await page.getByRole('button', { name: 'Facts fast' }).click()
-	await page.getByRole('button', { name: 'Within 10 min' }).click()
-	await page
-		.getByRole('button', { name: 'Proactive & open to discussion' })
-		.click()
-	await page
-		.getByRole('button', {
-			name: 'Represent seller only, buyer unrepresented (disclosed)',
-		})
-		.click()
-	await page.getByRole('button', { name: 'Skip' }).click()
-}
-
-async function fillComplianceStep() {
-	await page.getByRole('checkbox').first().click()
-	await page
-		.getByRole('radio', { name: 'Yes, I carry my own E&O policy' })
-		.click()
-}
-
-async function fillPeacePactStep() {
-	await page.getByRole('checkbox').first().click()
-	await page
-		.getByRole('textbox', { name: 'Agent Signature' })
-		.fill('Alex Morgan')
-}
+const agentPreviewDraft = {
+	firstName: 'Alex',
+	lastName: 'Morgan',
+	brokerageName: 'PRE Realty Group',
+	city: 'Austin',
+	state: 'TX',
+	zipCodes: ['78701', '78704'],
+	typicalPriceRange: '400000-1000000',
+	representationSide: 'both' as const,
+	bestClientTypes: ['firstTime', 'moveUp'],
+	yearsLicensed: '6-10' as const,
+	averageTransactions: '16-30' as const,
+	eoInsuranceStatus: 'Yes, I carry my own E&O policy',
+	clientDescription: 'strategicDataDriven',
+	communicationFrequency: 'scheduled',
+	quickCommunicationChannel: 'text',
+	updateDeliveryMethod: 'email',
+	difficultDealInstinct: 'factsFast',
+	responseTime: 'within10Min',
+	commissionApproach: 'proactiveOpen',
+	unrepresentedBuyerApproach: 'representSellerOnly',
+} satisfies AgentPreviewFixture
 
 describe('agent signup flow', () => {
-	beforeEach(async () => {
-		localStorage.clear()
+	function renderStep(
+		stepId: 'identity' | 'market' | 'workStyle' | 'compliance' | 'peacePact',
+		children: React.ReactNode,
+		completedStepIds: (
+			| 'identity'
+			| 'market'
+			| 'workStyle'
+			| 'compliance'
+			| 'peacePact'
+		)[] = [],
+	) {
+		return renderComponent({
+			element: (
+				<WizardChrome
+					steps={agentSteps}
+					currentStepId={stepId}
+					onHomeClick={() => {}}
+					onStepClick={() => {}}
+					completedStepIds={completedStepIds}
+				>
+					{children}
+				</WizardChrome>
+			),
+		})
+	}
+
+	test('identity step screenshot', async () => {
+		await renderStep(
+			'identity',
+			<AgentIdentity state={{}} onUpdate={() => {}} onContinue={() => {}} />,
+		)
+		await expectScreenshot(document.body, { name: 'step-1-identity' })
 	})
 
-	test('walkthrough screenshots', async () => {
-		await renderRoute({ path: '/signup/agent/identity' })
-		await expectScreenshot(document.body, { name: 'step-1-identity' })
-
-		await fillIdentityStep()
-		await page.getByRole('button', { name: 'Continue' }).click()
+	test('market step screenshot', async () => {
+		await renderStep(
+			'market',
+			<AgentMarket state={{}} onUpdate={() => {}} onContinue={() => {}} />,
+			['identity'],
+		)
 		await expectScreenshot(document.body, { name: 'step-2-market' })
+	})
 
-		await fillMarketStep()
-		await page.getByRole('button', { name: 'Continue' }).click()
+	test('work style step screenshot', async () => {
+		await renderStep(
+			'workStyle',
+			<AgentWorkStyle state={{}} onUpdate={() => {}} onContinue={() => {}} />,
+			['identity', 'market'],
+		)
 		await expectScreenshot(document.body, { name: 'step-3-work-style' })
+	})
 
-		await fillWorkStyleStep()
+	test('compliance step screenshot', async () => {
+		await renderStep(
+			'compliance',
+			<AgentCompliance state={{}} onUpdate={() => {}} onContinue={() => {}} />,
+			['identity', 'market', 'workStyle'],
+		)
 		await expectScreenshot(document.body, { name: 'step-4-compliance' })
+	})
 
-		await fillComplianceStep()
-		await page.getByRole('button', { name: 'Continue' }).click()
+	test('peace pact step screenshot', async () => {
+		await renderStep(
+			'peacePact',
+			<AgentPeacePact state={{}} onUpdate={() => {}} onContinue={() => {}} />,
+			['identity', 'market', 'workStyle', 'compliance'],
+		)
 		await expectScreenshot(document.body, { name: 'step-5-peace-pact' })
+	})
 
-		await fillPeacePactStep()
-		await page.getByRole('button', { name: 'Sign & continue' }).click()
-
+	test('preview screenshot', async () => {
+		await renderComponent({
+			element: (
+				<AgentPreview profile={draftToPreviewProfile(agentPreviewDraft)} />
+			),
+		})
 		await expectScreenshot(document.body, { name: 'step-6-preview' })
 	})
 })

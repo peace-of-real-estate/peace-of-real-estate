@@ -39,7 +39,7 @@ function AgentIdentityRoute() {
 	)
 }
 
-function AgentIdentity({
+export function AgentIdentity({
 	state,
 	onUpdate,
 	onContinue,

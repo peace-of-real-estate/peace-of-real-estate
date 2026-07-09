@@ -146,7 +146,7 @@ function StepDot({
 	)
 }
 
-function WizardChrome<TStep extends string>({
+export function WizardChrome<TStep extends string>({
 	steps,
 	currentStepId,
 	progress,
@@ -529,10 +529,10 @@ export function StepHeader({
 			<p className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
 				Step {stepNumber} of {totalSteps}
 			</p>
-			<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+			<h2 className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
 				{Icon ? <Icon className="h-4 w-4" weight="duotone" /> : null}
 				{title}
-			</p>
+			</h2>
 		</div>
 	)
 }

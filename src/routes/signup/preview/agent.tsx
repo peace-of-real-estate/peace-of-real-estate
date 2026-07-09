@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, ClientOnly } from '@tanstack/react-router'
 import {
 	Banknote,
 	Briefcase,
@@ -34,7 +34,11 @@ function AgentPreviewRoute() {
 	const parsed = agentProfileCreateSchema.safeParse(state)
 	const profile = draftToPreviewProfile(parsed.success ? parsed.data : state)
 
-	return <AgentPreview profile={profile} />
+	return (
+		<ClientOnly fallback={null}>
+			<AgentPreview profile={profile} />
+		</ClientOnly>
+	)
 }
 
 const agentPreviewMatches: MatchDetails[] = [

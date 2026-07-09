@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { AgentDraft } from '@/lib/matching/profile'
 import {
 	agentAnswerLabels,
+	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
 } from '@/lib/matching/questions'
@@ -25,7 +26,7 @@ export const Route = createFileRoute(
 })
 
 const agentQuestions = Object.entries(agentAnswerLabels).map(
-	([id, config]) =>
+	([id, config]: [string, AnswerLabelConfig]) =>
 		({
 			id,
 			title: config.title,
@@ -59,7 +60,7 @@ function AgentWorkStyleRoute() {
 	)
 }
 
-function AgentWorkStyle({
+export function AgentWorkStyle({
 	state,
 	onUpdate,
 	onContinue,

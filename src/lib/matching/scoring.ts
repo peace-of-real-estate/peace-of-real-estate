@@ -3,6 +3,10 @@ import type {
 	BuyerProfile,
 	SellerProfile,
 } from '@/lib/matching/profile.types'
+import type {
+	BestClientTypeSlug,
+	PropertyTypeSlug,
+} from '@/lib/matching/questions'
 
 type ClientProfile = BuyerProfile | SellerProfile
 
@@ -134,7 +138,10 @@ const PRIORITY_TO_DIMENSION: Record<string, DimensionId> = {
 const PRIORITY_BOOST = 1.5
 
 /** Buyer property-type slugs → agent bestClientTypes slugs that serve them. */
-const propertyTypeToClientTypes: Record<string, string[]> = {
+const propertyTypeToClientTypes: Record<
+	PropertyTypeSlug,
+	BestClientTypeSlug[]
+> = {
 	singleFamily: ['firstTime', 'moveUp'],
 	condoTownhome: ['condoTownhome', 'moveUp'],
 	multiFamily: ['landMultiFamily', 'investor'],
@@ -332,9 +339,9 @@ export function scorePriceFit(
 function expectedClientTypeSources(
 	client: ClientProfile,
 	side: 'buying' | 'selling',
-): Map<string, string[]> {
-	const sources = new Map<string, string[]>()
-	const add = (slug: string, source: string) => {
+): Map<BestClientTypeSlug, string[]> {
+	const sources = new Map<BestClientTypeSlug, string[]>()
+	const add = (slug: BestClientTypeSlug, source: string) => {
 		const existing = sources.get(slug)
 		if (existing) existing.push(source)
 		else sources.set(slug, [source])
@@ -360,7 +367,7 @@ function expectedClientTypeSources(
 export function deriveExpectedClientTypes(
 	client: ClientProfile,
 	side: 'buying' | 'selling',
-): string[] {
+): BestClientTypeSlug[] {
 	return [...expectedClientTypeSources(client, side).keys()]
 }
 

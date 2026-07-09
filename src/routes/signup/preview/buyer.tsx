@@ -1,13 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, ClientOnly } from '@tanstack/react-router'
 
 import {
 	ClientMatchesPreview,
+	ClientPreviewHeader,
 	ClientProfilePreviewCard,
 	draftToClientPreviewProfile,
 } from './-components/client-preview'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 import { buyerDraftStorage } from '../(quiz)/buyer/route'
 import { createBuyerProfileFromDraft } from '@/lib/matching/profile'
+import type { ClientProfile } from '@/lib/matching/profile'
 
 export const Route = createFileRoute('/signup/preview/buyer')({
 	component: BuyerPreviewRoute,
@@ -16,6 +18,14 @@ export const Route = createFileRoute('/signup/preview/buyer')({
 function BuyerPreviewRoute() {
 	const profile = draftToClientPreviewProfile('buyer', buyerDraftStorage.load())
 
+	return (
+		<ClientOnly fallback={null}>
+			<BuyerPreview profile={profile} />
+		</ClientOnly>
+	)
+}
+
+export function BuyerPreview({ profile }: { profile: ClientProfile }) {
 	return (
 		<SignupPreviewShell
 			redirect="/buyer/matches"
@@ -34,26 +44,10 @@ function BuyerPreviewRoute() {
 			mobileSubtitle="Create your profile to view full agent matches."
 		>
 			<div className="mx-auto w-full max-w-2xl space-y-6">
-				<PreviewHeader />
+				<ClientPreviewHeader title="Your Profile" />
 				<ClientProfilePreviewCard profile={profile} />
 				<ClientMatchesPreview />
 			</div>
 		</SignupPreviewShell>
-	)
-}
-
-function PreviewHeader() {
-	return (
-		<div>
-			<span className="mb-2 inline-flex rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold tracking-[0.16em] text-amber-900 uppercase">
-				Preview
-			</span>
-			<h2 className="font-heading text-3xl tracking-tight text-slate-950 md:text-4xl">
-				Your Profile
-			</h2>
-			<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
-				Based on your quiz answers.
-			</p>
-		</div>
 	)
 }

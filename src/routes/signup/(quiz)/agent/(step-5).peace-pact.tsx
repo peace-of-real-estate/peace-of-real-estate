@@ -37,7 +37,7 @@ function AgentPeacePactRoute() {
 	)
 }
 
-function AgentPeacePact({
+export function AgentPeacePact({
 	state,
 	onUpdate,
 	onContinue,
