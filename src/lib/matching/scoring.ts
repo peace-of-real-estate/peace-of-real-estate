@@ -1,3 +1,5 @@
+import { parseMinMaxRange } from '@/lib/matching/price-range'
+
 import type {
 	AgentProfile,
 	BuyerProfile,
@@ -166,14 +168,7 @@ export interface PriceRangeValue {
 export function parseSerializedPriceRange(
 	value: string | null | undefined,
 ): PriceRangeValue | undefined {
-	const match = value?.trim().match(/^(\d+)-(\d+)$/)
-	if (!match) return undefined
-	const first = Number.parseInt(match[1]!, 10)
-	const second = Number.parseInt(match[2]!, 10)
-	return {
-		min: Math.min(first, second),
-		max: Math.max(first, second),
-	}
+	return parseMinMaxRange(value)
 }
 
 /**
