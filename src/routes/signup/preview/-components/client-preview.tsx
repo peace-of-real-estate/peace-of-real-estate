@@ -22,6 +22,7 @@ import {
 	buyerAnswerLabels,
 	getPropertyTypeLabel,
 	sellerAnswerLabels,
+	type AnswerLabelConfig,
 } from '@/lib/matching/questions'
 
 export function draftToClientPreviewProfile(
@@ -148,19 +149,27 @@ function statIcon(label: string) {
 	return Zap
 }
 
+function buildOptionsMap(
+	labels: Record<string, AnswerLabelConfig>,
+): Record<string, string> {
+	const optionsMap: Record<string, string> = {}
+	for (const config of Object.values(labels)) {
+		for (const [slug, label] of Object.entries(config.options)) {
+			optionsMap[slug] = label
+		}
+	}
+	return optionsMap
+}
+
 function formatAnswer(
 	value: string | string[] | null | undefined,
-	labels: Record<string, { options: Record<string, string> }>,
+	optionsMap: Record<string, string>,
 ): string {
 	if (value === undefined || value === null || value === '__skipped__')
 		return 'Not answered'
 	if (Array.isArray(value))
-		return value.map((slug) => labels[slug]?.options[slug] ?? slug).join(', ')
-	return (
-		Object.values(labels).find((config) => config.options[value])?.options[
-			value
-		] ?? value
-	)
+		return value.map((slug) => optionsMap[slug] ?? slug).join(', ')
+	return optionsMap[value] ?? value
 }
 
 function getProfileStats(profile: ClientProfile) {
@@ -178,13 +187,14 @@ function getProfileStats(profile: ClientProfile) {
 				.join(', '),
 		})
 
-	const isBuyer = 'idealAgentRelationship' in profile
+	const isBuyer = profile.role === 'buyer'
 	const labels = isBuyer ? buyerAnswerLabels : sellerAnswerLabels
+	const optionsMap = buildOptionsMap(labels)
 	for (const [id, config] of Object.entries(labels)) {
 		const value = Reflect.get(profile, id)
 		if (value === undefined || value === null || value === '__skipped__')
 			continue
-		stats.push({ label: config.label, value: formatAnswer(value, labels) })
+		stats.push({ label: config.label, value: formatAnswer(value, optionsMap) })
 	}
 	return stats
 }
