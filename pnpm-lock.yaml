@@ -106,7 +106,7 @@ importers:
         specifier: ^5.24.0
         version: 5.24.0
       nitro:
-        specifier: latest
+        specifier: 3.0.260610-beta
         version: 3.0.260610-beta(@vercel/functions@3.7.2(@aws-sdk/credential-provider-web-identity@3.972.54)(ws@8.21.0))(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.29.2)(pg@8.22.0))(jiti@2.7.0)
       posthog-js:
         specifier: ^1.391.2
