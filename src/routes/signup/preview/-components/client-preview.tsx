@@ -13,6 +13,7 @@ import {
 import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
 import { Card } from '@/components/ui/card'
 import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
+import { clientPreviewMatches } from '@/lib/matching/preview-matches'
 import {
 	buyerClientProfileSchema,
 	sellerClientProfileSchema,
@@ -126,7 +127,7 @@ export function ClientMatchesPreview() {
 				</p>
 			</div>
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-				{previewMatches.map((match) => (
+				{clientPreviewMatches.map((match) => (
 					<AgentPreviewCard key={match.id} match={match} />
 				))}
 			</div>
@@ -198,66 +199,3 @@ function getProfileStats(profile: ClientProfile) {
 	}
 	return stats
 }
-
-const previewMatches = [
-	{
-		id: 'preview-1',
-		name: 'Alex Morgan',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78704', '78745'],
-		fitScore: 97,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '12 years',
-		agency: 'PRE Partner Realty',
-		specialties: ['First-time buyers', 'Fast timelines', 'Negotiation'],
-		about: 'Calm, responsive agent focused on clear expectations.',
-		scores: {
-			'Working Style': 4.9,
-			Communication: 4.8,
-			Transparency: 4.9,
-			Fit: 5,
-		},
-	},
-	{
-		id: 'preview-2',
-		name: 'Jordan Lee',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78701', '78703'],
-		fitScore: 94,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '9 years',
-		agency: 'Urban Nest Realty',
-		specialties: ['Condos', 'Relocation', 'Offer strategy'],
-		about: 'Data-driven agent with a direct communication style.',
-		scores: {
-			'Working Style': 4.7,
-			Communication: 4.9,
-			Transparency: 4.7,
-			Fit: 4.8,
-		},
-	},
-	{
-		id: 'preview-3',
-		name: 'Sam Rivera',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78731', '78757'],
-		fitScore: 91,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '15 years',
-		agency: 'Local Key Realty',
-		specialties: ['Move-up buyers', 'Listings', 'Pricing'],
-		about: 'Experienced local advisor with strong pricing instincts.',
-		scores: {
-			'Working Style': 4.6,
-			Communication: 4.6,
-			Transparency: 4.8,
-			Fit: 4.7,
-		},
-	},
-]

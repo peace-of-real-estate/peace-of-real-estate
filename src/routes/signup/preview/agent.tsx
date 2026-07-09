@@ -13,7 +13,6 @@ import {
 import { z } from 'zod'
 
 import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
-import type { MatchDetails } from '@/routes/(dashboard)/-components/agent-preview-card'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 import { Card } from '@/components/ui/card'
 import {
@@ -23,6 +22,7 @@ import {
 import type { AgentDraft } from '@/lib/matching/profile'
 import { bestClientTypeLabels } from '@/lib/matching/questions'
 import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
+import { agentPreviewMatches } from '@/lib/matching/preview-matches'
 import { agentDraftStorage } from '../(quiz)/agent/route'
 
 export const Route = createFileRoute('/signup/preview/agent')({
@@ -40,69 +40,6 @@ function AgentPreviewRoute() {
 		</ClientOnly>
 	)
 }
-
-const agentPreviewMatches: MatchDetails[] = [
-	{
-		id: 'preview-client-1',
-		name: 'Alex Morgan',
-		role: 'agent',
-		location: 'Austin, TX',
-		zipCodes: ['78704', '78745'],
-		fitScore: 97,
-		status: 'new',
-		date: 'Today',
-		experience: 'Ready now',
-		agency: 'Buyer profile',
-		specialties: ['First-time buyer', 'Fast timeline', 'Clear communication'],
-		about: 'Preview of the matched client cards agents will see.',
-		scores: {
-			'Working Style': 4.9,
-			Communication: 4.8,
-			Transparency: 4.9,
-			Fit: 5,
-		},
-	},
-	{
-		id: 'preview-client-2',
-		name: 'Jordan Lee',
-		role: 'agent',
-		location: 'Austin, TX',
-		zipCodes: ['78701', '78703'],
-		fitScore: 94,
-		status: 'new',
-		date: 'Today',
-		experience: 'Exploring',
-		agency: 'Seller profile',
-		specialties: ['Listing prep', 'Pricing strategy', 'Transparency'],
-		about: 'Preview of the matched client cards agents will see.',
-		scores: {
-			'Working Style': 4.7,
-			Communication: 4.9,
-			Transparency: 4.7,
-			Fit: 4.8,
-		},
-	},
-	{
-		id: 'preview-client-3',
-		name: 'Sam Rivera',
-		role: 'agent',
-		location: 'Austin, TX',
-		zipCodes: ['78731', '78757'],
-		fitScore: 91,
-		status: 'new',
-		date: 'Today',
-		experience: '3 months',
-		agency: 'Buyer profile',
-		specialties: ['Move-up buyer', 'Negotiation', 'Local expertise'],
-		about: 'Preview of the matched client cards agents will see.',
-		scores: {
-			'Working Style': 4.6,
-			Communication: 4.6,
-			Transparency: 4.8,
-			Fit: 4.7,
-		},
-	},
-]
 
 const agentPreviewProfileSchema = agentProfileCreateSchema.partial().extend({
 	zipCodes: z.array(z.string()).default([]),
@@ -308,8 +245,6 @@ function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 }
 
 function AgentMatchesPreview() {
-	const previewMatches = agentPreviewMatches.slice(0, 3)
-
 	return (
 		<div className="pt-2">
 			<div className="mb-3 px-1">
@@ -321,7 +256,7 @@ function AgentMatchesPreview() {
 				</p>
 			</div>
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-				{previewMatches.map((match) => (
+				{agentPreviewMatches.map((match) => (
 					<AgentPreviewCard key={match.id} match={match} />
 				))}
 			</div>
