@@ -45,6 +45,27 @@ function scoreTone(score: number) {
 	return 'bg-red-500'
 }
 
+const DEBUG_PROFILE_FIELDS = new Set([
+	'city',
+	'state',
+	'zipCodes',
+	'priceRange',
+	'typicalPriceRange',
+	'propertyTypes',
+	'representationSide',
+	'bestClientTypes',
+	'matchPriorities',
+])
+
+function sanitizeDebugProfile(
+	profile: unknown,
+): Record<string, unknown> | null {
+	if (!profile || typeof profile !== 'object') return null
+	return Object.fromEntries(
+		Object.entries(profile).filter(([key]) => DEBUG_PROFILE_FIELDS.has(key)),
+	)
+}
+
 function DebugHeader({
 	debug,
 	matchCount,
@@ -97,7 +118,7 @@ function DebugHeader({
 
 			<JsonDetails
 				label={`client profile used for scoring (side: ${debug.trace.side})`}
-				value={debug.clientProfile}
+				value={sanitizeDebugProfile(debug.clientProfile)}
 			/>
 		</Card>
 	)
@@ -188,7 +209,10 @@ function MatchDebugRow({ match }: { match: AgentMatchData }) {
 					</div>
 				)}
 
-				<JsonDetails label="raw agent profile" value={debug.agentProfile} />
+				<JsonDetails
+					label="agent profile used for scoring"
+					value={sanitizeDebugProfile(debug.agentProfile)}
+				/>
 			</div>
 		</details>
 	)
