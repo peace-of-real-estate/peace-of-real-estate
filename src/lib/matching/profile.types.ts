@@ -69,32 +69,20 @@ export type SellerDraft = Omit<SellerProfileUpdate, 'role'>
 
 export type AgentDraft = Partial<AgentProfileCreateInput>
 
-export type BuyerClientProfile = Omit<
-	BuyerProfile,
-	'id' | 'userId' | 'createdAt' | 'updatedAt'
-> & {
-	role: 'buyer'
-}
-
-export type SellerClientProfile = Omit<
-	SellerProfile,
-	'id' | 'userId' | 'createdAt' | 'updatedAt'
-> & {
-	role: 'seller'
-}
-
-export type ClientProfile = BuyerClientProfile | SellerClientProfile
-
-// oxlint-disable-next-line typescript/consistent-type-assertions
 export const buyerClientProfileSchema = buyerProfileCreateSchema
 	.partial()
 	.extend({
 		role: z.literal('buyer'),
-	}) as z.ZodType<BuyerClientProfile>
+	})
 
-// oxlint-disable-next-line typescript/consistent-type-assertions
 export const sellerClientProfileSchema = sellerProfileCreateSchema
 	.partial()
 	.extend({
 		role: z.literal('seller'),
-	}) as z.ZodType<SellerClientProfile>
+	})
+
+export type BuyerClientProfile = z.infer<typeof buyerClientProfileSchema>
+
+export type SellerClientProfile = z.infer<typeof sellerClientProfileSchema>
+
+export type ClientProfile = BuyerClientProfile | SellerClientProfile
