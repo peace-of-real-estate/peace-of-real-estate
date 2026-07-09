@@ -43,7 +43,7 @@ export function ClientPreviewHeader({ title }: { title: string }) {
 			<span className="mb-2 inline-flex rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold tracking-[0.16em] text-amber-900 uppercase">
 				Preview
 			</span>
-			<h2 className="font-heading text-3xl tracking-tight text-slate-950 md:text-4xl">
+			<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
 				{title}
 			</h2>
 			<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
@@ -68,7 +68,7 @@ export function ClientProfilePreviewCard({
 		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
-		<Card className="gap-0 rounded-2xl border-slate-200 bg-white p-0 shadow-sm">
+		<Card className="border-border bg-card gap-0 rounded-2xl p-0 shadow-sm">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
 				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl">
 					{stateSvgPath ? (
@@ -84,25 +84,25 @@ export function ClientProfilePreviewCard({
 					)}
 				</div>
 				<div className="min-w-0 flex-1">
-					<h3 className="font-heading text-xl font-bold tracking-tight text-slate-950">
+					<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">
 						{profileTitle}
 					</h3>
 				</div>
 			</div>
 			{summaryItems.length > 0 ? (
-				<div className="grid grid-cols-1 gap-3 border-t border-slate-100 px-5 pt-4 pb-5 sm:grid-cols-2">
+				<div className="border-border grid grid-cols-1 gap-3 border-t px-5 pt-4 pb-5 sm:grid-cols-2">
 					{summaryItems.map((item) => {
 						const Icon = statIcon(item.label)
 						return (
 							<div key={item.label} className="flex items-start gap-3">
-								<div className="text-primary mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-50">
+								<div className="text-primary bg-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
 									<Icon className="h-4 w-4" />
 								</div>
 								<div className="min-w-0 flex-1">
 									<p className="text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase">
 										{item.label}
 									</p>
-									<p className="text-sm font-semibold text-slate-950">
+									<p className="text-foreground text-sm font-semibold">
 										{item.value}
 									</p>
 								</div>
@@ -119,7 +119,7 @@ export function ClientMatchesPreview() {
 	return (
 		<div className="pt-2">
 			<div className="mb-3 px-1">
-				<h3 className="font-heading text-lg font-bold tracking-tight text-slate-950">
+				<h3 className="font-heading text-foreground text-lg font-bold tracking-tight">
 					Your Top Matches
 				</h3>
 				<p className="text-muted-foreground mt-0.5 text-sm">
