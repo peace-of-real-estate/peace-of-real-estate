@@ -8,11 +8,20 @@ function isUsableEnvValue(value: string | undefined): boolean {
 	return value !== undefined && value.trim() !== ''
 }
 
-export function createEnv<T extends object>(schema: EnvSchema<T>): T {
+export function normalizeEnvironmentName(raw: string): string {
+	return /(?:^|-)pr-\d+$/.test(raw) ? 'staging' : raw
+}
+
+export function getEnvironmentName(): string {
 	const raw =
 		process.env.RAILWAY_ENVIRONMENT_NAME ??
 		(process.env.NODE_ENV === 'production' ? 'production' : 'development')
-	const environmentName = /(?:^|-)pr-\d+$/.test(raw) ? 'staging' : raw
+	return normalizeEnvironmentName(raw)
+}
+
+export function loadEnvFiles(
+	environmentName = getEnvironmentName(),
+): NodeJS.ProcessEnv {
 	const fileEnvironment: NodeJS.ProcessEnv = {}
 
 	config({
@@ -26,6 +35,22 @@ export function createEnv<T extends object>(schema: EnvSchema<T>): T {
 		override: true,
 		processEnv: fileEnvironment,
 	})
+
+	return fileEnvironment
+}
+
+export function loadPublicEnvIntoProcess(environmentName?: string): void {
+	const fileEnvironment = loadEnvFiles(environmentName)
+
+	for (const [key, value] of Object.entries(fileEnvironment)) {
+		if (key.startsWith('VITE_') && value !== undefined) {
+			process.env[key] = value
+		}
+	}
+}
+
+export function createEnv<T extends object>(schema: EnvSchema<T>): T {
+	const fileEnvironment = loadEnvFiles()
 
 	let parsed: T | undefined
 
