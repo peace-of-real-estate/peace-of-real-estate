@@ -27,7 +27,7 @@ export const Route = createRootRouteWithContext<{
 		],
 	}),
 	beforeLoad: async ({ location }) => {
-		const isBetaUser = hasBetaAccess()
+		const isBetaUser = await hasBetaAccess()
 
 		if (!isBetaUser && location.pathname !== '/auth/beta') {
 			throw redirect({ to: '/auth/beta' })
