@@ -21,8 +21,11 @@ export type {
 } from '@/lib/matching/profile.db'
 
 export {
+	agentDraftSchema,
 	agentProfileDraftSchema,
+	buyerDraftSchema,
 	buyerProfileDraftSchema,
+	sellerDraftSchema,
 	sellerProfileDraftSchema,
 } from '@/lib/matching/profile.types'
 

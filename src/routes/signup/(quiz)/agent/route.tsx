@@ -21,7 +21,7 @@ import {
 } from '../-components/signup-wizard-shell'
 import type { AgentDraft, RepresentationSide } from '@/lib/matching/profile'
 import { getCurrentSession } from '@/lib/auth/session'
-import { loadAgentProfile } from '@/lib/matching/profile'
+import { agentDraftSchema, loadAgentProfile } from '@/lib/matching/profile'
 import {
 	bestClientTypeOptions,
 	optionKeys,
@@ -39,8 +39,10 @@ export type AgentFlowStep =
 
 export type AgentWizardContext = SignupWizardContext<AgentDraft, AgentFlowStep>
 
-export const agentDraftStorage =
-	createLocalStorage<AgentDraft>('pre-agent-draft')
+export const agentDraftStorage = createLocalStorage<AgentDraft>(
+	'pre-agent-draft',
+	agentDraftSchema,
+)
 
 const agentFlowSteps = [
 	{ id: 'identity', label: 'Identity', icon: UserIcon },

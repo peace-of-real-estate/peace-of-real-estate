@@ -12,6 +12,9 @@ import {
 	loadAgentProfile,
 	loadBuyerProfile,
 	loadSellerProfile,
+	agentDraftSchema,
+	buyerDraftSchema,
+	sellerDraftSchema,
 	type AgentDraft,
 	type BuyerDraft,
 	type SellerDraft,
@@ -22,9 +25,18 @@ const completeSearchSchema = z.object({
 	role: z.enum(['agent', 'buyer', 'seller']),
 })
 
-const agentDraftStorage = createLocalStorage<AgentDraft>('pre-agent-draft')
-const buyerDraftStorage = createLocalStorage<BuyerDraft>('pre-buyer-draft')
-const sellerDraftStorage = createLocalStorage<SellerDraft>('pre-seller-draft')
+const agentDraftStorage = createLocalStorage<AgentDraft>(
+	'pre-agent-draft',
+	agentDraftSchema,
+)
+const buyerDraftStorage = createLocalStorage<BuyerDraft>(
+	'pre-buyer-draft',
+	buyerDraftSchema,
+)
+const sellerDraftStorage = createLocalStorage<SellerDraft>(
+	'pre-seller-draft',
+	sellerDraftSchema,
+)
 
 export const Route = createFileRoute('/auth/complete')({
 	validateSearch: completeSearchSchema,

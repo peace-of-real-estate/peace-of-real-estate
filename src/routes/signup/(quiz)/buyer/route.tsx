@@ -17,11 +17,13 @@ import {
 } from '../-components/client-quiz-fields'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 import { getCurrentSession } from '@/lib/auth/session'
-import { loadBuyerProfile } from '@/lib/matching/profile'
+import { buyerDraftSchema, loadBuyerProfile } from '@/lib/matching/profile'
 import type { BuyerDraft } from '@/lib/matching/profile'
 
-export const buyerDraftStorage =
-	createLocalStorage<BuyerDraft>('pre-buyer-draft')
+export const buyerDraftStorage = createLocalStorage<BuyerDraft>(
+	'pre-buyer-draft',
+	buyerDraftSchema,
+)
 
 export type BuyerWizardContext = SignupWizardContext<
 	ClientDraft,

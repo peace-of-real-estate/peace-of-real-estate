@@ -1,12 +1,16 @@
-export function readLocalStorage<T>(key: string): T | null {
+import { z } from 'zod'
+
+export function readLocalStorage<T>(
+	key: string,
+	schema: z.ZodType<T>,
+): T | null {
 	if (typeof window === 'undefined') return null
 	try {
 		const raw = window.localStorage.getItem(key)
 		if (!raw) return null
 		const parsed: unknown = JSON.parse(raw)
 		if (parsed && typeof parsed === 'object') {
-			// oxlint-disable-next-line typescript/consistent-type-assertions
-			return parsed as T
+			return schema.parse(parsed)
 		}
 		return null
 	} catch {
@@ -24,9 +28,9 @@ export function removeLocalStorage(key: string) {
 	window.localStorage.removeItem(key)
 }
 
-export function createLocalStorage<T>(key: string) {
+export function createLocalStorage<T>(key: string, schema: z.ZodType<T>) {
 	return {
-		load: (): T | null => readLocalStorage<T>(key),
+		load: (): T | null => readLocalStorage(key, schema),
 		save: (value: T) => writeLocalStorage(key, value),
 		clear: () => removeLocalStorage(key),
 	}
