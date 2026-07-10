@@ -2,6 +2,7 @@
 
 # env files
 .env*.local
+.env.compose
 .mise.local.toml
 
 # Build
