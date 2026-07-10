@@ -1,52 +1,52 @@
-CREATE TYPE IF NOT EXISTS "public"."profile_status" AS ENUM ('draft', 'essentials_submitted', 'active', 'enriched');
+CREATE TYPE "public"."profile_status" AS ENUM ('draft', 'essentials_submitted', 'active', 'enriched');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."representation_side" AS ENUM ('buying', 'selling', 'both');
+CREATE TYPE "public"."representation_side" AS ENUM ('buying', 'selling', 'both');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."buyer_experience_level" AS ENUM ('firstTime', 'experienced', 'veryExperienced');
+CREATE TYPE "public"."buyer_experience_level" AS ENUM ('firstTime', 'experienced', 'veryExperienced');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."buyer_ideal_agent_relationship" AS ENUM ('trustedAdvisor', 'thinkingPartner', 'skilledExecutor');
+CREATE TYPE "public"."buyer_ideal_agent_relationship" AS ENUM ('trustedAdvisor', 'thinkingPartner', 'skilledExecutor');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."buyer_decision_making_need" AS ENUM ('numbersData', 'timeAndSpace', 'trustedPerspective', 'gutFeeling');
+CREATE TYPE "public"."buyer_decision_making_need" AS ENUM ('numbersData', 'timeAndSpace', 'trustedPerspective', 'gutFeeling');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."buyer_bidding_war_response" AS ENUM ('factsOptions', 'space', 'reassurance', 'calmPresence');
+CREATE TYPE "public"."buyer_bidding_war_response" AS ENUM ('factsOptions', 'space', 'reassurance', 'calmPresence');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."quick_communication_channel" AS ENUM ('text', 'phone', 'either');
+CREATE TYPE "public"."quick_communication_channel" AS ENUM ('text', 'phone', 'either');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."update_delivery_method" AS ENUM ('email', 'textWithAttachments', 'phoneThenEmailRecap');
+CREATE TYPE "public"."update_delivery_method" AS ENUM ('email', 'textWithAttachments', 'phoneThenEmailRecap');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."involvement_level" AS ENUM ('veryInvolved', 'keyDetails', 'handsOff');
+CREATE TYPE "public"."involvement_level" AS ENUM ('veryInvolved', 'keyDetails', 'handsOff');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."response_time_expectation" AS ENUM ('within10Min', 'within30Min', 'fewHours', 'within24Hours');
+CREATE TYPE "public"."response_time_expectation" AS ENUM ('within10Min', 'within30Min', 'fewHours', 'within24Hours');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."commission_comfort" AS ENUM ('negotiate', 'openOptions', 'payFairRate', 'dontUnderstand');
+CREATE TYPE "public"."commission_comfort" AS ENUM ('negotiate', 'openOptions', 'payFairRate', 'dontUnderstand');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_sale_motivation" AS ENUM ('lifestyleChange', 'relocation', 'financialPressure', 'rightTime', 'majorTransition', 'other');
+CREATE TYPE "public"."seller_sale_motivation" AS ENUM ('lifestyleChange', 'relocation', 'financialPressure', 'rightTime', 'majorTransition', 'other');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_successful_sale_looks_like" AS ENUM ('maximumPrice', 'strongPriceSmoothProcess', 'speedCertainty', 'mustCloseByDate');
+CREATE TYPE "public"."seller_successful_sale_looks_like" AS ENUM ('maximumPrice', 'strongPriceSmoothProcess', 'speedCertainty', 'mustCloseByDate');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_agent_delivery_expectations" AS ENUM ('pricedRight', 'greatMarketing', 'greatNegotiatedOutcome', 'reachableResponsive', 'keptItCalm', 'honestStraightforward');
+CREATE TYPE "public"."seller_agent_delivery_expectations" AS ENUM ('pricedRight', 'greatMarketing', 'greatNegotiatedOutcome', 'reachableResponsive', 'keptItCalm', 'honestStraightforward');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_home_connection" AS ENUM ('asset', 'goodMemories', 'partOfIdentity', 'complicated');
+CREATE TYPE "public"."seller_home_connection" AS ENUM ('asset', 'goodMemories', 'partOfIdentity', 'complicated');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_agent_silence_preference" AS ENUM ('scheduled', 'milestones', 'clientLed');
+CREATE TYPE "public"."seller_agent_silence_preference" AS ENUM ('scheduled', 'milestones', 'clientLed');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."seller_representation_preference" AS ENUM ('broadConnections', 'exclusiveRepresentationOnly');
+CREATE TYPE "public"."seller_representation_preference" AS ENUM ('broadConnections', 'exclusiveRepresentationOnly');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_client_description" AS ENUM ('strategicDataDriven', 'calmSteady', 'warmRelational', 'efficientDecisive');
+CREATE TYPE "public"."agent_client_description" AS ENUM ('strategicDataDriven', 'calmSteady', 'warmRelational', 'efficientDecisive');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_communication_frequency" AS ENUM ('scheduled', 'milestones', 'clientLed');
+CREATE TYPE "public"."agent_communication_frequency" AS ENUM ('scheduled', 'milestones', 'clientLed');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_difficult_deal_instinct" AS ENUM ('factsFast', 'slowItDown', 'takeControl', 'deEscalateFirst');
+CREATE TYPE "public"."agent_difficult_deal_instinct" AS ENUM ('factsFast', 'slowItDown', 'takeControl', 'deEscalateFirst');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_response_time" AS ENUM ('within10Min', 'within30Min', 'fewHours', 'within24Hours');
+CREATE TYPE "public"."agent_response_time" AS ENUM ('within10Min', 'within30Min', 'fewHours', 'within24Hours');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_commission_approach" AS ENUM ('proactiveFixed', 'proactiveOpen', 'reactiveFixed', 'reactiveOpen');
+CREATE TYPE "public"."agent_commission_approach" AS ENUM ('proactiveFixed', 'proactiveOpen', 'reactiveFixed', 'reactiveOpen');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."agent_unrepresented_buyer_approach" AS ENUM ('referSeparateBrokerage', 'representSellerOnly', 'anotherAgentInBrokerage');
+CREATE TYPE "public"."agent_unrepresented_buyer_approach" AS ENUM ('referSeparateBrokerage', 'representSellerOnly', 'anotherAgentInBrokerage');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."property_type" AS ENUM ('singleFamily', 'condoTownhome', 'multiFamily', 'land');
+CREATE TYPE "public"."property_type" AS ENUM ('singleFamily', 'condoTownhome', 'multiFamily', 'land');
 --> statement-breakpoint
-CREATE TYPE IF NOT EXISTS "public"."best_client_type" AS ENUM ('firstTime', 'moveUp', 'relocation', 'luxury', 'investor', 'landMultiFamily', 'seller', 'condoTownhome', 'other');
+CREATE TYPE "public"."best_client_type" AS ENUM ('firstTime', 'moveUp', 'relocation', 'luxury', 'investor', 'landMultiFamily', 'seller', 'condoTownhome', 'other');
 --> statement-breakpoint
 UPDATE "seller_profiles" SET "involvement_level" = 'keyDetails' WHERE "involvement_level" = 'keepMeInformed';
 --> statement-breakpoint
