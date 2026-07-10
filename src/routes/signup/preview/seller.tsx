@@ -9,7 +9,7 @@ import {
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 import { sellerDraftStorage } from '../(quiz)/seller/route'
 import { createSellerProfileFromDraft } from '@/lib/matching/profile'
-import { sellerProfileCreateSchema } from '@/lib/matching/profile.types'
+import { sellerProfileDraftSchema } from '@/lib/matching/profile.types'
 import type { ClientProfile } from '@/lib/matching/profile'
 
 export const Route = createFileRoute('/signup/preview/seller')({
@@ -38,7 +38,7 @@ export function SellerPreview({ profile }: { profile: ClientProfile }) {
 			createProfile={createSellerProfileFromDraft}
 			loadDraft={sellerDraftStorage.load}
 			validateDraft={(draft) =>
-				sellerProfileCreateSchema
+				sellerProfileDraftSchema
 					.omit({ role: true, status: true })
 					.safeParse(draft).success
 			}

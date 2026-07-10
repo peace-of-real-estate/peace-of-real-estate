@@ -9,7 +9,7 @@ export type SellerProfile = typeof sellerProfiles.$inferSelect
 
 export type AgentProfile = typeof agentProfiles.$inferSelect
 
-const agentProfileCreateSchema = createInsertSchema(agentProfiles)
+const agentProfileDraftSchema = createInsertSchema(agentProfiles)
 	.omit({
 		id: true,
 		userId: true,
@@ -20,7 +20,7 @@ const agentProfileCreateSchema = createInsertSchema(agentProfiles)
 		role: z.literal('agent'),
 	})
 
-const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
+const buyerProfileDraftSchema = createInsertSchema(buyerProfiles)
 	.omit({
 		id: true,
 		userId: true,
@@ -31,7 +31,7 @@ const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
 		role: z.literal('buyer'),
 	})
 
-const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
+const sellerProfileDraftSchema = createInsertSchema(sellerProfiles)
 	.omit({
 		id: true,
 		userId: true,
@@ -43,36 +43,36 @@ const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
 	})
 
 export {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
+	agentProfileDraftSchema,
+	buyerProfileDraftSchema,
+	sellerProfileDraftSchema,
 }
 
-export type BuyerProfileCreateInput = z.infer<typeof buyerProfileCreateSchema>
+export type BuyerProfileDraftInput = z.infer<typeof buyerProfileDraftSchema>
 
-export type SellerProfileCreateInput = z.infer<typeof sellerProfileCreateSchema>
+export type SellerProfileDraftInput = z.infer<typeof sellerProfileDraftSchema>
 
-export type AgentProfileCreateInput = z.infer<typeof agentProfileCreateSchema>
+export type AgentProfileDraftInput = z.infer<typeof agentProfileDraftSchema>
 
-export type BuyerProfileUpdate = Partial<BuyerProfileCreateInput>
+export type BuyerProfileUpdate = Partial<BuyerProfileDraftInput>
 
-export type SellerProfileUpdate = Partial<SellerProfileCreateInput>
+export type SellerProfileUpdate = Partial<SellerProfileDraftInput>
 
-export type AgentProfileUpdate = Partial<AgentProfileCreateInput>
+export type AgentProfileUpdate = Partial<AgentProfileDraftInput>
 
 export type BuyerDraft = Omit<BuyerProfileUpdate, 'role'>
 
 export type SellerDraft = Omit<SellerProfileUpdate, 'role'>
 
-export type AgentDraft = Partial<AgentProfileCreateInput>
+export type AgentDraft = Partial<AgentProfileDraftInput>
 
-export const buyerClientProfileSchema = buyerProfileCreateSchema
+export const buyerClientProfileSchema = buyerProfileDraftSchema
 	.partial()
 	.extend({
 		role: z.literal('buyer'),
 	})
 
-export const sellerClientProfileSchema = sellerProfileCreateSchema
+export const sellerClientProfileSchema = sellerProfileDraftSchema
 	.partial()
 	.extend({
 		role: z.literal('seller'),

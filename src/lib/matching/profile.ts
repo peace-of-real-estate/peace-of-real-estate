@@ -6,9 +6,9 @@ import { requireUserId } from '@/lib/auth/session'
 import { calculateFitScore, type AgentMatchData } from '@/lib/matching/scoring'
 import { getAvatarUrl } from '@/lib/s3'
 import {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
+	agentProfileDraftSchema,
+	buyerProfileDraftSchema,
+	sellerProfileDraftSchema,
 	type BuyerProfile,
 	type BuyerProfileUpdate,
 	type SellerProfile,
@@ -21,26 +21,26 @@ export type {
 } from '@/lib/matching/profile.db'
 
 export {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
+	agentProfileDraftSchema,
+	buyerProfileDraftSchema,
+	sellerProfileDraftSchema,
 } from '@/lib/matching/profile.types'
 
 export type {
 	AgentDraft,
 	AgentProfile,
-	AgentProfileCreateInput,
+	AgentProfileDraftInput,
 	AgentProfileUpdate,
 	BuyerClientProfile,
 	BuyerDraft,
 	BuyerProfile,
-	BuyerProfileCreateInput,
+	BuyerProfileDraftInput,
 	BuyerProfileUpdate,
 	ClientProfile,
 	SellerClientProfile,
 	SellerDraft,
 	SellerProfile,
-	SellerProfileCreateInput,
+	SellerProfileDraftInput,
 	SellerProfileUpdate,
 } from '@/lib/matching/profile.types'
 
@@ -79,7 +79,7 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 
 		// role is a client-only discriminator with no DB column; drafts never
 		// include it, so validate the insert payload without it.
-		const insert = buyerProfileCreateSchema.omit({ role: true }).parse({
+		const insert = buyerProfileDraftSchema.omit({ role: true }).parse({
 			...data,
 			status: 'active',
 		})
@@ -123,7 +123,7 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 			throw new Error('Seller profile already exists')
 		}
 
-		const insert = sellerProfileCreateSchema.omit({ role: true }).parse({
+		const insert = sellerProfileDraftSchema.omit({ role: true }).parse({
 			...data,
 			status: 'active',
 		})
@@ -141,7 +141,7 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 
 export const completeAgentSignup = createServerFn({ method: 'POST' })
 	.validator((data: unknown) =>
-		agentProfileCreateSchema.omit({ role: true }).parse(data),
+		agentProfileDraftSchema.omit({ role: true }).parse(data),
 	)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()

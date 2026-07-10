@@ -16,7 +16,7 @@ import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 import { Card } from '@/components/ui/card'
 import {
-	agentProfileCreateSchema,
+	agentProfileDraftSchema,
 	completeAgentSignup,
 } from '@/lib/matching/profile'
 import type { AgentDraft } from '@/lib/matching/profile'
@@ -31,7 +31,7 @@ export const Route = createFileRoute('/signup/preview/agent')({
 
 function AgentPreviewRoute() {
 	const state = agentDraftStorage.load() ?? {}
-	const parsed = agentProfileCreateSchema.safeParse(state)
+	const parsed = agentProfileDraftSchema.safeParse(state)
 	const profile = draftToPreviewProfile(parsed.success ? parsed.data : state)
 
 	return (
@@ -41,7 +41,7 @@ function AgentPreviewRoute() {
 	)
 }
 
-const agentPreviewProfileSchema = agentProfileCreateSchema.partial().extend({
+const agentPreviewProfileSchema = agentProfileDraftSchema.partial().extend({
 	zipCodes: z.array(z.string()).default([]),
 	bestClientTypes: z.array(z.string()).default([]),
 })
@@ -61,7 +61,7 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 			createProfile={completeAgentSignup}
 			loadDraft={agentDraftStorage.load}
 			validateDraft={(draft) =>
-				agentProfileCreateSchema.omit({ role: true }).safeParse(draft).success
+				agentProfileDraftSchema.omit({ role: true }).safeParse(draft).success
 			}
 			clearDraft={agentDraftStorage.clear}
 			submitLabel="Activate profile"
