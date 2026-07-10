@@ -1,5 +1,32 @@
 import { z } from 'zod'
 
+import {
+	agentClientDescriptionOptions,
+	agentCommunicationFrequencyOptions,
+	agentCommissionApproachOptions,
+	agentDifficultDealInstinctOptions,
+	agentResponseTimeOptions,
+	agentUnrepresentedBuyerApproachOptions,
+	bestClientTypeOptions,
+	buyerBiddingWarResponseOptions,
+	buyerDecisionMakingNeedOptions,
+	buyerExperienceLevelOptions,
+	buyerIdealAgentRelationshipOptions,
+	commissionComfortOptions,
+	involvementLevelOptions,
+	optionKeys,
+	propertyTypeOptions,
+	quickCommunicationChannelOptions,
+	responseTimeExpectationOptions,
+	sellerAgentDeliveryExpectationsOptions,
+	sellerAgentSilencePreferenceOptions,
+	sellerHomeConnectionOptions,
+	sellerRepresentationPreferenceOptions,
+	sellerSaleMotivationOptions,
+	sellerSuccessfulSaleLooksLikeOptions,
+	updateDeliveryMethodOptions,
+} from '@/lib/matching/enums'
+
 export type Question = {
 	id: string
 	title: string
@@ -81,14 +108,6 @@ export function isFreeForm(question: Question): boolean {
 	return question.freeForm === true
 }
 
-export function optionKeys<const T extends Record<string, string>>(
-	options: T,
-): [keyof T & string, ...(keyof T & string)[]] {
-	// Object.keys returns string[]; this tuple shape is guaranteed by the caller.
-	// oxlint-disable-next-line typescript/consistent-type-assertions
-	return Object.keys(options) as [keyof T & string, ...(keyof T & string)[]]
-}
-
 export type AnswerLabelConfig = {
 	title: string
 	label: string
@@ -109,87 +128,47 @@ export const buyerAnswerLabels = {
 	experienceLevel: {
 		title: 'How familiar does this process feel?',
 		label: 'Experience',
-		options: {
-			firstTime: "First time; I'll want guidance",
-			experienced: "I've done this before, but want help staying on track",
-			veryExperienced: 'I know the process and want a strong operator',
-		} as const,
+		options: buyerExperienceLevelOptions,
 	},
 	idealAgentRelationship: {
 		title: 'What does your ideal agent relationship look like?',
 		label: 'Ideal relationship',
-		options: {
-			trustedAdvisor: 'Trusted advisor',
-			thinkingPartner: 'Thinking partner (collaborator)',
-			skilledExecutor: 'Skilled executor',
-		} as const,
+		options: buyerIdealAgentRelationshipOptions,
 	},
 	decisionMakingNeed: {
 		title: 'What do you need most to make a big decision?',
 		label: 'Decision support',
-		options: {
-			numbersData: 'The numbers/data',
-			timeAndSpace: 'Time and space',
-			trustedPerspective: 'A trusted perspective',
-			gutFeeling: 'A gut feeling',
-		} as const,
+		options: buyerDecisionMakingNeedOptions,
 	},
 	biddingWarResponse: {
 		title: 'After losing a bidding war, what do you need from your agent?',
 		label: 'After a loss',
-		options: {
-			factsOptions: 'Facts & options immediately',
-			space: 'Space to step back',
-			reassurance: 'Reassurance',
-			calmPresence: 'Calm, steady presence',
-		} as const,
+		options: buyerBiddingWarResponseOptions,
 	},
 	quickCommunicationChannel: {
 		title: 'How do you prefer quick back-and-forth communication?',
 		label: 'Quick chat',
-		options: {
-			text: 'Text',
-			phone: 'Phone',
-			either: 'Either is fine',
-		} as const,
+		options: quickCommunicationChannelOptions,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you prefer updates, timelines, and documents?',
 		label: 'Updates & docs',
-		options: {
-			email: 'Email',
-			textWithAttachments: 'Text with attachments',
-			phoneThenEmailRecap: 'Phone call then email recap',
-		} as const,
+		options: updateDeliveryMethodOptions,
 	},
 	involvementLevel: {
 		title: 'How involved do you want to be?',
 		label: 'Involvement',
-		options: {
-			veryInvolved: 'Very involved',
-			keyDetails: 'Key details only',
-			handsOff: 'Hands off',
-		} as const,
+		options: involvementLevelOptions,
 	},
 	responseTimeExpectation: {
 		title: 'How quickly do you expect a response?',
 		label: 'Response time',
-		options: {
-			within10Min: 'Within 10 min',
-			within30Min: '30 min',
-			fewHours: 'A few hours',
-			within24Hours: '24 hours',
-		} as const,
+		options: responseTimeExpectationOptions,
 	},
 	commissionComfort: {
 		title: 'How do you plan to handle commission with your agent?',
 		label: 'Commission',
-		options: {
-			negotiate: 'Plan to negotiate',
-			openOptions: 'Open but want options first',
-			payFairRate: 'Will pay fair rate, not a concern',
-			dontUnderstand: "Don't understand it yet",
-		} as const,
+		options: commissionComfortOptions,
 	},
 } satisfies AnswerLabels
 
@@ -197,111 +176,58 @@ export const sellerAnswerLabels = {
 	saleMotivation: {
 		title: 'What is driving this sale?',
 		label: 'Motivation',
-		options: {
-			lifestyleChange: 'Lifestyle change',
-			relocation: 'Relocation',
-			financialPressure: 'Financial pressure',
-			rightTime: 'Right time',
-			majorTransition: 'Major personal transition',
-			other: 'Other',
-		} as const,
+		options: sellerSaleMotivationOptions,
 	},
 	successfulSaleLooksLike: {
 		title: 'What does a successful sale look like to you?',
 		label: 'Success definition',
-		options: {
-			maximumPrice: 'Maximum price',
-			strongPriceSmoothProcess: 'Strong price + smooth process',
-			speedCertainty: 'Speed & certainty',
-			mustCloseByDate: 'Must close by a specific date',
-		} as const,
+		options: sellerSuccessfulSaleLooksLikeOptions,
 	},
 	involvementLevel: {
 		title: 'How involved do you want to be?',
 		label: 'Involvement',
-		options: {
-			veryInvolved: 'Very involved',
-			keepMeInformed: 'Keep me informed',
-			handsOff: 'Hands off',
-		} as const,
+		options: involvementLevelOptions,
 	},
 	quickCommunicationChannel: {
 		title: 'How do you prefer quick back-and-forth communication?',
 		label: 'Quick chat',
-		options: {
-			text: 'Text',
-			phone: 'Phone',
-			either: 'Either is fine',
-		} as const,
+		options: quickCommunicationChannelOptions,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you prefer updates, timelines, and documents?',
 		label: 'Updates & docs',
-		options: {
-			email: 'Email',
-			textWithAttachments: 'Text with attachments',
-			phoneThenEmailRecap: 'Phone call then email recap',
-		} as const,
+		options: updateDeliveryMethodOptions,
 	},
 	agentDeliveryExpectations: {
 		title: 'What would make you feel your agent delivered? (choose up to 2)',
 		label: 'Delivery expectations',
-		options: {
-			pricedRight: 'Priced it right',
-			greatMarketing: 'Great marketing',
-			greatNegotiatedOutcome: 'Great negotiated outcome',
-			reachableResponsive: 'Reachable & responsive',
-			keptItCalm: 'Kept it calm',
-			honestStraightforward: 'Honest & straightforward',
-		} as const,
+		options: sellerAgentDeliveryExpectationsOptions,
 		multiple: true,
 	},
 	homeConnection: {
 		title: 'How would you describe your connection to this home?',
 		label: 'Home connection',
-		options: {
-			asset: "It's an asset",
-			goodMemories: 'Good memories, ready to move on',
-			partOfIdentity: 'Part of my identity',
-			complicated: 'Complicated/emotionally difficult',
-		} as const,
+		options: sellerHomeConnectionOptions,
 	},
 	agentSilencePreference: {
 		title: 'When not hearing from your agent, what do you prefer?',
 		label: 'Check-ins',
-		options: {
-			scheduled: 'Regular scheduled check-ins',
-			milestones: 'Updates at key milestones',
-			clientLed: "I'll reach out when needed",
-		} as const,
+		options: sellerAgentSilencePreferenceOptions,
 	},
 	representationPreference: {
 		title: 'Which matters more to you?',
 		label: 'Exclusivity',
-		options: {
-			broadConnections: 'Broad connections (even with competing loyalties)',
-			exclusiveRepresentationOnly: 'Exclusive representation only',
-		} as const,
+		options: sellerRepresentationPreferenceOptions,
 	},
 	responseTimeExpectation: {
 		title: 'How quickly do you expect a response?',
 		label: 'Response time',
-		options: {
-			within10Min: 'Within 10 min',
-			within30Min: '30 min',
-			fewHours: 'A few hours',
-			within24Hours: '24 hours',
-		} as const,
+		options: responseTimeExpectationOptions,
 	},
 	commissionComfort: {
 		title: 'How do you plan to handle listing-agent commission?',
 		label: 'Commission',
-		options: {
-			negotiate: 'Plan to negotiate',
-			openOptions: 'Open but want options first',
-			payFairRate: 'Will pay fair rate, not a concern',
-			dontUnderstand: "Don't understand it yet",
-		} as const,
+		options: commissionComfortOptions,
 	},
 } satisfies AnswerLabels
 
@@ -309,106 +235,55 @@ export const agentAnswerLabels = {
 	clientDescription: {
 		title: 'How would clients describe working with you?',
 		label: 'Client description',
-		options: {
-			strategicDataDriven: 'Strategic & data-driven',
-			calmSteady: 'Calm & steady',
-			warmRelational: 'Warm & relational',
-			efficientDecisive: 'Efficient & decisive',
-		} as const,
+		options: agentClientDescriptionOptions,
 	},
 	communicationFrequency: {
 		title: 'How often do you communicate during a transaction?',
 		label: 'Communication frequency',
-		options: {
-			scheduled: 'Regular scheduled check-ins',
-			milestones: 'At key milestones',
-			clientLed: 'Client-led pace',
-		} as const,
+		options: agentCommunicationFrequencyOptions,
 	},
 	quickCommunicationChannel: {
 		title: 'Preferred quick back-and-forth channel?',
 		label: 'Quick chat',
-		options: {
-			text: 'Text',
-			phone: 'Phone',
-			either: 'Either is fine',
-		} as const,
+		options: quickCommunicationChannelOptions,
 	},
 	updateDeliveryMethod: {
 		title: 'How do you deliver updates, timelines, documents?',
 		label: 'Updates & docs',
-		options: {
-			email: 'Email',
-			textWithAttachments: 'Text with attachments',
-			phoneThenEmailRecap: 'Phone call then email recap',
-		} as const,
+		options: updateDeliveryMethodOptions,
 	},
 	difficultDealInstinct: {
 		title: 'Instinct when a deal gets difficult?',
 		label: 'Difficult deals',
-		options: {
-			factsFast: 'Facts fast',
-			slowItDown: 'Slow it down',
-			takeControl: 'Take control',
-			deEscalateFirst: 'De-escalate first',
-		} as const,
+		options: agentDifficultDealInstinctOptions,
 	},
 	responseTime: {
 		title: 'How quickly do you typically respond to clients?',
 		label: 'Response time',
-		options: {
-			within10Min: 'Within 10 min',
-			within30Min: '30 min',
-			fewHours: 'A few hours',
-			within24Hours: '24 hours',
-		} as const,
+		options: agentResponseTimeOptions,
 	},
 	commissionApproach: {
 		title: 'How do you approach commission conversations?',
 		label: 'Commission approach',
-		options: {
-			proactiveFixed: 'Proactive & fixed rate',
-			proactiveOpen: 'Proactive & open to discussion',
-			reactiveFixed: 'Reactive & fixed rate',
-			reactiveOpen: 'Reactive & open',
-		} as const,
+		options: agentCommissionApproachOptions,
 	},
 	unrepresentedBuyerApproach: {
 		title: 'Unrepresented buyer approaches your listing — what do you do?',
 		label: 'Unrepresented buyers',
-		options: {
-			referSeparateBrokerage: 'Refer to a separate brokerage',
-			representSellerOnly:
-				'Represent seller only, buyer unrepresented (disclosed)',
-			anotherAgentInBrokerage:
-				'Another agent at your brokerage represents buyer (disclosed)',
-		} as const,
+		options: agentUnrepresentedBuyerApproachOptions,
 	},
 } satisfies AnswerLabels
 
-export const bestClientTypeOptions = {
-	firstTime: 'First-time buyers',
-	moveUp: 'Move-up or downsizing',
-	relocation: 'Relocation',
-	luxury: 'Luxury',
-	investor: 'Investors',
-	landMultiFamily: 'Land or multi-family',
-	seller: 'Sellers & listings',
-	condoTownhome: 'Condos & townhomes',
-	other: 'Other',
-} as const
+export {
+	bestClientTypeOptions,
+	propertyTypeOptions,
+	optionKeys,
+} from '@/lib/matching/enums'
 
 export const bestClientTypeLabels: Record<string, string> =
 	bestClientTypeOptions
 
 export type BestClientTypeSlug = keyof typeof bestClientTypeOptions
-
-export const propertyTypeOptions = {
-	singleFamily: 'Single-Family',
-	condoTownhome: 'Condo/Townhome',
-	multiFamily: 'Multi-family',
-	land: 'Land',
-} as const
 
 export type PropertyTypeSlug = keyof typeof propertyTypeOptions
 
@@ -428,88 +303,58 @@ export const bestClientTypesSchema = z.array(
 )
 
 export const buyerAnswerSchema = z.object({
-	experienceLevel: z.enum(
-		optionKeys(buyerAnswerLabels.experienceLevel.options),
-	),
+	experienceLevel: z.enum(optionKeys(buyerExperienceLevelOptions)),
 	idealAgentRelationship: z.enum(
-		optionKeys(buyerAnswerLabels.idealAgentRelationship.options),
+		optionKeys(buyerIdealAgentRelationshipOptions),
 	),
-	decisionMakingNeed: z.enum(
-		optionKeys(buyerAnswerLabels.decisionMakingNeed.options),
-	),
-	biddingWarResponse: z.enum(
-		optionKeys(buyerAnswerLabels.biddingWarResponse.options),
-	),
+	decisionMakingNeed: z.enum(optionKeys(buyerDecisionMakingNeedOptions)),
+	biddingWarResponse: z.enum(optionKeys(buyerBiddingWarResponseOptions)),
 	quickCommunicationChannel: z.enum(
-		optionKeys(buyerAnswerLabels.quickCommunicationChannel.options),
+		optionKeys(quickCommunicationChannelOptions),
 	),
-	updateDeliveryMethod: z.enum(
-		optionKeys(buyerAnswerLabels.updateDeliveryMethod.options),
-	),
-	involvementLevel: z.enum(
-		optionKeys(buyerAnswerLabels.involvementLevel.options),
-	),
-	responseTimeExpectation: z.enum(
-		optionKeys(buyerAnswerLabels.responseTimeExpectation.options),
-	),
-	commissionComfort: z.enum(
-		optionKeys(buyerAnswerLabels.commissionComfort.options),
-	),
+	updateDeliveryMethod: z.enum(optionKeys(updateDeliveryMethodOptions)),
+	involvementLevel: z.enum(optionKeys(involvementLevelOptions)),
+	responseTimeExpectation: z.enum(optionKeys(responseTimeExpectationOptions)),
+	commissionComfort: z.enum(optionKeys(commissionComfortOptions)),
 })
 
 export const sellerAnswerSchema = z.object({
-	saleMotivation: z.enum(optionKeys(sellerAnswerLabels.saleMotivation.options)),
+	saleMotivation: z.enum(optionKeys(sellerSaleMotivationOptions)),
 	successfulSaleLooksLike: z.enum(
-		optionKeys(sellerAnswerLabels.successfulSaleLooksLike.options),
+		optionKeys(sellerSuccessfulSaleLooksLikeOptions),
 	),
-	involvementLevel: z.enum(
-		optionKeys(sellerAnswerLabels.involvementLevel.options),
-	),
+	involvementLevel: z.enum(optionKeys(involvementLevelOptions)),
 	quickCommunicationChannel: z.enum(
-		optionKeys(sellerAnswerLabels.quickCommunicationChannel.options),
+		optionKeys(quickCommunicationChannelOptions),
 	),
-	updateDeliveryMethod: z.enum(
-		optionKeys(sellerAnswerLabels.updateDeliveryMethod.options),
-	),
+	updateDeliveryMethod: z.enum(optionKeys(updateDeliveryMethodOptions)),
 	agentDeliveryExpectations: z.array(
-		z.enum(optionKeys(sellerAnswerLabels.agentDeliveryExpectations.options)),
+		z.enum(optionKeys(sellerAgentDeliveryExpectationsOptions)),
 	),
-	homeConnection: z.enum(optionKeys(sellerAnswerLabels.homeConnection.options)),
+	homeConnection: z.enum(optionKeys(sellerHomeConnectionOptions)),
 	agentSilencePreference: z.enum(
-		optionKeys(sellerAnswerLabels.agentSilencePreference.options),
+		optionKeys(sellerAgentSilencePreferenceOptions),
 	),
 	representationPreference: z.enum(
-		optionKeys(sellerAnswerLabels.representationPreference.options),
+		optionKeys(sellerRepresentationPreferenceOptions),
 	),
-	responseTimeExpectation: z.enum(
-		optionKeys(sellerAnswerLabels.responseTimeExpectation.options),
-	),
-	commissionComfort: z.enum(
-		optionKeys(sellerAnswerLabels.commissionComfort.options),
-	),
+	responseTimeExpectation: z.enum(optionKeys(responseTimeExpectationOptions)),
+	commissionComfort: z.enum(optionKeys(commissionComfortOptions)),
 })
 
 export const agentAnswerSchema = z.object({
-	clientDescription: z.enum(
-		optionKeys(agentAnswerLabels.clientDescription.options),
-	),
+	clientDescription: z.enum(optionKeys(agentClientDescriptionOptions)),
 	communicationFrequency: z.enum(
-		optionKeys(agentAnswerLabels.communicationFrequency.options),
+		optionKeys(agentCommunicationFrequencyOptions),
 	),
 	quickCommunicationChannel: z.enum(
-		optionKeys(agentAnswerLabels.quickCommunicationChannel.options),
+		optionKeys(quickCommunicationChannelOptions),
 	),
-	updateDeliveryMethod: z.enum(
-		optionKeys(agentAnswerLabels.updateDeliveryMethod.options),
-	),
-	difficultDealInstinct: z.enum(
-		optionKeys(agentAnswerLabels.difficultDealInstinct.options),
-	),
-	responseTime: z.enum(optionKeys(agentAnswerLabels.responseTime.options)),
-	commissionApproach: z.enum(
-		optionKeys(agentAnswerLabels.commissionApproach.options),
-	),
+	updateDeliveryMethod: z.enum(optionKeys(updateDeliveryMethodOptions)),
+	difficultDealInstinct: z.enum(optionKeys(agentDifficultDealInstinctOptions)),
+	responseTime: z.enum(optionKeys(agentResponseTimeOptions)),
+	commissionApproach: z.enum(optionKeys(agentCommissionApproachOptions)),
 	unrepresentedBuyerApproach: z.enum(
-		optionKeys(agentAnswerLabels.unrepresentedBuyerApproach.options),
+		optionKeys(agentUnrepresentedBuyerApproachOptions),
 	),
 })

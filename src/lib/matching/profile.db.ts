@@ -1,13 +1,33 @@
 import { boolean, pgEnum, text, timestamp } from 'drizzle-orm/pg-core'
 
 import {
-	agentAnswerLabels,
+	agentClientDescriptionOptions,
+	agentCommunicationFrequencyOptions,
+	agentCommissionApproachOptions,
+	agentDifficultDealInstinctOptions,
+	agentResponseTimeOptions,
+	agentUnrepresentedBuyerApproachOptions,
 	bestClientTypeOptions,
-	buyerAnswerLabels,
+	buyerBiddingWarResponseOptions,
+	buyerDecisionMakingNeedOptions,
+	buyerExperienceLevelOptions,
+	buyerIdealAgentRelationshipOptions,
+	commissionComfortOptions,
+	involvementLevelOptions,
 	optionKeys,
+	profileStatusOptions,
 	propertyTypeOptions,
-	sellerAnswerLabels,
-} from '@/lib/matching/questions'
+	quickCommunicationChannelOptions,
+	representationSideOptions,
+	responseTimeExpectationOptions,
+	sellerAgentDeliveryExpectationsOptions,
+	sellerAgentSilencePreferenceOptions,
+	sellerHomeConnectionOptions,
+	sellerRepresentationPreferenceOptions,
+	sellerSaleMotivationOptions,
+	sellerSuccessfulSaleLooksLikeOptions,
+	updateDeliveryMethodOptions,
+} from '@/lib/matching/enums'
 
 export type ProfileStatus =
 	| 'draft'
@@ -15,104 +35,101 @@ export type ProfileStatus =
 	| 'active'
 	| 'enriched'
 
-const profileStatusEnum = pgEnum('profile_status', [
-	'draft',
-	'essentials_submitted',
-	'active',
-	'enriched',
-])
+const profileStatusEnum = pgEnum(
+	'profile_status',
+	optionKeys(profileStatusOptions),
+)
 
-const representationSideEnum = pgEnum('representation_side', [
-	'buying',
-	'selling',
-	'both',
-])
+const representationSideEnum = pgEnum(
+	'representation_side',
+	optionKeys(representationSideOptions),
+)
 
 const buyerExperienceLevelEnum = pgEnum(
 	'buyer_experience_level',
-	optionKeys(buyerAnswerLabels.experienceLevel.options),
+	optionKeys(buyerExperienceLevelOptions),
 )
 const buyerIdealAgentRelationshipEnum = pgEnum(
 	'buyer_ideal_agent_relationship',
-	optionKeys(buyerAnswerLabels.idealAgentRelationship.options),
+	optionKeys(buyerIdealAgentRelationshipOptions),
 )
 const buyerDecisionMakingNeedEnum = pgEnum(
 	'buyer_decision_making_need',
-	optionKeys(buyerAnswerLabels.decisionMakingNeed.options),
+	optionKeys(buyerDecisionMakingNeedOptions),
 )
 const buyerBiddingWarResponseEnum = pgEnum(
 	'buyer_bidding_war_response',
-	optionKeys(buyerAnswerLabels.biddingWarResponse.options),
+	optionKeys(buyerBiddingWarResponseOptions),
 )
 const quickCommunicationChannelEnum = pgEnum(
 	'quick_communication_channel',
-	optionKeys(buyerAnswerLabels.quickCommunicationChannel.options),
+	optionKeys(quickCommunicationChannelOptions),
 )
 const updateDeliveryMethodEnum = pgEnum(
 	'update_delivery_method',
-	optionKeys(buyerAnswerLabels.updateDeliveryMethod.options),
+	optionKeys(updateDeliveryMethodOptions),
 )
 const involvementLevelEnum = pgEnum(
 	'involvement_level',
-	optionKeys(buyerAnswerLabels.involvementLevel.options),
+	optionKeys(involvementLevelOptions),
 )
 const responseTimeExpectationEnum = pgEnum(
 	'response_time_expectation',
-	optionKeys(buyerAnswerLabels.responseTimeExpectation.options),
+	optionKeys(responseTimeExpectationOptions),
 )
 const commissionComfortEnum = pgEnum(
 	'commission_comfort',
-	optionKeys(buyerAnswerLabels.commissionComfort.options),
+	optionKeys(commissionComfortOptions),
 )
 
 const sellerSaleMotivationEnum = pgEnum(
 	'seller_sale_motivation',
-	optionKeys(sellerAnswerLabels.saleMotivation.options),
+	optionKeys(sellerSaleMotivationOptions),
 )
 const sellerSuccessfulSaleLooksLikeEnum = pgEnum(
 	'seller_successful_sale_looks_like',
-	optionKeys(sellerAnswerLabels.successfulSaleLooksLike.options),
+	optionKeys(sellerSuccessfulSaleLooksLikeOptions),
 )
 const sellerAgentDeliveryExpectationsEnum = pgEnum(
 	'seller_agent_delivery_expectations',
-	optionKeys(sellerAnswerLabels.agentDeliveryExpectations.options),
+	optionKeys(sellerAgentDeliveryExpectationsOptions),
 )
 const sellerHomeConnectionEnum = pgEnum(
 	'seller_home_connection',
-	optionKeys(sellerAnswerLabels.homeConnection.options),
+	optionKeys(sellerHomeConnectionOptions),
 )
 const sellerAgentSilencePreferenceEnum = pgEnum(
 	'seller_agent_silence_preference',
-	optionKeys(sellerAnswerLabels.agentSilencePreference.options),
+	optionKeys(sellerAgentSilencePreferenceOptions),
 )
 const sellerRepresentationPreferenceEnum = pgEnum(
 	'seller_representation_preference',
-	optionKeys(sellerAnswerLabels.representationPreference.options),
+	optionKeys(sellerRepresentationPreferenceOptions),
 )
 
 const agentClientDescriptionEnum = pgEnum(
 	'agent_client_description',
-	optionKeys(agentAnswerLabels.clientDescription.options),
+	optionKeys(agentClientDescriptionOptions),
 )
 const agentCommunicationFrequencyEnum = pgEnum(
 	'agent_communication_frequency',
-	optionKeys(agentAnswerLabels.communicationFrequency.options),
+	optionKeys(agentCommunicationFrequencyOptions),
 )
 const agentDifficultDealInstinctEnum = pgEnum(
 	'agent_difficult_deal_instinct',
-	optionKeys(agentAnswerLabels.difficultDealInstinct.options),
+	optionKeys(agentDifficultDealInstinctOptions),
 )
 const agentResponseTimeEnum = pgEnum(
 	'agent_response_time',
-	optionKeys(agentAnswerLabels.responseTime.options),
+	optionKeys(agentResponseTimeOptions),
 )
 const agentCommissionApproachEnum = pgEnum(
 	'agent_commission_approach',
-	optionKeys(agentAnswerLabels.commissionApproach.options),
+	optionKeys(agentCommissionApproachOptions),
 )
 const agentUnrepresentedBuyerApproachEnum = pgEnum(
 	'agent_unrepresented_buyer_approach',
-	optionKeys(agentAnswerLabels.unrepresentedBuyerApproach.options),
+	optionKeys(agentUnrepresentedBuyerApproachOptions),
 )
 
 const propertyTypeEnum = pgEnum(

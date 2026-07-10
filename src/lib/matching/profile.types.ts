@@ -17,7 +17,6 @@ const agentProfileCreateSchema = createInsertSchema(agentProfiles)
 		updatedAt: true,
 	})
 	.extend({
-		representationSide: z.enum(['buying', 'selling', 'both']),
 		role: z.literal('agent'),
 	})
 
@@ -29,7 +28,6 @@ const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
 		updatedAt: true,
 	})
 	.extend({
-		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
 		role: z.literal('buyer'),
 	})
 
@@ -41,7 +39,6 @@ const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
 		updatedAt: true,
 	})
 	.extend({
-		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
 		role: z.literal('seller'),
 	})
 
