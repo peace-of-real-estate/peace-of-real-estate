@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { authenticateBeta } from '@/lib/auth/beta'
+import { SUPPORT_EMAIL } from '@/lib/constants'
 
 async function authenticateBetaWithPassword(password: string) {
 	try {
@@ -114,7 +115,7 @@ function BetaLogin() {
 					<p className="text-muted-foreground mt-8 text-center text-xs leading-relaxed">
 						Need an invite?{' '}
 						<a
-							href="mailto:hello@peaceofrealestate.com"
+							href={`mailto:${SUPPORT_EMAIL}`}
 							className="font-medium underline underline-offset-4"
 						>
 							Request access

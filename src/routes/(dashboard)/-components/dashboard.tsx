@@ -3,6 +3,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { HelpCircle, LogOut } from 'lucide-react'
 
 import { authClient } from '@/lib/auth/client'
+import { SUPPORT_EMAIL } from '@/lib/constants'
 import { cn } from '@/lib/utils/ui'
 import { Button } from '@/components/ui/button'
 import {
@@ -301,8 +302,6 @@ function SupportDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
-	const supportEmail = 'hello@peaceofrealestate.com'
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
@@ -320,10 +319,10 @@ function SupportDialog({
 							human reply:
 						</p>
 						<a
-							href={`mailto:${supportEmail}`}
+							href={`mailto:${SUPPORT_EMAIL}`}
 							className="font-medium underline underline-offset-4"
 						>
-							{supportEmail}
+							{SUPPORT_EMAIL}
 						</a>
 					</div>
 
@@ -347,7 +346,7 @@ function SupportDialog({
 						<Button variant="outline">Close</Button>
 					</DialogClose>
 					<Button asChild>
-						<a href={`mailto:${supportEmail}`}>Open email</a>
+						<a href={`mailto:${SUPPORT_EMAIL}`}>Open email</a>
 					</Button>
 				</DialogFooter>
 			</DialogContent>
