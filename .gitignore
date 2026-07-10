@@ -25,6 +25,7 @@ playwright-report/
 html
 visual-diffs.html
 **/*-screenshot-1.png
+e2e/.auth
 
 # Vitest failure screenshots (not baseline snapshots)
 tests/routes/__screenshots__/*-matches-desktop-screenshot-*.png

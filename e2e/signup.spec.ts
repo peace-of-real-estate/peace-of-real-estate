@@ -5,12 +5,7 @@ import { test, expect } from '@playwright/test'
 // renders, but do not submit the signup form or create accounts.
 
 test.describe('with beta access', () => {
-	test.beforeEach(async ({ context, baseURL }) => {
-		if (!baseURL) throw new Error('BASE_URL must be set for e2e tests')
-		await context.addCookies([
-			{ name: 'beta_auth', value: 'true', url: baseURL },
-		])
-	})
+	test.use({ storageState: 'e2e/.auth/beta-user.json' })
 
 	test('buyer signup flow walks through all steps', async ({ page }) => {
 		await page.goto('/signup/buyer/location')

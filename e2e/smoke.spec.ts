@@ -12,12 +12,7 @@ test('beta gate greets visitors without access', async ({ page }) => {
 })
 
 test.describe('with beta access', () => {
-	test.beforeEach(async ({ context, baseURL }) => {
-		if (!baseURL) throw new Error('BASE_URL must be set for e2e tests')
-		await context.addCookies([
-			{ name: 'beta_auth', value: 'true', url: baseURL },
-		])
-	})
+	test.use({ storageState: 'e2e/.auth/beta-user.json' })
 
 	test('landing page renders', async ({ page }) => {
 		const response = await page.goto('/')

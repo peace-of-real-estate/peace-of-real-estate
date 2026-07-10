@@ -18,7 +18,13 @@ export default defineConfig({
 	expect: { timeout: 5_000 },
 	projects: [
 		{
+			name: 'setup',
+			testMatch: /auth\.setup\.ts/,
+			dependencies: [],
+		},
+		{
 			name: 'chromium',
+			dependencies: ['setup'],
 			use: {
 				...devices['Desktop Chrome'],
 				launchOptions: { args: ['--disable-lcd-text'] },
@@ -26,6 +32,7 @@ export default defineConfig({
 		},
 		{
 			name: 'mobile',
+			dependencies: ['setup'],
 			use: {
 				...devices['Desktop Chrome'],
 				viewport: { width: 320, height: 800 },
