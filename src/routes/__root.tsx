@@ -1,5 +1,5 @@
 import { hasBetaAccess } from '@/lib/auth/beta'
-import { getCurrentSession } from '@/lib/auth/functions'
+import { getCurrentSession } from '@/lib/auth/session'
 import type { QueryClient } from '@tanstack/react-query'
 import {
 	HeadContent,
@@ -27,7 +27,7 @@ export const Route = createRootRouteWithContext<{
 		],
 	}),
 	beforeLoad: async ({ location }) => {
-		const isBetaUser = hasBetaAccess()
+		const isBetaUser = await hasBetaAccess()
 
 		if (!isBetaUser && location.pathname !== '/auth/beta') {
 			throw redirect({ to: '/auth/beta' })

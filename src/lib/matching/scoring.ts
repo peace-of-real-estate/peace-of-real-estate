@@ -1,8 +1,14 @@
+import { parseMinMaxRange } from '@/lib/matching/price-range'
+
 import type {
 	AgentProfile,
 	BuyerProfile,
 	SellerProfile,
 } from '@/lib/matching/profile.types'
+import type {
+	BestClientTypeSlug,
+	PropertyTypeSlug,
+} from '@/lib/matching/questions'
 
 type ClientProfile = BuyerProfile | SellerProfile
 
@@ -43,6 +49,8 @@ export type ScoreBucket = 'Location' | 'Price Fit' | 'Client Fit'
  * about fit for a specific client.
  */
 export type DimensionId = 'location' | 'priceFit' | 'clientFit'
+
+const DIMENSION_IDS: DimensionId[] = ['location', 'priceFit', 'clientFit']
 
 /** One row of a dimension's client-vs-agent comparison table. */
 export interface SubCheck {
@@ -107,7 +115,7 @@ export interface FitScoreResult {
 	trace: ScoreTrace
 }
 
-const BASE_WEIGHTS: Record<DimensionId, number> = {
+export const BASE_WEIGHTS: Record<DimensionId, number> = {
 	location: 40,
 	priceFit: 35,
 	clientFit: 25,
@@ -134,7 +142,10 @@ const PRIORITY_TO_DIMENSION: Record<string, DimensionId> = {
 const PRIORITY_BOOST = 1.5
 
 /** Buyer property-type slugs → agent bestClientTypes slugs that serve them. */
-const propertyTypeToClientTypes: Record<string, string[]> = {
+const propertyTypeToClientTypes: Record<
+	PropertyTypeSlug,
+	BestClientTypeSlug[]
+> = {
 	singleFamily: ['firstTime', 'moveUp'],
 	condoTownhome: ['condoTownhome', 'moveUp'],
 	multiFamily: ['landMultiFamily', 'investor'],
@@ -157,14 +168,7 @@ export interface PriceRangeValue {
 export function parseSerializedPriceRange(
 	value: string | null | undefined,
 ): PriceRangeValue | undefined {
-	const match = value?.trim().match(/^(\d+)-(\d+)$/)
-	if (!match) return undefined
-	const first = Number.parseInt(match[1]!, 10)
-	const second = Number.parseInt(match[2]!, 10)
-	return {
-		min: Math.min(first, second),
-		max: Math.max(first, second),
-	}
+	return parseMinMaxRange(value)
 }
 
 /**
@@ -332,9 +336,9 @@ export function scorePriceFit(
 function expectedClientTypeSources(
 	client: ClientProfile,
 	side: 'buying' | 'selling',
-): Map<string, string[]> {
-	const sources = new Map<string, string[]>()
-	const add = (slug: string, source: string) => {
+): Map<BestClientTypeSlug, string[]> {
+	const sources = new Map<BestClientTypeSlug, string[]>()
+	const add = (slug: BestClientTypeSlug, source: string) => {
 		const existing = sources.get(slug)
 		if (existing) existing.push(source)
 		else sources.set(slug, [source])
@@ -360,7 +364,7 @@ function expectedClientTypeSources(
 export function deriveExpectedClientTypes(
 	client: ClientProfile,
 	side: 'buying' | 'selling',
-): string[] {
+): BestClientTypeSlug[] {
 	return [...expectedClientTypeSources(client, side).keys()]
 }
 
@@ -417,17 +421,18 @@ export function resolveDimensionWeights(
 		if (dimension) boosted.add(dimension)
 	}
 
-	const raw = Object.fromEntries(
-		Object.entries(BASE_WEIGHTS).map(([id, weight]) => [
-			id,
-			boosted.has(id as DimensionId) ? weight * PRIORITY_BOOST : weight,
-		]),
-	) as Record<DimensionId, number>
+	const raw: Record<DimensionId, number> = { ...BASE_WEIGHTS }
+	for (const id of DIMENSION_IDS) {
+		const weight = BASE_WEIGHTS[id]
+		raw[id] = boosted.has(id) ? weight * PRIORITY_BOOST : weight
+	}
 
 	const total = Object.values(raw).reduce((sum, weight) => sum + weight, 0)
-	const weights = Object.fromEntries(
-		Object.entries(raw).map(([id, weight]) => [id, (weight / total) * 100]),
-	) as Record<DimensionId, number>
+	const weights: Record<DimensionId, number> = { ...raw }
+	for (const id of DIMENSION_IDS) {
+		const weight = raw[id]
+		weights[id] = (weight / total) * 100
+	}
 
 	return { weights, boosted }
 }
@@ -483,7 +488,7 @@ export function calculateFitScore(
 		clientFit: scoreClientFit(client, agent, side),
 	}
 
-	const dimensions = (Object.keys(BASE_WEIGHTS) as DimensionId[]).map(
+	const dimensions = DIMENSION_IDS.map(
 		(id): DimensionTrace => ({
 			id,
 			label: DIMENSION_LABELS[id],

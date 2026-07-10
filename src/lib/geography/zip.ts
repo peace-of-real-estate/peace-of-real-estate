@@ -63,7 +63,8 @@ async function fetchZipBoundaryBatch(
 		)
 	}
 
-	return response.json() as Promise<FeatureCollection>
+	const data: FeatureCollection = await response.json()
+	return data
 }
 
 function buildTopCitiesWhereClause() {

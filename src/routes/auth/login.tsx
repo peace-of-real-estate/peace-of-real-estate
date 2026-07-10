@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { GoogleIcon } from '@/components/icons'
+import { GoogleAuthButton } from '@/components/google-auth-button'
 import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 import { useGoogleAuth } from '@/hooks/use-google-auth'
 import { authClient } from '@/lib/auth/client'
@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-const DEFAULT_POST_AUTH_REDIRECT = '/buyer/matches'
+const DEFAULT_POST_AUTH_REDIRECT = '/'
 
 export const Route = createFileRoute('/auth/login')({
 	validateSearch: z.object({
@@ -94,20 +94,15 @@ export function Login({ redirect }: { redirect?: string }) {
 						<div className="space-y-6">
 							{googleAvailable ? (
 								<>
-									<Button
-										type="button"
+									<GoogleAuthButton
+										fallbackRedirect={resolvedRedirect}
 										onClick={handleGoogleSignIn}
-										disabled={isGoogleLoading || isSubmitting}
-										variant="outline"
+										isLoading={isGoogleLoading}
 										className="w-full"
+										disabled={isSubmitting || isGoogleLoading}
 									>
-										{isGoogleLoading ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
-										) : (
-											<GoogleIcon className="h-5 w-5" />
-										)}
 										Sign in with Google
-									</Button>
+									</GoogleAuthButton>
 
 									<div className="text-muted-foreground relative py-2 text-center text-xs tracking-[0.2em] uppercase">
 										<span className="bg-background relative z-10 px-3">or</span>

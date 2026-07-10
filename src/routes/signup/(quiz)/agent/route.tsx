@@ -20,9 +20,13 @@ import {
 	type SignupWizardStep,
 } from '../-components/signup-wizard-shell'
 import type { AgentDraft, RepresentationSide } from '@/lib/matching/profile'
-import { getCurrentSession } from '@/lib/auth/functions'
-import { loadAgentProfile } from '@/lib/matching/profile'
-import { bestClientTypeLabels } from '@/lib/matching/questions'
+import { getCurrentSession } from '@/lib/auth/session'
+import { agentDraftSchema, loadAgentProfile } from '@/lib/matching/profile'
+import {
+	bestClientTypeOptions,
+	optionKeys,
+	type BestClientTypeSlug,
+} from '@/lib/matching/questions'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 export type AgentFlowStep =
@@ -35,8 +39,10 @@ export type AgentFlowStep =
 
 export type AgentWizardContext = SignupWizardContext<AgentDraft, AgentFlowStep>
 
-export const agentDraftStorage =
-	createLocalStorage<AgentDraft>('pre-agent-draft')
+export const agentDraftStorage = createLocalStorage<AgentDraft>(
+	'pre-agent-draft',
+	agentDraftSchema,
+)
 
 const agentFlowSteps = [
 	{ id: 'identity', label: 'Identity', icon: UserIcon },
@@ -46,17 +52,19 @@ const agentFlowSteps = [
 	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
 ] satisfies SignupWizardStep<Exclude<AgentFlowStep, 'preview'>>[]
 
+const representationSides: RepresentationSide[] = ['buying', 'selling', 'both']
+
 export const agentConfig = {
 	basePath: '/signup/agent',
 	label: 'Agent',
-	intentOptions: ['buying', 'selling', 'both'] as RepresentationSide[],
-	clientOptions: Object.keys(bestClientTypeLabels),
+	intentOptions: representationSides,
+	clientOptions: optionKeys(bestClientTypeOptions),
 	accent: 'amber',
 } satisfies {
 	basePath: '/signup/agent'
 	label: string
 	intentOptions: RepresentationSide[]
-	clientOptions: string[]
+	clientOptions: BestClientTypeSlug[]
 	accent: 'amber'
 }
 

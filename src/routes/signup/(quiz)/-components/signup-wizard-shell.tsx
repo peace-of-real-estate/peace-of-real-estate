@@ -1,5 +1,10 @@
 import type { Icon } from '@phosphor-icons/react'
-import { Link, Outlet, useNavigate } from '@tanstack/react-router'
+import {
+	Link,
+	Outlet,
+	useNavigate,
+	type RegisteredRouter,
+} from '@tanstack/react-router'
 import { TriangleAlert } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { createContext, useContext, useState, type ReactNode } from 'react'
@@ -36,14 +41,20 @@ type DraftStorage<TDraft> = {
 
 const SignupWizardContextValue = createContext<unknown>(null)
 
-export function useSignupWizardContext<TDraft, TStep extends string>() {
-	const context = useContext(SignupWizardContextValue)
+function assertIsContext<TDraft, TStep extends string>(
+	context: unknown,
+): asserts context is SignupWizardContext<TDraft, TStep> {
 	if (!context) {
 		throw new Error(
 			'useSignupWizardContext must be used inside SignupWizardShell',
 		)
 	}
-	return context as SignupWizardContext<TDraft, TStep>
+}
+
+export function useSignupWizardContext<TDraft, TStep extends string>() {
+	const context = useContext(SignupWizardContextValue)
+	assertIsContext<TDraft, TStep>(context)
+	return context
 }
 
 export function SignupWizardShell<TDraft extends object, TStep extends string>({
@@ -74,10 +85,8 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 
 	const goToStep = (step: TStep) => {
 		const stepPath = getStepPath(step)
-		void navigate({
-			to: (stepPath.startsWith('/')
-				? stepPath
-				: `${basePath}/${stepPath}`) as never,
+		void navigate<RegisteredRouter, string>({
+			to: stepPath.startsWith('/') ? stepPath : `${basePath}/${stepPath}`,
 		})
 	}
 	const updateState = (patch: Partial<TDraft>) => {
@@ -146,7 +155,7 @@ function StepDot({
 	)
 }
 
-function WizardChrome<TStep extends string>({
+export function WizardChrome<TStep extends string>({
 	steps,
 	currentStepId,
 	progress,
@@ -529,10 +538,10 @@ export function StepHeader({
 			<p className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
 				Step {stepNumber} of {totalSteps}
 			</p>
-			<p className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
+			<h2 className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
 				{Icon ? <Icon className="h-4 w-4" weight="duotone" /> : null}
 				{title}
-			</p>
+			</h2>
 		</div>
 	)
 }

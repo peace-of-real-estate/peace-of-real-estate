@@ -9,11 +9,12 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-import type {
-	AgentMatchData,
-	DimensionTrace,
-	MatchDebugInfo,
-	SubCheck,
+import {
+	BASE_WEIGHTS,
+	type AgentMatchData,
+	type DimensionTrace,
+	type MatchDebugInfo,
+	type SubCheck,
 } from '@/lib/matching/scoring'
 import { cn } from '@/lib/utils/ui'
 
@@ -43,6 +44,27 @@ function scoreTone(score: number) {
 	if (score >= 0.75) return 'bg-emerald-500'
 	if (score >= 0.4) return 'bg-amber-500'
 	return 'bg-red-500'
+}
+
+const DEBUG_PROFILE_FIELDS = new Set([
+	'city',
+	'state',
+	'zipCodes',
+	'priceRange',
+	'typicalPriceRange',
+	'propertyTypes',
+	'representationSide',
+	'bestClientTypes',
+	'matchPriorities',
+])
+
+function sanitizeDebugProfile(
+	profile: unknown,
+): Record<string, unknown> | null {
+	if (!profile || typeof profile !== 'object') return null
+	return Object.fromEntries(
+		Object.entries(profile).filter(([key]) => DEBUG_PROFILE_FIELDS.has(key)),
+	)
 }
 
 function DebugHeader({
@@ -97,7 +119,7 @@ function DebugHeader({
 
 			<JsonDetails
 				label={`client profile used for scoring (side: ${debug.trace.side})`}
-				value={debug.clientProfile}
+				value={sanitizeDebugProfile(debug.clientProfile)}
 			/>
 		</Card>
 	)
@@ -160,7 +182,10 @@ function MatchDebugRow({ match }: { match: AgentMatchData }) {
 						</div>
 					) : (
 						<p className="text-muted-foreground text-xs">
-							No client priorities set — using base weights (40 / 35 / 25).
+							No client priorities set — using base weights (
+							{BASE_WEIGHTS.location} / {BASE_WEIGHTS.priceFit} /{' '}
+							{BASE_WEIGHTS.clientFit}
+							).
 						</p>
 					)}
 				</div>
@@ -188,7 +213,10 @@ function MatchDebugRow({ match }: { match: AgentMatchData }) {
 					</div>
 				)}
 
-				<JsonDetails label="raw agent profile" value={debug.agentProfile} />
+				<JsonDetails
+					label="agent profile used for scoring"
+					value={sanitizeDebugProfile(debug.agentProfile)}
+				/>
 			</div>
 		</details>
 	)

@@ -3,108 +3,96 @@ import { z } from 'zod'
 
 import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
 
+const agentProfileDraftSchema = createInsertSchema(agentProfiles)
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		role: z.literal('agent'),
+	})
+
+const buyerProfileDraftSchema = createInsertSchema(buyerProfiles)
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		role: z.literal('buyer'),
+	})
+
+const sellerProfileDraftSchema = createInsertSchema(sellerProfiles)
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		role: z.literal('seller'),
+	})
+
+const buyerDraftSchema = buyerProfileDraftSchema.omit({ role: true }).partial()
+const sellerDraftSchema = sellerProfileDraftSchema
+	.omit({ role: true })
+	.partial()
+const agentDraftSchema = agentProfileDraftSchema.partial()
+
+export {
+	agentDraftSchema,
+	agentProfileDraftSchema,
+	buyerDraftSchema,
+	buyerProfileDraftSchema,
+	sellerDraftSchema,
+	sellerProfileDraftSchema,
+}
+
 export type BuyerProfile = typeof buyerProfiles.$inferSelect
 
 export type SellerProfile = typeof sellerProfiles.$inferSelect
 
 export type AgentProfile = typeof agentProfiles.$inferSelect
 
-const agentProfileCreateSchema = createInsertSchema(agentProfiles)
-	.omit({
-		id: true,
-		userId: true,
-		createdAt: true,
-		updatedAt: true,
-	})
-	.extend({
-		representationSide: z.enum(['buying', 'selling', 'both']),
-		role: z.literal('agent'),
-	})
+export type BuyerProfileDraftInput = z.infer<typeof buyerProfileDraftSchema>
 
-const buyerProfileCreateSchema = createInsertSchema(buyerProfiles)
-	.omit({
-		id: true,
-		userId: true,
-		createdAt: true,
-		updatedAt: true,
-	})
-	.extend({
-		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
-		role: z.literal('buyer'),
-	})
+export type SellerProfileDraftInput = z.infer<typeof sellerProfileDraftSchema>
 
-const sellerProfileCreateSchema = createInsertSchema(sellerProfiles)
-	.omit({
-		id: true,
-		userId: true,
-		createdAt: true,
-		updatedAt: true,
-	})
-	.extend({
-		status: z.enum(['draft', 'essentials_submitted', 'active', 'enriched']),
-		role: z.literal('seller'),
-	})
+export type AgentProfileDraftInput = z.infer<typeof agentProfileDraftSchema>
 
-export {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
-}
+const buyerProfileUpdateSchema = buyerProfileDraftSchema.partial()
+const sellerProfileUpdateSchema = sellerProfileDraftSchema.partial()
+const agentProfileUpdateSchema = agentProfileDraftSchema.partial()
 
-export type BuyerProfileCreateInput = z.infer<typeof buyerProfileCreateSchema>
+export type BuyerProfileUpdate = z.infer<typeof buyerProfileUpdateSchema>
 
-export type SellerProfileCreateInput = z.infer<typeof sellerProfileCreateSchema>
+export type SellerProfileUpdate = z.infer<typeof sellerProfileUpdateSchema>
 
-export type AgentProfileCreateInput = z.infer<typeof agentProfileCreateSchema>
-
-export type BuyerProfileUpdate = Partial<BuyerProfileCreateInput>
-
-export type SellerProfileUpdate = Partial<SellerProfileCreateInput>
-
-export type AgentProfileUpdate = Partial<AgentProfileCreateInput>
+export type AgentProfileUpdate = z.infer<typeof agentProfileUpdateSchema>
 
 export type BuyerDraft = Omit<BuyerProfileUpdate, 'role'>
 
 export type SellerDraft = Omit<SellerProfileUpdate, 'role'>
 
-export type AgentDraft = Partial<AgentProfileCreateInput>
+export type AgentDraft = AgentProfileUpdate
 
-export type BuyerClientProfile = Omit<
-	BuyerProfile,
-	'id' | 'userId' | 'createdAt' | 'updatedAt'
-> & {
-	role: 'buyer'
-}
-
-export type SellerClientProfile = Omit<
-	SellerProfile,
-	'id' | 'userId' | 'createdAt' | 'updatedAt'
-> & {
-	role: 'seller'
-}
-
-export type ClientProfile = BuyerClientProfile | SellerClientProfile
-
-export const buyerClientProfileSchema = buyerProfileCreateSchema
+export const buyerClientProfileSchema = buyerProfileDraftSchema
 	.partial()
 	.extend({
 		role: z.literal('buyer'),
-	}) as z.ZodType<BuyerClientProfile>
+	})
 
-export const sellerClientProfileSchema = sellerProfileCreateSchema
+export const sellerClientProfileSchema = sellerProfileDraftSchema
 	.partial()
 	.extend({
 		role: z.literal('seller'),
-	}) as z.ZodType<SellerClientProfile>
+	})
 
-export function isBuyerClientProfile(
-	profile: ClientProfile,
-): profile is BuyerClientProfile {
-	return profile.role === 'buyer'
-}
+export type BuyerClientProfile = z.infer<typeof buyerClientProfileSchema>
 
-export function isSellerClientProfile(
-	profile: ClientProfile,
-): profile is SellerClientProfile {
-	return profile.role === 'seller'
-}
+export type SellerClientProfile = z.infer<typeof sellerClientProfileSchema>
+
+export type ClientProfile = BuyerClientProfile | SellerClientProfile

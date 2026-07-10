@@ -6,7 +6,7 @@ import { Lock, Mail, User } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { GoogleIcon } from '@/components/icons'
+import { GoogleAuthButton } from '@/components/google-auth-button'
 import { useGoogleAuth } from '@/hooks/use-google-auth'
 import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
@@ -25,8 +25,10 @@ export type SignupFormProps<TData = unknown> = {
 	idPrefix?: string
 	redirect: string
 	oauthRedirect?: string
+	quizPath: string
 	createProfile: (payload: { data: TData }) => Promise<unknown>
 	loadDraft: () => TData | null
+	validateDraft: (draft: TData) => boolean
 	clearDraft: () => void
 	submitLabel?: string
 	showTerms?: boolean
@@ -36,8 +38,10 @@ function SignupForm<TData>({
 	idPrefix = 'signup',
 	redirect,
 	oauthRedirect = redirect,
+	quizPath,
 	createProfile,
 	loadDraft,
+	validateDraft,
 	clearDraft,
 	submitLabel = 'Create my account',
 	showTerms = true,
@@ -62,6 +66,14 @@ function SignupForm<TData>({
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
 		if (isSubmitting) return
+
+		const draft = loadDraft()
+		if (!draft || !validateDraft(draft)) {
+			toast.error('Please complete your profile before creating an account.')
+			await navigate({ to: quizPath })
+			return
+		}
+
 		setIsSubmitting(true)
 
 		try {
@@ -72,11 +84,8 @@ function SignupForm<TData>({
 			})
 			if (error) throw error
 
-			const draft = loadDraft()
-			if (draft) {
-				await createProfile({ data: draft })
-				clearDraft()
-			}
+			await createProfile({ data: draft })
+			clearDraft()
 
 			await navigate({ to: redirect })
 		} catch (error) {
@@ -178,20 +187,15 @@ function SignupForm<TData>({
 						<div className="absolute top-1/2 left-0 h-px w-full bg-white/20" />
 					</div>
 
-					<Button
-						type="button"
+					<GoogleAuthButton
+						fallbackRedirect={oauthRedirect}
 						onClick={handleGoogleSignIn}
-						disabled={isGoogleLoading || isSubmitting}
-						variant="outline"
+						isLoading={isGoogleLoading}
 						className="h-9 w-full rounded-xl border-white bg-white text-sm font-medium text-slate-950 hover:bg-slate-100 hover:text-slate-950 lg:h-11 lg:text-base"
+						disabled={isSubmitting}
 					>
-						{isGoogleLoading ? (
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-						) : (
-							<GoogleIcon className="mr-2 h-5 w-5" />
-						)}
 						Continue with Google
-					</Button>
+					</GoogleAuthButton>
 				</>
 			) : null}
 
@@ -295,8 +299,6 @@ function MobileSignupBanner<TData>({
 }) {
 	const redirect = signupFormProps.redirect
 	const oauthRedirect = signupFormProps.oauthRedirect ?? redirect
-	const { signIn: handleGoogleSignIn, isLoading: isGoogleLoading } =
-		useGoogleAuth({ fallbackRedirect: oauthRedirect })
 
 	return (
 		<Sheet>
@@ -316,21 +318,13 @@ function MobileSignupBanner<TData>({
 								{ctaLabel}
 							</Button>
 						</SheetTrigger>
-						<Button
-							type="button"
-							onClick={handleGoogleSignIn}
-							disabled={isGoogleLoading}
-							variant="outline"
+						<GoogleAuthButton
+							fallbackRedirect={oauthRedirect}
 							className="h-11 rounded-xl border-white bg-white px-4 text-sm font-semibold text-slate-950 hover:bg-slate-100 hover:text-slate-950"
 							aria-label="Continue with Google"
 						>
-							{isGoogleLoading ? (
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							) : (
-								<GoogleIcon className="mr-2 h-5 w-5" />
-							)}
 							Google
-						</Button>
+						</GoogleAuthButton>
 					</div>
 				</div>
 			</div>

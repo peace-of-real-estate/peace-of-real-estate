@@ -2,13 +2,13 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
-import { requireUserId } from '@/lib/auth/functions'
+import { requireUserId } from '@/lib/auth/session'
 import { calculateFitScore, type AgentMatchData } from '@/lib/matching/scoring'
 import { getAvatarUrl } from '@/lib/s3'
 import {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
+	agentProfileDraftSchema,
+	buyerProfileDraftSchema,
+	sellerProfileDraftSchema,
 	type BuyerProfile,
 	type BuyerProfileUpdate,
 	type SellerProfile,
@@ -21,33 +21,34 @@ export type {
 } from '@/lib/matching/profile.db'
 
 export {
-	agentProfileCreateSchema,
-	buyerProfileCreateSchema,
-	sellerProfileCreateSchema,
+	agentDraftSchema,
+	agentProfileDraftSchema,
+	buyerDraftSchema,
+	buyerProfileDraftSchema,
+	sellerDraftSchema,
+	sellerProfileDraftSchema,
 } from '@/lib/matching/profile.types'
 
 export type {
 	AgentDraft,
 	AgentProfile,
-	AgentProfileCreateInput,
+	AgentProfileDraftInput,
 	AgentProfileUpdate,
 	BuyerClientProfile,
 	BuyerDraft,
 	BuyerProfile,
-	BuyerProfileCreateInput,
+	BuyerProfileDraftInput,
 	BuyerProfileUpdate,
 	ClientProfile,
 	SellerClientProfile,
 	SellerDraft,
 	SellerProfile,
-	SellerProfileCreateInput,
+	SellerProfileDraftInput,
 	SellerProfileUpdate,
 } from '@/lib/matching/profile.types'
 
 export {
 	buyerClientProfileSchema,
-	isBuyerClientProfile,
-	isSellerClientProfile,
 	sellerClientProfileSchema,
 } from '@/lib/matching/profile.types'
 
@@ -81,7 +82,7 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 
 		// role is a client-only discriminator with no DB column; drafts never
 		// include it, so validate the insert payload without it.
-		const insert = buyerProfileCreateSchema.omit({ role: true }).parse({
+		const insert = buyerProfileDraftSchema.omit({ role: true }).parse({
 			...data,
 			status: 'active',
 		})
@@ -125,7 +126,7 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 			throw new Error('Seller profile already exists')
 		}
 
-		const insert = sellerProfileCreateSchema.omit({ role: true }).parse({
+		const insert = sellerProfileDraftSchema.omit({ role: true }).parse({
 			...data,
 			status: 'active',
 		})
@@ -142,7 +143,9 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 	})
 
 export const completeAgentSignup = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => agentProfileCreateSchema.parse(data))
+	.validator((data: unknown) =>
+		agentProfileDraftSchema.omit({ role: true }).parse(data),
+	)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const now = new Date()
@@ -178,6 +181,36 @@ export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
 			.where(eq(agentProfiles.userId, userId))
 			.limit(1)
 		return profile ?? null
+	},
+)
+
+export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
+	async () => {
+		const userId = await requireUserId()
+
+		const [[agent], [buyer], [seller]] = await Promise.all([
+			db
+				.select({ id: agentProfiles.id })
+				.from(agentProfiles)
+				.where(eq(agentProfiles.userId, userId))
+				.limit(1),
+			db
+				.select({ id: buyerProfiles.id })
+				.from(buyerProfiles)
+				.where(eq(buyerProfiles.userId, userId))
+				.limit(1),
+			db
+				.select({ id: sellerProfiles.id })
+				.from(sellerProfiles)
+				.where(eq(sellerProfiles.userId, userId))
+				.limit(1),
+		])
+
+		if (agent) return '/agent/introductions'
+		if (buyer) return '/buyer/matches'
+		if (seller) return '/seller/matches'
+
+		return '/buyer/matches'
 	},
 )
 
@@ -252,7 +285,7 @@ async function loadAgentMatchesForProfile(
 	qualified.sort(byComputedScore)
 
 	const { offset, limit } = pageParam
-	const top = [...scored].sort(byComputedScore).slice(offset, offset + limit)
+	const top = qualified.slice(offset, offset + limit)
 
 	const scoreDistribution = buildScoreDistribution(
 		scored.map(({ score }) => score),

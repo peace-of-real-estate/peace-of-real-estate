@@ -33,7 +33,12 @@ import {
 	getRepresentationLabel,
 	type AgentFlowStep,
 } from './route'
-import { bestClientTypeLabels } from '@/lib/matching/questions'
+import {
+	bestClientTypeLabels,
+	bestClientTypesSchema,
+	type BestClientTypeSlug,
+} from '@/lib/matching/questions'
+import type { z } from 'zod'
 
 export const Route = createFileRoute('/signup/(quiz)/agent/(step-2)/market')({
 	component: AgentMarketRoute,
@@ -54,7 +59,7 @@ function AgentMarketRoute() {
 	)
 }
 
-function AgentMarket({
+export function AgentMarket({
 	state,
 	onUpdate,
 	onContinue,
@@ -74,14 +79,10 @@ function AgentMarket({
 	const [priceRange, setPriceRange] = useState(initialRange)
 	const [representationSide, setRepresentationSide] = useState<
 		RepresentationSide | ''
-	>(
-		state.representationSide
-			? (state.representationSide as RepresentationSide)
-			: '',
-	)
-	const [bestClientTypes, setBestClientTypes] = useState<string[]>(
-		state.bestClientTypes ?? [],
-	)
+	>(state.representationSide ? state.representationSide : '')
+	const [bestClientTypes, setBestClientTypes] = useState<
+		z.infer<typeof bestClientTypesSchema>
+	>(state.bestClientTypes ?? [])
 
 	const marketComplete = committedLocation.trim().length >= 2
 	const priceComplete =
@@ -98,7 +99,7 @@ function AgentMarket({
 		setSelectedZipCodes(zipCodes)
 	}
 
-	const toggleClientType = (option: string) => {
+	const toggleClientType = (option: BestClientTypeSlug) => {
 		setBestClientTypes((current) =>
 			current.includes(option)
 				? current.filter((item) => item !== option)
@@ -111,6 +112,7 @@ function AgentMarket({
 			setHasTriedContinue(true)
 			return
 		}
+		if (!representationSide) return
 
 		const locationUpdate = cityState
 			? { city: cityState.city, state: cityState.state }
@@ -119,7 +121,7 @@ function AgentMarket({
 			...locationUpdate,
 			zipCodes: selectedZipCodes,
 			typicalPriceRange: serializePriceRange(priceRange),
-			representationSide: representationSide as RepresentationSide,
+			representationSide,
 			bestClientTypes,
 		})
 		onContinue()

@@ -1,66 +1,119 @@
-import { beforeEach, describe, expect, test } from 'vitest'
-import { page } from 'vite-plus/test/browser'
-import { renderRoute } from '@tests/support/render/route'
+import { describe, test } from 'vitest'
+import type { z } from 'zod'
+import { MapPinIcon, HouseLineIcon, UserIcon } from '@phosphor-icons/react'
+
+import { renderComponent } from '@tests/support/render/component'
 import { expectScreenshot } from '@tests/support/render/screenshot'
-import { sellerAnswerLabels } from '@/lib/matching/questions'
+import { SellerPreview } from '@/routes/signup/preview/seller'
+import { draftToClientPreviewProfile } from '@/routes/signup/preview/-components/client-preview'
+import {
+	sellerAnswerSchema,
+	propertyTypesSchema,
+} from '@/lib/matching/questions'
+import {
+	ClientLocationFields,
+	ClientHomeFields,
+	ClientPreferencesFields,
+} from '@/routes/signup/(quiz)/-components/client-quiz-fields'
+import { WizardChrome } from '@/routes/signup/(quiz)/-components/signup-wizard-shell'
 
-async function clickSelector(id: string) {
-	await page.elementLocator(document.querySelector(id)!).click()
+type SellerPreviewFixture = z.infer<typeof sellerAnswerSchema> & {
+	city?: string
+	state?: string
+	zipCodes?: string[]
+	priceRange?: string
+	propertyTypes?: z.infer<typeof propertyTypesSchema>
+	timeline?: string
 }
 
-async function selectCity() {
-	await clickSelector('#client-location')
-	const searchInput = page.getByPlaceholder('Search city')
-	await expect.element(searchInput).toBeVisible()
-	await searchInput.fill('Austin')
-	await page.getByRole('option').first().click()
-	await page.getByRole('button', { name: 'Continue' }).click()
-}
-
-async function fillHomeStep() {
-	const singleFamily = page.getByRole('button', { name: 'Single-Family' })
-	await expect.element(singleFamily).toBeVisible()
-	await singleFamily.click()
-	await page.getByRole('button', { name: 'Continue' }).click()
-}
-
-async function answerPreference(name: string) {
-	const option = page.getByRole('button', { name, exact: true })
-	await expect.element(option).toBeVisible()
-	await option.click()
-}
-
-async function fillPreferencesStep() {
-	for (const config of Object.values(sellerAnswerLabels)) {
-		const [firstOption, secondOption] = Object.values(config.options)
-		if (!firstOption || !secondOption)
-			throw new Error(`Question "${config.label}" has fewer than two options`)
-		if (config.multiple) {
-			await answerPreference(firstOption)
-			await answerPreference(secondOption)
-			await page.getByRole('button', { name: 'Next question' }).click()
-		} else {
-			await answerPreference(firstOption)
-		}
-	}
-}
+const sellerSteps = [
+	{ id: 'location', label: 'Location', icon: MapPinIcon },
+	{ id: 'home', label: 'Home', icon: HouseLineIcon },
+	{ id: 'preferences', label: 'Preferences', icon: UserIcon },
+]
 
 describe('seller signup flow', () => {
-	beforeEach(async () => {
-		localStorage.clear()
+	function renderStep(
+		stepId: 'location' | 'home' | 'preferences',
+		children: React.ReactNode,
+		completedStepIds: ('location' | 'home' | 'preferences')[] = [],
+	) {
+		return renderComponent({
+			element: (
+				<WizardChrome
+					steps={sellerSteps}
+					currentStepId={stepId}
+					onHomeClick={() => {}}
+					onStepClick={() => {}}
+					completedStepIds={completedStepIds}
+				>
+					{children}
+				</WizardChrome>
+			),
+		})
+	}
+
+	test('location step screenshot', async () => {
+		await renderStep(
+			'location',
+			<ClientLocationFields
+				state={{}}
+				onUpdate={() => {}}
+				onContinue={() => {}}
+			/>,
+		)
+		await expectScreenshot(document.body, { name: 'step-1-location' })
 	})
 
-	test('walkthrough screenshots', async () => {
-		await renderRoute({ path: '/signup/seller/location' })
-		await expectScreenshot(document.body, { name: 'step-1-location' })
-
-		await selectCity()
+	test('home step screenshot', async () => {
+		await renderStep(
+			'home',
+			<ClientHomeFields
+				state={{}}
+				priceLabel="Expected sale price"
+				onUpdate={() => {}}
+				onContinue={() => {}}
+			/>,
+			['location'],
+		)
 		await expectScreenshot(document.body, { name: 'step-2-home' })
+	})
 
-		await fillHomeStep()
+	test('preferences step screenshot', async () => {
+		await renderStep(
+			'preferences',
+			<ClientPreferencesFields
+				state={{}}
+				onUpdate={() => {}}
+				onComplete={() => {}}
+				clientRole="seller"
+			/>,
+			['location', 'home'],
+		)
 		await expectScreenshot(document.body, { name: 'step-3-preferences' })
+	})
 
-		await fillPreferencesStep()
+	test('preview screenshot', async () => {
+		const profile = draftToClientPreviewProfile('seller', {
+			city: 'Austin',
+			state: 'TX',
+			zipCodes: [],
+			priceRange: '400000-750000',
+			propertyTypes: ['singleFamily'],
+			timeline: 'exploring',
+			saleMotivation: 'relocation',
+			successfulSaleLooksLike: 'strongPriceSmoothProcess',
+			involvementLevel: 'veryInvolved',
+			quickCommunicationChannel: 'text',
+			updateDeliveryMethod: 'email',
+			agentDeliveryExpectations: ['pricedRight', 'honestStraightforward'],
+			homeConnection: 'goodMemories',
+			agentSilencePreference: 'milestones',
+			representationPreference: 'exclusiveRepresentationOnly',
+			responseTimeExpectation: 'within30Min',
+			commissionComfort: 'openOptions',
+		} satisfies SellerPreviewFixture)
+		await renderComponent({ element: <SellerPreview profile={profile} /> })
 		await expectScreenshot(document.body, { name: 'step-4-preview' })
 	})
 })

@@ -15,15 +15,26 @@ export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
 	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
 }
 
-export function parsePriceRange(value: string | undefined | null): PriceRange {
-	if (!value) return { ...DEFAULT_PRICE_RANGE }
-	const [minRaw, maxRaw] = value.split('-')
-	const min = Number.parseInt(minRaw?.replace(/\D/g, '') ?? '', 10)
-	const max = Number.parseInt(maxRaw?.replace(/\D/g, '') ?? '', 10)
-	if (Number.isNaN(min) || Number.isNaN(max)) return { ...DEFAULT_PRICE_RANGE }
+export function parseMinMaxRange(
+	value: string | undefined | null,
+): PriceRange | undefined {
+	const match = value?.trim().match(/^(\d+)-(\d+)$/)
+	if (!match) return undefined
+	const min = Number.parseInt(match[1]!, 10)
+	const max = Number.parseInt(match[2]!, 10)
 	return {
-		min: Math.max(PRICE_MIN, Math.min(min, max)),
-		max: Math.min(PRICE_MAX, Math.max(min, max)),
+		min: Math.min(min, max),
+		max: Math.max(min, max),
+	}
+}
+
+export function parsePriceRange(value: string | undefined | null): PriceRange {
+	const sanitized = value?.replace(/[^\d-]/g, '').replace(/-{2,}/g, '-')
+	const parsed = parseMinMaxRange(sanitized)
+	if (!parsed) return { ...DEFAULT_PRICE_RANGE }
+	return {
+		min: Math.max(PRICE_MIN, Math.min(parsed.min, parsed.max)),
+		max: Math.min(PRICE_MAX, Math.max(parsed.min, parsed.max)),
 	}
 }
 

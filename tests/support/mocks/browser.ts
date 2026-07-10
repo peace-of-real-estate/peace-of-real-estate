@@ -5,8 +5,8 @@ import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
 type MockSession = unknown
 
-const authState = vi.hoisted(() => ({
-	session: null as MockSession,
+const authState = vi.hoisted<{ session: MockSession }>(() => ({
+	session: null,
 }))
 
 export function setMockSession(session: MockSession) {
@@ -33,12 +33,7 @@ vi.mock('@/lib/auth/functions', () => ({
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
 }))
 
-vi.mock('@/lib/premium', () => ({
-	isUserPremium: () => false,
-	upgradeToPremium: () => ({ success: true }),
-}))
-
-vi.mock('@/lib/beta', () => ({
+vi.mock('@/lib/auth/beta', () => ({
 	authenticateBeta: async () => ({ success: true }),
 	hasBetaAccess: () => true,
 }))

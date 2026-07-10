@@ -26,6 +26,7 @@ function AgentDashboardLayout() {
 				<DashboardSidebar
 					items={agentItems}
 					aiItems={[]}
+					userRole="agent"
 					profileLabel="Agent dashboard"
 					profileHint="Agent dashboard"
 				/>

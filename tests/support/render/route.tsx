@@ -7,10 +7,10 @@ import {
 	RouterProvider,
 	type AnyRouter,
 } from '@tanstack/react-router'
-import { renderComponent, createTestQueryClient } from './component'
+import { render, type RenderResult } from 'vitest-browser-react'
+import { createTestQueryClient } from './component'
 import { setMockSession } from '@tests/support/mocks/browser'
 import { testSession } from '@tests/support/fixtures/data/session'
-import type { RenderResult } from 'vitest-browser-react'
 
 type RouteTarget =
 	| { path: string; name?: string }
@@ -26,7 +26,7 @@ type RenderedRoute = {
 	queryClient: ReturnType<typeof createTestQueryClient>
 }
 
-const protectedPathPrefixes = ['/agent/dashboard', '/consumer/dashboard']
+const protectedPathPrefixes = ['/agent/', '/buyer/', '/seller/']
 
 function resolveRoutePath({ path, name }: RouteTestOptions) {
 	if (path) return path
@@ -65,10 +65,19 @@ export async function renderRoute(
 
 	await router.load()
 
-	const screen = await renderComponent({
-		element: <RouterProvider router={router} />,
-		queryClient,
-	})
+	localStorage.clear()
+	document.body.replaceChildren()
+
+	const container = document.body.appendChild(document.createElement('div'))
+	container.style.width = '100vw'
+	container.style.minHeight = '100vh'
+
+	const screen = await render(
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>,
+		{ container },
+	)
 
 	return { router, screen, queryClient }
 }

@@ -13,6 +13,7 @@ import {
 import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
 import { Card } from '@/components/ui/card'
 import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
+import { clientPreviewMatches } from '@/lib/matching/preview-matches'
 import {
 	buyerClientProfileSchema,
 	sellerClientProfileSchema,
@@ -20,8 +21,9 @@ import {
 } from '@/lib/matching/profile'
 import {
 	buyerAnswerLabels,
-	propertyTypeOptions,
+	getPropertyTypeLabel,
 	sellerAnswerLabels,
+	type AnswerLabelConfig,
 } from '@/lib/matching/questions'
 
 export function draftToClientPreviewProfile(
@@ -33,6 +35,22 @@ export function draftToClientPreviewProfile(
 		return buyerClientProfileSchema.parse({ role, ...input })
 	}
 	return sellerClientProfileSchema.parse({ role, ...input })
+}
+
+export function ClientPreviewHeader({ title }: { title: string }) {
+	return (
+		<div>
+			<span className="mb-2 inline-flex rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold tracking-[0.16em] text-amber-900 uppercase">
+				Preview
+			</span>
+			<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
+				{title}
+			</h2>
+			<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
+				Based on your quiz answers.
+			</p>
+		</div>
+	)
 }
 
 export function ClientProfilePreviewCard({
@@ -50,7 +68,7 @@ export function ClientProfilePreviewCard({
 		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
-		<Card className="gap-0 rounded-2xl border-slate-200 bg-white p-0 shadow-sm">
+		<Card className="border-border bg-card gap-0 rounded-2xl p-0 shadow-sm">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
 				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl">
 					{stateSvgPath ? (
@@ -66,25 +84,25 @@ export function ClientProfilePreviewCard({
 					)}
 				</div>
 				<div className="min-w-0 flex-1">
-					<h3 className="font-heading text-xl font-bold tracking-tight text-slate-950">
+					<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">
 						{profileTitle}
 					</h3>
 				</div>
 			</div>
 			{summaryItems.length > 0 ? (
-				<div className="grid grid-cols-1 gap-3 border-t border-slate-100 px-5 pt-4 pb-5 sm:grid-cols-2">
+				<div className="border-border grid grid-cols-1 gap-3 border-t px-5 pt-4 pb-5 sm:grid-cols-2">
 					{summaryItems.map((item) => {
 						const Icon = statIcon(item.label)
 						return (
 							<div key={item.label} className="flex items-start gap-3">
-								<div className="text-primary mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-50">
+								<div className="text-primary bg-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
 									<Icon className="h-4 w-4" />
 								</div>
 								<div className="min-w-0 flex-1">
 									<p className="text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase">
 										{item.label}
 									</p>
-									<p className="text-sm font-semibold text-slate-950">
+									<p className="text-foreground text-sm font-semibold">
 										{item.value}
 									</p>
 								</div>
@@ -101,7 +119,7 @@ export function ClientMatchesPreview() {
 	return (
 		<div className="pt-2">
 			<div className="mb-3 px-1">
-				<h3 className="font-heading text-lg font-bold tracking-tight text-slate-950">
+				<h3 className="font-heading text-foreground text-lg font-bold tracking-tight">
 					Your Top Matches
 				</h3>
 				<p className="text-muted-foreground mt-0.5 text-sm">
@@ -109,7 +127,7 @@ export function ClientMatchesPreview() {
 				</p>
 			</div>
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-				{previewMatches.map((match) => (
+				{clientPreviewMatches.map((match) => (
 					<AgentPreviewCard key={match.id} match={match} />
 				))}
 			</div>
@@ -132,19 +150,27 @@ function statIcon(label: string) {
 	return Zap
 }
 
+function buildOptionsMap(
+	labels: Record<string, AnswerLabelConfig>,
+): Record<string, string> {
+	const optionsMap: Record<string, string> = {}
+	for (const config of Object.values(labels)) {
+		for (const [slug, label] of Object.entries(config.options)) {
+			optionsMap[slug] = label
+		}
+	}
+	return optionsMap
+}
+
 function formatAnswer(
 	value: string | string[] | null | undefined,
-	labels: Record<string, { options: Record<string, string> }>,
+	optionsMap: Record<string, string>,
 ): string {
 	if (value === undefined || value === null || value === '__skipped__')
 		return 'Not answered'
 	if (Array.isArray(value))
-		return value.map((slug) => labels[slug]?.options[slug] ?? slug).join(', ')
-	return (
-		Object.values(labels).find((config) => config.options[value])?.options[
-			value
-		] ?? value
-	)
+		return value.map((slug) => optionsMap[slug] ?? slug).join(', ')
+	return optionsMap[value] ?? value
 }
 
 function getProfileStats(profile: ClientProfile) {
@@ -158,88 +184,18 @@ function getProfileStats(profile: ClientProfile) {
 		stats.push({
 			label: 'Home Type',
 			value: profile.propertyTypes
-				.map(
-					(type) =>
-						propertyTypeOptions[type as keyof typeof propertyTypeOptions] ??
-						type,
-				)
+				.map((type) => getPropertyTypeLabel(type))
 				.join(', '),
 		})
 
-	const isBuyer = 'idealAgentRelationship' in profile
+	const isBuyer = profile.role === 'buyer'
 	const labels = isBuyer ? buyerAnswerLabels : sellerAnswerLabels
+	const optionsMap = buildOptionsMap(labels)
 	for (const [id, config] of Object.entries(labels)) {
-		const value = profile[id as keyof ClientProfile] as
-			| string
-			| string[]
-			| null
-			| undefined
+		const value = Reflect.get(profile, id)
 		if (value === undefined || value === null || value === '__skipped__')
 			continue
-		stats.push({ label: config.label, value: formatAnswer(value, labels) })
+		stats.push({ label: config.label, value: formatAnswer(value, optionsMap) })
 	}
 	return stats
 }
-
-const previewMatches = [
-	{
-		id: 'preview-1',
-		name: 'Alex Morgan',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78704', '78745'],
-		fitScore: 97,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '12 years',
-		agency: 'PRE Partner Realty',
-		specialties: ['First-time buyers', 'Fast timelines', 'Negotiation'],
-		about: 'Calm, responsive agent focused on clear expectations.',
-		scores: {
-			'Working Style': 4.9,
-			Communication: 4.8,
-			Transparency: 4.9,
-			Fit: 5,
-		},
-	},
-	{
-		id: 'preview-2',
-		name: 'Jordan Lee',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78701', '78703'],
-		fitScore: 94,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '9 years',
-		agency: 'Urban Nest Realty',
-		specialties: ['Condos', 'Relocation', 'Offer strategy'],
-		about: 'Data-driven agent with a direct communication style.',
-		scores: {
-			'Working Style': 4.7,
-			Communication: 4.9,
-			Transparency: 4.7,
-			Fit: 4.8,
-		},
-	},
-	{
-		id: 'preview-3',
-		name: 'Sam Rivera',
-		role: 'agent' as const,
-		location: 'Austin, TX',
-		zipCodes: ['78731', '78757'],
-		fitScore: 91,
-		status: 'new' as const,
-		date: 'Today',
-		experience: '15 years',
-		agency: 'Local Key Realty',
-		specialties: ['Move-up buyers', 'Listings', 'Pricing'],
-		about: 'Experienced local advisor with strong pricing instincts.',
-		scores: {
-			'Working Style': 4.6,
-			Communication: 4.6,
-			Transparency: 4.8,
-			Fit: 4.7,
-		},
-	},
-]

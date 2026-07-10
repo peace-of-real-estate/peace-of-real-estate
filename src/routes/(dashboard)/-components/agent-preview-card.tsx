@@ -62,7 +62,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 	const topSpecialties = match.specialties.slice(0, 2)
 
 	return (
-		<Card className="hover:border-primary/20 flex flex-col overflow-hidden border-slate-200 bg-white shadow-sm transition-colors">
+		<Card className="hover:border-primary/20 border-border bg-card flex flex-col overflow-hidden shadow-sm transition-colors">
 			<CardContent className="flex flex-1 flex-col items-center p-4 text-center">
 				{showAvatar ? (
 					<img
@@ -77,7 +77,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 						className="h-16 w-16 rounded-full text-lg"
 					/>
 				)}
-				<h4 className="mt-3 max-w-full truncate text-sm font-bold text-slate-950 blur-sm select-none">
+				<h4 className="text-foreground mt-3 max-w-full truncate text-sm font-bold blur-sm select-none">
 					{match.name}
 				</h4>
 				<p className="text-muted-foreground mt-0.5 max-w-full truncate text-xs font-medium">

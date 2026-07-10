@@ -1,6 +1,12 @@
 import '@tests/support/mocks/browser'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+	createMemoryHistory,
+	createRootRoute,
+	createRouter,
+	RouterProvider,
+} from '@tanstack/react-router'
 import { render, type RenderResult } from 'vitest-browser-react'
 import type { ReactElement } from 'react'
 
@@ -30,9 +36,20 @@ export async function renderComponent(
 	container.style.width = '100vw'
 	container.style.minHeight = '100vh'
 
+	const element = options.element
+	const rootRoute = createRootRoute({
+		component: () => element,
+	})
+	const router = createRouter({
+		routeTree: rootRoute,
+		history: createMemoryHistory({ initialEntries: ['/'] }),
+		defaultPreloadStaleTime: 0,
+		context: { queryClient },
+	})
+
 	return render(
 		<QueryClientProvider client={queryClient}>
-			{options.element}
+			<RouterProvider router={router} />
 		</QueryClientProvider>,
 		{ container },
 	)

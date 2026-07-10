@@ -1,8 +1,9 @@
 import { useState, type ElementType, type ReactNode } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { HelpCircle, LogOut, MessageSquare } from 'lucide-react'
+import { HelpCircle, LogOut } from 'lucide-react'
 
 import { authClient } from '@/lib/auth/client'
+import { SUPPORT_EMAIL } from '@/lib/constants'
 import { cn } from '@/lib/utils/ui'
 import { Button } from '@/components/ui/button'
 import {
@@ -75,19 +76,15 @@ export type DashboardSidebarProps = {
 	profileLabel: string
 	profileHint?: string
 	aiItems?: SidebarItem[]
+	userRole?: 'buyer' | 'seller' | 'agent'
 }
 
 export function DashboardSidebar({
 	items,
 	profileLabel,
 	profileHint,
-	aiItems = [
-		{
-			label: 'Practice Negotiating',
-			icon: MessageSquare,
-			href: '/buyer/practice-negotiating',
-		},
-	],
+	aiItems = [],
+	userRole = 'buyer',
 }: DashboardSidebarProps) {
 	const router = useRouterState()
 	const currentPath = router.location.pathname
@@ -116,7 +113,13 @@ export function DashboardSidebar({
 		})
 	}
 
-	const homeHref = isAuthenticated ? '/buyer' : '/auth/login'
+	const homeHref = isAuthenticated
+		? userRole === 'seller'
+			? '/seller/matches'
+			: userRole === 'agent'
+				? '/agent/introductions'
+				: '/buyer/matches'
+		: '/auth/login'
 
 	const renderItem = (item: SidebarItem) => {
 		const Icon = item.icon
@@ -299,8 +302,6 @@ function SupportDialog({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) {
-	const supportEmail = 'hello@peaceofrealestate.com'
-
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
@@ -318,10 +319,10 @@ function SupportDialog({
 							human reply:
 						</p>
 						<a
-							href={`mailto:${supportEmail}`}
+							href={`mailto:${SUPPORT_EMAIL}`}
 							className="font-medium underline underline-offset-4"
 						>
-							{supportEmail}
+							{SUPPORT_EMAIL}
 						</a>
 					</div>
 
@@ -345,10 +346,7 @@ function SupportDialog({
 						<Button variant="outline">Close</Button>
 					</DialogClose>
 					<Button asChild>
-						<a href={`mailto:${supportEmail}`}>Open email</a>
-					</Button>
-					<Button type="button" onClick={() => onOpenChange(false)}>
-						Submit report
+						<a href={`mailto:${SUPPORT_EMAIL}`}>Open email</a>
 					</Button>
 				</DialogFooter>
 			</DialogContent>

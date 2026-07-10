@@ -1,6 +1,5 @@
 import {
 	boolean,
-	check,
 	foreignKey,
 	index,
 	pgTable,
@@ -8,8 +7,6 @@ import {
 	timestamp,
 	uniqueIndex,
 } from 'drizzle-orm/pg-core'
-
-import { sql } from 'drizzle-orm'
 
 import {
 	agentProfileColumns,
@@ -157,10 +154,6 @@ export const buyerProfiles = pgTable(
 			foreignColumns: [user.id],
 			name: 'buyer_profiles_user_id_fk',
 		}),
-		check(
-			'buyer_profiles_status_check',
-			sql`${table.status} in ('draft', 'essentials_submitted', 'active', 'enriched')`,
-		),
 	],
 )
 
@@ -181,10 +174,6 @@ export const sellerProfiles = pgTable(
 			foreignColumns: [user.id],
 			name: 'seller_profiles_user_id_fk',
 		}),
-		check(
-			'seller_profiles_status_check',
-			sql`${table.status} in ('draft', 'essentials_submitted', 'active', 'enriched')`,
-		),
 	],
 )
 
@@ -204,10 +193,6 @@ export const agentProfiles = pgTable(
 			foreignColumns: [user.id],
 			name: 'agent_profiles_user_id_fk',
 		}),
-		check(
-			'agent_profiles_representation_side_check',
-			sql`${table.representationSide} in ('buying', 'selling', 'both')`,
-		),
 	],
 )
 

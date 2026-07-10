@@ -5,10 +5,10 @@ import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import babel from '@rolldown/plugin-babel'
 import svgr from 'vite-plugin-svgr'
-import { config } from 'dotenv'
 import { resolve } from 'node:path'
 import { defineConfig, type UserConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
+import { loadPublicEnvIntoProcess } from './src/lib/utils/env'
 
 const fmt = {
 	singleQuote: true,
@@ -46,6 +46,7 @@ const lint = {
 		'node',
 		'promise',
 	],
+	jsPlugins: [{ name: 'eslint-js', specifier: 'oxlint-plugin-eslint' }],
 	categories: {},
 	options: {
 		typeAware: true,
@@ -54,6 +55,18 @@ const lint = {
 	rules: {
 		'no-empty-pattern': 'off',
 		'no-console': ['error', { allow: ['warn', 'error'] }],
+		'typescript/consistent-type-assertions': [
+			'error',
+			{ assertionStyle: 'never' },
+		],
+		'eslint-js/no-restricted-syntax': [
+			'error',
+			{
+				selector: 'TSTypePredicate[asserts=false]',
+				message:
+					'Type predicates are not allowed. Use runtime validation instead.',
+			},
+		],
 	},
 	overrides: [
 		{
@@ -84,37 +97,10 @@ const lint = {
 
 const root = import.meta.dirname
 
-function normalizeEnvironmentName(raw: string) {
-	return /(?:^|-)pr-\d+$/.test(raw) ? 'staging' : raw
-}
-
-function loadPublicFileEnv(mode: string) {
-	const environmentName = normalizeEnvironmentName(
-		process.env.RAILWAY_ENVIRONMENT_NAME ?? process.env.APP_ENV ?? mode,
-	)
-	const fileEnvironment: NodeJS.ProcessEnv = {}
-
-	config({
-		path: [
-			resolve(root, '.env'),
-			resolve(root, '.env.local'),
-			resolve(root, `.env.${environmentName}`),
-			resolve(root, `.env.${environmentName}.local`),
-		],
-		quiet: true,
-		override: true,
-		processEnv: fileEnvironment,
-	})
-
-	for (const [key, value] of Object.entries(fileEnvironment)) {
-		if (key.startsWith('VITE_') && value !== undefined) {
-			process.env[key] = value
-		}
-	}
-}
-
 export default defineConfig(({ mode }) => {
-	loadPublicFileEnv(mode)
+	const environmentName =
+		process.env.RAILWAY_ENVIRONMENT_NAME ?? process.env.APP_ENV ?? mode
+	loadPublicEnvIntoProcess(environmentName)
 
 	return {
 		root,
@@ -172,7 +158,7 @@ export default defineConfig(({ mode }) => {
 					extends: true,
 					test: {
 						name: 'server',
-						include: ['src/**/*.{server,db}.ts'],
+						include: ['src/**/*.{server,db}.test.ts'],
 						testTimeout: 5_000,
 					},
 				},

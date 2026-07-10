@@ -44,13 +44,20 @@ import type {
 	SellerDraft,
 } from '@/lib/matching/profile'
 import {
+	answerValueSchema,
 	buyerAnswerLabels,
+	buyerAnswerSchema,
+	optionKeys,
 	propertyTypeOptions,
+	propertyTypesSchema,
 	questionOptionEntries,
 	sellerAnswerLabels,
+	sellerAnswerSchema,
+	type AnswerLabelConfig,
 	type AnswerValue,
 	type Question,
 } from '@/lib/matching/questions'
+import type { z } from 'zod'
 import { cn } from '@/lib/utils/ui'
 import {
 	AnimatedStepCard,
@@ -80,34 +87,12 @@ const timelineOptions = [
 	{ slug: '12monthsPlus', label: '12+ months' },
 ] as const
 
-const buyerQuizFields = [
-	'experienceLevel',
-	'idealAgentRelationship',
-	'decisionMakingNeed',
-	'biddingWarResponse',
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'involvementLevel',
-	'responseTimeExpectation',
-	'commissionComfort',
-] as const satisfies readonly (keyof BuyerDraft)[]
+const buyerQuizFields = Object.keys(buyerAnswerSchema.shape)
 
-const sellerQuizFields = [
-	'saleMotivation',
-	'successfulSaleLooksLike',
-	'involvementLevel',
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'agentDeliveryExpectations',
-	'homeConnection',
-	'agentSilencePreference',
-	'representationPreference',
-	'responseTimeExpectation',
-	'commissionComfort',
-] as const satisfies readonly (keyof SellerDraft)[]
+const sellerQuizFields = Object.keys(sellerAnswerSchema.shape)
 
 const buyerQuestions = Object.entries(buyerAnswerLabels).map(
-	([id, config]) => ({
+	([id, config]: [string, AnswerLabelConfig]) => ({
 		id,
 		title: config.title,
 		options: config.options,
@@ -116,7 +101,7 @@ const buyerQuestions = Object.entries(buyerAnswerLabels).map(
 ) satisfies Question[]
 
 const sellerQuestions = Object.entries(sellerAnswerLabels).map(
-	([id, config]) => ({
+	([id, config]: [string, AnswerLabelConfig]) => ({
 		id,
 		title: config.title,
 		options: config.options,
@@ -206,9 +191,9 @@ export function ClientHomeFields({
 	const [priceRange, setPriceRange] = useState(
 		parsePriceRange(state.priceRange),
 	)
-	const [propertyTypes, setPropertyTypes] = useState<string[]>(
-		state.propertyTypes ?? [],
-	)
+	const [propertyTypes, setPropertyTypes] = useState<
+		z.infer<typeof propertyTypesSchema>
+	>(state.propertyTypes ?? [])
 	const [hasDeadline, setHasDeadline] = useState(
 		state.timeline ? state.timeline !== 'exploring' : false,
 	)
@@ -306,11 +291,11 @@ export function ClientHomeFields({
 							}
 						>
 							<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-								{Object.entries(propertyTypeOptions).map(([option, label]) => (
+								{optionKeys(propertyTypeOptions).map((option) => (
 									<SelectionCard
 										key={option}
 										icon={Home}
-										title={label}
+										title={propertyTypeOptions[option]}
 										selected={propertyTypes.includes(option)}
 										variant="solid"
 										layout="vertical"
@@ -436,11 +421,15 @@ export function ClientPreferencesFields({
 }
 
 export function isBuyerPreferencesComplete(state: BuyerDraft): boolean {
-	return buyerQuizFields.every((field) => state[field] !== undefined)
+	return buyerQuizFields.every(
+		(field) => Reflect.get(state, field) !== undefined,
+	)
 }
 
 export function isSellerPreferencesComplete(state: SellerDraft): boolean {
-	return sellerQuizFields.every((field) => state[field] !== undefined)
+	return sellerQuizFields.every(
+		(field) => Reflect.get(state, field) !== undefined,
+	)
 }
 
 function ContinueButton({
@@ -515,9 +504,10 @@ function extractAnswers(
 ): Record<string, AnswerValue> {
 	const answers: Record<string, AnswerValue> = {}
 	for (const question of questions) {
-		const value = draft[question.id as keyof ClientDraft]
-		if (value !== undefined && value !== null)
-			answers[question.id] = value as AnswerValue
+		if (!Object.hasOwn(draft, question.id)) continue
+		const value = Reflect.get(draft, question.id)
+		const parsed = answerValueSchema.safeParse(value)
+		if (parsed.success) answers[question.id] = parsed.data
 	}
 	return answers
 }
@@ -526,11 +516,10 @@ function answersToProfileUpdate(
 	answers: Record<string, AnswerValue>,
 	questions: Question[],
 ): Partial<ClientDraft> {
-	const update: Partial<ClientDraft> = {}
+	const update: Partial<ClientDraft> & Record<string, AnswerValue> = {}
 	for (const question of questions) {
 		const value = answers[question.id]
-		if (value !== undefined && value !== null)
-			update[question.id as keyof ClientDraft] = value as never
+		if (value !== undefined && value !== null) update[question.id] = value
 	}
 	return update
 }
