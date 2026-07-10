@@ -20,7 +20,7 @@ import {
 	type SignupWizardStep,
 } from '../-components/signup-wizard-shell'
 import type { AgentDraft, RepresentationSide } from '@/lib/matching/profile'
-import { getCurrentSession } from '@/lib/auth/functions'
+import { getCurrentSession } from '@/lib/auth/session'
 import { loadAgentProfile } from '@/lib/matching/profile'
 import {
 	bestClientTypeOptions,

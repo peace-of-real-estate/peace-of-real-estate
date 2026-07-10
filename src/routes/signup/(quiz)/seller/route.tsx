@@ -16,7 +16,7 @@ import {
 	type ClientSignupStep,
 } from '../-components/client-quiz-fields'
 import { createLocalStorage } from '@/lib/utils/localstorage'
-import { getCurrentSession } from '@/lib/auth/functions'
+import { getCurrentSession } from '@/lib/auth/session'
 import { loadSellerProfile } from '@/lib/matching/profile'
 import type { SellerDraft } from '@/lib/matching/profile'
 

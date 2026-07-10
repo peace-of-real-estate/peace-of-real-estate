@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { getCurrentSession } from '@/lib/auth/functions'
+import { getCurrentSession } from '@/lib/auth/session'
 import {
 	completeAgentSignup,
 	createBuyerProfileFromDraft,

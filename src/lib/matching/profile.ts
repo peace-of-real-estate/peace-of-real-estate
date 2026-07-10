@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
-import { requireUserId } from '@/lib/auth/functions'
+import { requireUserId } from '@/lib/auth/session'
 import { calculateFitScore, type AgentMatchData } from '@/lib/matching/scoring'
 import { getAvatarUrl } from '@/lib/s3'
 import {
@@ -178,6 +178,36 @@ export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
 			.where(eq(agentProfiles.userId, userId))
 			.limit(1)
 		return profile ?? null
+	},
+)
+
+export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
+	async () => {
+		const userId = await requireUserId()
+
+		const [[agent], [buyer], [seller]] = await Promise.all([
+			db
+				.select({ id: agentProfiles.id })
+				.from(agentProfiles)
+				.where(eq(agentProfiles.userId, userId))
+				.limit(1),
+			db
+				.select({ id: buyerProfiles.id })
+				.from(buyerProfiles)
+				.where(eq(buyerProfiles.userId, userId))
+				.limit(1),
+			db
+				.select({ id: sellerProfiles.id })
+				.from(sellerProfiles)
+				.where(eq(sellerProfiles.userId, userId))
+				.limit(1),
+		])
+
+		if (agent) return '/agent/introductions'
+		if (buyer) return '/buyer/matches'
+		if (seller) return '/seller/matches'
+
+		return '/buyer/matches'
 	},
 )
 

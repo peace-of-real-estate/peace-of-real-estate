@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-const DEFAULT_POST_AUTH_REDIRECT = '/buyer/matches'
+const DEFAULT_POST_AUTH_REDIRECT = '/'
 
 export const Route = createFileRoute('/auth/login')({
 	validateSearch: z.object({
