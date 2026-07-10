@@ -65,6 +65,8 @@ jobs:
           echo "Deployment never became reachable at $BASE_URL" >&2
           exit 1
       - name: Run Playwright tests
+        env:
+          BETA_PASSWORD: ${{ secrets.BETA_PASSWORD }}
         run: vpx playwright test
       - name: Upload Playwright report
         if: failure()
