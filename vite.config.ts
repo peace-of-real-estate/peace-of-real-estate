@@ -158,7 +158,7 @@ export default defineConfig(({ mode }) => {
 					extends: true,
 					test: {
 						name: 'server',
-						include: ['src/**/*.{server,db}.ts'],
+						include: ['src/**/*.{server,db}.test.ts'],
 						testTimeout: 5_000,
 					},
 				},
