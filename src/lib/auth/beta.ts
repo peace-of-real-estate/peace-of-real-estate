@@ -1,4 +1,6 @@
-import { createIsomorphicFn, createServerFn } from '@tanstack/react-start'
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
+import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
 
 import { serverEnv as env } from '@/env.server'
@@ -7,14 +9,12 @@ const BETA_COOKIE = 'beta_auth'
 const BETA_VALUE = 'true'
 
 async function deriveBetaSecret() {
-	const { createHmac } = await import('node:crypto')
 	return createHmac('sha256', env.BETTER_AUTH_SECRET)
 		.update('beta')
 		.digest('hex')
 }
 
 async function signBetaValue(value: string) {
-	const { createHmac } = await import('node:crypto')
 	const secret = await deriveBetaSecret()
 	return createHmac('sha256', secret).update(value).digest('hex')
 }
@@ -51,20 +51,16 @@ export const authenticateBeta = createServerFn({ method: 'POST' })
 		return { success: isValid }
 	})
 
-export const hasBetaAccess = createIsomorphicFn()
-	.server(async () => {
+export const hasBetaAccess = createServerFn({ method: 'GET' }).handler(
+	async () => {
 		const cookie = getCookie(BETA_COOKIE)
 		const parsed = parseBetaCookie(cookie)
 		if (!parsed) return false
 
 		const expected = await signBetaValue(parsed.value)
-		const { timingSafeEqual } = await import('node:crypto')
 		return timingSafeEqual(
 			Buffer.from(expected, 'hex'),
 			Buffer.from(parsed.signature, 'hex'),
 		)
-	})
-	.client(() => {
-		const match = document.cookie.match(/(?:^|; )beta_auth=([^;]*)/)
-		return parseBetaCookie(match?.[1]) !== null
-	})
+	},
+)
