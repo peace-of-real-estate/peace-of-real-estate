@@ -115,7 +115,7 @@ export interface FitScoreResult {
 	trace: ScoreTrace
 }
 
-const BASE_WEIGHTS: Record<DimensionId, number> = {
+export const BASE_WEIGHTS: Record<DimensionId, number> = {
 	location: 40,
 	priceFit: 35,
 	clientFit: 25,

@@ -9,11 +9,12 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-import type {
-	AgentMatchData,
-	DimensionTrace,
-	MatchDebugInfo,
-	SubCheck,
+import {
+	BASE_WEIGHTS,
+	type AgentMatchData,
+	type DimensionTrace,
+	type MatchDebugInfo,
+	type SubCheck,
 } from '@/lib/matching/scoring'
 import { cn } from '@/lib/utils/ui'
 
@@ -181,7 +182,10 @@ function MatchDebugRow({ match }: { match: AgentMatchData }) {
 						</div>
 					) : (
 						<p className="text-muted-foreground text-xs">
-							No client priorities set — using base weights (40 / 35 / 25).
+							No client priorities set — using base weights (
+							{BASE_WEIGHTS.location} / {BASE_WEIGHTS.priceFit} /{' '}
+							{BASE_WEIGHTS.clientFit}
+							).
 						</p>
 					)}
 				</div>
