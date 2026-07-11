@@ -168,9 +168,7 @@ export default defineConfig(({ mode }) => {
 						name: 'browser',
 						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 						setupFiles: ['./tests/support/mocks/styles.ts'],
-						// fail fast locally, but let CI collect every screenshot diff
-						bail: process.env.CI ? 0 : 1,
-						testTimeout: process.env.CI ? 60_000 : 20_000,
+						testTimeout: process.env.CI ? 30_000 : 5_000,
 						browser: {
 							instances: [{ browser: 'chromium' }],
 							provider: playwright(),
