@@ -33,6 +33,11 @@ vi.mock('@/lib/auth/functions', () => ({
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
 }))
 
+vi.mock('@/lib/auth/session', () => ({
+	getCurrentSession: () => Promise.resolve(authState.session),
+	requireUserId: () => Promise.resolve('user-1'),
+}))
+
 vi.mock('@/lib/auth/beta', () => ({
 	authenticateBeta: async () => ({ success: true }),
 	hasBetaAccess: () => true,
