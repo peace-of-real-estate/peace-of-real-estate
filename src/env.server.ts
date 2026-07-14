@@ -21,5 +21,7 @@ export const serverEnv = createEnv(
 		AI_BASE_URL: z.string().url().optional(),
 		AI_MODEL: z.string().optional(),
 		AI_API_KEY: z.string().optional(),
+		RESEND_API_KEY: z.string().optional(),
+		FROM_EMAIL: z.string().email().optional(),
 	}),
 )

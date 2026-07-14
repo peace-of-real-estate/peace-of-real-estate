@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
 import { Route as AuthBetaRouteImport } from './routes/auth/beta'
 import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
@@ -51,9 +53,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/auth/login',
   path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCompleteRoute = AuthCompleteRouteImport.update({
@@ -252,7 +264,9 @@ export interface FileRoutesByFullPath {
   '/seller': typeof dashboardSellerRouteRouteWithChildren
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -290,7 +304,9 @@ export interface FileRoutesByTo {
   '/seller': typeof dashboardSellerRouteRouteWithChildren
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -329,7 +345,9 @@ export interface FileRoutesById {
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -369,7 +387,9 @@ export interface FileRouteTypes {
     | '/seller'
     | '/auth/beta'
     | '/auth/complete'
+    | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/reset-password'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -407,7 +427,9 @@ export interface FileRouteTypes {
     | '/seller'
     | '/auth/beta'
     | '/auth/complete'
+    | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/reset-password'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -445,7 +467,9 @@ export interface FileRouteTypes {
     | '/(dashboard)/seller'
     | '/auth/beta'
     | '/auth/complete'
+    | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/reset-password'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -484,7 +508,9 @@ export interface RootRouteChildren {
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
   AuthBetaRoute: typeof AuthBetaRoute
   AuthCompleteRoute: typeof AuthCompleteRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   SignupstepsAgentRouteRoute: typeof SignupstepsAgentRouteRouteWithChildren
   SignupstepsBuyerRouteRoute: typeof SignupstepsBuyerRouteRouteWithChildren
   SignupstepsSellerRouteRoute: typeof SignupstepsSellerRouteRouteWithChildren
@@ -505,11 +531,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
       fullPath: '/auth/login'
       preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/complete': {
@@ -864,7 +904,9 @@ const rootRouteChildren: RootRouteChildren = {
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,
   AuthBetaRoute: AuthBetaRoute,
   AuthCompleteRoute: AuthCompleteRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   SignupstepsAgentRouteRoute: SignupstepsAgentRouteRouteWithChildren,
   SignupstepsBuyerRouteRoute: SignupstepsBuyerRouteRouteWithChildren,
   SignupstepsSellerRouteRoute: SignupstepsSellerRouteRouteWithChildren,
