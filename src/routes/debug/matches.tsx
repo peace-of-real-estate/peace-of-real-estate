@@ -1,7 +1,6 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { clientEnv } from '@/env'
 import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
 import { loadDebugClientOptions, loadDebugMatches } from '@/lib/matching/debug'
 import { DebugMatchesPage } from '@/routes/debug/-components/debug-matches-page'
@@ -16,10 +15,6 @@ const debugMatchesSearchSchema = z.object({
 export const Route = createFileRoute('/debug/matches')({
 	validateSearch: debugMatchesSearchSchema,
 	beforeLoad: async () => {
-		if (clientEnv.VITE_MATCH_DEBUG !== 'true') {
-			throw notFound()
-		}
-
 		await redirectUnauthenticatedUsers({ redirectTo: '/debug/matches' })
 	},
 	component: DebugMatchesRoute,

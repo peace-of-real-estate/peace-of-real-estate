@@ -9,4 +9,6 @@ declare module 'zipcodes' {
 	}
 
 	export const codes: Record<string, ZipCodeRecord>
+	export function lookup(zip: string): ZipCodeRecord | undefined
+	export function distance(zipA: string, zipB: string): number
 }

@@ -89,12 +89,13 @@ type AgentPersona = {
 function generatePersona(): AgentPersona {
 	const priceTier = pickWeighted(PRICE_TIERS)
 	const clientTypeCount = randInt(2, 4)
+	const notFitNote = pick(NOT_FIT_FOR)
 
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
 		typicalPriceRange: pick(PRICE_BY_TIER[priceTier]!),
 		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
-		notFitFor: pick(NOT_FIT_FOR),
+		notFitFor: notFitNote ? [notFitNote] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
 		averageTransactions: pick(averageTransactions.slugs),
 		employmentStatus: pick(EMPLOYMENT_STATUSES),
