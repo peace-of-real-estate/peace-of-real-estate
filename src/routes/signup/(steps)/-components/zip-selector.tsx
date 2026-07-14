@@ -11,7 +11,6 @@ import type {
 	MapLayerMouseEvent,
 	MapRef,
 } from 'react-map-gl/maplibre'
-import type { StyleSpecification } from 'maplibre-gl'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -31,6 +30,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { StepLabel } from './signup-shell'
 import { cn } from '@/lib/utils/ui'
+import { cartoRasterStyle } from '@/lib/geography/basemap'
 import {
 	isValidZipCode,
 	loadCityCenter,
@@ -305,26 +305,7 @@ type BBox = {
 	maxLat: number
 }
 
-const CARTO_STYLE = {
-	version: 8,
-	sources: {
-		'carto-light': {
-			type: 'raster',
-			tiles: ['https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'],
-			tileSize: 256,
-			attribution:
-				'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
-			maxzoom: 19,
-		},
-	},
-	layers: [
-		{
-			id: 'carto-light-layer',
-			type: 'raster',
-			source: 'carto-light',
-		},
-	],
-} satisfies StyleSpecification
+const CARTO_STYLE = cartoRasterStyle('light_all')
 
 const LINE_LAYER = {
 	id: 'zip-line',

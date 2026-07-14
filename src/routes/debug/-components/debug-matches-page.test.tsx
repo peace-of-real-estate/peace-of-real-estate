@@ -208,6 +208,7 @@ async function renderPage(
 				loadDebugMatches={
 					loadDebugMatches ?? ((_input) => Promise.resolve(payload))
 				}
+				mapsEnabled={false}
 			/>
 		),
 	})

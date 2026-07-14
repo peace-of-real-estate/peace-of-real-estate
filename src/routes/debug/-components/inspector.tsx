@@ -10,6 +10,8 @@ import { DimensionTable } from '@/routes/debug/-components/dimension-table'
 import { FallbackCard } from '@/routes/debug/-components/fallback-card'
 import { FitScoreBadge } from '@/routes/debug/-components/fit-score-badge'
 import { GatesSection } from '@/routes/debug/-components/gates-section'
+import { MapPlaceholder } from '@/routes/debug/-components/map-support'
+import { MatchGeoMap } from '@/routes/debug/-components/match-geo-map'
 import { RawJsonSection } from '@/routes/debug/-components/raw-json-section'
 import { ScoreInternals } from '@/routes/debug/-components/score-internals'
 
@@ -22,6 +24,7 @@ interface InspectorProps {
 	onSelectAgent: (agentId: string | undefined) => void
 	onSetCompare: (agentId: string | undefined) => void
 	onFilterByGate: (gate: string) => void
+	mapsEnabled: boolean
 }
 
 export function Inspector({
@@ -33,6 +36,7 @@ export function Inspector({
 	onSelectAgent,
 	onSetCompare,
 	onFilterByGate,
+	mapsEnabled,
 }: InspectorProps) {
 	const staleSelection = Boolean(selectedAgentId && !selectedMatch)
 	const staleCompare = Boolean(compareAgentId && !compareMatch)
@@ -52,7 +56,12 @@ export function Inspector({
 						onClear={() => onSetCompare(undefined)}
 					/>
 				)}
-				<CohortOverview matches={matches} onFilterByGate={onFilterByGate} />
+				<CohortOverview
+					matches={matches}
+					onFilterByGate={onFilterByGate}
+					onSelectAgent={onSelectAgent}
+					mapsEnabled={mapsEnabled}
+				/>
 			</div>
 		)
 	}
@@ -93,6 +102,11 @@ export function Inspector({
 				{selectedMatch.disqualified && (
 					<GatesSection trace={selectedMatch.trace} />
 				)}
+				<MatchGeoSlot
+					match={selectedMatch}
+					clientProfile={matches.clientProfile}
+					mapsEnabled={mapsEnabled}
+				/>
 				{selectedMatch.trace.mode === 'fallback' ? (
 					<FallbackCard trace={selectedMatch.trace} />
 				) : (
@@ -191,6 +205,41 @@ function PairHeader({
 				</Button>
 			</div>
 		</div>
+	)
+}
+
+function MatchGeoSlot({
+	match,
+	clientProfile,
+	mapsEnabled,
+}: {
+	match: DebugMatch
+	clientProfile: DebugMatchesPayload['clientProfile']
+	mapsEnabled: boolean
+}) {
+	const geo = match.trace.geo
+	const client = geo?.client
+	const agent = geo?.agent
+	if (!geo || !client || !agent) return null
+	if (!mapsEnabled) return <MapPlaceholder label="Geography" />
+
+	return (
+		<MatchGeoMap
+			client={client}
+			agent={agent}
+			miles={geo.centroidMiles}
+			zipFit={geo.zipFit}
+			cityFit={geo.cityFit}
+			clientLabel={`${clientProfile.city}, ${clientProfile.state}`}
+			agentLabel={match.location}
+			clientCity={
+				clientProfile.city && clientProfile.state
+					? { city: clientProfile.city, state: clientProfile.state }
+					: undefined
+			}
+			clientZipCodes={clientProfile.zipCodes ?? []}
+			agentZipCodes={match.agentProfile.zipCodes ?? []}
+		/>
 	)
 }
 

@@ -41,6 +41,8 @@ export interface DebugMatchesPageProps {
 		clientId: string
 		side: 'buying' | 'selling'
 	}) => Promise<DebugMatchesPayload>
+	/** Disable live map tiles (screenshot tests render a fixed placeholder). */
+	mapsEnabled?: boolean
 }
 
 export function DebugMatchesPage({
@@ -53,6 +55,7 @@ export function DebugMatchesPage({
 	onSetCompare,
 	loadDebugClientOptions,
 	loadDebugMatches,
+	mapsEnabled = true,
 }: DebugMatchesPageProps) {
 	const [pickerOpen, setPickerOpen] = React.useState(false)
 	const [filters, setFilters] = React.useState<RankingFilters>(EMPTY_FILTERS)
@@ -184,6 +187,7 @@ export function DebugMatchesPage({
 							onFilterByGate={(gate) =>
 								setFilters((prev) => ({ ...prev, dqGate: gate }))
 							}
+							mapsEnabled={mapsEnabled}
 						/>
 					</div>
 				)}
