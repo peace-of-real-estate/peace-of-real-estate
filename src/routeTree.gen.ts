@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DebugMatchesRouteImport } from './routes/debug/matches'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -51,6 +52,11 @@ import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/sign
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DebugMatchesRoute = DebugMatchesRouteImport.update({
+  id: '/debug/matches',
+  path: '/debug/matches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/debug/matches': typeof DebugMatchesRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/debug/matches': typeof DebugMatchesRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/debug/matches': typeof DebugMatchesRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -390,6 +399,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/debug/matches'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -430,6 +440,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/debug/matches'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -470,6 +481,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/debug/matches'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -511,6 +523,7 @@ export interface RootRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  DebugMatchesRoute: typeof DebugMatchesRoute
   SignupstepsAgentRouteRoute: typeof SignupstepsAgentRouteRouteWithChildren
   SignupstepsBuyerRouteRoute: typeof SignupstepsBuyerRouteRouteWithChildren
   SignupstepsSellerRouteRoute: typeof SignupstepsSellerRouteRouteWithChildren
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/debug/matches': {
+      id: '/debug/matches'
+      path: '/debug/matches'
+      fullPath: '/debug/matches'
+      preLoaderRoute: typeof DebugMatchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password': {
@@ -907,6 +927,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  DebugMatchesRoute: DebugMatchesRoute,
   SignupstepsAgentRouteRoute: SignupstepsAgentRouteRouteWithChildren,
   SignupstepsBuyerRouteRoute: SignupstepsBuyerRouteRouteWithChildren,
   SignupstepsSellerRouteRoute: SignupstepsSellerRouteRouteWithChildren,
