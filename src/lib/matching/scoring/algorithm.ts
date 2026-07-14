@@ -201,12 +201,15 @@ export function scoreLocation(
 
 	const zipFit = clientZips.length > 0 ? bestFitSum / clientZips.length : 0
 
-	const clientCenter = profileCityCenter(client) ?? centroidOfZips(clientZips)
-	const agentCenter = profileCityCenter(agent) ?? centroidOfZips(agentZips)
+	const clientStoredCenter = profileCityCenter(client)
+	const agentStoredCenter = profileCityCenter(agent)
+	const clientCenter = clientStoredCenter ?? centroidOfZips(clientZips)
+	const agentCenter = agentStoredCenter ?? centroidOfZips(agentZips)
 
 	let cityFit = 0
+	let centroidMiles: number | undefined
 	if (clientCenter && agentCenter) {
-		const centroidMiles = haversineMiles(
+		centroidMiles = haversineMiles(
 			clientCenter.lat,
 			clientCenter.lng,
 			agentCenter.lat,
@@ -244,8 +247,8 @@ export function scoreLocation(
 			: '(unresolved)',
 		passed: cityFit > 0,
 		effect:
-			cityFit > 0
-				? `continuous taper ${round2(cityFit)}`
+			cityFit > 0 && centroidMiles !== undefined
+				? `continuous taper ${round2(cityFit)} (${round2(centroidMiles)} mi)`
 				: 'cities ≥ 50 mi apart or unresolved',
 	})
 
@@ -253,6 +256,24 @@ export function scoreLocation(
 		score: round2(locationScore),
 		explanation,
 		checks,
+		geo: {
+			client: clientCenter
+				? {
+						...clientCenter,
+						source: clientStoredCenter ? 'cityCenter' : 'zipCentroid',
+					}
+				: undefined,
+			agent: agentCenter
+				? {
+						...agentCenter,
+						source: agentStoredCenter ? 'cityCenter' : 'zipCentroid',
+					}
+				: undefined,
+			centroidMiles:
+				centroidMiles === undefined ? undefined : round2(centroidMiles),
+			zipFit: round2(zipFit),
+			cityFit: round2(cityFit),
+		},
 	}
 }
 
@@ -1167,6 +1188,7 @@ export function calculateFitScore(
 						scoreAfter: round2(notFitPenalty.score),
 					}
 				: undefined,
+			geo: results.location.geo,
 		},
 	}
 }

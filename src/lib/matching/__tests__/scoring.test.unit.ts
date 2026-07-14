@@ -304,6 +304,34 @@ describe('scoreLocation', () => {
 		const buyer = baseBuyer()
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBe(0)
+		expect(result.geo?.client).toBeUndefined()
+		expect(result.geo?.agent).toBeUndefined()
+		expect(result.geo?.centroidMiles).toBeUndefined()
+	})
+
+	test('geo trace carries centers, source, and centroid miles', () => {
+		const agent = baseAgent({
+			city: 'St. Paul',
+			state: 'MN',
+			cityCenterLatitude: 44.9537,
+			cityCenterLongitude: -93.09,
+		})
+		const buyer = baseBuyer({
+			city: 'Minneapolis',
+			state: 'MN',
+			zipCodes: ['55401'],
+			cityCenterLatitude: null,
+			cityCenterLongitude: null,
+		})
+		const full = calculateFitScore(agent, buyer, 'buying')
+		const geo = full.trace.geo
+		expect(geo?.client?.source).toBe('zipCentroid')
+		expect(geo?.agent?.source).toBe('cityCenter')
+		expect(geo?.agent?.lat).toBeCloseTo(44.9537, 4)
+		// Minneapolis 55401 to the St. Paul city center is ~9 miles
+		expect(geo?.centroidMiles).toBeGreaterThan(5)
+		expect(geo?.centroidMiles).toBeLessThan(15)
+		expect(geo?.cityFit).toBeGreaterThan(0)
 	})
 })
 

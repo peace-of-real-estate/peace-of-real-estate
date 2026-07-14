@@ -24,6 +24,23 @@ export type ScoreBucket =
 	| 'Communication'
 	| 'Business Terms'
 
+/** A resolved coordinate and where it came from. */
+export interface GeoPoint {
+	lat: number
+	lng: number
+	source: 'cityCenter' | 'zipCentroid'
+}
+
+/** Geographic inputs the location dimension actually scored with. */
+export interface LocationGeoTrace {
+	client?: GeoPoint | undefined
+	agent?: GeoPoint | undefined
+	/** Haversine miles between the two centers, when both resolve. */
+	centroidMiles?: number | undefined
+	zipFit: number
+	cityFit: number
+}
+
 /** One row of a dimension's client-vs-agent comparison table. */
 export interface SubCheck {
 	label: string
@@ -49,6 +66,8 @@ export interface DimensionResult {
 	score: number
 	explanation: string
 	checks: SubCheck[]
+	/** Only set by the location dimension. */
+	geo?: LocationGeoTrace | undefined
 }
 
 export interface DisqualifierTrace {
@@ -82,6 +101,8 @@ export interface ScoreTrace {
 		present: string[]
 		missing: string[]
 	}
+	/** Location-dimension geography, hoisted for map visualizations. */
+	geo?: LocationGeoTrace | undefined
 }
 
 export interface MatchDebugInfo {
