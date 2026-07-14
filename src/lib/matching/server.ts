@@ -12,6 +12,10 @@ import {
 } from './match.view'
 import { calculateFitScore, type MatchSide } from './scoring'
 
+function toScoringSide(side: MatchSide): 'buying' | 'selling' {
+	return side === 'buyers' ? 'buying' : 'selling'
+}
+
 type MatchPageParam = { offset: number; limit: number }
 
 const defaultMatchPageParam: MatchPageParam = { offset: 0, limit: 10 }
@@ -60,7 +64,7 @@ async function loadAgentMatchesForProfile(
 		.innerJoin(user, eq(agentProfiles.userId, user.id))
 	const scored = results.map((row) => ({
 		row,
-		score: calculateFitScore(row.agent, profile, side),
+		score: calculateFitScore(row.agent, profile, toScoringSide(side)),
 	}))
 	const byComputedScore = (
 		a: (typeof scored)[number],

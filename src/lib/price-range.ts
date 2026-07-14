@@ -3,6 +3,8 @@ export type PriceRange = {
 	max: number
 }
 
+export type PriceRangeValue = PriceRange
+
 export const PRICE_MIN = 0
 export const PRICE_MAX = 2_000_000
 export const PRICE_STEP = 50_000
@@ -14,6 +16,15 @@ export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
 	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
 	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
 }
+
+export const BUCKET_ORDER = [
+	'under400k',
+	'400kTo750k',
+	'750kTo1_5m',
+	'1_5mPlus',
+] as const
+
+export type AgentPriceBucket = (typeof BUCKET_ORDER)[number]
 
 export function parseMinMaxRange(
 	value: string | undefined | null,
@@ -38,6 +49,7 @@ export function parsePriceRange(value: string | undefined | null): PriceRange {
 	}
 }
 
+export const parseSerializedPriceRange = parseMinMaxRange
 export function serializePriceRange(range: PriceRange): string {
 	return `${range.min}-${range.max}`
 }

@@ -1,6 +1,18 @@
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
-import type { FitScoreResult, MatchDebugInfo } from '@/lib/matching/scoring'
-import { DIMENSIONS } from '@/lib/matching/scoring'
+import type {
+	FitScoreResult,
+	MatchDebugInfo,
+	ScoreBucket,
+} from './scoring/types'
+
+const DIMENSIONS: ScoreBucket[] = [
+	'Location',
+	'Price Fit',
+	'Specialization',
+	'Working Style',
+	'Communication',
+	'Business Terms',
+]
 
 /** Placeholder display data — not real agent metrics yet. */
 const PLACEHOLDER_AGENT_DISPLAY = {
@@ -76,10 +88,7 @@ export function toAgentMatchData({
 		specialties: agent.bestClientTypes,
 		about: PLACEHOLDER_AGENT_DISPLAY.about,
 		scores: Object.fromEntries(
-			DIMENSIONS.map((dimension) => [
-				dimension.scoreLabel,
-				score.scores[dimension.id],
-			]),
+			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
 		),
 		contact: {
 			email: user.email,

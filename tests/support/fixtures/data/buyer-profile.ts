@@ -7,6 +7,8 @@ export const mockBuyerProfile = {
 	state: 'TX',
 	city: 'Austin',
 	zipCodes: [],
+	cityCenterLatitude: null,
+	cityCenterLongitude: null,
 	timeline: 'exploring',
 	priceRange: '400000-750000',
 	propertyTypes: ['singleFamily'],

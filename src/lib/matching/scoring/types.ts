@@ -6,9 +6,40 @@ import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
  * they cannot differentiate agents, and years licensed / volume said little
  * about fit for a specific client.
  */
-export type DimensionId = 'location' | 'priceFit' | 'clientFit'
+export type DimensionId =
+	| 'location'
+	| 'priceFit'
+	| 'specialization'
+	| 'workingStyle'
+	| 'communication'
+	| 'businessTerms'
 
 export type MatchSide = 'buyers' | 'sellers'
+
+export type ScoreBucket =
+	| 'Location'
+	| 'Price Fit'
+	| 'Specialization'
+	| 'Working Style'
+	| 'Communication'
+	| 'Business Terms'
+
+/** A resolved coordinate and where it came from. */
+export interface GeoPoint {
+	lat: number
+	lng: number
+	source: 'cityCenter' | 'zipCentroid'
+}
+
+/** Geographic inputs the location dimension actually scored with. */
+export interface LocationGeoTrace {
+	client?: GeoPoint | undefined
+	agent?: GeoPoint | undefined
+	/** Haversine miles between the two centers, when both resolve. */
+	centroidMiles?: number | undefined
+	zipFit: number
+	cityFit: number
+}
 
 /** One row of a dimension's client-vs-agent comparison table. */
 export interface SubCheck {
@@ -35,6 +66,8 @@ export interface DimensionResult {
 	score: number
 	explanation: string
 	checks: SubCheck[]
+	/** Only set by the location dimension. */
+	geo?: LocationGeoTrace | undefined
 }
 
 export interface DisqualifierTrace {
@@ -56,10 +89,20 @@ export interface ScoreTrace {
 	/** computedScore, or 0 if any hard disqualifier fired. */
 	fitScore: number
 	formula: string
+	agentFit?: number
+	reciprocalBlend?: number
+	stage2?:
+		| { linear: number; geometric: number; consumerScore: number }
+		| undefined
+	notFitPenalty?:
+		| { reason: string; scoreBefore: number; scoreAfter: number }
+		| undefined
 	fallback?: {
 		present: string[]
 		missing: string[]
 	}
+	/** Location-dimension geography, hoisted for map visualizations. */
+	geo?: LocationGeoTrace | undefined
 }
 
 export interface MatchDebugInfo {
@@ -74,7 +117,7 @@ export interface MatchDebugInfo {
 
 export interface FitScoreResult {
 	fitScore: number
-	scores: Record<DimensionId, number>
+	scores: Record<ScoreBucket, number>
 	disqualified: boolean
 	trace: ScoreTrace
 }

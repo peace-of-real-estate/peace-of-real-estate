@@ -7,12 +7,12 @@ import {
 	EO_INSURANCE_STATUSES,
 	FIRST_NAMES,
 	LAST_NAMES,
-	NOT_FIT_FOR,
-	PRICE_BY_TIER,
-	PRICE_TIERS,
 	REPRESENTATION_SIDES,
 	type City,
 } from './mocks'
+
+import { AGENT_PRICE_RANGES } from '../../../src/lib/price-range'
+import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
 
 import { pickWeighted, sample, type WeightedOption } from './stats'
 
@@ -87,14 +87,21 @@ type AgentPersona = {
 }
 
 function generatePersona(): AgentPersona {
-	const priceTier = pickWeighted(PRICE_TIERS)
 	const clientTypeCount = randInt(2, 4)
+	const notFitForSlugs = [
+		...Object.keys(structuredNotFitForOptions).filter(
+			(slug) => slug !== 'other',
+		),
+		null,
+		null,
+	]
+	const notFitForSlug = pick(notFitForSlugs)
 
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
-		typicalPriceRange: pick(PRICE_BY_TIER[priceTier]!),
+		typicalPriceRange: pick(Object.keys(AGENT_PRICE_RANGES)),
 		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
-		notFitFor: pick(NOT_FIT_FOR),
+		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
 		averageTransactions: pick(averageTransactions.slugs),
 		employmentStatus: pick(EMPLOYMENT_STATUSES),

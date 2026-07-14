@@ -9,7 +9,6 @@ import {
 	DashboardPage,
 	DashboardPageMobileNav,
 } from '@/routes/(dashboard)/-components/dashboard'
-import { MatchDebugPanel } from '@/routes/(dashboard)/-components/match-debug-panel'
 import { MatchList } from '@/routes/(dashboard)/-components/match-list'
 import { authClient } from '@/lib/auth/client'
 import { loadBuyerProfile, loadSellerProfile } from '@/lib/profile'
@@ -25,7 +24,6 @@ import {
 	type SummaryItem,
 } from '@/components/profile-summary'
 import { resolveStateCode } from '@/lib/geography/states'
-import { clientEnv } from '@/env'
 
 type ClientRole = 'buyer' | 'seller'
 
@@ -109,8 +107,6 @@ export function ClientMatches({
 								No matches available yet.
 							</p>
 						</Card>
-					) : clientEnv.VITE_MATCH_DEBUG === 'true' ? (
-						<MatchDebugPanel matches={matches} />
 					) : (
 						<MatchList matches={matches} />
 					)}
