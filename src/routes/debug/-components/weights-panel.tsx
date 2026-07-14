@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import type { DebugMatchesPayload } from '@/lib/matching/debug'
+import { MeterBar } from '@/routes/debug/-components/meter-bar'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
 
 interface WeightsPanelProps {
@@ -37,12 +38,7 @@ export function WeightsPanel({ matches }: WeightsPanelProps) {
 				{trace.dimensions.map((dimension) => (
 					<div key={dimension.id} className="flex items-center gap-2 text-xs">
 						<span className="w-28 truncate font-medium">{dimension.label}</span>
-						<div className="bg-border h-1.5 flex-1 overflow-hidden rounded-full">
-							<div
-								className="bg-primary h-full rounded-full"
-								style={{ width: `${dimension.weight}%` }}
-							/>
-						</div>
+						<MeterBar value={dimension.weight / 100} className="h-1.5 flex-1" />
 						<span className="w-10 text-right font-mono tabular-nums">
 							{dimension.weight}
 						</span>

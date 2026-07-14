@@ -8,11 +8,8 @@ import {
 } from '@/components/ui/tooltip'
 import type { DebugMatch } from '@/lib/matching/debug'
 import { cn } from '@/lib/utils/ui'
+import { FitScoreBadge } from '@/routes/debug/-components/fit-score-badge'
 import { failedGateLabels } from '@/routes/debug/-components/ranking-model'
-import {
-	fitScoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
 
 interface RankingRowProps {
 	match: DebugMatch
@@ -44,17 +41,11 @@ export function RankingRow({
 			aria-label={`Select ${match.name ?? 'agent'}`}
 			aria-current={selected ? 'true' : undefined}
 		>
-			<Badge
-				variant="outline"
-				className={cn(
-					'w-14 justify-center py-1 font-mono text-sm font-semibold tabular-nums',
-					disqualified
-						? 'border-red-500/30 text-red-600 dark:text-red-400'
-						: scoreToneClasses[fitScoreTone(match.fitScore)].badge,
-				)}
-			>
-				{match.fitScore}%
-			</Badge>
+			<FitScoreBadge
+				fitScore={match.fitScore}
+				disqualified={disqualified}
+				size="sm"
+			/>
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center gap-1.5">

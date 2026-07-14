@@ -1,11 +1,8 @@
 import { Card } from '@/components/ui/card'
 import type { DebugMatchesPayload } from '@/lib/matching/debug'
-import { cn } from '@/lib/utils/ui'
+import { MeterBar } from '@/routes/debug/-components/meter-bar'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
-import {
-	scoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
+import { scoreTone } from '@/routes/debug/-components/score-tone'
 
 interface DimensionCohortStatsProps {
 	matches: DebugMatchesPayload
@@ -58,22 +55,11 @@ export function DimensionCohortStats({ matches }: DimensionCohortStatsProps) {
 					{stats.map((stat) => (
 						<div key={stat.id} className="flex items-center gap-2 text-xs">
 							<span className="w-28 truncate font-medium">{stat.label}</span>
-							<div className="bg-muted relative h-2 flex-1 overflow-hidden rounded-full">
-								<div
-									className="bg-muted-foreground/25 absolute top-0 h-full"
-									style={{
-										left: `${stat.min * 100}%`,
-										width: `${Math.max((stat.max - stat.min) * 100, 1)}%`,
-									}}
-								/>
-								<div
-									className={cn(
-										'absolute top-0 h-full w-0.5',
-										scoreToneClasses[scoreTone(stat.mean)].solid,
-									)}
-									style={{ left: `calc(${stat.mean * 100}% - 1px)` }}
-								/>
-							</div>
+							<MeterBar
+								range={{ min: stat.min, max: stat.max, marker: stat.mean }}
+								tone={scoreTone(stat.mean)}
+								className="flex-1"
+							/>
 							<span className="text-muted-foreground w-40 shrink-0 text-right font-mono tabular-nums">
 								μ {stat.mean.toFixed(2)} · {stat.min.toFixed(2)}–
 								{stat.max.toFixed(2)}

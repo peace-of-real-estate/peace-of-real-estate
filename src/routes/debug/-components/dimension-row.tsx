@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion'
 import type { DimensionTrace } from '@/lib/matching/scoring'
 import { cn } from '@/lib/utils/ui'
+import { MeterBar } from '@/routes/debug/-components/meter-bar'
 import {
 	scoreTone,
 	scoreToneClasses,
@@ -42,20 +43,12 @@ export function DimensionRow({ dimension }: DimensionRowProps) {
 
 					{/* Track length = weight share of 100 pts; fill = score share of the track,
 					    so fill length visually equals contribution on a common scale. */}
-					<div className="h-2.5 w-full">
-						<div
-							className="bg-muted h-full overflow-hidden rounded-full"
-							style={{ width: `${dimension.weight}%` }}
-						>
-							<div
-								className={cn(
-									'h-full rounded-full',
-									scoreToneClasses[tone].solid,
-								)}
-								style={{ width: `${dimension.score * 100}%` }}
-							/>
-						</div>
-					</div>
+					<MeterBar
+						value={dimension.score}
+						tone={tone}
+						trackPct={dimension.weight}
+						className="h-2.5"
+					/>
 
 					<div className="text-right">
 						<div className="font-mono text-sm font-semibold tabular-nums">

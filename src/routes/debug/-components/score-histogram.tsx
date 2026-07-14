@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card'
 import type { DebugMatchesPayload } from '@/lib/matching/debug'
+import { MeterBar } from '@/routes/debug/-components/meter-bar'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
 
 interface ScoreHistogramProps {
@@ -21,12 +22,8 @@ export function ScoreHistogram({ matches }: ScoreHistogramProps) {
 						<span className="text-muted-foreground w-14 shrink-0 text-right">
 							{bucket.range}
 						</span>
-						<div className="bg-border h-2 w-full overflow-hidden rounded-sm">
-							<div
-								className="bg-primary h-full rounded-sm"
-								style={{ width: `${(bucket.count / maxCount) * 100}%` }}
-							/>
-						</div>
+						<MeterBar value={bucket.count / maxCount} />
+
 						<span className="w-6 text-right tabular-nums">{bucket.count}</span>
 					</div>
 				))}

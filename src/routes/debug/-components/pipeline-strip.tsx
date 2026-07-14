@@ -133,9 +133,6 @@ export function PipelineStrip({ trace, fitScore }: PipelineStripProps) {
 					</div>
 				))}
 			</div>
-			<code className="bg-muted/60 mt-3 block max-h-32 overflow-auto rounded-md px-2.5 py-1.5 font-mono text-xs break-words">
-				{trace.formula}
-			</code>
 		</Card>
 	)
 }

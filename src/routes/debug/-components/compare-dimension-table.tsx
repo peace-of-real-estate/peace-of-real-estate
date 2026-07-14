@@ -1,13 +1,10 @@
 import { Card } from '@/components/ui/card'
 import type { DebugMatch } from '@/lib/matching/debug'
 import type { DimensionTrace } from '@/lib/matching/scoring'
-import { cn } from '@/lib/utils/ui'
 import { DeltaValue } from '@/routes/debug/-components/delta-value'
+import { MeterBar } from '@/routes/debug/-components/meter-bar'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
-import {
-	scoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
+import { scoreTone } from '@/routes/debug/-components/score-tone'
 
 interface CompareDimensionTableProps {
 	selected: DebugMatch
@@ -68,15 +65,11 @@ function DimensionBar({
 
 	return (
 		<div className="flex items-center gap-2">
-			<div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
-				<div
-					className={cn(
-						'h-full rounded-full',
-						scoreToneClasses[scoreTone(dimension.score)].solid,
-					)}
-					style={{ width: `${dimension.score * 100}%` }}
-				/>
-			</div>
+			<MeterBar
+				value={dimension.score}
+				tone={scoreTone(dimension.score)}
+				className="flex-1"
+			/>
 			<span className="w-8 shrink-0 text-right font-mono tabular-nums">
 				{dimension.score.toFixed(2)}
 			</span>

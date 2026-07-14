@@ -7,17 +7,12 @@ import {
 import type { ScoreTrace } from '@/lib/matching/scoring'
 import { cn } from '@/lib/utils/ui'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
-import {
-	fitScoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
 
 interface BlendEquationProps {
 	trace: ScoreTrace
-	fitScore: number
 }
 
-export function BlendEquation({ trace, fitScore }: BlendEquationProps) {
+export function BlendEquation({ trace }: BlendEquationProps) {
 	const stage2 = trace.stage2
 	const penalty = trace.notFitPenalty
 
@@ -40,15 +35,14 @@ export function BlendEquation({ trace, fitScore }: BlendEquationProps) {
 				/>
 			</div>
 
-			<Operator className="my-2 justify-center">↓</Operator>
+			<div className="text-muted-foreground my-2 flex items-center justify-center gap-1.5">
+				<span className="text-lg">↓</span>
+				<span className="font-mono text-[10px]">
+					harmonicMean(consumerScore, 0.5 + 0.5·agentFit)
+				</span>
+			</div>
 
 			<div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2">
-				<Tile
-					label="consumerScore"
-					value={stage2?.consumerScore}
-					tooltip="0.7·linear + 0.3·geometric"
-				/>
-				<Operator>⨯</Operator>
 				<Tile
 					label="agentFit"
 					value={trace.agentFit}
@@ -60,12 +54,13 @@ export function BlendEquation({ trace, fitScore }: BlendEquationProps) {
 					value={trace.reciprocalBlend}
 					tooltip="harmonicMean(consumerScore, 0.5 + 0.5·agentFit)"
 				/>
-			</div>
-
-			<Operator className="my-2 justify-center">↓</Operator>
-
-			<div className="flex items-center justify-center">
-				<Tile label="×100" value={trace.computedScore} suffix="pts" />
+				<Operator>→</Operator>
+				<Tile
+					label="×100"
+					value={trace.computedScore}
+					suffix="pts"
+					tooltip="Blend scaled to points, before penalties and gates"
+				/>
 			</div>
 
 			{penalty && (
@@ -81,20 +76,6 @@ export function BlendEquation({ trace, fitScore }: BlendEquationProps) {
 					</div>
 				</>
 			)}
-
-			<div className="mt-3 text-center">
-				<p className="text-muted-foreground text-[10px] uppercase">
-					Final fitScore
-				</p>
-				<p
-					className={cn(
-						'font-mono text-3xl font-bold tabular-nums',
-						scoreToneClasses[fitScoreTone(fitScore)].text,
-					)}
-				>
-					{fitScore}%
-				</p>
-			</div>
 		</Card>
 	)
 }
@@ -107,7 +88,12 @@ function Operator({
 	children: React.ReactNode
 }) {
 	return (
-		<div className={cn('text-muted-foreground flex text-lg', className)}>
+		<div
+			className={cn(
+				'text-muted-foreground flex items-center text-lg',
+				className,
+			)}
+		>
 			{children}
 		</div>
 	)

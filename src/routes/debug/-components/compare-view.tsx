@@ -4,14 +4,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import type { DebugMatch } from '@/lib/matching/debug'
-import { cn } from '@/lib/utils/ui'
 import { CompareDimensionTable } from '@/routes/debug/-components/compare-dimension-table'
 import { DeltaValue } from '@/routes/debug/-components/delta-value'
+import { FitScoreBadge } from '@/routes/debug/-components/fit-score-badge'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
-import {
-	fitScoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
 
 interface CompareViewProps {
 	selected: DebugMatch
@@ -85,16 +81,11 @@ function AgentSummary({
 						)}
 					</div>
 				</div>
-				<div
-					className={cn(
-						'shrink-0 font-mono text-xl font-bold tabular-nums',
-						match.disqualified
-							? 'text-red-600 dark:text-red-400'
-							: scoreToneClasses[fitScoreTone(match.fitScore)].text,
-					)}
-				>
-					{match.fitScore}%
-				</div>
+				<FitScoreBadge
+					fitScore={match.fitScore}
+					disqualified={match.disqualified}
+					size="lg"
+				/>
 			</div>
 		</Card>
 	)

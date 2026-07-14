@@ -262,10 +262,11 @@ describe('debug matches page', () => {
 		const selected = payload.qualified[0]?.agentId
 		const page = await renderPage(payload, { selectedAgentId: selected })
 
-		await expect.element(page).toHaveTextContent('Score pipeline')
-		await expect.element(page).toHaveTextContent('Stage 0 — Hard gates')
 		await expect.element(page).toHaveTextContent('Stage 1 — Dimensions')
-		await expect.element(page).toHaveTextContent('Stage 2 — Reciprocal blend')
+		await expect.element(page).toHaveTextContent('Hard gates')
+		await expect
+			.element(page)
+			.toHaveTextContent('Score internals (pipeline + blend)')
 		await expect.element(page).toHaveTextContent('Raw data')
 		await expect.element(page).toHaveTextContent('Final fitScore')
 		await expectScreenshot(page, { name: 'debug-pair-inspector' })
@@ -277,8 +278,8 @@ describe('debug matches page', () => {
 		const page = await renderPage(payload, { selectedAgentId: selected })
 
 		await expect.element(page).toHaveTextContent('Taylor Reed')
-		await expect.element(page).toHaveTextContent('Failed gate')
-		await expect.element(page).toHaveTextContent('Disqualified')
+		await expect.element(page).toHaveTextContent('Disqualified — failed gates')
+		await expect.element(page).toHaveTextContent('Score before gate')
 		await expectScreenshot(page, { name: 'debug-disqualified' })
 	}, 60000)
 

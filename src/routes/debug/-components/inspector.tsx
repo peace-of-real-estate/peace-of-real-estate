@@ -3,21 +3,15 @@ import { GitCompareArrows, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { DebugMatch, DebugMatchesPayload } from '@/lib/matching/debug'
-import { cn } from '@/lib/utils/ui'
-import { BlendEquation } from '@/routes/debug/-components/blend-equation'
 import { CohortOverview } from '@/routes/debug/-components/cohort-overview'
 import { CompareView } from '@/routes/debug/-components/compare-view'
 import { CopyJsonButton } from '@/routes/debug/-components/copy-json-button'
 import { DimensionTable } from '@/routes/debug/-components/dimension-table'
-import { DisqualifiedCard } from '@/routes/debug/-components/disqualified-card'
 import { FallbackCard } from '@/routes/debug/-components/fallback-card'
-import { GatesRow } from '@/routes/debug/-components/gates-row'
-import { PipelineStrip } from '@/routes/debug/-components/pipeline-strip'
+import { FitScoreBadge } from '@/routes/debug/-components/fit-score-badge'
+import { GatesSection } from '@/routes/debug/-components/gates-section'
 import { RawJsonSection } from '@/routes/debug/-components/raw-json-section'
-import {
-	fitScoreTone,
-	scoreToneClasses,
-} from '@/routes/debug/-components/score-tone'
+import { ScoreInternals } from '@/routes/debug/-components/score-internals'
 
 interface InspectorProps {
 	matches: DebugMatchesPayload
@@ -96,27 +90,24 @@ export function Inspector({
 			/>
 
 			<div className="space-y-3">
-				<PipelineStrip
-					trace={selectedMatch.trace}
-					fitScore={selectedMatch.fitScore}
-				/>
 				{selectedMatch.disqualified && (
-					<DisqualifiedCard trace={selectedMatch.trace} />
+					<GatesSection trace={selectedMatch.trace} />
 				)}
-				<GatesRow trace={selectedMatch.trace} />
 				{selectedMatch.trace.mode === 'fallback' ? (
 					<FallbackCard trace={selectedMatch.trace} />
 				) : (
-					<>
-						<DimensionTable trace={selectedMatch.trace} />
-						<BlendEquation
-							trace={selectedMatch.trace}
-							fitScore={selectedMatch.fitScore}
-						/>
-					</>
+					<DimensionTable trace={selectedMatch.trace} />
 				)}
+				{!selectedMatch.disqualified && (
+					<GatesSection trace={selectedMatch.trace} />
+				)}
+				<ScoreInternals
+					trace={selectedMatch.trace}
+					fitScore={selectedMatch.fitScore}
+				/>
 				<RawJsonSection
 					sections={[
+						{ label: 'formula', value: selectedMatch.trace.formula },
 						{ label: 'score trace', value: selectedMatch.trace },
 						{ label: 'agent profile', value: selectedMatch.agentProfile },
 						{ label: 'client profile', value: matches.clientProfile },
@@ -173,21 +164,13 @@ function PairHeader({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
-				<div className="mr-1 text-right">
-					<div
-						className={cn(
-							'font-mono text-2xl font-bold tabular-nums',
-							match.disqualified
-								? 'text-red-600 dark:text-red-400'
-								: scoreToneClasses[fitScoreTone(match.fitScore)].text,
-						)}
-					>
-						{match.fitScore}%
-					</div>
-					<div className="text-muted-foreground text-[10px] uppercase">
-						{match.disqualified ? 'Disqualified' : 'Final fitScore'}
-					</div>
-				</div>
+				<FitScoreBadge
+					fitScore={match.fitScore}
+					disqualified={match.disqualified}
+					size="xl"
+					label={match.disqualified ? 'Disqualified' : 'Final fitScore'}
+					className="mr-1"
+				/>
 				<CopyJsonButton value={match} label="Copy" />
 				<Button
 					variant={pinned ? 'secondary' : 'outline'}
