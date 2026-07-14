@@ -936,6 +936,7 @@ function applyModulation(
 export function resolveDimensionWeights(
 	client: ClientProfileRow,
 	side: 'buying' | 'selling',
+	applyModulations = true,
 ): {
 	weights: Record<DimensionId, number>
 	boosted: Set<DimensionId>
@@ -950,7 +951,9 @@ export function resolveDimensionWeights(
 			(baseDimensionWeights[dimension] + rocWeights[dimension]) / 2
 	}
 
-	const { weights: modulated } = applyModulation(raw, client, side)
+	const { weights: modulated } = applyModulations
+		? applyModulation(raw, client, side)
+		: { weights: raw }
 
 	const total = Object.values(modulated).reduce(
 		(sum, weight) => sum + weight,
@@ -1057,14 +1060,32 @@ function harmonicMean(a: number, b: number): number {
 	return (2 * a * b) / (a + b)
 }
 
+/**
+ * Offline experiment knobs for scripts/compare-scoring.ts. Production callers
+ * omit this argument; every default reproduces the current pipeline exactly.
+ */
+export interface ScoringVariant {
+	/** 'linearOnly' drops the geometric term from consumerScore. */
+	blend?: 'current' | 'linearOnly'
+	/** 'multiplier' replaces harmonicMean with consumer × (0.75 + 0.25·agentFit). */
+	reciprocity?: 'harmonic' | 'multiplier'
+	/** false skips experience/stakes weight modulations. */
+	modulations?: boolean
+}
+
 export function calculateFitScore(
 	agent: AgentProfile,
 	client?: ClientProfileRow,
 	side: 'buying' | 'selling' = 'buying',
+	variant?: ScoringVariant,
 ): FitScoreResult {
 	if (!client) return calculateFallbackScore(agent, side)
 
-	const { weights, boosted } = resolveDimensionWeights(client, side)
+	const { weights, boosted } = resolveDimensionWeights(
+		client,
+		side,
+		variant?.modulations ?? true,
+	)
 
 	const results: Record<DimensionId, DimensionResult> = {
 		location: scoreLocation(client, agent),
@@ -1090,7 +1111,10 @@ export function calculateFitScore(
 		linear += weight * score
 		geometric *= Math.max(score, GEOMETRIC_FLOOR) ** weight
 	}
-	const consumerScore = LINEAR_WEIGHT * linear + GEOMETRIC_WEIGHT * geometric
+	const consumerScore =
+		variant?.blend === 'linearOnly'
+			? linear
+			: LINEAR_WEIGHT * linear + GEOMETRIC_WEIGHT * geometric
 
 	const clientRange = parseSerializedPriceRange(client.priceRange)
 	const agentBucket = AGENT_PRICE_RANGES[agent.typicalPriceRange]
@@ -1101,10 +1125,10 @@ export function calculateFitScore(
 
 	const clientTypeFit = getClientTypeFit(client, agent, side)
 	const agentFit = (centrality + clientTypeFit) / 2
-	const reciprocalBlend = harmonicMean(
-		consumerScore,
-		RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit,
-	)
+	const reciprocalBlend =
+		variant?.reciprocity === 'multiplier'
+			? consumerScore * (0.75 + 0.25 * agentFit)
+			: harmonicMean(consumerScore, RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit)
 
 	const baseFinalScore = Math.round(reciprocalBlend * 100)
 
