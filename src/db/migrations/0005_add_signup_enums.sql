@@ -50,6 +50,14 @@ CREATE TYPE "public"."best_client_type" AS ENUM ('firstTime', 'moveUp', 'relocat
 --> statement-breakpoint
 UPDATE "seller_profiles" SET "involvement_level" = 'keyDetails' WHERE "involvement_level" = 'keepMeInformed';
 --> statement-breakpoint
+UPDATE "buyer_profiles" SET "commission_comfort" = 'openOptions' WHERE "commission_comfort" = 'explain';
+--> statement-breakpoint
+UPDATE "seller_profiles" SET "commission_comfort" = 'openOptions' WHERE "commission_comfort" = 'explain';
+--> statement-breakpoint
+UPDATE "seller_profiles" SET "representation_preference" = 'broadConnections' WHERE "representation_preference" = 'access';
+--> statement-breakpoint
+UPDATE "seller_profiles" SET "representation_preference" = 'exclusiveRepresentationOnly' WHERE "representation_preference" = 'exclusive';
+--> statement-breakpoint
 ALTER TABLE "agent_profiles" DROP CONSTRAINT IF EXISTS "agent_profiles_representation_side_check";--> statement-breakpoint
 ALTER TABLE "buyer_profiles" DROP CONSTRAINT IF EXISTS "buyer_profiles_status_check";--> statement-breakpoint
 ALTER TABLE "seller_profiles" DROP CONSTRAINT IF EXISTS "seller_profiles_status_check";--> statement-breakpoint
