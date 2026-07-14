@@ -241,25 +241,17 @@ export function CityZipSelector({
 					</div>
 					{selectedZipCodes.length > 0 ? (
 						<div className="flex flex-wrap gap-1.5">
-							{selectedZipCodes.map((zipCode) => {
-								const isSelected = selectedZipCodes.includes(zipCode)
-								return (
-									<button
-										key={zipCode}
-										type="button"
-										onClick={() => toggleZipCode(zipCode)}
-										className={cn(
-											'resize-none rounded-full border px-2 py-0.5 text-[10px] font-semibold transition',
-											isSelected
-												? 'border-primary bg-primary text-primary-foreground shadow-sm'
-												: 'border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground',
-										)}
-										aria-pressed={isSelected}
-									>
-										{zipCode}
-									</button>
-								)
-							})}
+							{selectedZipCodes.map((zipCode) => (
+								<button
+									key={zipCode}
+									type="button"
+									onClick={() => toggleZipCode(zipCode)}
+									className="border-primary bg-primary text-primary-foreground rounded-full border px-2 py-0.5 text-[10px] font-semibold shadow-sm transition hover:opacity-80"
+									aria-pressed
+								>
+									{zipCode}
+								</button>
+							))}
 						</div>
 					) : null}
 					<div className="bg-muted/30 border-border overflow-hidden rounded-2xl border p-3">
@@ -274,8 +266,8 @@ export function CityZipSelector({
 									}
 								}
 								selectedZipCodes={selectedZipCodes}
+								onToggleZipCode={toggleZipCode}
 								center={centerForCity}
-								readOnly
 								className={mapHeight}
 							/>
 						)}
@@ -303,7 +295,6 @@ export type ZipCodeMapProps = {
 	selectedZipCodes: string[]
 	onToggleZipCode?: ((zipCode: string) => void) | undefined
 	center?: { latitude: number; longitude: number } | undefined
-	readOnly?: boolean | undefined
 	className?: string | undefined
 }
 
@@ -434,19 +425,32 @@ function ZipCodeMapImpl({
 	selectedZipCodes,
 	onToggleZipCode,
 	center,
-	readOnly,
 	className,
 }: ZipCodeMapProps) {
 	const mapRef = useRef<MapRef>(null)
 	const [mapLoaded, setMapLoaded] = useState(false)
+	const [hovered, setHovered] = useState<{
+		zipCode: string
+		x: number
+		y: number
+	} | null>(null)
 
 	const bounds = getBounds(boundaries.features)
+	const fitKey = bounds
+		? `${bounds.minLng},${bounds.minLat},${bounds.maxLng},${bounds.maxLat}`
+		: center
+			? `${center.longitude},${center.latitude}`
+			: ''
+	const lastFitKey = useRef('')
 
 	useEffect(() => {
-		if (!mapRef.current || !mapLoaded) return
+		const map = mapRef.current
+		if (!map || !mapLoaded) return
+		if (fitKey === '' || lastFitKey.current === fitKey) return
+		lastFitKey.current = fitKey
 
 		if (bounds) {
-			mapRef.current.fitBounds(
+			map.fitBounds(
 				[
 					[bounds.minLng, bounds.minLat],
 					[bounds.maxLng, bounds.maxLat],
@@ -454,14 +458,15 @@ function ZipCodeMapImpl({
 				{ padding: 24, duration: 0 },
 			)
 		} else if (center) {
-			mapRef.current.flyTo({
+			map.flyTo({
 				center: [center.longitude, center.latitude],
 				zoom: 10,
 				duration: 0,
 			})
 		}
-	}, [bounds, center, mapLoaded])
+	}, [bounds, center, fitKey, mapLoaded])
 
+	const hoveredZipCode = hovered ? hovered.zipCode : ''
 	const fillLayer = {
 		id: 'zip-fill',
 		type: 'fill',
@@ -475,6 +480,8 @@ function ZipCodeMapImpl({
 					false,
 				],
 				'#2563eb',
+				['==', ['get', 'ZCTA5'], hoveredZipCode],
+				'#93c5fd',
 				'#e5e7eb',
 			],
 			'fill-opacity': 0.5,
@@ -505,7 +512,18 @@ function ZipCodeMapImpl({
 		mapRef.current.getCanvas().style.cursor = 'pointer'
 	}
 
+	function handleMouseMove(event: MapLayerMouseEvent) {
+		const feature = event.features?.[0]
+		const zipCode = feature?.properties?.ZCTA5
+		if (typeof zipCode !== 'string') {
+			setHovered(null)
+			return
+		}
+		setHovered({ zipCode, x: event.point.x, y: event.point.y })
+	}
+
 	function handleMouseLeave() {
+		setHovered(null)
 		if (!mapRef.current) return
 		mapRef.current.getCanvas().style.cursor = ''
 	}
@@ -530,21 +548,17 @@ function ZipCodeMapImpl({
 				ref={mapRef}
 				mapStyle={CARTO_STYLE}
 				initialViewState={initialViewState}
-				dragPan={false}
 				dragRotate={false}
-				scrollZoom={false}
-				doubleClickZoom={false}
-				touchZoomRotate={false}
 				keyboard={false}
-				{...(readOnly ? { interactiveLayerIds: [] } : { interactiveLayerIds })}
-				{...(readOnly
-					? {}
-					: {
-							onClick: handleClick,
-							onMouseEnter: handleMouseEnter,
-							onMouseLeave: handleMouseLeave,
-						})}
-				onLoad={() => setMapLoaded(true)}
+				interactiveLayerIds={interactiveLayerIds}
+				onClick={handleClick}
+				onMouseEnter={handleMouseEnter}
+				onMouseMove={handleMouseMove}
+				onMouseLeave={handleMouseLeave}
+				onLoad={(event) => {
+					event.target.touchZoomRotate.disableRotation()
+					setMapLoaded(true)
+				}}
 				style={{ width: '100%', height: '100%' }}
 			>
 				<Source id="zip-codes" type="geojson" data={boundaries} />
@@ -552,6 +566,14 @@ function ZipCodeMapImpl({
 				<Layer {...LINE_LAYER} />
 				<Layer {...selectedLineLayer} />
 			</Map>
+			{hovered ? (
+				<div
+					className="bg-foreground text-background pointer-events-none absolute z-10 rounded-md px-2 py-1 text-xs font-semibold shadow-md"
+					style={{ left: hovered.x + 12, top: hovered.y + 12 }}
+				>
+					{hovered.zipCode}
+				</div>
+			) : null}
 		</div>
 	)
 }
