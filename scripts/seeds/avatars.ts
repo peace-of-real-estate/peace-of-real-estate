@@ -1,4 +1,8 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+	CreateBucketCommand,
+	PutObjectCommand,
+	S3Client,
+} from '@aws-sdk/client-s3'
 import { serverEnv as env } from '../../src/env.server'
 
 // =============================================================================
@@ -33,6 +37,26 @@ const HEADSHOT_URLS = [
 // =============================================================================
 
 let s3Client: S3Client | null = null
+let bucketEnsured: Promise<void> | null = null
+
+// =============================================================================
+// S3 helpers
+// =============================================================================
+
+async function ensureBucket(client: S3Client): Promise<void> {
+	try {
+		await client.send(new CreateBucketCommand({ Bucket: env.AVATAR_BUCKET }))
+	} catch (error) {
+		if (
+			error instanceof Error &&
+			(error.name === 'BucketAlreadyExists' ||
+				error.name === 'BucketAlreadyOwnedByYou')
+		) {
+			return
+		}
+		throw error
+	}
+}
 
 function canUseS3Storage(): boolean {
 	return Boolean(
@@ -98,6 +122,9 @@ export async function uploadAgentAvatar(
 	if (!canUseS3Storage()) return null
 
 	const client = getStorageClient()
+	bucketEnsured ??= ensureBucket(client)
+	await bucketEnsured
+
 	const headshotUrl =
 		HEADSHOT_URLS[hashStringToIndex(email, HEADSHOT_URLS.length)]!
 	const imageBuffer = await fetchHeadshot(headshotUrl)
