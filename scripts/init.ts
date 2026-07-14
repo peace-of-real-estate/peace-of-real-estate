@@ -5,6 +5,27 @@ import * as zipcodes from 'zipcodes'
 const BATCH_SIZE_CITIES = 1000
 const BATCH_SIZE_ZIPS = 2000
 
+// Official NYC borough ZIP ranges. Records in these ranges are ALSO added to
+// the "New York, NY" city group so the whole city shows all five boroughs,
+// while boroughs/neighborhoods stay searchable under their own city labels.
+// Careful: 110xx (except 11004-11005) and 115xx are Nassau County, not NYC.
+const NYC_ZIP_RANGES: Array<[number, number]> = [
+	[10001, 10282], // Manhattan
+	[10301, 10314], // Staten Island
+	[10451, 10475], // Bronx
+	[11004, 11005], // Queens (Glen Oaks / Floral Park border)
+	[11101, 11109], // Queens (Long Island City / Astoria)
+	[11201, 11256], // Brooklyn
+	[11351, 11499], // Queens (Flushing, Bayside, Jamaica, JFK)
+	[11691, 11697], // Queens (the Rockaways)
+]
+
+function isNycZip(zip: string): boolean {
+	const value = Number.parseInt(zip, 10)
+	if (!Number.isFinite(value)) return false
+	return NYC_ZIP_RANGES.some(([min, max]) => value >= min && value <= max)
+}
+
 async function seedCityData() {
 	const now = new Date()
 
@@ -43,6 +64,33 @@ async function seedCityData() {
 			group.lngs.push(record.longitude)
 		}
 		group.zips.push(record.zip)
+
+		if (
+			record.state === 'NY' &&
+			record.city !== 'New York' &&
+			isNycZip(record.zip)
+		) {
+			const nycKey = 'New York|NY'
+			let nycGroup = cityGroups.get(nycKey)
+			if (!nycGroup) {
+				nycGroup = {
+					city: 'New York',
+					state: 'NY',
+					lats: [],
+					lngs: [],
+					zips: [],
+				}
+				cityGroups.set(nycKey, nycGroup)
+			}
+			if (
+				typeof record.latitude === 'number' &&
+				typeof record.longitude === 'number'
+			) {
+				nycGroup.lats.push(record.latitude)
+				nycGroup.lngs.push(record.longitude)
+			}
+			nycGroup.zips.push(record.zip)
+		}
 	}
 
 	const cityRows = []
