@@ -5,6 +5,8 @@ ALTER TYPE "public"."representation_side" RENAME TO "representation_side_old";--
 CREATE TYPE "public"."representation_side" AS ENUM ('buyers', 'sellers', 'both');--> statement-breakpoint
 ALTER TABLE "agent_profiles" ALTER COLUMN "representation_side" SET DATA TYPE "public"."representation_side" USING CASE WHEN "representation_side"::text = 'buying' THEN 'buyers'::"public"."representation_side" WHEN "representation_side"::text = 'selling' THEN 'sellers'::"public"."representation_side" ELSE "representation_side"::text::"public"."representation_side" END;--> statement-breakpoint
 DROP TYPE "public"."representation_side_old";--> statement-breakpoint
+UPDATE "agent_profiles" SET "years_licensed" = NULL WHERE "years_licensed" = '';--> statement-breakpoint
+UPDATE "agent_profiles" SET "average_transactions" = NULL WHERE "average_transactions" = '';--> statement-breakpoint
 ALTER TABLE "agent_profiles" DROP CONSTRAINT IF EXISTS "agent_profiles_representation_side_check";--> statement-breakpoint
 ALTER TABLE "buyer_profiles" DROP CONSTRAINT IF EXISTS "buyer_profiles_status_check";--> statement-breakpoint
 ALTER TABLE "seller_profiles" DROP CONSTRAINT IF EXISTS "seller_profiles_status_check";--> statement-breakpoint
