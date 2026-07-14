@@ -43,6 +43,13 @@
 			"when": 1783556479146,
 			"tag": "0005_add_signup_enums",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1783765627779,
+			"tag": "0006_rename_representation_side_values",
+			"breakpoints": true
 		}
 	]
 }

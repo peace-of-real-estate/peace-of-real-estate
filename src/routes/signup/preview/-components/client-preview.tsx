@@ -1,30 +1,82 @@
 import { MapPinIcon, UserIcon } from '@phosphor-icons/react'
-import {
-	Banknote,
-	Home,
-	MessageSquare,
-	Scale,
-	Shield,
-	Star,
-	Target,
-	Zap,
-} from 'lucide-react'
 
-import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
+import {
+	AgentPreviewCard,
+	type MatchDetails,
+} from '@/routes/(dashboard)/-components/agent-preview-card'
 import { Card } from '@/components/ui/card'
-import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
-import { clientPreviewMatches } from '@/lib/matching/preview-matches'
 import {
 	buyerClientProfileSchema,
 	sellerClientProfileSchema,
 	type ClientProfile,
-} from '@/lib/matching/profile'
+} from '@/lib/profile'
 import {
-	buyerAnswerLabels,
-	getPropertyTypeLabel,
-	sellerAnswerLabels,
-	type AnswerLabelConfig,
-} from '@/lib/matching/questions'
+	getProfileSummary,
+	ProfileSummaryGrid,
+} from '@/components/profile-summary'
+
+const clientPreviewMatches: MatchDetails[] = [
+	{
+		id: 'preview-1',
+		name: 'Alex Morgan',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78704', '78745'],
+		fitScore: 97,
+		status: 'new',
+		date: 'Today',
+		experience: '12 years',
+		agency: 'PRE Partner Realty',
+		specialties: ['First-time buyers', 'Fast timelines', 'Negotiation'],
+		about: 'Calm, responsive agent focused on clear expectations.',
+		scores: {
+			'Working Style': 4.9,
+			Communication: 4.8,
+			Transparency: 4.9,
+			Fit: 5,
+		},
+	},
+	{
+		id: 'preview-2',
+		name: 'Jordan Lee',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78701', '78703'],
+		fitScore: 94,
+		status: 'new',
+		date: 'Today',
+		experience: '9 years',
+		agency: 'Urban Nest Realty',
+		specialties: ['Condos', 'Relocation', 'Offer strategy'],
+		about: 'Data-driven agent with a direct communication style.',
+		scores: {
+			'Working Style': 4.7,
+			Communication: 4.9,
+			Transparency: 4.7,
+			Fit: 4.8,
+		},
+	},
+	{
+		id: 'preview-3',
+		name: 'Sam Rivera',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78731', '78757'],
+		fitScore: 91,
+		status: 'new',
+		date: 'Today',
+		experience: '15 years',
+		agency: 'Local Key Realty',
+		specialties: ['Move-up buyers', 'Listings', 'Pricing'],
+		about: 'Experienced local advisor with strong pricing instincts.',
+		scores: {
+			'Working Style': 4.6,
+			Communication: 4.6,
+			Transparency: 4.8,
+			Fit: 4.7,
+		},
+	},
+]
 
 export function draftToClientPreviewProfile(
 	role: 'buyer' | 'seller',
@@ -61,7 +113,7 @@ export function ClientProfilePreviewCard({
 	const stateSvgPath = profile.state
 		? `/states/${profile.state}.svg`
 		: undefined
-	const summaryItems = getProfileStats(profile)
+	const summaryItems = getProfileSummary({ role: profile.role, profile })
 	const profileTitle =
 		profile.city ??
 		profile.state ??
@@ -90,25 +142,8 @@ export function ClientProfilePreviewCard({
 				</div>
 			</div>
 			{summaryItems.length > 0 ? (
-				<div className="border-border grid grid-cols-1 gap-3 border-t px-5 pt-4 pb-5 sm:grid-cols-2">
-					{summaryItems.map((item) => {
-						const Icon = statIcon(item.label)
-						return (
-							<div key={item.label} className="flex items-start gap-3">
-								<div className="text-primary bg-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
-									<Icon className="h-4 w-4" />
-								</div>
-								<div className="min-w-0 flex-1">
-									<p className="text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase">
-										{item.label}
-									</p>
-									<p className="text-foreground text-sm font-semibold">
-										{item.value}
-									</p>
-								</div>
-							</div>
-						)
-					})}
+				<div className="border-border border-t px-5 pt-4 pb-5">
+					<ProfileSummaryGrid items={summaryItems} variant="preview" />
 				</div>
 			) : null}
 		</Card>
@@ -133,69 +168,4 @@ export function ClientMatchesPreview() {
 			</div>
 		</div>
 	)
-}
-
-function statIcon(label: string) {
-	const normalized = label.toLowerCase()
-	if (normalized.includes('budget') || normalized.includes('price'))
-		return Banknote
-	if (normalized.includes('communication')) return MessageSquare
-	if (normalized.includes('involvement')) return Target
-	if (normalized.includes('exclusiv')) return Shield
-	if (normalized.includes('negotiation')) return Scale
-	if (normalized.includes('experience') || normalized.includes('buyer'))
-		return Star
-	if (normalized.includes('property') || normalized.includes('home'))
-		return Home
-	return Zap
-}
-
-function buildOptionsMap(
-	labels: Record<string, AnswerLabelConfig>,
-): Record<string, string> {
-	const optionsMap: Record<string, string> = {}
-	for (const config of Object.values(labels)) {
-		for (const [slug, label] of Object.entries(config.options)) {
-			optionsMap[slug] = label
-		}
-	}
-	return optionsMap
-}
-
-function formatAnswer(
-	value: string | string[] | null | undefined,
-	optionsMap: Record<string, string>,
-): string {
-	if (value === undefined || value === null || value === '__skipped__')
-		return 'Not answered'
-	if (Array.isArray(value))
-		return value.map((slug) => optionsMap[slug] ?? slug).join(', ')
-	return optionsMap[value] ?? value
-}
-
-function getProfileStats(profile: ClientProfile) {
-	const stats: { label: string; value: string }[] = []
-	if (profile.priceRange)
-		stats.push({
-			label: 'Budget',
-			value: formatPriceRange(parsePriceRange(profile.priceRange)),
-		})
-	if (profile.propertyTypes?.length)
-		stats.push({
-			label: 'Home Type',
-			value: profile.propertyTypes
-				.map((type) => getPropertyTypeLabel(type))
-				.join(', '),
-		})
-
-	const isBuyer = profile.role === 'buyer'
-	const labels = isBuyer ? buyerAnswerLabels : sellerAnswerLabels
-	const optionsMap = buildOptionsMap(labels)
-	for (const [id, config] of Object.entries(labels)) {
-		const value = Reflect.get(profile, id)
-		if (value === undefined || value === null || value === '__skipped__')
-			continue
-		stats.push({ label: config.label, value: formatAnswer(value, optionsMap) })
-	}
-	return stats
 }

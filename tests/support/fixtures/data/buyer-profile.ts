@@ -1,4 +1,4 @@
-import { BuyerProfile } from '@/lib/matching/profile.types'
+import type { BuyerProfile } from '@/lib/profile/types'
 
 export const mockBuyerProfile = {
 	id: 'consumer-1',

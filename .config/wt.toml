@@ -15,5 +15,8 @@ server = "wt step tether -- vp run dev -- --port {{ branch | hash_port }}"
 [pre-remove]
 compose-down = "vp run compose:down"
 
+[post-merge]
+check = "vp run check && vp run test"
+
 [list]
 url = "http://localhost:{{ branch | hash_port }}"

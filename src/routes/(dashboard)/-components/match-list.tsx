@@ -2,7 +2,7 @@ import { MapPin, Star, Clock, Users } from 'lucide-react'
 
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import type { AgentMatchData } from '@/lib/matching/scoring'
+import type { AgentMatchData } from '@/lib/matching/match.view'
 
 export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 	return (

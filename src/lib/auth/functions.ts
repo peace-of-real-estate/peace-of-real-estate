@@ -1,6 +1,6 @@
 import { redirect } from '@tanstack/react-router'
 
-import { getUserDashboardPath } from '@/lib/matching/profile'
+import { getUserDashboardPath } from '@/lib/profile'
 import { getCurrentSession } from './session'
 
 export async function redirectAuthenticatedUsers() {

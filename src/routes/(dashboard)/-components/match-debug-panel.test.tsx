@@ -4,8 +4,9 @@ import { expectScreenshot } from '@tests/support/render/screenshot'
 
 import { MatchDebugPanel } from '@/routes/(dashboard)/-components/match-debug-panel'
 import { calculateFitScore } from '@/lib/matching/scoring'
-import type { AgentMatchData, MatchDebugInfo } from '@/lib/matching/scoring'
-import type { AgentProfile, BuyerProfile } from '@/lib/matching/profile.types'
+import type { MatchDebugInfo } from '@/lib/matching/scoring'
+import type { AgentMatchData } from '@/lib/matching/match.view'
+import type { AgentProfile, BuyerProfile } from '@/lib/profile/types'
 
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
@@ -28,8 +29,8 @@ function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		billingAddress: null,
 		licenseNumberState: 'LIC-123456-MD',
 		zipCodes: ['21201', '21202'],
-		yearsLicensed: '5-10 years',
-		averageTransactions: '10-15 per year',
+		yearsLicensed: '6-10',
+		averageTransactions: '6-15',
 		employmentStatus: 'Realtor',
 		licenseProof: null,
 		usePaxWriter: true,
@@ -96,7 +97,7 @@ function makeMatch(input: {
 	agent: AgentProfile
 	client?: BuyerProfile
 }): AgentMatchData {
-	const score = calculateFitScore(input.agent, input.client, 'buying')
+	const score = calculateFitScore(input.agent, input.client, 'buyers')
 	const debug: MatchDebugInfo = {
 		rank: input.rank,
 		totalAgents: 1000,
@@ -124,40 +125,40 @@ function makeMatch(input: {
 	}
 }
 
-const matches: AgentMatchData[] = [
-	makeMatch({
-		rank: 1,
-		name: 'Avery Stone',
-		agent: makeAgent(),
-		client: buyer,
+const strongMatch = makeMatch({
+	rank: 1,
+	name: 'Avery Stone',
+	agent: makeAgent(),
+	client: buyer,
+})
+const weakMatch = makeMatch({
+	rank: 2,
+	name: 'Jordan Vale',
+	agent: makeAgent({
+		id: 'agent-fixture-2',
+		city: 'Annapolis',
+		zipCodes: ['21401'],
+		typicalPriceRange: '550000-900000',
+		bestClientTypes: ['luxury', 'investor'],
+		yearsLicensed: '0-2',
+		averageTransactions: null,
+		peacePactSigned: false,
+		eoInsuranceStatus: 'Pending',
 	}),
-	makeMatch({
-		rank: 2,
-		name: 'Jordan Vale',
-		agent: makeAgent({
-			id: 'agent-fixture-2',
-			city: 'Annapolis',
-			zipCodes: ['21401'],
-			typicalPriceRange: '550000-900000',
-			bestClientTypes: ['luxury', 'investor'],
-			yearsLicensed: 'Less than 1 year',
-			averageTransactions: null,
-			peacePactSigned: false,
-			eoInsuranceStatus: 'Pending',
-		}),
-		client: buyer,
+	client: buyer,
+})
+const fallbackMatch = makeMatch({
+	rank: 3,
+	name: 'Sam Rios (fallback)',
+	agent: makeAgent({
+		id: 'agent-fixture-3',
+		typicalPriceRange: 'legacy $250k - $500k',
+		bestClientTypes: [],
+		peacePactSigned: false,
 	}),
-	makeMatch({
-		rank: 3,
-		name: 'Sam Rios (fallback)',
-		agent: makeAgent({
-			id: 'agent-fixture-3',
-			typicalPriceRange: 'legacy $250k - $500k',
-			bestClientTypes: [],
-			peacePactSigned: false,
-		}),
-	}),
-]
+})
+
+const matches: AgentMatchData[] = [strongMatch, weakMatch, fallbackMatch]
 
 async function renderPanel(panelMatches: AgentMatchData[]) {
 	await renderComponent({
@@ -177,7 +178,9 @@ function expandRow(panel: HTMLElement, index: number) {
 	const rows = panel.querySelectorAll<HTMLDetailsElement>(
 		'[data-slot="match-debug-row"]',
 	)
-	rows[index]!.open = true
+	const row = rows[index]
+	if (!row) throw new Error(`Match row ${index} not found`)
+	row.open = true
 }
 
 describe('match debug panel', () => {
@@ -187,32 +190,32 @@ describe('match debug panel', () => {
 			name: 'collapsed-list',
 			viewport: { width: 1240, height: 700 },
 		})
-	}, 60000)
+	})
 
 	test('header and strong match trace', async () => {
-		const panel = await renderPanel([matches[0]!])
+		const panel = await renderPanel([strongMatch])
 		expandRow(panel, 0)
 		await expectScreenshot(panel, {
 			name: 'strong-match',
 			viewport: { width: 1240, height: 2300 },
 		})
-	}, 60000)
+	})
 
 	test('weak match trace with failing checks', async () => {
-		const panel = await renderPanel([matches[1]!])
+		const panel = await renderPanel([weakMatch])
 		expandRow(panel, 0)
 		await expectScreenshot(panel, {
 			name: 'weak-match',
 			viewport: { width: 1240, height: 2450 },
 		})
-	}, 60000)
+	})
 
 	test('fallback trace without client profile', async () => {
-		const panel = await renderPanel([matches[2]!])
+		const panel = await renderPanel([fallbackMatch])
 		expandRow(panel, 0)
 		await expectScreenshot(panel, {
 			name: 'fallback-match',
 			viewport: { width: 1240, height: 1400 },
 		})
-	}, 60000)
+	})
 })

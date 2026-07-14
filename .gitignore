@@ -24,7 +24,7 @@ playwright-report/
 .vitest-attachments
 html
 visual-diffs.html
-**/*-screenshot-1.png
+**/*-1.png
 e2e/.auth
 
 # Vitest failure screenshots (not baseline snapshots)

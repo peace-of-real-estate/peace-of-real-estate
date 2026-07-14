@@ -12,6 +12,6 @@ setup('authenticate with beta gate', async ({ page }) => {
 	await page.getByPlaceholder('Enter invite password').fill(password)
 	await page.getByRole('button', { name: 'Unlock Preview' }).click()
 
-	await expect(page).toHaveURL(/\//)
+	await expect(page).toHaveURL(/\/$/)
 	await page.context().storageState({ path: authFile })
 })

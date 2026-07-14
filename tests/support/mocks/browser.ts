@@ -33,6 +33,11 @@ vi.mock('@/lib/auth/functions', () => ({
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
 }))
 
+vi.mock('@/lib/auth/session', () => ({
+	getCurrentSession: () => Promise.resolve(authState.session),
+	requireUserId: () => Promise.resolve('user-1'),
+}))
+
 vi.mock('@/lib/auth/beta', () => ({
 	authenticateBeta: async () => ({ success: true }),
 	hasBetaAccess: () => true,
@@ -50,24 +55,25 @@ vi.mock('@/routes/__root', async () => {
 	}
 })
 
-vi.mock('@/lib/matching/profile', async () => {
-	const actual = await vi.importActual<typeof import('@/lib/matching/profile')>(
-		'@/lib/matching/profile',
-	)
+vi.mock('@/lib/profile', async () => {
+	const actual =
+		await vi.importActual<typeof import('@/lib/profile')>('@/lib/profile')
 	return {
 		...actual,
 		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
 		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
 		loadAgentProfile: () => Promise.resolve(null),
-		loadBuyerAgentMatches: () => Promise.resolve(mockAgentMatches),
-		loadSellerAgentMatches: () => Promise.resolve(mockAgentMatches),
-		loadAgentMatches: () => Promise.resolve(mockAgentMatches),
 		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
 		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
 		completeAgentSignup: () => Promise.resolve({ success: true }),
 		updateAgentProfile: () => Promise.resolve(),
 	}
 })
+
+vi.mock('@/lib/matching/server', () => ({
+	loadBuyerAgentMatches: () => Promise.resolve(mockAgentMatches),
+	loadSellerAgentMatches: () => Promise.resolve(mockAgentMatches),
+}))
 
 vi.mock('@/lib/geography/zip', async () => {
 	const actual = await vi.importActual<typeof import('@/lib/geography/zip')>(

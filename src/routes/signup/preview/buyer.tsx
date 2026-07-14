@@ -7,10 +7,10 @@ import {
 	draftToClientPreviewProfile,
 } from './-components/client-preview'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
-import { buyerDraftStorage } from '../(quiz)/buyer/route'
-import { createBuyerProfileFromDraft } from '@/lib/matching/profile'
-import { buyerProfileDraftSchema } from '@/lib/matching/profile.types'
-import type { ClientProfile } from '@/lib/matching/profile'
+import { buyerDraftStorage } from '../(steps)/buyer/route'
+import { createBuyerProfileFromDraft } from '@/lib/profile'
+import { buyerInsertSchema } from '@/lib/profile/types'
+import type { ClientProfile } from '@/lib/profile'
 
 export const Route = createFileRoute('/signup/preview/buyer')({
 	component: BuyerPreviewRoute,
@@ -35,9 +35,7 @@ export function BuyerPreview({ profile }: { profile: ClientProfile }) {
 			createProfile={createBuyerProfileFromDraft}
 			loadDraft={buyerDraftStorage.load}
 			validateDraft={(draft) =>
-				buyerProfileDraftSchema
-					.omit({ role: true, status: true })
-					.safeParse(draft).success
+				buyerInsertSchema.omit({ status: true }).safeParse(draft).success
 			}
 			clearDraft={buyerDraftStorage.clear}
 			panelTitle={

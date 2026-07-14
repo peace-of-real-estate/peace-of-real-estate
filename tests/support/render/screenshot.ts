@@ -54,15 +54,18 @@ function clampBodyToViewport<T>(
 	const originalHeight = body.style.height
 	const originalOverflow = body.style.overflow
 	const originalMinHeight = body.style.minHeight
+	const originalPointerEvents = body.style.pointerEvents
 
 	body.style.height = `${viewport.height}px`
 	body.style.minHeight = `${viewport.height}px`
 	body.style.overflow = 'hidden'
+	body.style.pointerEvents = 'none'
 
 	return action().finally(() => {
 		body.style.height = originalHeight
 		body.style.minHeight = originalMinHeight
 		body.style.overflow = originalOverflow
+		body.style.pointerEvents = originalPointerEvents
 	})
 }
 
@@ -86,6 +89,10 @@ export async function expectScreenshot(
 	const capture = () =>
 		expect.element(target).toMatchScreenshot(`${options.name}.png`, {
 			screenshotOptions,
+			comparatorOptions: {
+				allowedMismatchedPixelRatio: 0,
+				allowedMismatchedPixels: 0,
+			},
 			timeout: 5000,
 		})
 

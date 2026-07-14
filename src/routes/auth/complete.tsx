@@ -18,7 +18,7 @@ import {
 	type AgentDraft,
 	type BuyerDraft,
 	type SellerDraft,
-} from '@/lib/matching/profile'
+} from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 const completeSearchSchema = z.object({
@@ -75,7 +75,13 @@ function SignupCompleteRoute() {
 		hasSubmitted.current = true
 
 		if (role === 'agent') {
-			const draft = agentDraftStorage.load()
+			let draft: AgentDraft | null
+			try {
+				draft = agentDraftStorage.load()
+			} catch (error) {
+				console.error('Failed to load saved agent draft:', error)
+				draft = null
+			}
 			if (!draft) {
 				setMessage('We could not find your signup answers.')
 				void navigate({ to: '/signup/agent' })
@@ -96,7 +102,13 @@ function SignupCompleteRoute() {
 		}
 
 		if (role === 'buyer') {
-			const draft = buyerDraftStorage.load()
+			let draft: BuyerDraft | null
+			try {
+				draft = buyerDraftStorage.load()
+			} catch (error) {
+				console.error('Failed to load saved buyer draft:', error)
+				draft = null
+			}
 			if (!draft) {
 				setMessage('We could not find your quiz answers.')
 				void navigate({ to: '/signup/buyer/location' })
@@ -116,7 +128,13 @@ function SignupCompleteRoute() {
 			return
 		}
 
-		const draft = sellerDraftStorage.load()
+		let draft: SellerDraft | null
+		try {
+			draft = sellerDraftStorage.load()
+		} catch (error) {
+			console.error('Failed to load saved seller draft:', error)
+			draft = null
+		}
 		if (!draft) {
 			setMessage('We could not find your quiz answers.')
 			void navigate({ to: '/signup/seller/location' })
