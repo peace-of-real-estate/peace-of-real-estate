@@ -1,29 +1,88 @@
 import { createFileRoute, ClientOnly } from '@tanstack/react-router'
-import {
-	Banknote,
-	Briefcase,
-	Clock,
-	Home,
-	MapPin,
-	Shield,
-	Star,
-	User,
-	Zap,
-} from 'lucide-react'
+import { User } from 'lucide-react'
 import { z } from 'zod'
 
-import { AgentPreviewCard } from '@/routes/(dashboard)/-components/agent-preview-card'
+import {
+	AgentPreviewCard,
+	type MatchDetails,
+} from '@/routes/(dashboard)/-components/agent-preview-card'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 import { Card } from '@/components/ui/card'
 import {
-	agentProfileDraftSchema,
+	agentDraftSchema,
+	agentInsertSchema,
 	completeAgentSignup,
-} from '@/lib/matching/profile'
-import type { AgentDraft } from '@/lib/matching/profile'
-import { bestClientTypeLabels } from '@/lib/matching/questions'
-import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
-import { agentPreviewMatches } from '@/lib/matching/preview-matches'
-import { agentDraftStorage } from '../(quiz)/agent/route'
+} from '@/lib/profile'
+import type { AgentDraft } from '@/lib/profile'
+import { bestClientType } from '@/lib/profile'
+import {
+	getProfileSummary,
+	ProfileSummaryGrid,
+} from '@/components/profile-summary'
+import { agentDraftStorage } from '../(steps)/agent/route'
+
+const agentPreviewMatches: MatchDetails[] = [
+	{
+		id: 'preview-client-1',
+		name: 'Alex Morgan',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78704', '78745'],
+		fitScore: 97,
+		status: 'new',
+		date: 'Today',
+		experience: 'Ready now',
+		agency: 'Buyer profile',
+		specialties: ['First-time buyer', 'Fast timeline', 'Clear communication'],
+		about: 'Preview of the matched client cards agents will see.',
+		scores: {
+			'Working Style': 4.9,
+			Communication: 4.8,
+			Transparency: 4.9,
+			Fit: 5,
+		},
+	},
+	{
+		id: 'preview-client-2',
+		name: 'Jordan Lee',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78701', '78703'],
+		fitScore: 94,
+		status: 'new',
+		date: 'Today',
+		experience: 'Exploring',
+		agency: 'Seller profile',
+		specialties: ['Listing prep', 'Pricing strategy', 'Transparency'],
+		about: 'Preview of the matched client cards agents will see.',
+		scores: {
+			'Working Style': 4.7,
+			Communication: 4.9,
+			Transparency: 4.7,
+			Fit: 4.8,
+		},
+	},
+	{
+		id: 'preview-client-3',
+		name: 'Sam Rivera',
+		role: 'agent',
+		location: 'Austin, TX',
+		zipCodes: ['78731', '78757'],
+		fitScore: 91,
+		status: 'new',
+		date: 'Today',
+		experience: '3 months',
+		agency: 'Buyer profile',
+		specialties: ['Move-up buyer', 'Negotiation', 'Local expertise'],
+		about: 'Preview of the matched client cards agents will see.',
+		scores: {
+			'Working Style': 4.6,
+			Communication: 4.6,
+			Transparency: 4.8,
+			Fit: 4.7,
+		},
+	},
+]
 
 export const Route = createFileRoute('/signup/preview/agent')({
 	component: AgentPreviewRoute,
@@ -31,7 +90,7 @@ export const Route = createFileRoute('/signup/preview/agent')({
 
 function AgentPreviewRoute() {
 	const state = agentDraftStorage.load() ?? {}
-	const parsed = agentProfileDraftSchema.safeParse(state)
+	const parsed = agentInsertSchema.safeParse(state)
 	const profile = draftToPreviewProfile(parsed.success ? parsed.data : state)
 
 	return (
@@ -41,9 +100,9 @@ function AgentPreviewRoute() {
 	)
 }
 
-const agentPreviewProfileSchema = agentProfileDraftSchema.partial().extend({
+const agentPreviewProfileSchema = agentDraftSchema.extend({
 	zipCodes: z.array(z.string()).default([]),
-	bestClientTypes: z.array(z.string()).default([]),
+	bestClientTypes: z.array(z.enum(bestClientType.slugs)).default([]),
 })
 
 export type AgentPreviewProfile = z.infer<typeof agentPreviewProfileSchema>
@@ -60,9 +119,7 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 			quizPath="/signup/agent/identity"
 			createProfile={completeAgentSignup}
 			loadDraft={agentDraftStorage.load}
-			validateDraft={(draft) =>
-				agentProfileDraftSchema.omit({ role: true }).safeParse(draft).success
-			}
+			validateDraft={(draft) => agentInsertSchema.safeParse(draft).success}
 			clearDraft={agentDraftStorage.clear}
 			submitLabel="Activate profile"
 			showTerms={false}
@@ -97,103 +154,8 @@ export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 	)
 }
 
-function statIcon(label: string) {
-	const normalized = label.toLowerCase()
-	if (normalized.includes('price') || normalized.includes('budget'))
-		return Banknote
-	if (normalized.includes('side') || normalized.includes('clients'))
-		return Briefcase
-	if (normalized.includes('area') || normalized.includes('location'))
-		return MapPin
-	if (normalized.includes('license') || normalized.includes('insured'))
-		return Shield
-	if (normalized.includes('experience') || normalized.includes('years'))
-		return Star
-	if (normalized.includes('transaction') || normalized.includes('volume'))
-		return Home
-	if (normalized.includes('contact') || normalized.includes('response'))
-		return Clock
-	if (normalized.includes('brokerage') || normalized.includes('work'))
-		return Briefcase
-	return Zap
-}
-
-function getProfileStats(profile: AgentPreviewProfile) {
-	const stats: { label: string; value: string }[] = []
-
-	if (profile.typicalPriceRange) {
-		stats.push({
-			label: 'Typical price range',
-			value: formatPriceRange(parsePriceRange(profile.typicalPriceRange)),
-		})
-	}
-
-	if (profile.representationSide) {
-		const labels: Record<string, string> = {
-			buying: 'Buyer representation',
-			selling: 'Seller representation',
-			both: 'Buyers & sellers',
-		}
-		stats.push({
-			label: 'Representation',
-			value: labels[profile.representationSide] ?? profile.representationSide,
-		})
-	}
-
-	if (profile.zipCodes.length > 0) {
-		stats.push({
-			label: 'Service areas',
-			value: profile.zipCodes.slice(0, 3).join(', '),
-		})
-	}
-
-	if (profile.bestClientTypes.length > 0) {
-		stats.push({
-			label: 'Best clients',
-			value: profile.bestClientTypes
-				.map((slug) => bestClientTypeLabels[slug] ?? slug)
-				.join(', '),
-		})
-	}
-
-	if (profile.yearsLicensed) {
-		const labels: Record<string, string> = {
-			'0-2': '0-2 years',
-			'3-5': '3-5 years',
-			'6-10': '6-10 years',
-			'10+': '10+ years',
-		}
-		stats.push({
-			label: 'Experience',
-			value: labels[profile.yearsLicensed] ?? profile.yearsLicensed,
-		})
-	}
-
-	if (profile.averageTransactions) {
-		const labels: Record<string, string> = {
-			'0-5': '0-5 per year',
-			'6-15': '6-15 per year',
-			'16-30': '16-30 per year',
-			'30+': '30+ per year',
-		}
-		stats.push({
-			label: 'Transaction volume',
-			value: labels[profile.averageTransactions] ?? profile.averageTransactions,
-		})
-	}
-
-	if (profile.eoInsuranceStatus) {
-		stats.push({
-			label: 'E&O insurance',
-			value: profile.eoInsuranceStatus,
-		})
-	}
-
-	return stats
-}
-
 function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
-	const summaryItems = getProfileStats(profile)
+	const summaryItems = getProfileSummary({ role: 'agent', profile })
 	const fullName = [profile.firstName, profile.lastName]
 		.filter(Boolean)
 		.join(' ')
@@ -219,25 +181,8 @@ function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 			</div>
 
 			{summaryItems.length > 0 ? (
-				<div className="border-border grid grid-cols-1 gap-3 border-t px-5 pt-4 pb-5 sm:grid-cols-2">
-					{summaryItems.map((item) => {
-						const Icon = statIcon(item.label)
-						return (
-							<div key={item.label} className="flex items-start gap-3">
-								<div className="text-primary bg-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl">
-									<Icon className="h-4 w-4" />
-								</div>
-								<div className="min-w-0 flex-1">
-									<p className="text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase">
-										{item.label}
-									</p>
-									<p className="text-foreground text-sm font-semibold">
-										{item.value}
-									</p>
-								</div>
-							</div>
-						)
-					})}
+				<div className="border-border border-t px-5 pt-4 pb-5">
+					<ProfileSummaryGrid items={summaryItems} variant="preview" />
 				</div>
 			) : null}
 		</Card>

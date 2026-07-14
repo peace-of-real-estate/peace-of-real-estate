@@ -1,4 +1,4 @@
-import { approxLabel, buildAddress, buildPhone, pick, randInt } from './stats'
+import { buildAddress, buildPhone, pick, randInt } from './stats'
 import {
 	BROKERAGE_POOLS,
 	CITIES,
@@ -11,8 +11,6 @@ import {
 	PRICE_BY_TIER,
 	PRICE_TIERS,
 	REPRESENTATION_SIDES,
-	TRANSACTION_LABELS,
-	YEARS_LABELS,
 	type City,
 } from './mocks'
 
@@ -20,10 +18,14 @@ import { pickWeighted, sample, type WeightedOption } from './stats'
 
 import { db } from '../../../src/db/connection'
 import {
-	agentAnswerLabels,
-	optionKeys,
-} from '../../../src/lib/matching/questions'
-import type { AgentProfile } from '../../../src/lib/matching/profile.types'
+	agentQuestions,
+	averageTransactions,
+	yearsLicensed,
+	type AgentProfile,
+	type AgentWorkStyle,
+	type AverageTransactions,
+	type YearsLicensed,
+} from '../../../src/lib/profile'
 import {
 	account,
 	agentProfiles,
@@ -35,12 +37,30 @@ import {
 } from '../../../src/db/tables'
 import { uploadAgentAvatar } from '../avatars'
 
-function pickAnswer<K extends keyof typeof agentAnswerLabels>(
+const agentAnswerPickers: {
+	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>
+} = {
+	clientDescription: () =>
+		pick(agentQuestions['clientDescription'].options.slugs),
+	communicationFrequency: () =>
+		pick(agentQuestions['communicationFrequency'].options.slugs),
+	quickCommunicationChannel: () =>
+		pick(agentQuestions['quickCommunicationChannel'].options.slugs),
+	updateDeliveryMethod: () =>
+		pick(agentQuestions['updateDeliveryMethod'].options.slugs),
+	difficultDealInstinct: () =>
+		pick(agentQuestions['difficultDealInstinct'].options.slugs),
+	responseTime: () => pick(agentQuestions['responseTime'].options.slugs),
+	commissionApproach: () =>
+		pick(agentQuestions['commissionApproach'].options.slugs),
+	unrepresentedBuyerApproach: () =>
+		pick(agentQuestions['unrepresentedBuyerApproach'].options.slugs),
+}
+
+function pickAnswer<K extends keyof AgentWorkStyle>(
 	questionId: K,
-): keyof (typeof agentAnswerLabels)[K]['options'] {
-	const label = agentAnswerLabels[questionId]
-	if (!label) throw new Error(`Unknown answer key: ${String(questionId)}`)
-	return pick(optionKeys(label.options))
+): NonNullable<AgentWorkStyle[K]> {
+	return agentAnswerPickers[questionId]()
 }
 
 // Fields required to seed an agent profile. All values are generated from valid
@@ -50,8 +70,8 @@ type AgentPersona = {
 	typicalPriceRange: string
 	bestClientTypes: AgentProfile['bestClientTypes']
 	notFitFor: AgentProfile['notFitFor']
-	yearsLicensed: string
-	averageTransactions: string
+	yearsLicensed: YearsLicensed
+	averageTransactions: AverageTransactions
 	employmentStatus: string
 	clientDescription: AgentProfile['clientDescription']
 	communicationFrequency: AgentProfile['communicationFrequency']
@@ -68,8 +88,6 @@ type AgentPersona = {
 
 function generatePersona(): AgentPersona {
 	const priceTier = pickWeighted(PRICE_TIERS)
-	const years = randInt(1, 30)
-	const avgTrans = randInt(3, 60)
 	const clientTypeCount = randInt(2, 4)
 
 	return {
@@ -77,8 +95,8 @@ function generatePersona(): AgentPersona {
 		typicalPriceRange: pick(PRICE_BY_TIER[priceTier]!),
 		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
 		notFitFor: pick(NOT_FIT_FOR),
-		yearsLicensed: approxLabel(YEARS_LABELS, years),
-		averageTransactions: approxLabel(TRANSACTION_LABELS, avgTrans),
+		yearsLicensed: pick(yearsLicensed.slugs),
+		averageTransactions: pick(averageTransactions.slugs),
 		employmentStatus: pick(EMPLOYMENT_STATUSES),
 		clientDescription: pickAnswer('clientDescription'),
 		communicationFrequency: pickAnswer('communicationFrequency'),

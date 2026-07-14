@@ -273,7 +273,7 @@ export function SignupPreviewShell<TData>({
 					</div>
 				</div>
 
-				<div className="order-1 flex flex-col px-5 pt-8 pb-[calc(12rem+env(safe-area-inset-bottom))] sm:px-8 lg:order-2 lg:justify-center lg:px-12 lg:py-16 xl:px-20">
+				<div className="order-1 flex flex-col px-5 pt-8 max-lg:pb-[calc(12rem+env(safe-area-inset-bottom))] sm:px-8 lg:order-2 lg:justify-center lg:px-12 lg:py-16 xl:px-20">
 					{children}
 				</div>
 			</motion.div>

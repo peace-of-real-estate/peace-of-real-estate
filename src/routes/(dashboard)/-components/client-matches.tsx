@@ -1,19 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import {
-	ArrowRightLeft,
-	Banknote,
-	Clock,
-	Home,
-	MapPin,
-	MessageSquare,
-	Pencil,
-	Scale,
-	Shield,
-	Star,
-	Target,
-	Users,
-	Zap,
-} from 'lucide-react'
+import { ArrowRightLeft, MapPin, Pencil, Users } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { Button } from '@/components/ui/button'
@@ -25,22 +11,18 @@ import {
 import { MatchDebugPanel } from '@/routes/(dashboard)/-components/match-debug-panel'
 import { MatchList } from '@/routes/(dashboard)/-components/match-list'
 import { authClient } from '@/lib/auth/client'
+import { loadBuyerProfile, loadSellerProfile } from '@/lib/profile'
+import type { BuyerProfile, SellerProfile } from '@/lib/profile'
 import {
 	loadBuyerAgentMatches,
-	loadBuyerProfile,
 	loadSellerAgentMatches,
-	loadSellerProfile,
-} from '@/lib/matching/profile'
-import type { BuyerProfile, SellerProfile } from '@/lib/matching/profile'
-import type { AgentMatchData } from '@/lib/matching/scoring'
+} from '@/lib/matching/server'
+import type { AgentMatchData } from '@/lib/matching/match.view'
 import {
-	buyerAnswerLabels,
-	getPropertyTypeLabel,
-	sellerAnswerLabels,
-	type AnswerLabels,
-} from '@/lib/matching/questions'
-import { formatPriceRange, parsePriceRange } from '@/lib/matching/price-range'
-
+	getProfileSummary,
+	ProfileSummaryGrid,
+	type SummaryItem,
+} from '@/components/profile-summary'
 import { resolveStateCode } from '@/lib/geography/states'
 import { clientEnv } from '@/env'
 
@@ -51,7 +33,6 @@ type ClientMatchesProfile = BuyerProfile | SellerProfile
 type RoleConfig = {
 	loadProfile: () => Promise<ClientMatchesProfile | null>
 	loadMatches: () => Promise<AgentMatchData[]>
-	answerLabels: AnswerLabels
 	searchPreferencesPath:
 		| '/buyer/search-preferences'
 		| '/seller/search-preferences'
@@ -61,41 +42,13 @@ const roleConfig: Record<ClientRole, RoleConfig> = {
 	buyer: {
 		loadProfile: loadBuyerProfile,
 		loadMatches: loadBuyerAgentMatches,
-		answerLabels: buyerAnswerLabels,
 		searchPreferencesPath: '/buyer/search-preferences',
 	},
 	seller: {
 		loadProfile: loadSellerProfile,
 		loadMatches: loadSellerAgentMatches,
-		answerLabels: sellerAnswerLabels,
 		searchPreferencesPath: '/seller/search-preferences',
 	},
-}
-
-function statIcon(label: string) {
-	const normalized = label.toLowerCase()
-	if (
-		normalized.includes('budget') ||
-		normalized.includes('price') ||
-		normalized.includes('commission')
-	)
-		return Banknote
-	if (
-		normalized.includes('communication') ||
-		normalized.includes('chat') ||
-		normalized.includes('updates')
-	)
-		return MessageSquare
-	if (normalized.includes('involvement')) return Target
-	if (normalized.includes('exclusiv')) return Shield
-	if (normalized.includes('negotiation')) return Scale
-	if (normalized.includes('response')) return Clock
-	if (normalized.includes('experience') || normalized.includes('buyer'))
-		return Star
-	if (normalized.includes('property') || normalized.includes('home'))
-		return Home
-	if (normalized.includes('location')) return MapPin
-	return Zap
 }
 
 export function ClientMatches({
@@ -174,10 +127,15 @@ function PreferencesSummaryCard({
 	name?: string | null | undefined
 	state?: string | undefined
 }) {
-	const items = getPreferenceSummaryItems(
-		profile,
-		roleConfig[role].answerLabels,
-	)
+	const locationItems: SummaryItem[] = []
+	if (profile?.city) {
+		locationItems.push({ label: 'City', value: profile.city, icon: MapPin })
+	}
+	if (profile?.state) {
+		locationItems.push({ label: 'State', value: profile.state, icon: MapPin })
+	}
+	const summaryItems = getProfileSummary({ role, profile })
+	const items = [...locationItems, ...summaryItems]
 	const stateSvgFile = state ? `/states/${state}.svg` : null
 
 	return (
@@ -203,29 +161,7 @@ function PreferencesSummaryCard({
 						</div>
 					</div>
 
-					<div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-						{items.map((item) => {
-							const Icon = statIcon(item.label)
-							return (
-								<div
-									key={item.label}
-									className="flex min-w-0 items-start gap-3"
-								>
-									<div className="text-primary bg-secondary/70 mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
-										<Icon className="h-3.5 w-3.5" />
-									</div>
-									<div className="min-w-0">
-										<p className="text-muted-foreground text-[9px] font-bold tracking-[0.15em] uppercase">
-											{item.label}
-										</p>
-										<p className="truncate text-sm font-semibold">
-											{item.value}
-										</p>
-									</div>
-								</div>
-							)
-						})}
-					</div>
+					<ProfileSummaryGrid items={items} variant="dashboard" />
 				</div>
 
 				<Button asChild variant="outline" size="sm" className="shrink-0">
@@ -237,48 +173,4 @@ function PreferencesSummaryCard({
 			</div>
 		</Card>
 	)
-}
-
-function getPreferenceSummaryItems(
-	profile: ClientMatchesProfile | null | undefined,
-	answerLabels: AnswerLabels,
-) {
-	if (!profile) return []
-
-	const profileItems = [
-		profile.city ? { label: 'City', value: profile.city } : null,
-		profile.state ? { label: 'State', value: profile.state } : null,
-		profile.priceRange
-			? {
-					label: 'Budget',
-					value: formatPriceRange(parsePriceRange(profile.priceRange)),
-				}
-			: null,
-		profile.propertyTypes?.length
-			? {
-					label: 'Home Type',
-					value: profile.propertyTypes
-						.map((type) => getPropertyTypeLabel(type))
-						.join(', '),
-				}
-			: null,
-	]
-
-	const answerItems = Object.entries(answerLabels).map(([id, config]) => {
-		const answer = Reflect.get(profile, id)
-		if (Array.isArray(answer)) {
-			const value = answer
-				.map((slug: string) => config.options[slug] ?? slug)
-				.join(', ')
-			return value ? { label: config.label, value } : null
-		}
-		if (typeof answer !== 'string' || answer === '') return null
-		return { label: config.label, value: config.options[answer] ?? answer }
-	})
-
-	const items: { label: string; value: string }[] = []
-	for (const item of [...profileItems, ...answerItems]) {
-		if (item) items.push(item)
-	}
-	return items
 }

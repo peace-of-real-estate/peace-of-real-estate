@@ -11,6 +11,7 @@ export default defineConfig({
 	schema: './src/db/tables.ts',
 	out: './src/db/migrations',
 	dialect: 'postgresql',
+	casing: 'snake_case',
 	dbCredentials: {
 		url: databaseUrl,
 	},

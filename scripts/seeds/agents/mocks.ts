@@ -1,8 +1,5 @@
-import { serializePriceRange } from '../../../src/lib/matching/price-range'
-import {
-	bestClientTypeOptions,
-	optionKeys,
-} from '../../../src/lib/matching/questions'
+import { serializePriceRange } from '../../../src/lib/price-range'
+import { bestClientType } from '../../../src/lib/profile'
 import type { WeightedOption } from './stats'
 
 export const FIRST_NAMES = [
@@ -1383,11 +1380,11 @@ export const TRANSACTION_LABELS: Record<number, string> = {
 }
 
 export const REPRESENTATION_SIDES: WeightedOption<
-	'buying' | 'selling' | 'both'
+	'buyers' | 'sellers' | 'both'
 >[] = [
 	{ value: 'both', weight: 50 },
-	{ value: 'buying', weight: 30 },
-	{ value: 'selling', weight: 20 },
+	{ value: 'buyers', weight: 30 },
+	{ value: 'sellers', weight: 20 },
 ]
 
 export const PRICE_TIERS: WeightedOption<keyof typeof PRICE_BY_TIER>[] = [
@@ -1398,10 +1395,10 @@ export const PRICE_TIERS: WeightedOption<keyof typeof PRICE_BY_TIER>[] = [
 	{ value: 'investor', weight: 8 },
 ]
 
-// Slugs from bestClientTypeOptions — the format the agent signup market step
+// Slugs from bestClientType — the format the agent signup market step
 // writes to bestClientTypes. 'other' is excluded because it carries no
 // matching signal.
-export const CLIENT_TYPES = optionKeys(bestClientTypeOptions).filter(
+export const CLIENT_TYPES = bestClientType.slugs.filter(
 	(slug) => slug !== 'other',
 )
 

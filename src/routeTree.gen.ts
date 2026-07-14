@@ -30,21 +30,21 @@ import { Route as dashboardBuyerPracticeNegotiatingRouteImport } from './routes/
 import { Route as dashboardBuyerMatchesRouteImport } from './routes/(dashboard)/buyer/matches'
 import { Route as dashboardBuyerIntroductionsRouteImport } from './routes/(dashboard)/buyer/introductions'
 import { Route as dashboardAgentIntroductionsRouteImport } from './routes/(dashboard)/agent/introductions'
-import { Route as SignupquizSellerRouteRouteImport } from './routes/signup/(quiz)/seller/route'
-import { Route as SignupquizBuyerRouteRouteImport } from './routes/signup/(quiz)/buyer/route'
-import { Route as SignupquizAgentRouteRouteImport } from './routes/signup/(quiz)/agent/route'
+import { Route as SignupstepsSellerRouteRouteImport } from './routes/signup/(steps)/seller/route'
+import { Route as SignupstepsBuyerRouteRouteImport } from './routes/signup/(steps)/buyer/route'
+import { Route as SignupstepsAgentRouteRouteImport } from './routes/signup/(steps)/agent/route'
 import { Route as ApiIngestStaticSplatRouteImport } from './routes/api/ingest.static.$'
-import { Route as SignupquizSellerstep3PreferencesRouteImport } from './routes/signup/(quiz)/seller/(step-3).preferences'
-import { Route as SignupquizSellerstep2LocationRouteImport } from './routes/signup/(quiz)/seller/(step-2).location'
-import { Route as SignupquizSellerstep1HomeRouteImport } from './routes/signup/(quiz)/seller/(step-1).home'
-import { Route as SignupquizBuyerstep3PreferencesRouteImport } from './routes/signup/(quiz)/buyer/(step-3).preferences'
-import { Route as SignupquizBuyerstep2LocationRouteImport } from './routes/signup/(quiz)/buyer/(step-2).location'
-import { Route as SignupquizBuyerstep1HomeRouteImport } from './routes/signup/(quiz)/buyer/(step-1).home'
-import { Route as SignupquizAgentstep5PeacePactRouteImport } from './routes/signup/(quiz)/agent/(step-5).peace-pact'
-import { Route as SignupquizAgentstep4ComplianceRouteImport } from './routes/signup/(quiz)/agent/(step-4).compliance'
-import { Route as SignupquizAgentstep3WorkStyleRouteImport } from './routes/signup/(quiz)/agent/(step-3).work-style'
-import { Route as SignupquizAgentstep2MarketRouteImport } from './routes/signup/(quiz)/agent/(step-2).market'
-import { Route as SignupquizAgentstep1IdentityRouteImport } from './routes/signup/(quiz)/agent/(step-1).identity'
+import { Route as SignupstepsSellerstep3PreferencesRouteImport } from './routes/signup/(steps)/seller/(step-3).preferences'
+import { Route as SignupstepsSellerstep2LocationRouteImport } from './routes/signup/(steps)/seller/(step-2).location'
+import { Route as SignupstepsSellerstep1HomeRouteImport } from './routes/signup/(steps)/seller/(step-1).home'
+import { Route as SignupstepsBuyerstep3PreferencesRouteImport } from './routes/signup/(steps)/buyer/(step-3).preferences'
+import { Route as SignupstepsBuyerstep2LocationRouteImport } from './routes/signup/(steps)/buyer/(step-2).location'
+import { Route as SignupstepsBuyerstep1HomeRouteImport } from './routes/signup/(steps)/buyer/(step-1).home'
+import { Route as SignupstepsAgentstep5PeacePactRouteImport } from './routes/signup/(steps)/agent/(step-5).peace-pact'
+import { Route as SignupstepsAgentstep4ComplianceRouteImport } from './routes/signup/(steps)/agent/(step-4).compliance'
+import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/signup/(steps)/agent/(step-3).preferences'
+import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
+import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/signup/(steps)/agent/(step-1).identity'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -158,18 +158,18 @@ const dashboardAgentIntroductionsRoute =
     path: '/introductions',
     getParentRoute: () => dashboardAgentRouteRoute,
   } as any)
-const SignupquizSellerRouteRoute = SignupquizSellerRouteRouteImport.update({
-  id: '/signup/(quiz)/seller',
+const SignupstepsSellerRouteRoute = SignupstepsSellerRouteRouteImport.update({
+  id: '/signup/(steps)/seller',
   path: '/signup/seller',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupquizBuyerRouteRoute = SignupquizBuyerRouteRouteImport.update({
-  id: '/signup/(quiz)/buyer',
+const SignupstepsBuyerRouteRoute = SignupstepsBuyerRouteRouteImport.update({
+  id: '/signup/(steps)/buyer',
   path: '/signup/buyer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupquizAgentRouteRoute = SignupquizAgentRouteRouteImport.update({
-  id: '/signup/(quiz)/agent',
+const SignupstepsAgentRouteRoute = SignupstepsAgentRouteRouteImport.update({
+  id: '/signup/(steps)/agent',
   path: '/signup/agent',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -178,71 +178,71 @@ const ApiIngestStaticSplatRoute = ApiIngestStaticSplatRouteImport.update({
   path: '/api/ingest/static/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupquizSellerstep3PreferencesRoute =
-  SignupquizSellerstep3PreferencesRouteImport.update({
+const SignupstepsSellerstep3PreferencesRoute =
+  SignupstepsSellerstep3PreferencesRouteImport.update({
     id: '/(step-3)/preferences',
     path: '/preferences',
-    getParentRoute: () => SignupquizSellerRouteRoute,
+    getParentRoute: () => SignupstepsSellerRouteRoute,
   } as any)
-const SignupquizSellerstep2LocationRoute =
-  SignupquizSellerstep2LocationRouteImport.update({
+const SignupstepsSellerstep2LocationRoute =
+  SignupstepsSellerstep2LocationRouteImport.update({
     id: '/(step-2)/location',
     path: '/location',
-    getParentRoute: () => SignupquizSellerRouteRoute,
+    getParentRoute: () => SignupstepsSellerRouteRoute,
   } as any)
-const SignupquizSellerstep1HomeRoute =
-  SignupquizSellerstep1HomeRouteImport.update({
+const SignupstepsSellerstep1HomeRoute =
+  SignupstepsSellerstep1HomeRouteImport.update({
     id: '/(step-1)/home',
     path: '/home',
-    getParentRoute: () => SignupquizSellerRouteRoute,
+    getParentRoute: () => SignupstepsSellerRouteRoute,
   } as any)
-const SignupquizBuyerstep3PreferencesRoute =
-  SignupquizBuyerstep3PreferencesRouteImport.update({
+const SignupstepsBuyerstep3PreferencesRoute =
+  SignupstepsBuyerstep3PreferencesRouteImport.update({
     id: '/(step-3)/preferences',
     path: '/preferences',
-    getParentRoute: () => SignupquizBuyerRouteRoute,
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
   } as any)
-const SignupquizBuyerstep2LocationRoute =
-  SignupquizBuyerstep2LocationRouteImport.update({
+const SignupstepsBuyerstep2LocationRoute =
+  SignupstepsBuyerstep2LocationRouteImport.update({
     id: '/(step-2)/location',
     path: '/location',
-    getParentRoute: () => SignupquizBuyerRouteRoute,
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
   } as any)
-const SignupquizBuyerstep1HomeRoute =
-  SignupquizBuyerstep1HomeRouteImport.update({
+const SignupstepsBuyerstep1HomeRoute =
+  SignupstepsBuyerstep1HomeRouteImport.update({
     id: '/(step-1)/home',
     path: '/home',
-    getParentRoute: () => SignupquizBuyerRouteRoute,
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
   } as any)
-const SignupquizAgentstep5PeacePactRoute =
-  SignupquizAgentstep5PeacePactRouteImport.update({
+const SignupstepsAgentstep5PeacePactRoute =
+  SignupstepsAgentstep5PeacePactRouteImport.update({
     id: '/(step-5)/peace-pact',
     path: '/peace-pact',
-    getParentRoute: () => SignupquizAgentRouteRoute,
+    getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupquizAgentstep4ComplianceRoute =
-  SignupquizAgentstep4ComplianceRouteImport.update({
+const SignupstepsAgentstep4ComplianceRoute =
+  SignupstepsAgentstep4ComplianceRouteImport.update({
     id: '/(step-4)/compliance',
     path: '/compliance',
-    getParentRoute: () => SignupquizAgentRouteRoute,
+    getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupquizAgentstep3WorkStyleRoute =
-  SignupquizAgentstep3WorkStyleRouteImport.update({
-    id: '/(step-3)/work-style',
-    path: '/work-style',
-    getParentRoute: () => SignupquizAgentRouteRoute,
+const SignupstepsAgentstep3PreferencesRoute =
+  SignupstepsAgentstep3PreferencesRouteImport.update({
+    id: '/(step-3)/preferences',
+    path: '/preferences',
+    getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupquizAgentstep2MarketRoute =
-  SignupquizAgentstep2MarketRouteImport.update({
+const SignupstepsAgentstep2MarketRoute =
+  SignupstepsAgentstep2MarketRouteImport.update({
     id: '/(step-2)/market',
     path: '/market',
-    getParentRoute: () => SignupquizAgentRouteRoute,
+    getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupquizAgentstep1IdentityRoute =
-  SignupquizAgentstep1IdentityRouteImport.update({
+const SignupstepsAgentstep1IdentityRoute =
+  SignupstepsAgentstep1IdentityRouteImport.update({
     id: '/(step-1)/identity',
     path: '/identity',
-    getParentRoute: () => SignupquizAgentRouteRoute,
+    getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -253,9 +253,9 @@ export interface FileRoutesByFullPath {
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/login': typeof AuthLoginRoute
-  '/signup/agent': typeof SignupquizAgentRouteRouteWithChildren
-  '/signup/buyer': typeof SignupquizBuyerRouteRouteWithChildren
-  '/signup/seller': typeof SignupquizSellerRouteRouteWithChildren
+  '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
+  '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
+  '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
   '/agent/introductions': typeof dashboardAgentIntroductionsRoute
   '/buyer/introductions': typeof dashboardBuyerIntroductionsRoute
   '/buyer/matches': typeof dashboardBuyerMatchesRoute
@@ -271,17 +271,17 @@ export interface FileRoutesByFullPath {
   '/signup/preview/buyer': typeof SignupPreviewBuyerRoute
   '/signup/preview/seller': typeof SignupPreviewSellerRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
-  '/signup/agent/identity': typeof SignupquizAgentstep1IdentityRoute
-  '/signup/agent/market': typeof SignupquizAgentstep2MarketRoute
-  '/signup/agent/work-style': typeof SignupquizAgentstep3WorkStyleRoute
-  '/signup/agent/compliance': typeof SignupquizAgentstep4ComplianceRoute
-  '/signup/agent/peace-pact': typeof SignupquizAgentstep5PeacePactRoute
-  '/signup/buyer/home': typeof SignupquizBuyerstep1HomeRoute
-  '/signup/buyer/location': typeof SignupquizBuyerstep2LocationRoute
-  '/signup/buyer/preferences': typeof SignupquizBuyerstep3PreferencesRoute
-  '/signup/seller/home': typeof SignupquizSellerstep1HomeRoute
-  '/signup/seller/location': typeof SignupquizSellerstep2LocationRoute
-  '/signup/seller/preferences': typeof SignupquizSellerstep3PreferencesRoute
+  '/signup/agent/identity': typeof SignupstepsAgentstep1IdentityRoute
+  '/signup/agent/market': typeof SignupstepsAgentstep2MarketRoute
+  '/signup/agent/preferences': typeof SignupstepsAgentstep3PreferencesRoute
+  '/signup/agent/compliance': typeof SignupstepsAgentstep4ComplianceRoute
+  '/signup/agent/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
+  '/signup/buyer/home': typeof SignupstepsBuyerstep1HomeRoute
+  '/signup/buyer/location': typeof SignupstepsBuyerstep2LocationRoute
+  '/signup/buyer/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
+  '/signup/seller/home': typeof SignupstepsSellerstep1HomeRoute
+  '/signup/seller/location': typeof SignupstepsSellerstep2LocationRoute
+  '/signup/seller/preferences': typeof SignupstepsSellerstep3PreferencesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -291,9 +291,9 @@ export interface FileRoutesByTo {
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/login': typeof AuthLoginRoute
-  '/signup/agent': typeof SignupquizAgentRouteRouteWithChildren
-  '/signup/buyer': typeof SignupquizBuyerRouteRouteWithChildren
-  '/signup/seller': typeof SignupquizSellerRouteRouteWithChildren
+  '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
+  '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
+  '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
   '/agent/introductions': typeof dashboardAgentIntroductionsRoute
   '/buyer/introductions': typeof dashboardBuyerIntroductionsRoute
   '/buyer/matches': typeof dashboardBuyerMatchesRoute
@@ -309,17 +309,17 @@ export interface FileRoutesByTo {
   '/signup/preview/buyer': typeof SignupPreviewBuyerRoute
   '/signup/preview/seller': typeof SignupPreviewSellerRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
-  '/signup/agent/identity': typeof SignupquizAgentstep1IdentityRoute
-  '/signup/agent/market': typeof SignupquizAgentstep2MarketRoute
-  '/signup/agent/work-style': typeof SignupquizAgentstep3WorkStyleRoute
-  '/signup/agent/compliance': typeof SignupquizAgentstep4ComplianceRoute
-  '/signup/agent/peace-pact': typeof SignupquizAgentstep5PeacePactRoute
-  '/signup/buyer/home': typeof SignupquizBuyerstep1HomeRoute
-  '/signup/buyer/location': typeof SignupquizBuyerstep2LocationRoute
-  '/signup/buyer/preferences': typeof SignupquizBuyerstep3PreferencesRoute
-  '/signup/seller/home': typeof SignupquizSellerstep1HomeRoute
-  '/signup/seller/location': typeof SignupquizSellerstep2LocationRoute
-  '/signup/seller/preferences': typeof SignupquizSellerstep3PreferencesRoute
+  '/signup/agent/identity': typeof SignupstepsAgentstep1IdentityRoute
+  '/signup/agent/market': typeof SignupstepsAgentstep2MarketRoute
+  '/signup/agent/preferences': typeof SignupstepsAgentstep3PreferencesRoute
+  '/signup/agent/compliance': typeof SignupstepsAgentstep4ComplianceRoute
+  '/signup/agent/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
+  '/signup/buyer/home': typeof SignupstepsBuyerstep1HomeRoute
+  '/signup/buyer/location': typeof SignupstepsBuyerstep2LocationRoute
+  '/signup/buyer/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
+  '/signup/seller/home': typeof SignupstepsSellerstep1HomeRoute
+  '/signup/seller/location': typeof SignupstepsSellerstep2LocationRoute
+  '/signup/seller/preferences': typeof SignupstepsSellerstep3PreferencesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -330,9 +330,9 @@ export interface FileRoutesById {
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/login': typeof AuthLoginRoute
-  '/signup/(quiz)/agent': typeof SignupquizAgentRouteRouteWithChildren
-  '/signup/(quiz)/buyer': typeof SignupquizBuyerRouteRouteWithChildren
-  '/signup/(quiz)/seller': typeof SignupquizSellerRouteRouteWithChildren
+  '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
+  '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
+  '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
   '/(dashboard)/agent/introductions': typeof dashboardAgentIntroductionsRoute
   '/(dashboard)/buyer/introductions': typeof dashboardBuyerIntroductionsRoute
   '/(dashboard)/buyer/matches': typeof dashboardBuyerMatchesRoute
@@ -348,17 +348,17 @@ export interface FileRoutesById {
   '/signup/preview/buyer': typeof SignupPreviewBuyerRoute
   '/signup/preview/seller': typeof SignupPreviewSellerRoute
   '/api/ingest/static/$': typeof ApiIngestStaticSplatRoute
-  '/signup/(quiz)/agent/(step-1)/identity': typeof SignupquizAgentstep1IdentityRoute
-  '/signup/(quiz)/agent/(step-2)/market': typeof SignupquizAgentstep2MarketRoute
-  '/signup/(quiz)/agent/(step-3)/work-style': typeof SignupquizAgentstep3WorkStyleRoute
-  '/signup/(quiz)/agent/(step-4)/compliance': typeof SignupquizAgentstep4ComplianceRoute
-  '/signup/(quiz)/agent/(step-5)/peace-pact': typeof SignupquizAgentstep5PeacePactRoute
-  '/signup/(quiz)/buyer/(step-1)/home': typeof SignupquizBuyerstep1HomeRoute
-  '/signup/(quiz)/buyer/(step-2)/location': typeof SignupquizBuyerstep2LocationRoute
-  '/signup/(quiz)/buyer/(step-3)/preferences': typeof SignupquizBuyerstep3PreferencesRoute
-  '/signup/(quiz)/seller/(step-1)/home': typeof SignupquizSellerstep1HomeRoute
-  '/signup/(quiz)/seller/(step-2)/location': typeof SignupquizSellerstep2LocationRoute
-  '/signup/(quiz)/seller/(step-3)/preferences': typeof SignupquizSellerstep3PreferencesRoute
+  '/signup/(steps)/agent/(step-1)/identity': typeof SignupstepsAgentstep1IdentityRoute
+  '/signup/(steps)/agent/(step-2)/market': typeof SignupstepsAgentstep2MarketRoute
+  '/signup/(steps)/agent/(step-3)/preferences': typeof SignupstepsAgentstep3PreferencesRoute
+  '/signup/(steps)/agent/(step-4)/compliance': typeof SignupstepsAgentstep4ComplianceRoute
+  '/signup/(steps)/agent/(step-5)/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
+  '/signup/(steps)/buyer/(step-1)/home': typeof SignupstepsBuyerstep1HomeRoute
+  '/signup/(steps)/buyer/(step-2)/location': typeof SignupstepsBuyerstep2LocationRoute
+  '/signup/(steps)/buyer/(step-3)/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
+  '/signup/(steps)/seller/(step-1)/home': typeof SignupstepsSellerstep1HomeRoute
+  '/signup/(steps)/seller/(step-2)/location': typeof SignupstepsSellerstep2LocationRoute
+  '/signup/(steps)/seller/(step-3)/preferences': typeof SignupstepsSellerstep3PreferencesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -390,7 +390,7 @@ export interface FileRouteTypes {
     | '/api/ingest/static/$'
     | '/signup/agent/identity'
     | '/signup/agent/market'
-    | '/signup/agent/work-style'
+    | '/signup/agent/preferences'
     | '/signup/agent/compliance'
     | '/signup/agent/peace-pact'
     | '/signup/buyer/home'
@@ -428,7 +428,7 @@ export interface FileRouteTypes {
     | '/api/ingest/static/$'
     | '/signup/agent/identity'
     | '/signup/agent/market'
-    | '/signup/agent/work-style'
+    | '/signup/agent/preferences'
     | '/signup/agent/compliance'
     | '/signup/agent/peace-pact'
     | '/signup/buyer/home'
@@ -446,9 +446,9 @@ export interface FileRouteTypes {
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/login'
-    | '/signup/(quiz)/agent'
-    | '/signup/(quiz)/buyer'
-    | '/signup/(quiz)/seller'
+    | '/signup/(steps)/agent'
+    | '/signup/(steps)/buyer'
+    | '/signup/(steps)/seller'
     | '/(dashboard)/agent/introductions'
     | '/(dashboard)/buyer/introductions'
     | '/(dashboard)/buyer/matches'
@@ -464,17 +464,17 @@ export interface FileRouteTypes {
     | '/signup/preview/buyer'
     | '/signup/preview/seller'
     | '/api/ingest/static/$'
-    | '/signup/(quiz)/agent/(step-1)/identity'
-    | '/signup/(quiz)/agent/(step-2)/market'
-    | '/signup/(quiz)/agent/(step-3)/work-style'
-    | '/signup/(quiz)/agent/(step-4)/compliance'
-    | '/signup/(quiz)/agent/(step-5)/peace-pact'
-    | '/signup/(quiz)/buyer/(step-1)/home'
-    | '/signup/(quiz)/buyer/(step-2)/location'
-    | '/signup/(quiz)/buyer/(step-3)/preferences'
-    | '/signup/(quiz)/seller/(step-1)/home'
-    | '/signup/(quiz)/seller/(step-2)/location'
-    | '/signup/(quiz)/seller/(step-3)/preferences'
+    | '/signup/(steps)/agent/(step-1)/identity'
+    | '/signup/(steps)/agent/(step-2)/market'
+    | '/signup/(steps)/agent/(step-3)/preferences'
+    | '/signup/(steps)/agent/(step-4)/compliance'
+    | '/signup/(steps)/agent/(step-5)/peace-pact'
+    | '/signup/(steps)/buyer/(step-1)/home'
+    | '/signup/(steps)/buyer/(step-2)/location'
+    | '/signup/(steps)/buyer/(step-3)/preferences'
+    | '/signup/(steps)/seller/(step-1)/home'
+    | '/signup/(steps)/seller/(step-2)/location'
+    | '/signup/(steps)/seller/(step-3)/preferences'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -485,9 +485,9 @@ export interface RootRouteChildren {
   AuthBetaRoute: typeof AuthBetaRoute
   AuthCompleteRoute: typeof AuthCompleteRoute
   AuthLoginRoute: typeof AuthLoginRoute
-  SignupquizAgentRouteRoute: typeof SignupquizAgentRouteRouteWithChildren
-  SignupquizBuyerRouteRoute: typeof SignupquizBuyerRouteRouteWithChildren
-  SignupquizSellerRouteRoute: typeof SignupquizSellerRouteRouteWithChildren
+  SignupstepsAgentRouteRoute: typeof SignupstepsAgentRouteRouteWithChildren
+  SignupstepsBuyerRouteRoute: typeof SignupstepsBuyerRouteRouteWithChildren
+  SignupstepsSellerRouteRoute: typeof SignupstepsSellerRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiIngestSplatRoute: typeof ApiIngestSplatRoute
   SignupPreviewAgentRoute: typeof SignupPreviewAgentRoute
@@ -645,25 +645,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardAgentIntroductionsRouteImport
       parentRoute: typeof dashboardAgentRouteRoute
     }
-    '/signup/(quiz)/seller': {
-      id: '/signup/(quiz)/seller'
+    '/signup/(steps)/seller': {
+      id: '/signup/(steps)/seller'
       path: '/signup/seller'
       fullPath: '/signup/seller'
-      preLoaderRoute: typeof SignupquizSellerRouteRouteImport
+      preLoaderRoute: typeof SignupstepsSellerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/(quiz)/buyer': {
-      id: '/signup/(quiz)/buyer'
+    '/signup/(steps)/buyer': {
+      id: '/signup/(steps)/buyer'
       path: '/signup/buyer'
       fullPath: '/signup/buyer'
-      preLoaderRoute: typeof SignupquizBuyerRouteRouteImport
+      preLoaderRoute: typeof SignupstepsBuyerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/(quiz)/agent': {
-      id: '/signup/(quiz)/agent'
+    '/signup/(steps)/agent': {
+      id: '/signup/(steps)/agent'
       path: '/signup/agent'
       fullPath: '/signup/agent'
-      preLoaderRoute: typeof SignupquizAgentRouteRouteImport
+      preLoaderRoute: typeof SignupstepsAgentRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ingest/static/$': {
@@ -673,82 +673,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIngestStaticSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/(quiz)/seller/(step-3)/preferences': {
-      id: '/signup/(quiz)/seller/(step-3)/preferences'
+    '/signup/(steps)/seller/(step-3)/preferences': {
+      id: '/signup/(steps)/seller/(step-3)/preferences'
       path: '/preferences'
       fullPath: '/signup/seller/preferences'
-      preLoaderRoute: typeof SignupquizSellerstep3PreferencesRouteImport
-      parentRoute: typeof SignupquizSellerRouteRoute
+      preLoaderRoute: typeof SignupstepsSellerstep3PreferencesRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
     }
-    '/signup/(quiz)/seller/(step-2)/location': {
-      id: '/signup/(quiz)/seller/(step-2)/location'
+    '/signup/(steps)/seller/(step-2)/location': {
+      id: '/signup/(steps)/seller/(step-2)/location'
       path: '/location'
       fullPath: '/signup/seller/location'
-      preLoaderRoute: typeof SignupquizSellerstep2LocationRouteImport
-      parentRoute: typeof SignupquizSellerRouteRoute
+      preLoaderRoute: typeof SignupstepsSellerstep2LocationRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
     }
-    '/signup/(quiz)/seller/(step-1)/home': {
-      id: '/signup/(quiz)/seller/(step-1)/home'
+    '/signup/(steps)/seller/(step-1)/home': {
+      id: '/signup/(steps)/seller/(step-1)/home'
       path: '/home'
       fullPath: '/signup/seller/home'
-      preLoaderRoute: typeof SignupquizSellerstep1HomeRouteImport
-      parentRoute: typeof SignupquizSellerRouteRoute
+      preLoaderRoute: typeof SignupstepsSellerstep1HomeRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
     }
-    '/signup/(quiz)/buyer/(step-3)/preferences': {
-      id: '/signup/(quiz)/buyer/(step-3)/preferences'
+    '/signup/(steps)/buyer/(step-3)/preferences': {
+      id: '/signup/(steps)/buyer/(step-3)/preferences'
       path: '/preferences'
       fullPath: '/signup/buyer/preferences'
-      preLoaderRoute: typeof SignupquizBuyerstep3PreferencesRouteImport
-      parentRoute: typeof SignupquizBuyerRouteRoute
+      preLoaderRoute: typeof SignupstepsBuyerstep3PreferencesRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
     }
-    '/signup/(quiz)/buyer/(step-2)/location': {
-      id: '/signup/(quiz)/buyer/(step-2)/location'
+    '/signup/(steps)/buyer/(step-2)/location': {
+      id: '/signup/(steps)/buyer/(step-2)/location'
       path: '/location'
       fullPath: '/signup/buyer/location'
-      preLoaderRoute: typeof SignupquizBuyerstep2LocationRouteImport
-      parentRoute: typeof SignupquizBuyerRouteRoute
+      preLoaderRoute: typeof SignupstepsBuyerstep2LocationRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
     }
-    '/signup/(quiz)/buyer/(step-1)/home': {
-      id: '/signup/(quiz)/buyer/(step-1)/home'
+    '/signup/(steps)/buyer/(step-1)/home': {
+      id: '/signup/(steps)/buyer/(step-1)/home'
       path: '/home'
       fullPath: '/signup/buyer/home'
-      preLoaderRoute: typeof SignupquizBuyerstep1HomeRouteImport
-      parentRoute: typeof SignupquizBuyerRouteRoute
+      preLoaderRoute: typeof SignupstepsBuyerstep1HomeRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
     }
-    '/signup/(quiz)/agent/(step-5)/peace-pact': {
-      id: '/signup/(quiz)/agent/(step-5)/peace-pact'
+    '/signup/(steps)/agent/(step-5)/peace-pact': {
+      id: '/signup/(steps)/agent/(step-5)/peace-pact'
       path: '/peace-pact'
       fullPath: '/signup/agent/peace-pact'
-      preLoaderRoute: typeof SignupquizAgentstep5PeacePactRouteImport
-      parentRoute: typeof SignupquizAgentRouteRoute
+      preLoaderRoute: typeof SignupstepsAgentstep5PeacePactRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(quiz)/agent/(step-4)/compliance': {
-      id: '/signup/(quiz)/agent/(step-4)/compliance'
+    '/signup/(steps)/agent/(step-4)/compliance': {
+      id: '/signup/(steps)/agent/(step-4)/compliance'
       path: '/compliance'
       fullPath: '/signup/agent/compliance'
-      preLoaderRoute: typeof SignupquizAgentstep4ComplianceRouteImport
-      parentRoute: typeof SignupquizAgentRouteRoute
+      preLoaderRoute: typeof SignupstepsAgentstep4ComplianceRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(quiz)/agent/(step-3)/work-style': {
-      id: '/signup/(quiz)/agent/(step-3)/work-style'
-      path: '/work-style'
-      fullPath: '/signup/agent/work-style'
-      preLoaderRoute: typeof SignupquizAgentstep3WorkStyleRouteImport
-      parentRoute: typeof SignupquizAgentRouteRoute
+    '/signup/(steps)/agent/(step-3)/preferences': {
+      id: '/signup/(steps)/agent/(step-3)/preferences'
+      path: '/preferences'
+      fullPath: '/signup/agent/preferences'
+      preLoaderRoute: typeof SignupstepsAgentstep3PreferencesRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(quiz)/agent/(step-2)/market': {
-      id: '/signup/(quiz)/agent/(step-2)/market'
+    '/signup/(steps)/agent/(step-2)/market': {
+      id: '/signup/(steps)/agent/(step-2)/market'
       path: '/market'
       fullPath: '/signup/agent/market'
-      preLoaderRoute: typeof SignupquizAgentstep2MarketRouteImport
-      parentRoute: typeof SignupquizAgentRouteRoute
+      preLoaderRoute: typeof SignupstepsAgentstep2MarketRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(quiz)/agent/(step-1)/identity': {
-      id: '/signup/(quiz)/agent/(step-1)/identity'
+    '/signup/(steps)/agent/(step-1)/identity': {
+      id: '/signup/(steps)/agent/(step-1)/identity'
       path: '/identity'
       fullPath: '/signup/agent/identity'
-      preLoaderRoute: typeof SignupquizAgentstep1IdentityRouteImport
-      parentRoute: typeof SignupquizAgentRouteRoute
+      preLoaderRoute: typeof SignupstepsAgentstep1IdentityRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
     }
   }
 }
@@ -800,55 +800,61 @@ const dashboardSellerRouteRouteChildren: dashboardSellerRouteRouteChildren = {
 const dashboardSellerRouteRouteWithChildren =
   dashboardSellerRouteRoute._addFileChildren(dashboardSellerRouteRouteChildren)
 
-interface SignupquizAgentRouteRouteChildren {
-  SignupquizAgentstep1IdentityRoute: typeof SignupquizAgentstep1IdentityRoute
-  SignupquizAgentstep2MarketRoute: typeof SignupquizAgentstep2MarketRoute
-  SignupquizAgentstep3WorkStyleRoute: typeof SignupquizAgentstep3WorkStyleRoute
-  SignupquizAgentstep4ComplianceRoute: typeof SignupquizAgentstep4ComplianceRoute
-  SignupquizAgentstep5PeacePactRoute: typeof SignupquizAgentstep5PeacePactRoute
+interface SignupstepsAgentRouteRouteChildren {
+  SignupstepsAgentstep1IdentityRoute: typeof SignupstepsAgentstep1IdentityRoute
+  SignupstepsAgentstep2MarketRoute: typeof SignupstepsAgentstep2MarketRoute
+  SignupstepsAgentstep3PreferencesRoute: typeof SignupstepsAgentstep3PreferencesRoute
+  SignupstepsAgentstep4ComplianceRoute: typeof SignupstepsAgentstep4ComplianceRoute
+  SignupstepsAgentstep5PeacePactRoute: typeof SignupstepsAgentstep5PeacePactRoute
 }
 
-const SignupquizAgentRouteRouteChildren: SignupquizAgentRouteRouteChildren = {
-  SignupquizAgentstep1IdentityRoute: SignupquizAgentstep1IdentityRoute,
-  SignupquizAgentstep2MarketRoute: SignupquizAgentstep2MarketRoute,
-  SignupquizAgentstep3WorkStyleRoute: SignupquizAgentstep3WorkStyleRoute,
-  SignupquizAgentstep4ComplianceRoute: SignupquizAgentstep4ComplianceRoute,
-  SignupquizAgentstep5PeacePactRoute: SignupquizAgentstep5PeacePactRoute,
+const SignupstepsAgentRouteRouteChildren: SignupstepsAgentRouteRouteChildren = {
+  SignupstepsAgentstep1IdentityRoute: SignupstepsAgentstep1IdentityRoute,
+  SignupstepsAgentstep2MarketRoute: SignupstepsAgentstep2MarketRoute,
+  SignupstepsAgentstep3PreferencesRoute: SignupstepsAgentstep3PreferencesRoute,
+  SignupstepsAgentstep4ComplianceRoute: SignupstepsAgentstep4ComplianceRoute,
+  SignupstepsAgentstep5PeacePactRoute: SignupstepsAgentstep5PeacePactRoute,
 }
 
-const SignupquizAgentRouteRouteWithChildren =
-  SignupquizAgentRouteRoute._addFileChildren(SignupquizAgentRouteRouteChildren)
+const SignupstepsAgentRouteRouteWithChildren =
+  SignupstepsAgentRouteRoute._addFileChildren(
+    SignupstepsAgentRouteRouteChildren,
+  )
 
-interface SignupquizBuyerRouteRouteChildren {
-  SignupquizBuyerstep1HomeRoute: typeof SignupquizBuyerstep1HomeRoute
-  SignupquizBuyerstep2LocationRoute: typeof SignupquizBuyerstep2LocationRoute
-  SignupquizBuyerstep3PreferencesRoute: typeof SignupquizBuyerstep3PreferencesRoute
+interface SignupstepsBuyerRouteRouteChildren {
+  SignupstepsBuyerstep1HomeRoute: typeof SignupstepsBuyerstep1HomeRoute
+  SignupstepsBuyerstep2LocationRoute: typeof SignupstepsBuyerstep2LocationRoute
+  SignupstepsBuyerstep3PreferencesRoute: typeof SignupstepsBuyerstep3PreferencesRoute
 }
 
-const SignupquizBuyerRouteRouteChildren: SignupquizBuyerRouteRouteChildren = {
-  SignupquizBuyerstep1HomeRoute: SignupquizBuyerstep1HomeRoute,
-  SignupquizBuyerstep2LocationRoute: SignupquizBuyerstep2LocationRoute,
-  SignupquizBuyerstep3PreferencesRoute: SignupquizBuyerstep3PreferencesRoute,
+const SignupstepsBuyerRouteRouteChildren: SignupstepsBuyerRouteRouteChildren = {
+  SignupstepsBuyerstep1HomeRoute: SignupstepsBuyerstep1HomeRoute,
+  SignupstepsBuyerstep2LocationRoute: SignupstepsBuyerstep2LocationRoute,
+  SignupstepsBuyerstep3PreferencesRoute: SignupstepsBuyerstep3PreferencesRoute,
 }
 
-const SignupquizBuyerRouteRouteWithChildren =
-  SignupquizBuyerRouteRoute._addFileChildren(SignupquizBuyerRouteRouteChildren)
+const SignupstepsBuyerRouteRouteWithChildren =
+  SignupstepsBuyerRouteRoute._addFileChildren(
+    SignupstepsBuyerRouteRouteChildren,
+  )
 
-interface SignupquizSellerRouteRouteChildren {
-  SignupquizSellerstep1HomeRoute: typeof SignupquizSellerstep1HomeRoute
-  SignupquizSellerstep2LocationRoute: typeof SignupquizSellerstep2LocationRoute
-  SignupquizSellerstep3PreferencesRoute: typeof SignupquizSellerstep3PreferencesRoute
+interface SignupstepsSellerRouteRouteChildren {
+  SignupstepsSellerstep1HomeRoute: typeof SignupstepsSellerstep1HomeRoute
+  SignupstepsSellerstep2LocationRoute: typeof SignupstepsSellerstep2LocationRoute
+  SignupstepsSellerstep3PreferencesRoute: typeof SignupstepsSellerstep3PreferencesRoute
 }
 
-const SignupquizSellerRouteRouteChildren: SignupquizSellerRouteRouteChildren = {
-  SignupquizSellerstep1HomeRoute: SignupquizSellerstep1HomeRoute,
-  SignupquizSellerstep2LocationRoute: SignupquizSellerstep2LocationRoute,
-  SignupquizSellerstep3PreferencesRoute: SignupquizSellerstep3PreferencesRoute,
-}
+const SignupstepsSellerRouteRouteChildren: SignupstepsSellerRouteRouteChildren =
+  {
+    SignupstepsSellerstep1HomeRoute: SignupstepsSellerstep1HomeRoute,
+    SignupstepsSellerstep2LocationRoute: SignupstepsSellerstep2LocationRoute,
+    SignupstepsSellerstep3PreferencesRoute:
+      SignupstepsSellerstep3PreferencesRoute,
+  }
 
-const SignupquizSellerRouteRouteWithChildren =
-  SignupquizSellerRouteRoute._addFileChildren(
-    SignupquizSellerRouteRouteChildren,
+const SignupstepsSellerRouteRouteWithChildren =
+  SignupstepsSellerRouteRoute._addFileChildren(
+    SignupstepsSellerRouteRouteChildren,
   )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -859,9 +865,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthBetaRoute: AuthBetaRoute,
   AuthCompleteRoute: AuthCompleteRoute,
   AuthLoginRoute: AuthLoginRoute,
-  SignupquizAgentRouteRoute: SignupquizAgentRouteRouteWithChildren,
-  SignupquizBuyerRouteRoute: SignupquizBuyerRouteRouteWithChildren,
-  SignupquizSellerRouteRoute: SignupquizSellerRouteRouteWithChildren,
+  SignupstepsAgentRouteRoute: SignupstepsAgentRouteRouteWithChildren,
+  SignupstepsBuyerRouteRoute: SignupstepsBuyerRouteRouteWithChildren,
+  SignupstepsSellerRouteRoute: SignupstepsSellerRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiIngestSplatRoute: ApiIngestSplatRoute,
   SignupPreviewAgentRoute: SignupPreviewAgentRoute,

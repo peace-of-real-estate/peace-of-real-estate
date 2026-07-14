@@ -5,17 +5,16 @@ export function readLocalStorage<T>(
 	schema: z.ZodType<T>,
 ): T | null {
 	if (typeof window === 'undefined') return null
-	try {
-		const raw = window.localStorage.getItem(key)
-		if (!raw) return null
-		const parsed: unknown = JSON.parse(raw)
-		if (parsed && typeof parsed === 'object') {
-			return schema.parse(parsed)
-		}
-		return null
-	} catch {
-		return null
+	const raw = window.localStorage.getItem(key)
+	if (!raw) return null
+	const parsed: unknown = JSON.parse(raw)
+	const result = schema.safeParse(parsed)
+	if (!result.success) {
+		throw new Error(
+			`Stored draft for ${key} is invalid and was discarded: ${result.error.message}`,
+		)
 	}
+	return result.data
 }
 
 export function writeLocalStorage(key: string, value: unknown) {
