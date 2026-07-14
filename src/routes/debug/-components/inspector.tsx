@@ -181,6 +181,7 @@ function PairHeader({
 				<FitScoreBadge
 					fitScore={match.fitScore}
 					disqualified={match.disqualified}
+					computedScore={match.trace.computedScore}
 					size="xl"
 					label={match.disqualified ? 'Disqualified' : 'Final fitScore'}
 					className="mr-1"

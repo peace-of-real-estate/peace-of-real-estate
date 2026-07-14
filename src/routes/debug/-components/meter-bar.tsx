@@ -4,10 +4,12 @@ import {
 	scoreToneClasses,
 } from '@/routes/debug/-components/score-tone'
 
+type MeterTone = ScoreTone | 'primary' | 'muted'
+
 interface MeterBarProps {
 	/** Fill fraction, 0–1. Ignored when `range` is set. */
 	value?: number
-	tone?: ScoreTone | 'primary'
+	tone?: MeterTone
 	/** Track width as a % of the row, so track length can encode a second quantity (e.g. weight). */
 	trackPct?: number
 	/** Range variant: a min–max band with a marker tick instead of a fill. All values 0–1. */
@@ -15,8 +17,10 @@ interface MeterBarProps {
 	className?: string
 }
 
-function fillClass(tone: ScoreTone | 'primary'): string {
-	return tone === 'primary' ? 'bg-primary' : scoreToneClasses[tone].solid
+function fillClass(tone: MeterTone): string {
+	if (tone === 'primary') return 'bg-primary'
+	if (tone === 'muted') return 'bg-muted-foreground/40'
+	return scoreToneClasses[tone].solid
 }
 
 export function MeterBar({

@@ -281,6 +281,7 @@ describe('debug matches page', () => {
 		await expect.element(page).toHaveTextContent('Taylor Reed')
 		await expect.element(page).toHaveTextContent('Disqualified — failed gates')
 		await expect.element(page).toHaveTextContent('Score before gate')
+		await expect.element(page).toHaveTextContent(/would be \d+%/)
 		await expectScreenshot(page, { name: 'debug-disqualified' })
 	}, 60000)
 

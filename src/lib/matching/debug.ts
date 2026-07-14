@@ -98,19 +98,22 @@ export function buildDebugPayload(
 		clientProfile.id,
 	).map(({ item, ...ranks }) => scoredAgentToDebugMatch(item, ranks, false))
 
-	const disqualifiedOut: DebugMatch[] = disqualified.map((item, index) =>
-		scoredAgentToDebugMatch(
-			item,
-			{
-				displayRank: qualified.length + index + 1,
-				preShuffleRank: qualified.length + index + 1,
-				bandIndex: -1,
-				bandSize: 1,
-				bandOffset: 0,
-			},
-			true,
-		),
-	)
+	// Rank disqualified agents by their would-be score so the rail is scannable.
+	const disqualifiedOut: DebugMatch[] = [...disqualified]
+		.sort((a, b) => b.score.trace.computedScore - a.score.trace.computedScore)
+		.map((item, index) =>
+			scoredAgentToDebugMatch(
+				item,
+				{
+					displayRank: qualified.length + index + 1,
+					preShuffleRank: qualified.length + index + 1,
+					bandIndex: -1,
+					bandSize: 1,
+					bandOffset: 0,
+				},
+				true,
+			),
+		)
 
 	return {
 		side,

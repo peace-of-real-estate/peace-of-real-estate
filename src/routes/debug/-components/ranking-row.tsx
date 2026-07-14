@@ -44,6 +44,7 @@ export function RankingRow({
 			<FitScoreBadge
 				fitScore={match.fitScore}
 				disqualified={disqualified}
+				computedScore={match.trace.computedScore}
 				size="sm"
 			/>
 
