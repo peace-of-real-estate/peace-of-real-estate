@@ -318,7 +318,7 @@ async function main() {
 	)
 
 	if (agents.length === 0) {
-		console.error('No agents in DB — run `pnpm db:seed` first.')
+		console.error('No agents in DB — run `vp db:seed` first.')
 		process.exit(1)
 	}
 
