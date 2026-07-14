@@ -6,6 +6,8 @@ import { betterAuth } from 'better-auth'
 import { oAuthProxy } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 
+import { sendPasswordResetEmail } from '@/lib/email.server'
+
 const appOrigin = new URL(env.BETTER_AUTH_URL).origin
 
 export function getAuth() {
@@ -30,6 +32,10 @@ export function getAuth() {
 		emailAndPassword: {
 			enabled: true,
 			autoSignIn: true,
+			resetPasswordPath: '/auth/reset-password',
+			sendResetPassword: async ({ user, url }) => {
+				await sendPasswordResetEmail({ to: user.email, resetUrl: url })
+			},
 		},
 		socialProviders: {
 			google: {

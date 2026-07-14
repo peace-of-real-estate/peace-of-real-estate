@@ -9,7 +9,7 @@ const TIGERWEB_ZCTA_URL =
 	'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/2/query'
 
 const BATCH_SIZE = 50
-const MAX_ZIPS = 200
+const MAX_ZIPS = 500
 
 const TOP_US_CITIES = [
 	'New York, NY',

@@ -139,6 +139,14 @@ export function Login({ redirect }: { redirect?: string }) {
 											required
 										/>
 									</Field>
+									<div className="flex justify-end">
+										<Link
+											to="/auth/forgot-password"
+											className="text-muted-foreground hover:text-foreground text-sm underline underline-offset-4"
+										>
+											Forgot password?
+										</Link>
+									</div>
 									<Button
 										type="submit"
 										disabled={isSubmitting || isGoogleLoading}
