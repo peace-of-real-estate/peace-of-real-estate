@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRightLeft, MapPin, Pencil, Users } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { useServerFn } from '@tanstack/react-start'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -59,13 +60,16 @@ export function ClientMatches({
 	const { loadProfile, loadMatches } = roleConfig[role]
 	const { data: session } = authClient.useSession()
 
+	const loadMatchesFn = useServerFn(loadMatches)
+	const loadProfileFn = useServerFn(loadProfile)
+
 	const { data: matches = [], isLoading } = useQuery({
 		queryKey: ['agent-matches', role],
-		queryFn: loadMatches,
+		queryFn: () => loadMatchesFn(),
 	})
 	const { data: profile } = useQuery({
 		queryKey: ['client-profile', role],
-		queryFn: loadProfile,
+		queryFn: () => loadProfileFn(),
 	})
 	const stateCode = resolveStateCode(profile?.state ?? undefined)
 
