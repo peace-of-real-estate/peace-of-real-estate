@@ -165,21 +165,22 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<DebugClientOption[]> => {
 		await requireUserId()
 
-		const buyers = await db
-			.select({
-				buyer: buyerProfiles,
-				user,
-			})
-			.from(buyerProfiles)
-			.innerJoin(user, eq(buyerProfiles.userId, user.id))
-
-		const sellers = await db
-			.select({
-				seller: sellerProfiles,
-				user,
-			})
-			.from(sellerProfiles)
-			.innerJoin(user, eq(sellerProfiles.userId, user.id))
+		const [buyers, sellers] = await Promise.all([
+			db
+				.select({
+					buyer: buyerProfiles,
+					user,
+				})
+				.from(buyerProfiles)
+				.innerJoin(user, eq(buyerProfiles.userId, user.id)),
+			db
+				.select({
+					seller: sellerProfiles,
+					user,
+				})
+				.from(sellerProfiles)
+				.innerJoin(user, eq(sellerProfiles.userId, user.id)),
+		])
 
 		return [
 			...buyers.map((row) => ({

@@ -18,7 +18,9 @@ import {
 	buyerBiddingWarMatrix,
 	buyerDecisionMakingMatrix,
 	buyerIdealRelationshipMatrix,
+	clientDescriptionAffinityMatrix,
 	commissionMatrix,
+	dealInstinctAffinityMatrix,
 	DIMENSION_IDS,
 	DIMENSION_LABELS,
 	experienceWeightModulation,
@@ -54,10 +56,10 @@ import {
 	toStars,
 } from './utils'
 
-const GEOMETRIC_FLOOR = 0.05
-const LINEAR_WEIGHT = 0.7
-const GEOMETRIC_WEIGHT = 0.3
-const RECIPROCAL_AGENT_FLOOR = 0.5
+export const SCORING_GEOMETRIC_FLOOR = 0.05
+export const SCORING_LINEAR_WEIGHT = 0.7
+export const SCORING_GEOMETRIC_WEIGHT = 0.3
+export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
 
 const propertyTypeToClientTypes: Record<
 	PropertyTypeSlug,
@@ -135,10 +137,7 @@ function haversineMiles(
 }
 
 function distanceBetweenZips(zip1: string, zip2: string): number | undefined {
-	const a = zipcodes.lookup(zip1)
-	const b = zipcodes.lookup(zip2)
-	if (!a || !b) return undefined
-	return haversineMiles(a.latitude, a.longitude, b.latitude, b.longitude)
+	return zipcodes.distance(zip1, zip2) ?? undefined
 }
 
 function distanceScore(miles: number): number {
@@ -313,7 +312,9 @@ export function scorePriceFit(
 		}
 	}
 
-	const bucketIndex = BUCKET_ORDER.indexOf(agent.typicalPriceRange)
+	const bucketIndex = BUCKET_ORDER.findIndex(
+		(bucket) => bucket === agent.typicalPriceRange,
+	)
 	const adjacentBuckets: PriceRange[] = []
 	if (bucketIndex >= 0) {
 		if (bucketIndex > 0) {
@@ -359,12 +360,7 @@ function bucketCentrality(
 	clientRange: PriceRangeValue,
 	agentBucket: PriceRange,
 ): number {
-	const overlap =
-		Math.min(clientRange.max, agentBucket.max) -
-		Math.max(clientRange.min, agentBucket.min)
-	const span = clientRange.max - clientRange.min
-	if (span <= 0) return 1
-	return clamp01(overlap / span)
+	return priceOverlapRatio(clientRange, agentBucket)
 }
 
 function expectedClientTypeSources(
@@ -435,6 +431,7 @@ export function scoreSpecialization(
 	}
 
 	let sum = 0
+	let creditedMatches = 0
 	for (const slug of expected) {
 		let match = 0
 		if (primary && slug === primary) match = 1.0
@@ -443,10 +440,11 @@ export function scoreSpecialization(
 		if (primary && slug === primary) source = [...source, 'primary']
 		else if (secondary && slug === secondary) source = [...source, 'secondary']
 		sum += match
+		if (match > 0) creditedMatches++
 		checks.push({
 			label: slug,
 			client: `expected — from ${source.join(', ')}`,
-			agent: agentTypes.includes(slug) ? 'served' : 'not served',
+			agent: match > 0 ? 'served' : 'not served',
 			passed: match > 0,
 			effect: match > 0 ? `match ${match}` : '0',
 		})
@@ -456,7 +454,7 @@ export function scoreSpecialization(
 
 	return {
 		score: round2(score),
-		explanation: `agent matches ${expected.filter((slug) => agentTypes.includes(slug)).length} of ${expected.length} expected client types`,
+		explanation: `agent matches ${creditedMatches} of ${expected.length} expected client types`,
 		checks,
 	}
 }
@@ -466,17 +464,7 @@ function getClientTypeFit(
 	agent: AgentProfile,
 	side: 'buying' | 'selling',
 ): number {
-	const expected = deriveExpectedClientTypes(client, side)
-	const agentTypes = agent.bestClientTypes ?? []
-	if (expected.length === 0) return 0.5
-	const primary = agentTypes[0]
-	const secondary = agentTypes[1]
-	let sum = 0
-	for (const slug of expected) {
-		if (primary && slug === primary) sum += 1.0
-		else if (secondary && slug === secondary) sum += 0.6
-	}
-	return sum / expected.length
+	return scoreSpecialization(client, agent, side).score
 }
 
 function scoreBuyerWorkingStyle(
@@ -542,63 +530,11 @@ function scoreBuyerWorkingStyle(
 function agentDescriptionScore(
 	agentDescription: string,
 ): Record<string, number> {
-	const map: Record<string, Record<string, number>> = {
-		strategicDataDriven: {
-			strategicDataDriven: 1.0,
-			calmSteady: 0.4,
-			warmRelational: 0.2,
-			efficientDecisive: 0.7,
-		},
-		calmSteady: {
-			strategicDataDriven: 0.4,
-			calmSteady: 1.0,
-			warmRelational: 0.7,
-			efficientDecisive: 0.2,
-		},
-		warmRelational: {
-			strategicDataDriven: 0.2,
-			calmSteady: 0.7,
-			warmRelational: 1.0,
-			efficientDecisive: 0.3,
-		},
-		efficientDecisive: {
-			strategicDataDriven: 0.7,
-			calmSteady: 0.2,
-			warmRelational: 0.3,
-			efficientDecisive: 1.0,
-		},
-	}
-	return map[agentDescription] ?? {}
+	return clientDescriptionAffinityMatrix[agentDescription] ?? {}
 }
 
 function agentDealInstinctScore(agentInstinct: string): Record<string, number> {
-	const map: Record<string, Record<string, number>> = {
-		factsFast: {
-			factsFast: 1.0,
-			slowItDown: 0.3,
-			takeControl: 0.6,
-			deEscalateFirst: 0.4,
-		},
-		slowItDown: {
-			factsFast: 0.3,
-			slowItDown: 1.0,
-			takeControl: 0.2,
-			deEscalateFirst: 0.7,
-		},
-		takeControl: {
-			factsFast: 0.6,
-			slowItDown: 0.2,
-			takeControl: 1.0,
-			deEscalateFirst: 0.5,
-		},
-		deEscalateFirst: {
-			factsFast: 0.4,
-			slowItDown: 0.7,
-			takeControl: 0.5,
-			deEscalateFirst: 1.0,
-		},
-	}
-	return map[agentInstinct] ?? {}
+	return dealInstinctAffinityMatrix[agentInstinct] ?? {}
 }
 
 function scoreAgentDeliveryExpectations(
@@ -980,6 +916,8 @@ function evaluateDisqualifiers(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 	side: 'buying' | 'selling',
+	locationResult: DimensionResult,
+	priceResult: DimensionResult,
 ): DisqualifierTrace[] {
 	const expectedSide = side === 'buying' ? 'buyers' : 'sellers'
 	const sideMismatch =
@@ -992,10 +930,7 @@ function evaluateDisqualifiers(
 		client.state.toLowerCase() !== agent.state.toLowerCase(),
 	)
 
-	const locationResult = scoreLocation(client, agent)
 	const locationDisqualified = locationResult.score <= 0
-
-	const priceResult = scorePriceFit(client, agent)
 	const priceDisqualified = priceResult.score <= 0
 
 	return [
@@ -1109,12 +1044,12 @@ export function calculateFitScore(
 		const score = results[dimension].score
 		const weight = normalizedWeights[dimension]
 		linear += weight * score
-		geometric *= Math.max(score, GEOMETRIC_FLOOR) ** weight
+		geometric *= Math.max(score, SCORING_GEOMETRIC_FLOOR) ** weight
 	}
 	const consumerScore =
 		variant?.blend === 'linearOnly'
 			? linear
-			: LINEAR_WEIGHT * linear + GEOMETRIC_WEIGHT * geometric
+			: SCORING_LINEAR_WEIGHT * linear + SCORING_GEOMETRIC_WEIGHT * geometric
 
 	const clientRange = parseSerializedPriceRange(client.priceRange)
 	const agentBucket = AGENT_PRICE_RANGES[agent.typicalPriceRange]
@@ -1128,7 +1063,10 @@ export function calculateFitScore(
 	const reciprocalBlend =
 		variant?.reciprocity === 'multiplier'
 			? consumerScore * (0.75 + 0.25 * agentFit)
-			: harmonicMean(consumerScore, RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit)
+			: harmonicMean(
+					consumerScore,
+					SCORING_RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit,
+				)
 
 	const baseFinalScore = Math.round(reciprocalBlend * 100)
 
@@ -1158,7 +1096,13 @@ export function calculateFitScore(
 		}
 	})
 
-	const disqualifiers = evaluateDisqualifiers(client, agent, side)
+	const disqualifiers = evaluateDisqualifiers(
+		client,
+		agent,
+		side,
+		results.location,
+		results.priceFit,
+	)
 	const disqualified = disqualifiers.some((entry) => entry.disqualified)
 	const fitScore = disqualified ? 0 : finalScore
 
@@ -1177,7 +1121,7 @@ export function calculateFitScore(
 	const penaltyText = notFitPenalty.penalized
 		? `; notFitFor penalty (${notFitPenalty.reason}) → ${finalScore}`
 		: ''
-	const fullFormula = `consumerScore = ${LINEAR_WEIGHT}·linear + ${GEOMETRIC_WEIGHT}·geometric; harmonicMean(consumerScore, ${RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit) → ${round2(reciprocalBlend)}${penaltyText}; dims: ${dimensionFormula}`
+	const fullFormula = `consumerScore = ${SCORING_LINEAR_WEIGHT}·linear + ${SCORING_GEOMETRIC_WEIGHT}·geometric; harmonicMean(consumerScore, ${SCORING_RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit) → ${round2(reciprocalBlend)}${penaltyText}; dims: ${dimensionFormula}`
 
 	return {
 		fitScore,

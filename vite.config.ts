@@ -151,7 +151,11 @@ export default defineConfig(({ mode }) => {
 					extends: true,
 					test: {
 						name: 'unit',
-						include: ['src/**/*.test.unit.ts'],
+						include: [
+							'src/**/*.test.unit.ts',
+							'src/**/*.test.ts',
+							'!src/**/*.{server,db}.test.ts',
+						],
 					},
 				},
 				{

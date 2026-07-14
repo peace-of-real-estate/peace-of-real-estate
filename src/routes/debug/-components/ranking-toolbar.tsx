@@ -80,7 +80,7 @@ export function RankingToolbar({
 							aria-label="Sort ranking"
 							className={cn(sortKey !== 'rank' && 'text-primary')}
 						>
-							<ArrowDownWideNarrow />
+							<ArrowDownWideNarrow className="size-4" />
 							<span className="max-w-24 truncate text-xs">
 								{sortLabel(sortKey)}
 							</span>

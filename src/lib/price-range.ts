@@ -17,12 +17,12 @@ export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
 	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
 }
 
-export const BUCKET_ORDER: readonly string[] = [
+export const BUCKET_ORDER = [
 	'under400k',
 	'400kTo750k',
 	'750kTo1_5m',
 	'1_5mPlus',
-]
+] as const
 
 export type AgentPriceBucket = (typeof BUCKET_ORDER)[number]
 

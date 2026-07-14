@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils/ui'
 
 export function SectionLabel({
@@ -5,7 +6,7 @@ export function SectionLabel({
 	children,
 }: {
 	className?: string | undefined
-	children: React.ReactNode
+	children: ReactNode
 }) {
 	return (
 		<p

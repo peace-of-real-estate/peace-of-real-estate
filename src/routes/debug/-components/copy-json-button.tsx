@@ -25,10 +25,13 @@ export function CopyJsonButton({
 			size="xs"
 			className={className}
 			onClick={() => {
-				void navigator.clipboard.writeText(JSON.stringify(value, null, 2))
-				setCopied(true)
-				clearTimeout(timeoutRef.current)
-				timeoutRef.current = setTimeout(() => setCopied(false), 1500)
+				void navigator.clipboard
+					.writeText(JSON.stringify(value, null, 2))
+					.then(() => {
+						setCopied(true)
+						clearTimeout(timeoutRef.current)
+						timeoutRef.current = setTimeout(() => setCopied(false), 1500)
+					})
 			}}
 		>
 			{copied ? <Check className="text-emerald-600" /> : <Copy />}

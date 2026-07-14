@@ -5,6 +5,11 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip'
 import type { ScoreTrace } from '@/lib/matching/scoring'
+import {
+	SCORING_GEOMETRIC_WEIGHT,
+	SCORING_LINEAR_WEIGHT,
+	SCORING_RECIPROCAL_AGENT_FLOOR,
+} from '@/lib/matching/scoring'
 import { cn } from '@/lib/utils/ui'
 import { SectionLabel } from '@/routes/debug/-components/section-label'
 
@@ -16,29 +21,39 @@ export function BlendEquation({ trace }: BlendEquationProps) {
 	const stage2 = trace.stage2
 	const penalty = trace.notFitPenalty
 
-	const weightedLinear = stage2 ? stage2.linear * 0.7 : undefined
-	const weightedGeometric = stage2 ? stage2.geometric * 0.3 : undefined
+	const weightedLinear = stage2
+		? stage2.linear * SCORING_LINEAR_WEIGHT
+		: undefined
+	const weightedGeometric = stage2
+		? stage2.geometric * SCORING_GEOMETRIC_WEIGHT
+		: undefined
 
 	return (
 		<Card className="p-3">
 			<SectionLabel className="mb-2">Stage 2 — Reciprocal blend</SectionLabel>
 
 			<div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2">
-				<Tile label="linear ×0.7" value={weightedLinear} />
+				<Tile
+					label={`linear ×${SCORING_LINEAR_WEIGHT}`}
+					value={weightedLinear}
+				/>
 				<Operator>+</Operator>
-				<Tile label="geometric ×0.3" value={weightedGeometric} />
+				<Tile
+					label={`geometric ×${SCORING_GEOMETRIC_WEIGHT}`}
+					value={weightedGeometric}
+				/>
 				<Operator>=</Operator>
 				<Tile
 					label="consumerScore"
 					value={stage2?.consumerScore}
-					tooltip="0.7·linear + 0.3·geometric"
+					tooltip={`${SCORING_LINEAR_WEIGHT}·linear + ${SCORING_GEOMETRIC_WEIGHT}·geometric`}
 				/>
 			</div>
 
 			<div className="text-muted-foreground my-2 flex items-center justify-center gap-1.5">
 				<span className="text-lg">↓</span>
 				<span className="font-mono text-[10px]">
-					harmonicMean(consumerScore, 0.5 + 0.5·agentFit)
+					{`harmonicMean(consumerScore, ${SCORING_RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit)`}
 				</span>
 			</div>
 
@@ -52,7 +67,7 @@ export function BlendEquation({ trace }: BlendEquationProps) {
 				<Tile
 					label="reciprocalBlend"
 					value={trace.reciprocalBlend}
-					tooltip="harmonicMean(consumerScore, 0.5 + 0.5·agentFit)"
+					tooltip={`harmonicMean(consumerScore, ${SCORING_RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit)`}
 				/>
 				<Operator>→</Operator>
 				<Tile

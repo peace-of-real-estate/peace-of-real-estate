@@ -48,6 +48,12 @@ export function RankingRail({
 	)
 	const dqVisible = dqOpen || Boolean(filters.dqGate) || selectedIsDisqualified
 
+	React.useEffect(() => {
+		if (!filters.dqGate && !selectedIsDisqualified) {
+			setDqOpen(false)
+		}
+	}, [filters.dqGate, selectedIsDisqualified])
+
 	if (matches.totalAgents === 0) {
 		return (
 			<EmptyState
@@ -110,7 +116,7 @@ export function RankingRail({
 					<div className="overflow-hidden rounded-md border border-red-500/20">
 						<button
 							type="button"
-							onClick={() => setDqOpen(!dqVisible)}
+							onClick={() => setDqOpen(!dqOpen)}
 							aria-expanded={dqVisible}
 							className="flex w-full items-center gap-1.5 bg-red-500/5 px-3 py-2 text-xs font-semibold text-red-700 dark:text-red-300"
 						>

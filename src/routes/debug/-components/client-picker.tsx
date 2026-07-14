@@ -38,6 +38,12 @@ export function ClientPicker({
 	open: controlledOpen,
 	onOpenChange,
 }: ClientPickerProps) {
+	if ((controlledOpen === undefined) !== (onOpenChange === undefined)) {
+		throw new Error(
+			'ClientPicker: `open` and `onOpenChange` must be provided together',
+		)
+	}
+
 	const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false)
 	const open = controlledOpen ?? uncontrolledOpen
 	const setOpen = onOpenChange ?? setUncontrolledOpen
@@ -121,7 +127,10 @@ function ClientCommandItem({
 }) {
 	const isSelected = selected?.id === option.id
 	return (
-		<CommandItem onSelect={onSelect}>
+		<CommandItem
+			value={[option.name, option.email].filter(Boolean).join(' ')}
+			onSelect={onSelect}
+		>
 			<User className="mr-2 h-4 w-4" />
 			<span className="flex-1 truncate">
 				{option.name ?? option.email} · {option.city}, {option.state} ·{' '}

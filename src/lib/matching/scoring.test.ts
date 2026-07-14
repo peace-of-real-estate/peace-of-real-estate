@@ -7,78 +7,27 @@ import {
 	calculateFitScore,
 	TIE_BAND_THRESHOLD,
 } from '@/lib/matching/scoring'
-import type { AgentProfile, BuyerProfile } from '@/lib/profile/types'
+import type { BuyerProfile } from '@/lib/profile/types'
+import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
+import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
-function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
-	return {
-		id: 'agent-fixture-1',
-		userId: 'user-agent-fixture-1',
-		representationSide: 'buyers',
-		city: 'Baltimore',
-		state: 'MD',
-		typicalPriceRange: '400kTo750k',
-		bestClientTypes: ['firstTime', 'moveUp'],
-		notFitFor: [] satisfies string[],
-		firstName: 'Avery',
-		lastName: 'Stone',
-		brokerageName: 'Harborline Realty',
-		email: 'avery@example.com',
-		phone: null,
-		businessAddress: null,
-		billingAddress: null,
-		licenseNumberState: 'LIC-123456-MD',
-		zipCodes: ['21201', '21202'],
-		cityCenterLatitude: null,
-		cityCenterLongitude: null,
-		yearsLicensed: '6-10',
-		averageTransactions: '6-15',
-		employmentStatus: 'Realtor',
-		licenseProof: null,
-		usePaxWriter: true,
-		licenseAttested: true,
-		eoInsuranceStatus: 'Active',
-		peacePactSigned: true,
-		peacePactSignature: 'Avery Stone',
-		peacePactSignedAt: FIXED_DATE,
-		clientDescription: 'strategicDataDriven',
-		communicationFrequency: 'scheduled',
-		quickCommunicationChannel: 'text',
-		updateDeliveryMethod: 'email',
-		difficultDealInstinct: 'factsFast',
-		responseTime: 'within30Min',
-		commissionApproach: 'proactiveOpen',
-		unrepresentedBuyerApproach: 'referSeparateBrokerage',
-		createdAt: FIXED_DATE,
-		updatedAt: FIXED_DATE,
-		...overrides,
-	}
-}
-
 const buyer: BuyerProfile = {
+	...mockBuyerProfile,
 	id: 'buyer-fixture-1',
 	userId: 'user-buyer-fixture-1',
 	status: 'active',
 	state: 'MD',
 	city: 'Baltimore',
 	zipCodes: ['21201', '21205'],
-	cityCenterLatitude: null,
-	cityCenterLongitude: null,
-	timeline: 'exploring',
 	priceRange: '400000-600000',
-	propertyTypes: ['singleFamily'],
-	experienceLevel: 'firstTime',
-	quickCommunicationChannel: 'text',
-	updateDeliveryMethod: 'email',
 	involvementLevel: 'veryInvolved',
 	commissionComfort: 'dontUnderstand',
-	responseTimeExpectation: 'within30Min',
 	idealAgentRelationship: 'thinkingPartner',
 	decisionMakingNeed: 'numbersData',
 	biddingWarResponse: 'factsOptions',
 	matchPriorities: ['priceRange'],
-	matchDetails: null,
 	createdAt: FIXED_DATE,
 	updatedAt: FIXED_DATE,
 }

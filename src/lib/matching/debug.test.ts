@@ -2,34 +2,10 @@ import { describe, expect, test } from 'vitest'
 
 import { buildDebugPayload } from '@/lib/matching/debug'
 import type { ScoredAgent } from '@/lib/matching/debug'
-import type { BuyerProfile } from '@/lib/profile/types'
+import { TIE_BAND_THRESHOLD } from '@/lib/matching/scoring'
+import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 
-const buyer: BuyerProfile = {
-	id: 'buyer-abc',
-	userId: 'user-abc',
-	status: 'active',
-	state: 'MD',
-	city: 'Baltimore',
-	zipCodes: ['21201'],
-	cityCenterLatitude: null,
-	cityCenterLongitude: null,
-	timeline: 'exploring',
-	priceRange: '400000-600000',
-	propertyTypes: ['singleFamily'],
-	experienceLevel: 'firstTime',
-	quickCommunicationChannel: 'text',
-	updateDeliveryMethod: 'email',
-	involvementLevel: 'veryInvolved',
-	commissionComfort: 'dontUnderstand',
-	responseTimeExpectation: 'within30Min',
-	idealAgentRelationship: 'thinkingPartner',
-	decisionMakingNeed: 'numbersData',
-	biddingWarResponse: 'factsOptions',
-	matchPriorities: [],
-	matchDetails: null,
-	createdAt: new Date(),
-	updatedAt: new Date(),
-}
+const buyer = mockBuyerProfile
 
 function makeScoredAgent(
 	id: string,
@@ -129,7 +105,7 @@ describe('buildDebugPayload', () => {
 		})
 
 		expect(payload.qualified).toHaveLength(4)
-		expect(payload.tieBandThreshold).toBe(3)
+		expect(payload.tieBandThreshold).toBe(TIE_BAND_THRESHOLD)
 
 		const bandA = payload.qualified.find((match) => match.agentId === 'a')!
 		const bandB = payload.qualified.find((match) => match.agentId === 'b')!
