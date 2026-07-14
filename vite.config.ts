@@ -168,7 +168,7 @@ export default defineConfig(({ mode }) => {
 						name: 'browser',
 						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 						setupFiles: ['./tests/support/mocks/styles.ts'],
-						testTimeout: process.env.CI ? 30_000 : 5_000,
+						testTimeout: 15_000,
 						browser: {
 							instances: [{ browser: 'chromium' }],
 							provider: playwright(),
