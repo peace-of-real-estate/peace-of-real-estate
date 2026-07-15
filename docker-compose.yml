@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: peace_of_real_estate_test
+      POSTGRES_DB: ${POSTGRES_DB:-peace_of_real_estate_test}
       POSTGRES_USER: peace_user
       POSTGRES_PASSWORD: peace_test
     ports:
