@@ -1,4 +1,7 @@
-import { GitCompareArrows, Shuffle } from 'lucide-react'
+import {
+	ArrowsLeftRightIcon as GitCompareArrows,
+	ShuffleIcon as Shuffle,
+} from '@phosphor-icons/react'
 
 import { Badge } from '@/components/ui/badge'
 import {

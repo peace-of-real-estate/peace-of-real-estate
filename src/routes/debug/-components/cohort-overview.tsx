@@ -1,4 +1,4 @@
-import { MousePointerClick } from 'lucide-react'
+import { CursorClickIcon as MousePointerClick } from '@phosphor-icons/react'
 
 import type { DebugMatch, DebugMatchesPayload } from '@/lib/matching/debug'
 import {

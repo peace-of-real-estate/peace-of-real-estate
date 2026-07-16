@@ -1,5 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { ArrowRightLeft, MapPin, Pencil, Users } from 'lucide-react'
+import {
+	ArrowsLeftRightIcon as ArrowRightLeft,
+	MapPinIcon as MapPin,
+	PencilSimpleIcon as Pencil,
+	UsersIcon as Users,
+} from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useServerFn } from '@tanstack/react-start'
 

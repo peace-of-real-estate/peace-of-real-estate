@@ -1,4 +1,7 @@
-import { CircleAlert, Inbox } from 'lucide-react'
+import {
+	TrayIcon as Inbox,
+	WarningCircleIcon as CircleAlert,
+} from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'

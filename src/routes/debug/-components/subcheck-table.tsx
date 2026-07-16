@@ -1,4 +1,8 @@
-import { Check, Minus, X } from 'lucide-react'
+import {
+	CheckIcon as Check,
+	MinusIcon as Minus,
+	XIcon as X,
+} from '@phosphor-icons/react'
 
 import {
 	Table,

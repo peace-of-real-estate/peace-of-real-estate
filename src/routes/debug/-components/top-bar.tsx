@@ -1,4 +1,4 @@
-import { Bug } from 'lucide-react'
+import { BugIcon as Bug } from '@phosphor-icons/react'
 
 import { Badge } from '@/components/ui/badge'
 import type {

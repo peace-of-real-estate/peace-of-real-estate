@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { CaretDownIcon as ChevronDown } from '@phosphor-icons/react'
 import * as React from 'react'
 
 import type { DebugMatch, DebugMatchesPayload } from '@/lib/matching/debug'

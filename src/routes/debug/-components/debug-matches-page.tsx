@@ -1,5 +1,5 @@
 import { skipToken, useQuery } from '@tanstack/react-query'
-import { Bug } from 'lucide-react'
+import { BugIcon as Bug } from '@phosphor-icons/react'
 import * as React from 'react'
 
 import { Card } from '@/components/ui/card'
