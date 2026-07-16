@@ -299,7 +299,7 @@ export function scorePriceFit(
 			score: 0,
 			explanation: !clientRange
 				? 'client price range missing or unparseable'
-				: 'agent price bucket unknown',
+				: 'agent price range unparseable (expected serialized "min-max" or bucket slug)',
 			checks: [
 				{
 					label: 'price range',
