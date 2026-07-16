@@ -1,15 +1,15 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
-import {
-	AlertTriangle,
-	ArrowLeft,
-	Compass,
-	MapPin,
-	RefreshCw,
-} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+	ArrowLeftIcon,
+	ArrowsClockwiseIcon,
+	CompassIcon,
+	MapPinIcon,
+	WarningIcon,
+} from '@phosphor-icons/react'
 
 // ========================================================================
 // * Not Found
@@ -21,7 +21,7 @@ export function NotFoundComponent() {
 			<Card className="mx-auto max-w-xl text-center">
 				<CardContent>
 					<div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center">
-						<Compass className="h-8 w-8" />
+						<CompassIcon className="h-8 w-8" />
 					</div>
 					<div className="text-muted-foreground mb-4 text-sm">Error 404</div>
 					<h1 className="mb-6 text-4xl md:text-5xl">Page Not Found</h1>
@@ -32,13 +32,13 @@ export function NotFoundComponent() {
 					<div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
 						<Button asChild>
 							<Link to="/">
-								<ArrowLeft className="h-4 w-4" />
+								<ArrowLeftIcon className="h-4 w-4" />
 								Back to Home
 							</Link>
 						</Button>
 						<Button asChild variant="secondary">
 							<Link to="/signup/buyer/location">
-								<MapPin className="h-4 w-4" />
+								<MapPinIcon className="h-4 w-4" />
 								Find an Agent
 							</Link>
 						</Button>
@@ -59,7 +59,7 @@ export function ServerErrorComponent({ reset }: ErrorComponentProps) {
 			<Card className="mx-auto max-w-xl text-center">
 				<CardContent>
 					<div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center">
-						<AlertTriangle className="h-8 w-8" />
+						<WarningIcon className="h-8 w-8" />
 					</div>
 					<div className="text-muted-foreground mb-4 text-sm">Error 500</div>
 					<h1 className="mb-6 text-4xl md:text-5xl">Something Went Wrong</h1>
@@ -69,12 +69,12 @@ export function ServerErrorComponent({ reset }: ErrorComponentProps) {
 					</p>
 					<div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
 						<Button type="button" onClick={reset}>
-							<RefreshCw className="h-4 w-4" />
+							<ArrowsClockwiseIcon className="h-4 w-4" />
 							Try Again
 						</Button>
 						<Button asChild variant="secondary">
 							<Link to="/">
-								<ArrowLeft className="h-4 w-4" />
+								<ArrowLeftIcon className="h-4 w-4" />
 								Back to Home
 							</Link>
 						</Button>

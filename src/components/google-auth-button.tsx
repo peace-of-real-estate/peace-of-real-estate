@@ -1,7 +1,6 @@
-import { Loader2 } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { useGoogleAuth } from '@/hooks/use-google-auth'
+import { SpinnerIcon } from '@phosphor-icons/react'
 
 type GoogleAuthButtonProps = {
 	fallbackRedirect: string
@@ -37,7 +36,7 @@ export function GoogleAuthButton({
 			className={className}
 		>
 			{isLoading ? (
-				<Loader2 className="mr-2 h-5 w-5 animate-spin" />
+				<SpinnerIcon className="mr-2 h-5 w-5 animate-spin" />
 			) : (
 				<svg
 					className="mr-2 h-5 w-5"

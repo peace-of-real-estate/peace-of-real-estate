@@ -1,52 +1,53 @@
 import type { ElementType } from 'react'
-import {
-	Clock,
-	Home,
-	Mail,
-	MessageSquare,
-	Scale,
-	Shield,
-	Star,
-	Target,
-	User,
-	Zap,
-} from 'lucide-react'
+
 import type {
 	AgentWorkStyleQuestionId,
 	BuyerQuestionId,
 	SellerQuestionId,
 } from './profile-fields'
+import {
+	ChatIcon,
+	ClockIcon,
+	EnvelopeIcon,
+	HouseIcon,
+	LightningIcon,
+	ScalesIcon,
+	ShieldIcon,
+	StarIcon,
+	TargetIcon,
+	UserIcon,
+} from '@phosphor-icons/react'
 
 export const questionIconMap = {
 	// Buyer
-	experienceLevel: Star,
-	idealAgentRelationship: MessageSquare,
-	decisionMakingNeed: Scale,
-	biddingWarResponse: Target,
-	quickCommunicationChannel: MessageSquare,
-	updateDeliveryMethod: Mail,
-	responseTimeExpectation: Clock,
-	involvementLevel: Target,
-	commissionComfort: Shield,
+	experienceLevel: StarIcon,
+	idealAgentRelationship: ChatIcon,
+	decisionMakingNeed: ScalesIcon,
+	biddingWarResponse: TargetIcon,
+	quickCommunicationChannel: ChatIcon,
+	updateDeliveryMethod: EnvelopeIcon,
+	responseTimeExpectation: ClockIcon,
+	involvementLevel: TargetIcon,
+	commissionComfort: ShieldIcon,
 
 	// Seller
-	saleMotivation: Star,
-	successfulSaleLooksLike: Target,
-	homeConnection: Home,
-	agentSilencePreference: Clock,
-	representationPreference: Shield,
-	agentDeliveryExpectations: Home,
+	saleMotivation: StarIcon,
+	successfulSaleLooksLike: TargetIcon,
+	homeConnection: HouseIcon,
+	agentSilencePreference: ClockIcon,
+	representationPreference: ShieldIcon,
+	agentDeliveryExpectations: HouseIcon,
 
 	// Agent
-	clientDescription: User,
-	communicationFrequency: MessageSquare,
-	difficultDealInstinct: Scale,
-	responseTime: Clock,
-	commissionApproach: Shield,
-	unrepresentedBuyerApproach: Zap,
+	clientDescription: UserIcon,
+	communicationFrequency: ChatIcon,
+	difficultDealInstinct: ScalesIcon,
+	responseTime: ClockIcon,
+	commissionApproach: ShieldIcon,
+	unrepresentedBuyerApproach: LightningIcon,
 
 	// Free form
-	notFitFor: User,
+	notFitFor: UserIcon,
 } satisfies Record<
 	BuyerQuestionId | SellerQuestionId | AgentWorkStyleQuestionId,
 	ElementType
@@ -55,6 +56,6 @@ export const questionIconMap = {
 export function getQuestionIcon(questionId: string): ElementType {
 	return (
 		Object.entries(questionIconMap).find(([id]) => id === questionId)?.[1] ??
-		User
+		UserIcon
 	)
 }

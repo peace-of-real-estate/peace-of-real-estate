@@ -1,5 +1,5 @@
 import { createFileRoute, ClientOnly } from '@tanstack/react-router'
-import { User } from 'lucide-react'
+
 import { z } from 'zod'
 
 import {
@@ -20,6 +20,7 @@ import {
 	ProfileSummaryGrid,
 } from '@/components/profile-summary'
 import { agentDraftStorage } from '../(steps)/agent/route'
+import { UserIcon } from '@phosphor-icons/react'
 
 const agentPreviewMatches: MatchDetails[] = [
 	{
@@ -168,7 +169,7 @@ function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 		<Card className="border-border bg-card gap-0 rounded-2xl p-0 shadow-sm">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
 				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl">
-					<User className="h-5 w-5" />
+					<UserIcon className="h-5 w-5" />
 				</div>
 				<div className="min-w-0 flex-1">
 					<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">

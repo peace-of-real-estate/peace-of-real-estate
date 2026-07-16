@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
+
 import { motion } from 'framer-motion'
 import { useNavigate } from '@tanstack/react-router'
-import { Lock, Mail, User } from 'lucide-react'
+
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -20,6 +20,12 @@ import {
 } from '@/components/ui/sheet'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import {
+	EnvelopeIcon,
+	LockIcon,
+	SpinnerIcon,
+	UserIcon,
+} from '@phosphor-icons/react'
 
 export type SignupFormProps<TData = unknown> = {
 	idPrefix?: string
@@ -111,7 +117,7 @@ function SignupForm<TData>({
 							Full name
 						</FieldLabel>
 						<div className="relative">
-							<User className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<UserIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
 							<Input
 								id={nameId}
 								placeholder="Jordan Lee"
@@ -131,7 +137,7 @@ function SignupForm<TData>({
 							Email address
 						</FieldLabel>
 						<div className="relative">
-							<Mail className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<EnvelopeIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
 							<Input
 								id={emailId}
 								type="email"
@@ -153,7 +159,7 @@ function SignupForm<TData>({
 							Password
 						</FieldLabel>
 						<div className="relative">
-							<Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<LockIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
 							<Input
 								id={passwordId}
 								type="password"
@@ -173,7 +179,7 @@ function SignupForm<TData>({
 						className="bg-accent text-accent-foreground hover:bg-accent/90 h-9 w-full rounded-xl text-sm font-semibold lg:h-11 lg:text-base"
 					>
 						{isSubmitting ? (
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+							<SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
 						) : null}
 						{submitLabel}
 					</Button>

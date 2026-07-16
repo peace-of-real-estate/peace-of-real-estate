@@ -1,26 +1,31 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { ArrowRightLeft, MessageSquare, Search, Users } from 'lucide-react'
 
 import {
 	DashboardShell,
 	DashboardSidebar,
 	type SidebarItem,
 } from '@/routes/(dashboard)/-components/dashboard'
+import {
+	ArrowsLeftRightIcon,
+	ChatIcon,
+	MagnifyingGlassIcon,
+	UsersIcon,
+} from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/(dashboard)/buyer')({
 	component: BuyerDashboardLayout,
 })
 
 const buyerItems: SidebarItem[] = [
-	{ label: 'Matches', icon: Users, href: '/buyer/matches' },
+	{ label: 'Matches', icon: UsersIcon, href: '/buyer/matches' },
 	{
 		label: 'Introductions',
-		icon: ArrowRightLeft,
+		icon: ArrowsLeftRightIcon,
 		href: '/buyer/introductions',
 	},
 	{
 		label: 'Search Preferences',
-		icon: Search,
+		icon: MagnifyingGlassIcon,
 		href: '/buyer/search-preferences',
 	},
 ]
@@ -28,7 +33,7 @@ const buyerItems: SidebarItem[] = [
 const buyerAiItems: SidebarItem[] = [
 	{
 		label: 'Practice Negotiating',
-		icon: MessageSquare,
+		icon: ChatIcon,
 		href: '/buyer/practice-negotiating',
 	},
 ]

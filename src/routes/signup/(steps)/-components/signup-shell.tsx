@@ -5,7 +5,7 @@ import {
 	useNavigate,
 	type RegisteredRouter,
 } from '@tanstack/react-router'
-import { TriangleAlert } from 'lucide-react'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
@@ -19,6 +19,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils/ui'
+import { WarningIcon } from '@phosphor-icons/react'
 
 export type SignupWizardStep<TStep extends string = string> = {
 	id: TStep
@@ -509,7 +510,7 @@ function LeaveDialog({
 			<DialogContent showCloseButton={false}>
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						<TriangleAlert className="text-destructive h-5 w-5" />
+						<WarningIcon className="text-destructive h-5 w-5" />
 						Leave this page?
 					</DialogTitle>
 					<DialogDescription>

@@ -1,8 +1,8 @@
-import { MapPin, Star } from 'lucide-react'
 import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils/ui'
+import { MapPinIcon, StarIcon } from '@phosphor-icons/react'
 
 export type MatchStatus = 'pending' | 'accepted' | 'completed' | 'new'
 
@@ -85,7 +85,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 				</p>
 				<div className="text-muted-foreground mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-[11px]">
 					<span className="flex items-center gap-1">
-						<MapPin className="h-3 w-3" />
+						<MapPinIcon className="h-3 w-3" />
 						{match.location}
 					</span>
 					<span aria-hidden="true">·</span>
@@ -105,7 +105,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 				)}
 				<div className="mt-auto flex w-full items-center justify-center gap-1.5 pt-3">
 					<span className="bg-accent/15 text-accent-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold">
-						<Star className="h-3 w-3 fill-current" />
+						<StarIcon className="h-3 w-3 fill-current" />
 						{match.fitScore}% match
 					</span>
 				</div>

@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
+
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 
@@ -20,6 +20,7 @@ import {
 	type SellerDraft,
 } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
+import { SpinnerIcon } from '@phosphor-icons/react'
 
 const completeSearchSchema = z.object({
 	role: z.enum(['agent', 'buyer', 'seller']),
@@ -162,7 +163,7 @@ function CompleteProfileStatus({ message }: { message: string }) {
 			<Card className="w-full max-w-md rounded-3xl border-slate-200 bg-white text-center shadow-sm">
 				<CardContent className="flex flex-col items-center gap-4 p-8">
 					<div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-2xl">
-						<Loader2 className="h-5 w-5 animate-spin" />
+						<SpinnerIcon className="h-5 w-5 animate-spin" />
 					</div>
 					<div>
 						<h1 className="font-heading text-2xl tracking-tight text-slate-950">

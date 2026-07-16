@@ -1,6 +1,5 @@
 import { useState, type ElementType, type ReactNode } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { HelpCircle, LogOut } from 'lucide-react'
 
 import { authClient } from '@/lib/auth/client'
 import { SUPPORT_EMAIL } from '@/lib/constants'
@@ -32,6 +31,7 @@ import {
 	SidebarMenuItem,
 	SidebarProvider,
 } from '@/components/ui/sidebar'
+import { QuestionIcon, SignOutIcon } from '@phosphor-icons/react'
 
 // ============================================================
 // Types
@@ -235,14 +235,14 @@ export function DashboardSidebar({
 					<SidebarMenu>
 						<SidebarMenuItem>
 							<SidebarMenuButton onClick={() => setShowSupport(true)}>
-								<HelpCircle />
+								<QuestionIcon />
 								<span>Support</span>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 						{isAuthenticated ? (
 							<SidebarMenuItem>
 								<SidebarMenuButton onClick={() => void handleSignOut()}>
-									<LogOut />
+									<SignOutIcon />
 									<span>Sign out</span>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
