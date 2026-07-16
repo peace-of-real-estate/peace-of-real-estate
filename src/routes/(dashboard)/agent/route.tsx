@@ -1,11 +1,11 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { MessageSquare } from 'lucide-react'
 
 import {
 	DashboardShell,
 	DashboardSidebar,
 	type SidebarItem,
 } from '@/routes/(dashboard)/-components/dashboard'
+import { ChatIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/(dashboard)/agent')({
 	component: AgentDashboardLayout,
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/(dashboard)/agent')({
 const agentItems: SidebarItem[] = [
 	{
 		label: 'Introductions',
-		icon: MessageSquare,
+		icon: ChatIcon,
 		href: '/agent/introductions',
 	},
 ]

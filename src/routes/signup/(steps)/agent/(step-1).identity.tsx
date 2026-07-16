@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { UserIcon } from '@phosphor-icons/react'
-import { ArrowRight } from 'lucide-react'
+
 import { useState } from 'react'
 
 import {
@@ -20,6 +20,7 @@ import {
 	parseSlug,
 	yearsLicensed as yearsLicensedEnum,
 } from '@/lib/profile'
+import { ArrowRightIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/signup/(steps)/agent/(step-1)/identity')(
 	{
@@ -254,7 +255,7 @@ export function AgentIdentity({
 							)}
 						>
 							Continue
-							<ArrowRight className="h-4 w-4" />
+							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
 					</div>
 				</CardContent>

@@ -1,7 +1,7 @@
 import type { ElementType, ReactNode } from 'react'
-import { Check } from 'lucide-react'
 
 import { cn } from '@/lib/utils/ui'
+import { CheckIcon } from '@phosphor-icons/react'
 
 type SelectionCardLayout = 'vertical' | 'horizontal'
 type SelectionCardVariant = 'solid' | 'subtle'
@@ -68,7 +68,7 @@ export function SelectionCard({
 							: 'bg-primary text-primary-foreground',
 					)}
 				>
-					<Check className="h-3 w-3" strokeWidth={3} />
+					<CheckIcon className="h-3 w-3" />
 				</span>
 			) : null}
 

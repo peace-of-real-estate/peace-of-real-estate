@@ -1,5 +1,5 @@
 import type { Icon } from '@phosphor-icons/react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
@@ -21,6 +21,7 @@ import { MultiSelectQuestionCard } from './multi-question'
 import { QuestionCard } from './single-question'
 import { QuestionPrompt } from './question-prompt'
 import { useQuestionFlow } from './use-question-flow'
+import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
 export function QuestionFlow({
 	currentStepIndex,
@@ -96,7 +97,7 @@ export function QuestionFlow({
 					disabled={isFirstQuestion || isTransitioning}
 					className="border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-25"
 				>
-					<ArrowLeft className="h-4 w-4" />
+					<ArrowLeftIcon className="h-4 w-4" />
 					<span className="sr-only">Previous question</span>
 				</button>
 
@@ -106,7 +107,7 @@ export function QuestionFlow({
 					disabled={!canAdvance || isTransitioning}
 					className="border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-25"
 				>
-					<ArrowRight className="h-4 w-4" />
+					<ArrowRightIcon className="h-4 w-4" />
 					<span className="sr-only">
 						{isLastQuestion ? 'Finish' : 'Next question'}
 					</span>

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ShieldCheckIcon } from '@phosphor-icons/react'
-import { ArrowRight } from 'lucide-react'
+
 import { useState } from 'react'
 
 import {
@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { cn } from '@/lib/utils/ui'
 import type { AgentDraft } from '@/lib/profile'
 import type { AgentFlowStep } from './route'
+import { ArrowRightIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute(
 	'/signup/(steps)/agent/(step-4)/compliance',
@@ -126,7 +127,7 @@ export function AgentCompliance({
 							)}
 						>
 							Continue
-							<ArrowRight className="h-4 w-4" />
+							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
 					</div>
 				</CardContent>

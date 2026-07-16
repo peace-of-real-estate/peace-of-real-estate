@@ -3,7 +3,7 @@ import {
 	ClockIcon,
 	HouseLineIcon,
 } from '@phosphor-icons/react'
-import { Banknote, Home } from 'lucide-react'
+
 import { useState } from 'react'
 
 import { createFileRoute } from '@tanstack/react-router'
@@ -29,6 +29,7 @@ import { FieldSection } from '../-components/ui/field-section'
 import { SelectionCard } from '../-components/ui/selection-card'
 import { PriceInput } from '../-components/price-selector'
 import type { ClientSignupStep } from './route'
+import { HouseIcon, MoneyIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/signup/(steps)/buyer/(step-1)/home')({
 	component: BuyerHomeRoute,
@@ -133,7 +134,7 @@ function BuyerHomeRoute() {
 						<FieldSection
 							title="Home type"
 							description="Select all that apply."
-							icon={Home}
+							icon={HouseIcon}
 							action={
 								propertyComplete ? (
 									<span className="bg-primary/10 text-primary rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap">
@@ -146,7 +147,7 @@ function BuyerHomeRoute() {
 								{propertyType.slugs.map((option) => (
 									<SelectionCard
 										key={option}
-										icon={Home}
+										icon={HouseIcon}
 										title={propertyType.labels[option]}
 										selected={propertyTypes.includes(option)}
 										variant="solid"
@@ -167,7 +168,7 @@ function BuyerHomeRoute() {
 							<FieldSection
 								title="Target price"
 								description="Set your minimum and maximum."
-								icon={Banknote}
+								icon={MoneyIcon}
 								action={
 									<span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-semibold whitespace-nowrap">
 										{formatPriceRange(priceRange)}

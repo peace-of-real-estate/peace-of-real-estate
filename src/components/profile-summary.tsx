@@ -1,5 +1,4 @@
 import type { ElementType } from 'react'
-import { Banknote, Briefcase, Home, Shield, Star, User } from 'lucide-react'
 
 import { formatPriceRange, parsePriceRange } from '@/lib/price-range'
 import {
@@ -14,6 +13,14 @@ import {
 	sellerQuestions,
 	yearsLicensed,
 } from '@/lib/profile'
+import {
+	BriefcaseIcon,
+	HouseIcon,
+	MoneyIcon,
+	ShieldIcon,
+	StarIcon,
+	UserIcon,
+} from '@phosphor-icons/react'
 
 export interface ClientSummaryProfile {
 	city?: string | null | undefined
@@ -75,7 +82,7 @@ function getClientSummaryItems(
 			? {
 					label: 'Budget',
 					value: formatPriceRange(parsePriceRange(profile.priceRange)),
-					icon: Banknote,
+					icon: MoneyIcon,
 				}
 			: null,
 		profile.propertyTypes?.length
@@ -84,7 +91,7 @@ function getClientSummaryItems(
 					value: profile.propertyTypes
 						.map((type) => getEnumLabel(propertyType.labels, type))
 						.join(', '),
-					icon: Home,
+					icon: HouseIcon,
 				}
 			: null,
 	]
@@ -204,7 +211,7 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 			? {
 					label: 'Typical price range',
 					value: formatPriceRange(parsePriceRange(profile.typicalPriceRange)),
-					icon: Banknote,
+					icon: MoneyIcon,
 				}
 			: null,
 		profile.representationSide
@@ -214,14 +221,14 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 						representationSide.labels,
 						profile.representationSide,
 					),
-					icon: Briefcase,
+					icon: BriefcaseIcon,
 				}
 			: null,
 		profile.zipCodes?.length
 			? {
 					label: 'Service areas',
 					value: profile.zipCodes.slice(0, 3).join(', '),
-					icon: Briefcase,
+					icon: BriefcaseIcon,
 				}
 			: null,
 		profile.bestClientTypes?.length
@@ -230,14 +237,14 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 					value: profile.bestClientTypes
 						.map((slug) => getEnumLabel(bestClientType.labels, slug))
 						.join(', '),
-					icon: User,
+					icon: UserIcon,
 				}
 			: null,
 		profile.yearsLicensed
 			? {
 					label: 'Experience',
 					value: getEnumLabel(yearsLicensed.labels, profile.yearsLicensed),
-					icon: Star,
+					icon: StarIcon,
 				}
 			: null,
 		profile.averageTransactions
@@ -247,14 +254,14 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 						averageTransactions.labels,
 						profile.averageTransactions,
 					),
-					icon: Home,
+					icon: HouseIcon,
 				}
 			: null,
 		profile.eoInsuranceStatus
 			? {
 					label: 'E&O insurance',
 					value: profile.eoInsuranceStatus,
-					icon: Shield,
+					icon: ShieldIcon,
 				}
 			: null,
 	]

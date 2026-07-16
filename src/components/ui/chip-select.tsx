@@ -1,6 +1,5 @@
-import { Check } from 'lucide-react'
-
 import { cn } from '@/lib/utils/ui'
+import { CheckIcon } from '@phosphor-icons/react'
 
 type ChipSelectOption = {
 	value: string
@@ -60,7 +59,7 @@ export function ChipSelect({
 							(isAtLimit || disabled) && 'pointer-events-none opacity-50',
 						)}
 					>
-						{isSelected && <Check className="h-3.5 w-3.5" />}
+						{isSelected && <CheckIcon className="h-3.5 w-3.5" />}
 						{option.label}
 					</button>
 				)

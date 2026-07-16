@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
+
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { SpinnerIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/auth/forgot-password')({
 	beforeLoad: redirectAuthenticatedUsers,
@@ -94,7 +95,7 @@ function ForgotPasswordRoute() {
 										className="w-full"
 									>
 										{isSubmitting ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
+											<SpinnerIcon className="h-4 w-4 animate-spin" />
 										) : null}
 										Send reset link
 									</Button>

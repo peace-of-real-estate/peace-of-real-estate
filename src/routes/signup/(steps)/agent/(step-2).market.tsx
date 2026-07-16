@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { MapPinIcon } from '@phosphor-icons/react'
-import { Check, ArrowRight } from 'lucide-react'
+
 import { useState } from 'react'
 
 import { CityZipSelector } from '../-components/zip-selector'
@@ -33,6 +33,7 @@ import {
 	serializePriceRange,
 } from '@/lib/price-range'
 import { agentConfig, getRepresentationIcon, type AgentFlowStep } from './route'
+import { ArrowRightIcon, CheckIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/signup/(steps)/agent/(step-2)/market')({
 	component: AgentMarketRoute,
@@ -269,7 +270,7 @@ export function AgentMarket({
 											)}
 										>
 											{isSelected ? (
-												<Check className="text-primary h-3 w-3" />
+												<CheckIcon className="text-primary h-3 w-3" />
 											) : null}
 										</span>
 										{bestClientType.labels[option]}
@@ -305,7 +306,7 @@ export function AgentMarket({
 							)}
 						>
 							Continue
-							<ArrowRight className="h-4 w-4" />
+							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
 					</div>
 				</CardContent>

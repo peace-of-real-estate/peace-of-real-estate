@@ -1,8 +1,12 @@
-import { MapPin, Star, Clock, Users } from 'lucide-react'
-
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { AgentMatchData } from '@/lib/matching/match.view'
+import {
+	ClockIcon,
+	MapPinIcon,
+	StarIcon,
+	UsersIcon,
+} from '@phosphor-icons/react'
 
 export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 	return (
@@ -34,7 +38,7 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 						<h3 className="truncate text-lg font-semibold">{match.name}</h3>
 						{match.isTopMatch && (
 							<span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold">
-								<Star className="h-3 w-3 fill-current" />
+								<StarIcon className="h-3 w-3 fill-current" />
 								Top match
 							</span>
 						)}
@@ -45,19 +49,19 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 
 					<div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
 						<span className="flex items-center gap-1">
-							<MapPin className="h-3 w-3" />
+							<MapPinIcon className="h-3 w-3" />
 							Serves {match.zipCodes.slice(0, 3).join(', ')}
 							{match.zipCodes.length > 3 && '...'}
 						</span>
 						{match.experience && (
 							<span className="flex items-center gap-1">
-								<Clock className="h-3 w-3" />
+								<ClockIcon className="h-3 w-3" />
 								{match.experience}
 							</span>
 						)}
 						{match.stats && (
 							<span className="flex items-center gap-1">
-								<Users className="h-3 w-3" />
+								<UsersIcon className="h-3 w-3" />
 								{match.stats.transactions} deals
 							</span>
 						)}

@@ -3,7 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { MapPinIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type { Feature, FeatureCollection } from 'geojson'
-import { Check, ChevronsUpDown } from 'lucide-react'
+
 import { useEffect, useRef, useState } from 'react'
 import Map, { Layer, Source } from 'react-map-gl/maplibre'
 import type {
@@ -38,6 +38,7 @@ import {
 	loadZipCodeBoundaries,
 	parseCityState,
 } from '@/lib/geography/zip'
+import { CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react'
 
 export type CityZipSelectorProps = {
 	id?: string
@@ -171,7 +172,7 @@ export function CityZipSelector({
 						>
 							{committedLocation || placeholder}
 						</span>
-						<ChevronsUpDown className="text-muted-foreground h-4 w-4 shrink-0" />
+						<CaretUpDownIcon className="text-muted-foreground h-4 w-4 shrink-0" />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent
@@ -199,7 +200,7 @@ export function CityZipSelector({
 										value={suggestion}
 										onSelect={selectCity}
 									>
-										<Check
+										<CheckIcon
 											className={cn(
 												committedLocation === suggestion
 													? 'opacity-100'

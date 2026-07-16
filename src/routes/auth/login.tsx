@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
+
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { SpinnerIcon } from '@phosphor-icons/react'
 
 const DEFAULT_POST_AUTH_REDIRECT = '/'
 
@@ -153,7 +154,7 @@ export function Login({ redirect }: { redirect?: string }) {
 										className="w-full"
 									>
 										{isSubmitting ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
+											<SpinnerIcon className="h-4 w-4 animate-spin" />
 										) : null}
 										Sign in
 									</Button>

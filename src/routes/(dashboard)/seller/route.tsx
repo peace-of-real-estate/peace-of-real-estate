@@ -1,26 +1,30 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { ArrowRightLeft, Search, Users } from 'lucide-react'
 
 import {
 	DashboardShell,
 	DashboardSidebar,
 	type SidebarItem,
 } from '@/routes/(dashboard)/-components/dashboard'
+import {
+	ArrowsLeftRightIcon,
+	MagnifyingGlassIcon,
+	UsersIcon,
+} from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/(dashboard)/seller')({
 	component: SellerDashboardLayout,
 })
 
 const sellerItems: SidebarItem[] = [
-	{ label: 'Matches', icon: Users, href: '/seller/matches' },
+	{ label: 'Matches', icon: UsersIcon, href: '/seller/matches' },
 	{
 		label: 'Introductions',
-		icon: ArrowRightLeft,
+		icon: ArrowsLeftRightIcon,
 		href: '/seller/introductions',
 	},
 	{
 		label: 'Search Preferences',
-		icon: Search,
+		icon: MagnifyingGlassIcon,
 		href: '/seller/search-preferences',
 	},
 ]

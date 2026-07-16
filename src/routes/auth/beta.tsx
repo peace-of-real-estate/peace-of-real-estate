@@ -1,12 +1,17 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
-import { ArrowRight, Lock, ShieldCheck, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { authenticateBeta } from '@/lib/auth/beta'
 import { SUPPORT_EMAIL } from '@/lib/constants'
+import {
+	ArrowRightIcon,
+	LockIcon,
+	ShieldCheckIcon,
+	SparkleIcon,
+} from '@phosphor-icons/react'
 
 async function authenticateBetaWithPassword(password: string) {
 	try {
@@ -54,14 +59,14 @@ function BetaLogin() {
 				<CardContent>
 					<div className="mb-8 flex items-center justify-between gap-4">
 						<div className="flex h-12 w-12 items-center justify-center">
-							<ShieldCheck className="h-6 w-6" />
+							<ShieldCheckIcon className="h-6 w-6" />
 						</div>
 						<div className="text-muted-foreground text-sm">Private Preview</div>
 					</div>
 
 					<div className="mb-10 text-center">
 						<div className="mx-auto mb-5 inline-flex items-center gap-2 text-xs">
-							<Sparkles className="h-3.5 w-3.5" />
+							<SparkleIcon className="h-3.5 w-3.5" />
 							Early Access
 						</div>
 						<h1 className="mb-4 text-4xl md:text-5xl">
@@ -75,7 +80,7 @@ function BetaLogin() {
 
 					<form onSubmit={handleSubmit} className="space-y-4">
 						<div className="relative">
-							<Lock className="text-muted-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2" />
+							<LockIcon className="text-muted-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2" />
 							<Input
 								ref={inputRef}
 								type="password"
@@ -108,7 +113,7 @@ function BetaLogin() {
 
 						<Button type="submit" disabled={success} className="w-full">
 							{success ? 'Entering...' : 'Unlock Preview'}
-							<ArrowRight className="h-4 w-4" />
+							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
 					</form>
 

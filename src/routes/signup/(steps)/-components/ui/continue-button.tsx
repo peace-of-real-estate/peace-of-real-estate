@@ -1,7 +1,6 @@
-import { ArrowRight } from 'lucide-react'
-
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils/ui'
+import { ArrowRightIcon } from '@phosphor-icons/react'
 
 export function ContinueButton({
 	disabled,
@@ -23,7 +22,7 @@ export function ContinueButton({
 			)}
 		>
 			Continue
-			<ArrowRight className="h-5 w-5" />
+			<ArrowRightIcon className="h-5 w-5" />
 		</Button>
 	)
 }

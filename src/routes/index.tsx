@@ -1,6 +1,6 @@
 import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowRight, CheckCircle2, Home, Tag } from 'lucide-react'
+
 import { Star, ShieldCheck, Clock } from '@phosphor-icons/react'
 import { useState } from 'react'
 
@@ -12,6 +12,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
+import {
+	ArrowRightIcon,
+	CheckCircleIcon,
+	HouseIcon,
+	TagIcon,
+} from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/')({
 	beforeLoad: redirectAuthenticatedUsers,
@@ -148,7 +154,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 								onClick={onOpenProfileType}
 							>
 								Find an Agent
-								<ArrowRight className="ml-2 h-4 w-4" />
+								<ArrowRightIcon className="ml-2 h-4 w-4" />
 							</Button>
 							<Button
 								variant="outline"
@@ -219,7 +225,7 @@ function ProfileTypeDialog({
 						onClick={() => onOpenChange(false)}
 					>
 						<div className="bg-primary/10 text-primary mb-4 flex size-11 items-center justify-center rounded-xl">
-							<Home className="size-5" />
+							<HouseIcon className="size-5" />
 						</div>
 						<h3 className="font-heading text-lg font-semibold">
 							I want to buy
@@ -235,7 +241,7 @@ function ProfileTypeDialog({
 						onClick={() => onOpenChange(false)}
 					>
 						<div className="bg-primary/10 text-primary mb-4 flex size-11 items-center justify-center rounded-xl">
-							<Tag className="size-5" />
+							<TagIcon className="size-5" />
 						</div>
 						<h3 className="font-heading text-lg font-semibold">
 							I want to sell
@@ -385,7 +391,7 @@ function FeaturesSection({
 						{featureItems.map((item) => (
 							<li key={item.lead} className="flex items-start gap-3">
 								<div className="bg-primary/10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
-									<CheckCircle2 className="text-primary h-3.5 w-3.5" />
+									<CheckCircleIcon className="text-primary h-3.5 w-3.5" />
 								</div>
 								<span className="text-sm leading-relaxed">
 									<strong>{item.lead}</strong> — {item.rest}
@@ -401,7 +407,7 @@ function FeaturesSection({
 							onClick={onOpenProfileType}
 						>
 							Find My Agent
-							<ArrowRight className="ml-2 h-4 w-4" />
+							<ArrowRightIcon className="ml-2 h-4 w-4" />
 						</Button>
 						<button
 							type="button"
