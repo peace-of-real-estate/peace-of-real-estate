@@ -287,17 +287,12 @@ export function ProfileSummaryGrid({
 			? 'grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3'
 			: 'grid grid-cols-1 gap-3 sm:grid-cols-2'
 
-	const iconContainerClass =
-		variant === 'dashboard'
-			? 'text-primary bg-secondary/70 mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg'
-			: 'text-primary bg-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl'
+	const iconContainerClass = 'text-muted-foreground mt-0.5 flex shrink-0'
 
-	const iconSize = variant === 'dashboard' ? 'h-3.5 w-3.5' : 'h-4 w-4'
+	const iconSize = 'h-4 w-4'
 
 	const labelClass =
-		variant === 'dashboard'
-			? 'text-muted-foreground text-[9px] font-bold tracking-[0.15em] uppercase'
-			: 'text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase'
+		'text-muted-foreground text-xs font-semibold tracking-[0.1em] uppercase'
 
 	const valueClass =
 		variant === 'dashboard'

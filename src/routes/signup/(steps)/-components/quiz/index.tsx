@@ -200,7 +200,7 @@ export function QuizQuestionContent<
 			const freeFormAnswer = (answer as string | null | undefined) ?? null
 			return (
 				<>
-					<QuestionPrompt title={question.title} label={question.label} />
+					<QuestionPrompt title={question.title} />
 					<FreeFormQuestionCard
 						question={freeFormQuestion}
 						value={freeFormAnswer}
@@ -222,7 +222,6 @@ export function PreferencesStep<
 	TStep extends string,
 >({
 	title,
-	icon,
 	stepNumber,
 	totalSteps,
 	stepKey,
@@ -278,13 +277,11 @@ export function PreferencesStep<
 						stepNumber={stepNumber}
 						totalSteps={totalSteps}
 						title={title}
-						icon={icon}
 					/>
 					<StepProgressHeader
 						stepNumber={stepNumber}
 						totalSteps={totalSteps}
 						title={title}
-						activeIndex={currentQuestionIndex}
 						items={answeredFlags}
 						showTitle={false}
 					/>

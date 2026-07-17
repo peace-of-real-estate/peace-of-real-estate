@@ -52,7 +52,7 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
 						<h3 className="truncate text-lg font-semibold">{match.name}</h3>
 						{match.isTopMatch && (
-							<span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold">
+							<span className="bg-amber/15 text-amber-foreground inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold">
 								<StarIcon className="h-3 w-3 fill-current" />
 								Top match
 							</span>
@@ -87,7 +87,7 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 							{topSpecialties.map((specialty) => (
 								<span
 									key={specialty}
-									className="bg-secondary text-secondary-foreground inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
+									className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium"
 								>
 									{specialty}
 								</span>
