@@ -40,8 +40,8 @@ export function BuyerPreview({ profile }: { profile: ClientProfile }) {
 			clearDraft={buyerDraftStorage.clear}
 			panelTitle={
 				<>
-					Create your profile to <span className="text-accent">unlock</span>{' '}
-					your matches
+					Create your profile to <span className="text-brand">unlock</span> your
+					matches
 				</>
 			}
 			panelDescription="Save your personalized buyer profile, view ranked agent matches, and connect with agents who fit your style."

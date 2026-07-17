@@ -17,7 +17,7 @@ export function MultiSelectQuestionCard<TSlug extends string>({
 }) {
 	return (
 		<div className="space-y-4">
-			<QuestionPrompt title={question.title} label={question.label} />
+			<QuestionPrompt title={question.title} />
 			<div className="space-y-3">
 				{question.options.slugs.map((slug, optionIndex) => {
 					const current = answer ?? []

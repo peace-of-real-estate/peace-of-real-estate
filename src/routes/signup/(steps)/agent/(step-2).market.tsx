@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { MapPinIcon } from '@phosphor-icons/react'
 
 import { useState } from 'react'
 
@@ -126,12 +125,7 @@ export function AgentMarket({
 		<AnimatedStepCard stepKey="market">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
-					<StepHeader
-						stepNumber={2}
-						totalSteps={5}
-						title="Market"
-						icon={MapPinIcon}
-					/>
+					<StepHeader stepNumber={2} totalSteps={5} title="Market" />
 
 					<CityZipSelector
 						id="agent-market"
@@ -154,7 +148,7 @@ export function AgentMarket({
 					<div className="space-y-5 border-t pt-5">
 						<div className="flex items-center justify-between gap-3">
 							<p className="text-sm font-semibold">Typical price range</p>
-							<span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-semibold whitespace-nowrap">
+							<span className="bg-primary/10 text-primary rounded-md px-3 py-1 text-sm font-semibold whitespace-nowrap">
 								{formatPriceRange(priceRange)}
 							</span>
 						</div>
@@ -204,7 +198,7 @@ export function AgentMarket({
 										style={{ left: `${percent}%` }}
 									>
 										<span className="bg-muted-foreground/30 h-1 w-px rounded-full" />
-										<span className="text-muted-foreground text-[10px] font-medium">
+										<span className="text-muted-foreground text-xs font-medium">
 											{formatPriceCompact(value)}
 										</span>
 									</div>
@@ -226,7 +220,7 @@ export function AgentMarket({
 										type="button"
 										onClick={() => setRepresentationSide(option)}
 										className={cn(
-											'group flex items-center gap-2 rounded-full border px-4 py-3 text-left text-sm font-semibold transition',
+											'group flex items-center gap-2 rounded-md border px-4 py-3 text-left text-sm font-semibold transition',
 											isSelected
 												? 'border-primary bg-primary text-primary-foreground shadow-sm'
 												: 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-background',
@@ -298,12 +292,7 @@ export function AgentMarket({
 							onClick={handleContinue}
 							disabled={!canContinue}
 							size="lg"
-							className={cn(
-								'w-full gap-2 rounded-4xl px-8 transition-all duration-300',
-								canContinue
-									? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg'
-									: 'bg-muted text-muted-foreground',
-							)}
+							className="w-full gap-2"
 						>
 							Continue
 							<ArrowRightIcon className="h-4 w-4" />

@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
-@import '@fontsource-variable/figtree';
 @import '@fontsource-variable/dm-sans';
 @import '@fontsource-variable/jetbrains-mono';
 
@@ -11,66 +10,78 @@
 	--app-header-height: 3.5rem;
 	--app-footer-height: 4rem;
 
-	--radius: 0.5rem;
+	--radius: 0.375rem;
 
-	--background: oklch(0.985 0.005 250);
-	--foreground: oklch(0.18 0.03 255);
+	--background: oklch(0.985 0.003 240);
+	--foreground: oklch(0.21 0.04 240);
 	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.18 0.03 255);
+	--card-foreground: oklch(0.21 0.04 240);
 	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.18 0.03 255);
+	--popover-foreground: oklch(0.21 0.04 240);
 
-	/* Brand: deep navy */
-	--primary: oklch(0.32 0.07 255);
-	--primary-foreground: oklch(0.97 0.005 250);
+	/* Primary: ink-depth brand navy (hue 235 held across the family) */
+	--primary: oklch(0.3 0.07 235);
+	--primary-foreground: oklch(0.98 0.005 240);
 
-	/* Secondary: cool slate */
-	--secondary: oklch(0.94 0.012 250);
-	--secondary-foreground: oklch(0.28 0.04 255);
+	/* Brand: #024A70 re-derived — headings on white, links, emphasis.
+	   Never a large fill: light-only UI, navy acts through text and buttons. */
+	--brand: oklch(0.38 0.08 235);
+	--brand-foreground: oklch(0.98 0.005 240);
+
+	/* Secondary: navy-cast neutral */
+	--secondary: oklch(0.945 0.01 240);
+	--secondary-foreground: oklch(0.3 0.05 238);
 
 	/* Muted */
-	--muted: oklch(0.93 0.01 250);
-	--muted-foreground: oklch(0.55 0.025 255);
+	--muted: oklch(0.955 0.008 240);
+	--muted-foreground: oklch(0.5 0.025 240);
 
-	/* Accent: amber gold — CTAs, badges, match highlights */
-	--accent: oklch(0.76 0.13 78);
-	--accent-foreground: oklch(0.18 0.04 78);
+	/* Accent: shadcn-conventional subtle tint for hover/selected states
+	   (menus, command items, ghost buttons). NOT the brand amber. */
+	--accent: oklch(0.945 0.01 240);
+	--accent-foreground: oklch(0.3 0.05 238);
 
-	/* Destructive */
-	--destructive: oklch(0.58 0.21 25);
+	/* Amber: brand highlight — match scores, badges, emphasized words.
+	   Never a CTA, never a hover state. */
+	--amber: oklch(0.72 0.13 75);
+	--amber-foreground: oklch(0.25 0.06 70);
+
+	/* Destructive: red-orange, clearly distinct from amber */
+	--destructive: oklch(0.55 0.2 27);
 	--destructive-foreground: oklch(1 0 0);
 
+	/* Success: replaces ad-hoc emerald */
+	--success: oklch(0.55 0.12 155);
+	--success-foreground: oklch(1 0 0);
+
 	/* Borders & inputs */
-	--border: oklch(0.86 0.015 250);
-	--input: oklch(0.91 0.012 250);
-	--ring: oklch(0.76 0.13 78);
+	--border: oklch(0.88 0.012 240);
+	--input: oklch(0.9 0.01 240);
+	--ring: oklch(0.3 0.07 235);
 
-	/* Sky blue: transparency, clarity, openness */
+	/* Sky: illustration + tint source only; never text, never large fills */
 	--sky: oklch(0.82 0.08 230);
-	--sky-foreground: oklch(0.18 0.03 255);
-
-	/* Gold: premium value, worth it */
-	--gold: oklch(0.76 0.13 78);
-	--gold-foreground: oklch(0.18 0.04 78);
+	--sky-foreground: oklch(0.21 0.04 240);
+	--sky-tint: oklch(0.95 0.02 230);
 
 	/* Sidebar */
-	--sidebar: oklch(0.96 0.008 250);
-	--sidebar-foreground: oklch(0.18 0.03 255);
-	--sidebar-primary: oklch(0.32 0.07 255);
-	--sidebar-primary-foreground: oklch(0.97 0.005 250);
-	--sidebar-accent: oklch(0.94 0.012 250);
-	--sidebar-accent-foreground: oklch(0.28 0.04 255);
-	--sidebar-border: oklch(0.86 0.015 250);
-	--sidebar-ring: oklch(0.76 0.13 78);
+	--sidebar: oklch(0.97 0.005 240);
+	--sidebar-foreground: oklch(0.21 0.04 240);
+	--sidebar-primary: oklch(0.3 0.07 235);
+	--sidebar-primary-foreground: oklch(0.98 0.005 240);
+	--sidebar-accent: oklch(0.945 0.01 240);
+	--sidebar-accent-foreground: oklch(0.3 0.05 238);
+	--sidebar-border: oklch(0.88 0.012 240);
+	--sidebar-ring: oklch(0.3 0.07 235);
 
-	/* Typography */
-	--font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
-	--font-serif: Georgia, Cambria, 'Times New Roman', Times, serif;
+	/* Typography: one family — DM Sans for headings and body */
+	--font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: georgia, cambria, 'Times New Roman', times, serif;
 	--font-mono:
-		'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco,
-		Consolas, monospace;
+		'JetBrains Mono Variable', ui-monospace, sfmono-regular, menlo, monaco,
+		consolas, monospace;
 	--font-family-sans: var(--font-sans);
-	--font-family-heading: 'DM Sans Variable', var(--font-sans);
+	--font-family-heading: var(--font-sans);
 	--font-family-mono: var(--font-mono);
 	--font-body: var(--font-sans);
 	--font-heading: var(--font-family-heading);
@@ -109,10 +120,15 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--color-brand: var(--brand);
+	--color-brand-foreground: var(--brand-foreground);
+	--color-amber: var(--amber);
+	--color-amber-foreground: var(--amber-foreground);
+	--color-success: var(--success);
+	--color-success-foreground: var(--success-foreground);
 	--color-sky: var(--sky);
 	--color-sky-foreground: var(--sky-foreground);
-	--color-gold: var(--gold);
-	--color-gold-foreground: var(--gold-foreground);
+	--color-sky-tint: var(--sky-tint);
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);
@@ -122,19 +138,26 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 
-	--font-sans: 'Figtree Variable', sans-serif;
-	--font-heading: 'DM Sans Variable', sans-serif;
-	--font-body: var(--font-sans);
-	--font-serif: var(--font-serif);
-	--font-mono: var(--font-mono);
+	/* Readability floor: smallest text in the app is 13px */
+	--text-xs: 0.8125rem;
+	--text-xs--line-height: 1.4;
 
-	--radius-sm: calc(var(--radius) - 4px);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
-	--radius-2xl: calc(var(--radius) * 1.8);
-	--radius-3xl: calc(var(--radius) * 2.2);
-	--radius-4xl: calc(var(--radius) * 2.6);
+	--font-sans: 'DM Sans Variable', sans-serif;
+	--font-heading: var(--font-sans);
+	--font-body: var(--font-sans);
+	--font-serif: georgia, cambria, 'Times New Roman', times, serif;
+	--font-mono:
+		'JetBrains Mono Variable', ui-monospace, sfmono-regular, menlo, monaco,
+		consolas, monospace;
+
+	/* Radius caps at xl — pill and bubble radii don't exist in this theme */
+	--radius-sm: calc(var(--radius) - 2px);
+	--radius-md: var(--radius);
+	--radius-lg: calc(var(--radius) + 2px);
+	--radius-xl: calc(var(--radius) + 6px);
+	--radius-2xl: initial;
+	--radius-3xl: initial;
+	--radius-4xl: initial;
 
 	--shadow-2xs: var(--shadow-2xs);
 	--shadow-xs: var(--shadow-xs);

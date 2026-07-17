@@ -48,7 +48,7 @@ export function SelectionCard({
 			disabled={disabled}
 			aria-pressed={selected}
 			className={cn(
-				'group relative flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition-all duration-150',
+				'group relative flex items-center gap-3 rounded-lg border px-4 py-4 text-left transition-all duration-150',
 				isVertical && 'flex-col justify-center gap-2 py-5 text-center',
 				selected && variant === 'solid'
 					? 'border-primary bg-primary text-primary-foreground shadow-sm'
@@ -62,7 +62,7 @@ export function SelectionCard({
 			{selected && indicator === 'check' ? (
 				<span
 					className={cn(
-						'absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full',
+						'absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-sm',
 						variant === 'solid'
 							? 'bg-primary-foreground text-primary'
 							: 'bg-primary text-primary-foreground',
@@ -75,7 +75,7 @@ export function SelectionCard({
 			{iconContent ? (
 				<span
 					className={cn(
-						'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors duration-150',
+						'flex h-10 w-10 shrink-0 items-center justify-center rounded-md border transition-colors duration-150',
 						selected
 							? variant === 'solid'
 								? 'border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground'

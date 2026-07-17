@@ -1,29 +1,29 @@
 import { cn } from '@/lib/utils/ui'
 import { CheckIcon } from '@phosphor-icons/react'
 
-type ChipSelectOption = {
-	value: string
+type ChipSelectOption<TValue extends string = string> = {
+	value: TValue
 	label: string
 }
 
-type ChipSelectProps = {
-	options: ChipSelectOption[]
-	selected: string[]
-	onChange: (selected: string[]) => void
+type ChipSelectProps<TValue extends string = string> = {
+	options: ChipSelectOption<TValue>[]
+	selected: TValue[]
+	onChange: (selected: TValue[]) => void
 	maxSelections?: number | undefined
 	disabled?: boolean
 	className?: string
 }
 
-export function ChipSelect({
+export function ChipSelect<TValue extends string>({
 	options,
 	selected,
 	onChange,
 	maxSelections,
 	disabled = false,
 	className,
-}: ChipSelectProps) {
-	const toggle = (value: string) => {
+}: ChipSelectProps<TValue>) {
+	const toggle = (value: TValue) => {
 		if (disabled) return
 		const isSelected = selected.includes(value)
 		if (isSelected) {
@@ -52,7 +52,7 @@ export function ChipSelect({
 						disabled={isAtLimit || disabled}
 						onClick={() => toggle(option.value)}
 						className={cn(
-							'inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-all',
+							'inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-sm font-medium transition-all',
 							isSelected
 								? 'border-primary bg-primary/10 text-primary'
 								: 'border-border bg-background text-foreground hover:border-foreground/30 hover:bg-muted/30',

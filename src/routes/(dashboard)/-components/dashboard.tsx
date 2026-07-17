@@ -96,9 +96,6 @@ export function DashboardSidebar({
 		session?.user.email || profileHint || 'Create a profile to save matches'
 	const profileImage = session?.user.image
 	const profileInitials = getInitials(session?.user.name, session?.user.email)
-	const profileGradient = getProfileGradient(
-		session?.user.email ?? session?.user.name,
-	)
 
 	const isActive = (path: string) =>
 		currentPath === path || currentPath.startsWith(`${path}/`)
@@ -133,7 +130,7 @@ export function DashboardSidebar({
 						<Icon />
 						<span className="truncate">{item.label}</span>
 						{item.badge ? (
-							<span className="ml-auto shrink-0 text-[10px] font-medium tracking-wider uppercase opacity-60">
+							<span className="ml-auto shrink-0 text-xs font-medium tracking-wider uppercase opacity-60">
 								{item.badge}
 							</span>
 						) : null}
@@ -143,7 +140,7 @@ export function DashboardSidebar({
 						<Icon />
 						<span className="truncate">{item.label}</span>
 						{item.badge ? (
-							<span className="ml-auto shrink-0 text-[10px] font-medium tracking-wider uppercase opacity-60">
+							<span className="ml-auto shrink-0 text-xs font-medium tracking-wider uppercase opacity-60">
 								{item.badge}
 							</span>
 						) : null}
@@ -154,7 +151,7 @@ export function DashboardSidebar({
 							<Icon />
 							<span className="truncate">{item.label}</span>
 							{item.badge ? (
-								<span className="ml-auto shrink-0 text-[10px] font-medium tracking-wider uppercase opacity-60">
+								<span className="ml-auto shrink-0 text-xs font-medium tracking-wider uppercase opacity-60">
 									{item.badge}
 								</span>
 							) : null}
@@ -166,7 +163,7 @@ export function DashboardSidebar({
 							<Icon />
 							<span className="truncate">{item.label}</span>
 							{item.badge ? (
-								<span className="ml-auto shrink-0 text-[10px] font-medium tracking-wider uppercase opacity-60">
+								<span className="ml-auto shrink-0 text-xs font-medium tracking-wider uppercase opacity-60">
 									{item.badge}
 								</span>
 							) : null}
@@ -185,9 +182,7 @@ export function DashboardSidebar({
 						to={homeHref}
 						className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex h-12 w-full items-center gap-2 overflow-hidden rounded-lg px-2.5 text-left text-sm transition-colors"
 					>
-						<div
-							className={`flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg text-xs font-semibold text-white ${profileGradient}`}
-						>
+						<div className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md text-xs font-semibold">
 							{profileImage ? (
 								<img
 									src={profileImage}
@@ -220,7 +215,7 @@ export function DashboardSidebar({
 						<SidebarGroup>
 							<SidebarGroupLabel>
 								AI
-								<span className="ml-1.5 rounded-full bg-sky-100 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-sky-700 uppercase dark:bg-sky-950 dark:text-sky-300">
+								<span className="bg-sky-tint text-brand ml-1.5 rounded-sm px-1.5 py-0.5 text-xs font-semibold tracking-wider uppercase">
 									beta
 								</span>
 							</SidebarGroupLabel>
@@ -276,25 +271,6 @@ function getInitials(name?: string | null, email?: string | null) {
 		.join('')
 }
 
-function getProfileGradient(seed?: string | null) {
-	const gradients = [
-		'bg-gradient-to-br from-emerald-500 to-teal-700',
-		'bg-gradient-to-br from-indigo-500 to-violet-700',
-		'bg-gradient-to-br from-rose-500 to-orange-600',
-		'bg-gradient-to-br from-sky-500 to-blue-700',
-		'bg-gradient-to-br from-amber-500 to-pink-600',
-	]
-
-	if (!seed) return gradients[0]
-
-	const index = Array.from(seed).reduce(
-		(total, char) => total + char.charCodeAt(0),
-		0,
-	)
-
-	return gradients[index % gradients.length]
-}
-
 function SupportDialog({
 	open,
 	onOpenChange,
@@ -313,7 +289,7 @@ function SupportDialog({
 				</DialogHeader>
 
 				<div className="space-y-5">
-					<div className="bg-muted/30 rounded-2xl border p-4">
+					<div className="bg-muted/30 rounded-lg border p-4">
 						<p className="text-muted-foreground mb-2 text-sm">
 							For account questions, match concerns, or anything that needs a
 							human reply:

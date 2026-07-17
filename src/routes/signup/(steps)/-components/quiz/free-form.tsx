@@ -33,7 +33,7 @@ export function FreeFormQuestionCard<TKey extends string>({
 						onClick={onComplete}
 						disabled={!canAdvance}
 						size="lg"
-						className="w-full gap-2 rounded-4xl px-8 py-6 text-base"
+						className="w-full gap-2"
 					>
 						{isLastQuestion ? 'Finish' : 'Continue'}
 					</Button>

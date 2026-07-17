@@ -13,6 +13,7 @@ import type {
 } from 'react-map-gl/maplibre'
 import { z } from 'zod'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
 	Command,
@@ -158,26 +159,43 @@ export function CityZipSelector({
 						variant="outline"
 						aria-expanded={locationOpen}
 						className={cn(
-							'h-12 w-full justify-between rounded-2xl px-4 text-left text-base font-semibold transition sm:h-14 sm:text-lg',
+							'h-12 w-full justify-between rounded-lg px-4 text-left text-base font-semibold transition sm:h-14 sm:text-lg',
 							marketComplete
 								? 'border-primary/60 bg-background text-foreground shadow-sm hover:bg-primary/[0.04]'
 								: 'border-primary/25 bg-background text-foreground shadow-sm hover:border-primary/50 hover:bg-background',
 						)}
 					>
-						<span
-							className={cn(
-								!committedLocation && 'text-muted-foreground',
-								'truncate',
-							)}
-						>
-							{committedLocation || placeholder}
+						<span className="flex min-w-0 flex-1 items-center gap-2.5">
+							<MapPinIcon
+								weight={marketComplete ? 'fill' : 'regular'}
+								className={cn(
+									'h-4 w-4 shrink-0',
+									marketComplete ? 'text-primary' : 'text-muted-foreground',
+								)}
+							/>
+							<span
+								className={cn(
+									'truncate',
+									!committedLocation && 'text-muted-foreground',
+								)}
+							>
+								{cityState ? cityState.city : committedLocation || placeholder}
+							</span>
+							{cityState?.state ? (
+								<Badge
+									variant="muted"
+									className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+								>
+									{cityState.state}
+								</Badge>
+							) : null}
 						</span>
 						<CaretUpDownIcon className="text-muted-foreground h-4 w-4 shrink-0" />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent
 					align="start"
-					className="w-(--radix-popover-trigger-width) min-w-[260px] p-0"
+					className="max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) min-w-[260px] p-0"
 				>
 					<Command shouldFilter={false}>
 						<CommandInput
@@ -194,22 +212,40 @@ export function CityZipSelector({
 										: 'City matches'
 								}
 							>
-								{locationSuggestions.map((suggestion) => (
-									<CommandItem
-										key={suggestion}
-										value={suggestion}
-										onSelect={selectCity}
-									>
-										<CheckIcon
-											className={cn(
-												committedLocation === suggestion
-													? 'opacity-100'
-													: 'opacity-0',
-											)}
-										/>
-										{suggestion}
-									</CommandItem>
-								))}
+								{locationSuggestions.map((suggestion) => {
+									const parsed = parseCityState(suggestion)
+									const isSelected = committedLocation === suggestion
+									return (
+										<CommandItem
+											key={suggestion}
+											value={suggestion}
+											onSelect={selectCity}
+											className="gap-2 rounded-md px-2.5 py-2"
+										>
+											<span className="truncate font-medium">
+												{parsed?.city ?? suggestion}
+											</span>
+											<span className="ml-auto flex shrink-0 items-center gap-1.5">
+												{parsed?.state ? (
+													<Badge
+														variant="muted"
+														className="px-1.5 text-[10px] font-semibold tracking-wider"
+													>
+														{parsed.state}
+													</Badge>
+												) : null}
+												<CheckIcon
+													className={cn(
+														'h-4 w-4',
+														isSelected
+															? 'text-primary opacity-100'
+															: 'opacity-0',
+													)}
+												/>
+											</span>
+										</CommandItem>
+									)
+								})}
 							</CommandGroup>
 						</CommandList>
 					</Command>
@@ -219,7 +255,7 @@ export function CityZipSelector({
 			{marketComplete ? (
 				<div className="space-y-3">
 					<div className="flex items-center gap-2">
-						<div className="bg-muted/50 relative flex flex-1 items-center rounded-2xl border px-3">
+						<div className="bg-muted/50 relative flex flex-1 items-center rounded-lg border px-3">
 							<input
 								value={manualZipCode}
 								onChange={(event) => setManualZipCode(event.target.value)}
@@ -234,30 +270,34 @@ export function CityZipSelector({
 								size="sm"
 								onClick={addManualZipCode}
 								disabled={!isValidZipCode(manualZipCode.trim())}
-								className="h-8 rounded-xl px-3 text-xs"
+								className="h-8 rounded-md px-3 text-xs"
 							>
 								Add
 							</Button>
 						</div>
 					</div>
-					{selectedZipCodes.length > 0 ? (
-						<div className="flex flex-wrap gap-1.5">
-							{selectedZipCodes.map((zipCode) => (
+					<div className="flex h-13 flex-wrap content-start items-start gap-1.5 overflow-y-auto">
+						{selectedZipCodes.length > 0 ? (
+							selectedZipCodes.map((zipCode) => (
 								<button
 									key={zipCode}
 									type="button"
 									onClick={() => toggleZipCode(zipCode)}
-									className="border-primary bg-primary text-primary-foreground rounded-full border px-2 py-0.5 text-[10px] font-semibold shadow-sm transition hover:opacity-80"
+									className="border-primary bg-primary text-primary-foreground shrink-0 rounded-md border px-2 py-0.5 text-xs font-semibold transition hover:opacity-80"
 									aria-pressed
 								>
 									{zipCode}
 								</button>
-							))}
-						</div>
-					) : null}
-					<div className="bg-muted/30 border-border overflow-hidden rounded-2xl border p-3">
+							))
+						) : (
+							<p className="text-muted-foreground flex h-full items-center text-xs">
+								Click ZIPs on the map or add one above.
+							</p>
+						)}
+					</div>
+					<div className="bg-muted/30 border-border overflow-hidden rounded-lg border p-3">
 						{!centerForCity ? (
-							<Skeleton className={cn('rounded-2xl', mapHeight)} />
+							<Skeleton className={cn('rounded-lg', mapHeight)} />
 						) : (
 							<ZipCodeMap
 								boundaries={
@@ -276,14 +316,35 @@ export function CityZipSelector({
 					{children}
 				</div>
 			) : (
-				<div className="flex min-h-64 flex-col items-center justify-center gap-2 text-center">
-					<MapPinIcon className="text-muted-foreground/60 h-8 w-8" />
-					<div>
-						<p className="font-semibold">Pick a city to unlock the map</p>
-						<p className="text-muted-foreground mt-1 max-w-sm text-sm">
-							The ZIP code map and manual ZIP entry will appear here after you
-							choose a city.
-						</p>
+				<div className="space-y-3">
+					<div className="bg-muted/50 relative flex items-center rounded-lg border px-3 opacity-60">
+						<input
+							placeholder="Add ZIP code"
+							disabled
+							className="h-11 w-full bg-transparent text-sm font-semibold outline-none"
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							disabled
+							className="h-8 rounded-md px-3 text-xs"
+						>
+							Add
+						</Button>
+					</div>
+					<div className="border-border/70 bg-muted/20 overflow-hidden rounded-lg border p-3">
+						<div
+							className={cn(
+								'flex flex-col items-center justify-center gap-2 text-center',
+								mapHeight,
+							)}
+						>
+							<MapPinIcon className="text-muted-foreground/60 h-6 w-6" />
+							<p className="text-muted-foreground text-sm">
+								Pick a city to unlock the ZIP map.
+							</p>
+						</div>
 					</div>
 				</div>
 			)}
@@ -393,7 +454,7 @@ function ZipCodeMapSkeleton({ className }: { className?: string | undefined }) {
 	return (
 		<div
 			className={cn(
-				'relative min-h-64 overflow-hidden rounded-2xl border',
+				'relative min-h-64 overflow-hidden rounded-lg border',
 				className,
 			)}
 		>
@@ -525,7 +586,7 @@ function ZipCodeMapImpl({
 			}
 
 	return (
-		<div className={cn('relative h-80 overflow-hidden rounded-2xl', className)}>
+		<div className={cn('relative h-80 overflow-hidden rounded-lg', className)}>
 			<Map
 				ref={mapRef}
 				mapStyle={CARTO_STYLE}
