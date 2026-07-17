@@ -1,4 +1,9 @@
-import { ArrowDownWideNarrow, Check, Search, X } from 'lucide-react'
+import {
+	CheckIcon as Check,
+	MagnifyingGlassIcon as Search,
+	SortAscendingIcon as ArrowDownWideNarrow,
+	XIcon as X,
+} from '@phosphor-icons/react'
 import * as React from 'react'
 
 import { Badge } from '@/components/ui/badge'

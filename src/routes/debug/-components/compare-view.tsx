@@ -1,4 +1,9 @@
-import { Check, GitCompareArrows, Pin, X } from 'lucide-react'
+import {
+	ArrowsLeftRightIcon as GitCompareArrows,
+	CheckIcon as Check,
+	PushPinIcon as Pin,
+	XIcon as X,
+} from '@phosphor-icons/react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

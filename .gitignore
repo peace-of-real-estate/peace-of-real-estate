@@ -22,7 +22,6 @@ test-results/
 playwright-report/
 .playwright
 .vitest-attachments
-html
 visual-diffs.html
 **/*-1.png
 e2e/.auth

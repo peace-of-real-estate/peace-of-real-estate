@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { CaretRightIcon as ChevronRight } from '@phosphor-icons/react'
 
 import { Card } from '@/components/ui/card'
 import {

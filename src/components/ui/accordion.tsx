@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ChevronDown } from 'lucide-react'
+import { CaretDownIcon as ChevronDown } from '@phosphor-icons/react'
 import { Accordion as AccordionPrimitive } from 'radix-ui'
 
 import { cn } from '@/lib/utils/ui'

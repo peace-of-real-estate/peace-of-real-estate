@@ -1,4 +1,4 @@
-import { parseMinMaxRange } from '@/lib/price-range'
+import { AGENT_PRICE_RANGES, parseMinMaxRange } from '@/lib/price-range'
 
 import type { PriceRangeValue } from './types'
 
@@ -24,15 +24,22 @@ export function formatPriceRangeValue(range: PriceRangeValue): string {
 }
 
 /**
- * Strict parser for the app's serialized "min-max" price format
- * (see serializePriceRange in price-range.ts). Returns undefined for
- * anything else so callers can trace unparseable data instead of
- * silently substituting defaults.
+ * Parses the stored price range formats used by the app.
+ * Accepts the serialized 'min-max' format (e.g. '400000-750000')
+ * and the agent bucket slugs from AGENT_PRICE_RANGES (e.g. '400kTo750k').
+ * Returns undefined for anything else so callers can trace unparseable data
+ * instead of silently substituting defaults.
  */
 export function parseSerializedPriceRange(
 	value: string | null | undefined,
 ): PriceRangeValue | undefined {
-	return parseMinMaxRange(value)
+	const minMax = parseMinMaxRange(value)
+	if (minMax) return minMax
+	const slug = value?.trim()
+	if (!slug) return undefined
+	const range = AGENT_PRICE_RANGES[slug]
+	if (range) return { ...range }
+	return undefined
 }
 
 /**

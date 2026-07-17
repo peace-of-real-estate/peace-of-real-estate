@@ -1,4 +1,8 @@
-import { Check, ChevronsUpDown, User } from 'lucide-react'
+import {
+	CaretUpDownIcon as ChevronsUpDown,
+	CheckIcon as Check,
+	UserIcon as User,
+} from '@phosphor-icons/react'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
