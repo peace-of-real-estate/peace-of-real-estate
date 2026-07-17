@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ScrollIcon } from '@phosphor-icons/react'
 
 import { useState } from 'react'
 
@@ -12,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils/ui'
 import type { AgentDraft } from '@/lib/profile'
 import type { AgentFlowStep } from './route'
 import { ArrowRightIcon } from '@phosphor-icons/react'
@@ -64,14 +62,9 @@ export function AgentPeacePact({
 		<AnimatedStepCard stepKey="peacePact">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
-					<StepHeader
-						stepNumber={5}
-						totalSteps={5}
-						title="Peace Pact"
-						icon={ScrollIcon}
-					/>
+					<StepHeader stepNumber={5} totalSteps={5} title="Peace Pact" />
 
-					<Card className="max-h-80 overflow-y-auto rounded-2xl border bg-transparent p-5 text-sm leading-relaxed shadow-none ring-0">
+					<Card className="max-h-80 overflow-y-auto rounded-lg border bg-transparent p-5 text-sm leading-relaxed shadow-none ring-0">
 						<h2 className="mb-4 text-xl font-semibold">THE PEACE PACT</h2>
 						<p>
 							This Commitment reinforces ethical, transparent, and client-first
@@ -122,12 +115,7 @@ export function AgentPeacePact({
 							onClick={handleContinue}
 							disabled={!canContinue}
 							size="lg"
-							className={cn(
-								'w-full gap-2 rounded-4xl px-8 transition-all duration-300',
-								canContinue
-									? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg'
-									: 'bg-muted text-muted-foreground',
-							)}
+							className="w-full gap-2"
 						>
 							Sign & continue
 							<ArrowRightIcon className="h-4 w-4" />

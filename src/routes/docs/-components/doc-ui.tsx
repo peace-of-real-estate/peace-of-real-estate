@@ -147,7 +147,7 @@ export function BulletList({ children }: { children: ReactNode }) {
 
 const pillTones = {
 	navy: 'bg-primary text-primary-foreground',
-	gold: 'bg-accent/15 text-accent-foreground border border-accent',
+	gold: 'bg-amber/15 text-amber-foreground border border-amber',
 	green: 'bg-emerald-600/10 text-emerald-700 border border-emerald-600/40',
 	muted: 'bg-muted text-muted-foreground',
 	sky: 'bg-sky/20 text-primary border border-sky',
@@ -165,7 +165,7 @@ export function Pill({
 	return (
 		<span
 			className={cn(
-				'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
+				'inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap',
 				pillTones[tone],
 			)}
 		>
@@ -201,7 +201,7 @@ export function Table({
 	children: ReactNode
 }) {
 	return (
-		<div className="overflow-x-auto rounded-2xl border">
+		<div className="overflow-x-auto rounded-lg border">
 			<table className="w-full min-w-[560px] text-sm">
 				<thead>
 					<tr className="border-b">

@@ -145,20 +145,17 @@ function StepDot({
 }) {
 	return (
 		<div className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center">
-			{isCurrent ? (
-				<span className="bg-gold/40 absolute h-9 w-9 animate-ping rounded-full" />
-			) : null}
 			<div
 				className={cn(
-					'relative flex h-full w-full items-center justify-center rounded-full transition-all duration-300',
+					'relative flex h-full w-full items-center justify-center rounded-full transition-colors',
 					isCurrent
-						? 'bg-primary-foreground text-primary shadow-[0_0_8px_2px_rgba(212,175,55,0.55)]'
+						? 'bg-primary text-primary-foreground'
 						: isComplete
-							? 'bg-gold text-primary'
-							: 'bg-primary-foreground/25 text-primary-foreground',
+							? 'bg-primary/15 text-primary'
+							: 'bg-muted text-muted-foreground',
 				)}
 			>
-				<span className="text-[10px] font-bold">{index + 1}</span>
+				<span className="text-xs font-semibold">{index + 1}</span>
 			</div>
 		</div>
 	)
@@ -184,7 +181,7 @@ export function WizardChrome<TStep extends string>({
 	const currentIndex = steps.findIndex((step) => step.id === currentStepId)
 	const homeContent = (
 		<>
-			<img src="/logomark-light.svg" alt="" className="h-8 w-auto" />
+			<img src="/logomark-theme.svg" alt="" className="h-8 w-auto" />
 			<span className="font-heading text-base font-semibold">
 				Peace of Real Estate
 			</span>
@@ -193,7 +190,7 @@ export function WizardChrome<TStep extends string>({
 
 	return (
 		<div className="flex flex-1 flex-col lg:grid lg:grid-cols-[16rem_1fr] xl:grid-cols-[18rem_1fr]">
-			<aside className="bg-primary text-primary-foreground hidden flex-col justify-between px-7 py-10 lg:sticky lg:top-0 lg:flex lg:min-h-dvh">
+			<aside className="bg-sidebar text-sidebar-foreground hidden flex-col justify-between border-r px-7 py-10 lg:sticky lg:top-0 lg:flex lg:min-h-dvh">
 				<div>
 					{onHomeClick ? (
 						<button
@@ -225,11 +222,10 @@ export function WizardChrome<TStep extends string>({
 								const isLast = index === steps.length - 1
 								const isClickable = onStepClick !== undefined && isComplete
 								const stepClassName = cn(
-									'grid grid-cols-[auto_1fr] gap-3 rounded-xl px-3 py-3 transition-colors',
-									isCurrent && 'bg-white/10',
-									isComplete && 'opacity-90',
-									isUpcoming && 'opacity-55',
-									isClickable && 'hover:bg-white/5',
+									'grid grid-cols-[auto_1fr] gap-3 rounded-md px-3 py-3 transition-colors',
+									isCurrent && 'bg-secondary',
+									isUpcoming && 'opacity-70',
+									isClickable && 'hover:bg-muted',
 								)
 								const stepContent = (
 									<>
@@ -242,8 +238,8 @@ export function WizardChrome<TStep extends string>({
 											{!isLast && (
 												<div
 													className={cn(
-														'absolute top-[0.875rem] left-1/2 h-[calc(100%+0.75rem)] w-0.5 -translate-x-1/2',
-														isComplete ? 'bg-gold' : 'bg-primary-foreground/40',
+														'absolute top-[0.875rem] left-1/2 h-[calc(100%+0.75rem)] w-px -translate-x-1/2',
+														isComplete ? 'bg-primary/30' : 'bg-border',
 													)}
 												/>
 											)}
@@ -252,24 +248,22 @@ export function WizardChrome<TStep extends string>({
 											<p
 												className={cn(
 													'text-sm font-semibold leading-tight',
-													isCurrent
-														? 'text-white'
-														: 'text-primary-foreground/90',
+													isCurrent ? 'text-foreground' : 'text-foreground/80',
 												)}
 											>
 												<step.icon
 													className={cn(
 														'-mt-0.5 mr-1.5 inline-block h-4 w-4',
 														isCurrent
-															? 'text-white'
-															: 'text-primary-foreground/80',
+															? 'text-primary'
+															: 'text-muted-foreground',
 													)}
 													weight="duotone"
 												/>
 												{step.label}
 											</p>
 											{step.description ? (
-												<p className="text-primary-foreground/60 mt-0.5 text-xs leading-snug">
+												<p className="text-muted-foreground mt-0.5 text-xs leading-snug">
 													{step.description}
 												</p>
 											) : null}
@@ -307,7 +301,7 @@ export function WizardChrome<TStep extends string>({
 				<div className="bg-card border-b px-4 py-4 lg:hidden">{progress}</div>
 			) : null}
 
-			<main className="flex flex-1 flex-col overflow-y-auto">
+			<main className="flex flex-1 flex-col overflow-y-auto xl:pr-72">
 				<div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:py-12 xl:py-16">
 					{children}
 				</div>
@@ -321,7 +315,6 @@ export function StepProgressHeader({
 	totalSteps,
 	title,
 	items,
-	activeIndex,
 	titleIcon: TitleIcon,
 	showTitle = true,
 }: {
@@ -329,7 +322,6 @@ export function StepProgressHeader({
 	totalSteps: number
 	title: string
 	items: boolean[]
-	activeIndex?: number
 	titleIcon?: Icon
 	showTitle?: boolean
 }) {
@@ -352,27 +344,19 @@ export function StepProgressHeader({
 					</div>
 				</div>
 			)}
-			<div className="flex flex-col items-center gap-1.5">
-				<div className="flex items-center gap-2.5">
-					{Array.from({ length: total }).map((_, index) => {
-						const isActive = activeIndex === index
-						const isCompleted = index < completedCount
-						return (
-							<div
-								key={index}
-								className={cn(
-									'h-2.5 w-2.5 rounded-full transition-all duration-300',
-									isCompleted ? 'bg-primary' : 'bg-muted',
-									isActive &&
-										'ring-primary ring-2 ring-offset-2 ring-offset-background scale-110',
-								)}
-							/>
-						)
-					})}
+			<div className="flex items-center gap-3">
+				<div
+					className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
+					aria-hidden="true"
+				>
+					<div
+						className="bg-primary h-full rounded-full transition-all duration-300"
+						style={{ width: `${(completedCount / total) * 100}%` }}
+					/>
 				</div>
 				<span
 					className={cn(
-						'text-xs font-bold transition-colors',
+						'text-xs font-semibold whitespace-nowrap tabular-nums transition-colors',
 						isComplete ? 'text-primary' : 'text-muted-foreground',
 					)}
 				>
@@ -384,9 +368,9 @@ export function StepProgressHeader({
 }
 
 const cardVariants = {
-	enter: { y: '2rem', opacity: 0, scale: 0.96 },
-	center: { y: 0, opacity: 1, scale: 1 },
-	exit: { y: '-1rem', opacity: 0, scale: 0.96 },
+	enter: { y: '0.5rem', opacity: 0 },
+	center: { y: 0, opacity: 1 },
+	exit: { y: '-0.25rem', opacity: 0 },
 }
 
 export function AnimatedStepCard({
@@ -406,9 +390,8 @@ export function AnimatedStepCard({
 					animate="center"
 					exit="exit"
 					transition={{
-						y: { type: 'spring', stiffness: 320, damping: 30 },
-						opacity: { duration: 0.25 },
-						scale: { duration: 0.25 },
+						y: { duration: 0.2, ease: 'easeOut' },
+						opacity: { duration: 0.2 },
 					}}
 				>
 					{children}
@@ -467,7 +450,7 @@ function FlowIntakeProgress({
 						</div>
 						<p
 							className={cn(
-								'flex items-center gap-1.5 text-[10px] font-semibold tracking-wide uppercase transition-colors',
+								'text-xs font-semibold transition-colors',
 								isCurrent
 									? 'text-primary'
 									: isComplete
@@ -475,19 +458,7 @@ function FlowIntakeProgress({
 										: 'text-muted-foreground',
 							)}
 						>
-							<span
-								className={cn(
-									'flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold',
-									isCurrent
-										? 'bg-primary text-primary-foreground'
-										: isComplete
-											? 'bg-primary/15 text-primary'
-											: 'bg-muted text-muted-foreground',
-								)}
-							>
-								{index + 1}
-							</span>
-							<span>{step.label}</span>
+							{step.label}
 						</p>
 					</div>
 				)
@@ -535,20 +506,17 @@ export function StepHeader({
 	stepNumber,
 	totalSteps,
 	title,
-	icon: Icon,
 }: {
 	stepNumber: number
 	totalSteps: number
 	title: string
-	icon?: Icon
 }) {
 	return (
 		<div className="space-y-1">
-			<p className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+			<p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
 				Step {stepNumber} of {totalSteps}
 			</p>
-			<h2 className="text-muted-foreground flex items-center gap-1.5 text-sm font-medium">
-				{Icon ? <Icon className="h-4 w-4" weight="duotone" /> : null}
+			<h2 className="font-heading text-2xl font-semibold tracking-tight">
 				{title}
 			</h2>
 		</div>

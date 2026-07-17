@@ -1,4 +1,3 @@
-import { MapPinIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { createFileRoute } from '@tanstack/react-router'
@@ -12,7 +11,6 @@ import {
 } from '../-components/signup-shell'
 import { CityZipSelector } from '../-components/zip-selector'
 import { ContinueButton } from '../-components/ui/continue-button'
-import { FieldSection } from '../-components/ui/field-section'
 import type { ClientSignupStep } from './route'
 
 export const Route = createFileRoute(
@@ -40,17 +38,8 @@ function SellerLocationRoute() {
 		<AnimatedStepCard stepKey="location">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-8">
-					<StepHeader
-						stepNumber={1}
-						totalSteps={3}
-						title="Location"
-						icon={MapPinIcon}
-					/>
-					<FieldSection
-						title="City"
-						description="Search for the city where you want to buy or sell."
-						icon={MapPinIcon}
-					>
+					<StepHeader stepNumber={1} totalSteps={3} title="Location" />
+					<div className="space-y-4">
 						<CityZipSelector
 							id="client-location"
 							value={rawInitialLocation}
@@ -64,7 +53,7 @@ function SellerLocationRoute() {
 						{hasTriedContinue && !canContinue ? (
 							<p className="text-destructive text-xs">Enter a city.</p>
 						) : null}
-					</FieldSection>
+					</div>
 					<ContinueButton
 						disabled={!canContinue}
 						onClick={() => {

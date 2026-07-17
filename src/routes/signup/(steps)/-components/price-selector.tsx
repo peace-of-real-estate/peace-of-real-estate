@@ -119,7 +119,7 @@ export function PriceInput({
 					onFocus={handleFocus}
 					onBlur={handleBlur}
 					className="text-foreground/0 w-full bg-transparent pr-6 pl-6"
-					style={{ caretColor: 'hsl(var(--primary))' }}
+					style={{ caretColor: 'var(--primary)' }}
 				/>
 			</div>
 		</div>
