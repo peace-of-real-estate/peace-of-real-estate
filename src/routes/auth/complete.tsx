@@ -12,32 +12,18 @@ import {
 	loadAgentProfile,
 	loadBuyerProfile,
 	loadSellerProfile,
-	agentDraftSchema,
-	buyerDraftSchema,
-	sellerDraftSchema,
 	type AgentDraft,
 	type BuyerDraft,
 	type SellerDraft,
 } from '@/lib/profile'
-import { createLocalStorage } from '@/lib/utils/localstorage'
+import { agentDraftStorage } from '@/routes/signup/(steps)/agent/route'
+import { buyerDraftStorage } from '@/routes/signup/(steps)/buyer/route'
+import { sellerDraftStorage } from '@/routes/signup/(steps)/seller/route'
 import { SpinnerIcon } from '@phosphor-icons/react'
 
 const completeSearchSchema = z.object({
 	role: z.enum(['agent', 'buyer', 'seller']),
 })
-
-const agentDraftStorage = createLocalStorage<AgentDraft>(
-	'pre-agent-draft',
-	agentDraftSchema,
-)
-const buyerDraftStorage = createLocalStorage<BuyerDraft>(
-	'pre-buyer-draft',
-	buyerDraftSchema,
-)
-const sellerDraftStorage = createLocalStorage<SellerDraft>(
-	'pre-seller-draft',
-	sellerDraftSchema,
-)
 
 export const Route = createFileRoute('/auth/complete')({
 	validateSearch: completeSearchSchema,
