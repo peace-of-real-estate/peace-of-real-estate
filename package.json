@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"setup": "tsx scripts/setup.ts",
 		"dev": "vp dev",
 		"build": "vp build",
 		"preview": "vp preview",
