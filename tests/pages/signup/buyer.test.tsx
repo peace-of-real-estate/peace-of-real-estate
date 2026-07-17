@@ -1,6 +1,7 @@
 import type { BuyerDraft } from '@/lib/profile'
-import { test, vi, beforeEach } from 'vitest'
+import { test, vi, beforeEach, expect } from 'vitest'
 
+import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 
@@ -70,3 +71,13 @@ test('preview screenshot', async () => {
 	await renderRoute({ path: '/signup/preview/buyer' })
 	await expectScreenshot(document.body, { name: 'step-4-preview' })
 })
+
+test('location step city dropdown open', async () => {
+	mockBuyerDraft = step1
+	await renderRoute({ path: '/signup/buyer/location' })
+	const trigger = page.getByRole('button', { name: /Austin/ })
+	await expect.element(trigger).toBeVisible()
+	await trigger.click()
+	await expect.element(page.getByPlaceholder('Search city...')).toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-1-city-dropdown' })
+}, 60000)

@@ -81,7 +81,7 @@ export function ClientMatches({
 			<DashboardPageMobileNav label="Menu" />
 			<div className="mx-auto w-full max-w-4xl">
 				<div className="mb-8 flex items-center gap-4">
-					<div className="from-primary to-primary/70 text-primary-foreground shadow-primary/20 ring-primary/20 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br shadow-sm ring-1">
+					<div className="bg-primary text-primary-foreground flex h-12 w-12 items-center justify-center rounded-md">
 						<ArrowRightLeft className="h-5 w-5" />
 					</div>
 					<div>
@@ -148,7 +148,7 @@ function PreferencesSummaryCard({
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div>
 					<div className="mb-5 flex items-center gap-3">
-						<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl">
+						<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
 							{stateSvgFile ? (
 								<img
 									src={stateSvgFile}

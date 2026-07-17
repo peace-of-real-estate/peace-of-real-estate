@@ -16,20 +16,18 @@ export const scoreToneClasses: Record<
 	{ text: string; badge: string; solid: string }
 > = {
 	high: {
-		text: 'text-emerald-700 dark:text-emerald-300',
-		badge:
-			'border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300',
-		solid: 'bg-emerald-500',
+		text: 'text-success',
+		badge: 'border-success/30 bg-success/5 text-success',
+		solid: 'bg-success',
 	},
 	mid: {
-		text: 'text-amber-700 dark:text-amber-300',
-		badge:
-			'border-amber-500/30 bg-amber-500/5 text-amber-700 dark:text-amber-300',
-		solid: 'bg-amber-500',
+		text: 'text-amber-foreground',
+		badge: 'border-amber/40 bg-amber/10 text-amber-foreground',
+		solid: 'bg-amber',
 	},
 	low: {
-		text: 'text-red-700 dark:text-red-300',
-		badge: 'border-red-500/30 bg-red-500/5 text-red-700 dark:text-red-300',
-		solid: 'bg-red-500',
+		text: 'text-destructive',
+		badge: 'border-destructive/30 bg-destructive/5 text-destructive',
+		solid: 'bg-destructive',
 	},
 }

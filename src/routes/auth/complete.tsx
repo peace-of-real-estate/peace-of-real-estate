@@ -145,14 +145,14 @@ function SignupCompleteRoute() {
 
 function CompleteProfileStatus({ message }: { message: string }) {
 	return (
-		<div className="flex min-h-dvh items-center justify-center bg-slate-50 px-6 py-12">
-			<Card className="w-full max-w-md rounded-3xl border-slate-200 bg-white text-center shadow-sm">
+		<div className="bg-background flex min-h-dvh items-center justify-center px-6 py-12">
+			<Card className="w-full max-w-md text-center shadow-sm">
 				<CardContent className="flex flex-col items-center gap-4 p-8">
-					<div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-2xl">
+					<div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-lg">
 						<SpinnerIcon className="h-5 w-5 animate-spin" />
 					</div>
 					<div>
-						<h1 className="font-heading text-2xl tracking-tight text-slate-950">
+						<h1 className="font-heading text-2xl tracking-tight">
 							Completing your profile
 						</h1>
 						<p className="text-muted-foreground mt-2 text-sm">{message}</p>

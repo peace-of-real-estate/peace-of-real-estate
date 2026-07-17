@@ -70,7 +70,7 @@ export function MatchListMockup() {
 		<Card className="bg-card/50 shadow-none">
 			<CardContent className="space-y-3">
 				<div className="flex flex-wrap items-center gap-2 text-xs">
-					<div className="border-border inline-flex h-8 items-center gap-1 rounded-full border px-3">
+					<div className="border-border inline-flex h-8 items-center gap-1 rounded-md border px-3">
 						<span className="text-muted-foreground">Sort:</span>
 						<span className="font-medium">Best fit</span>
 						<ChevronDown className="text-muted-foreground h-3 w-3" />

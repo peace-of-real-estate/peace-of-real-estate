@@ -31,7 +31,7 @@ export function QuestionCard<TAnswer extends string>({
 
 	return (
 		<div className="space-y-4">
-			<QuestionPrompt title={question.title} label={question.label} />
+			<QuestionPrompt title={question.title} />
 			<div className="space-y-3">
 				{question.options.slugs.map((slug, optionIndex) => {
 					const label = question.options.labels[slug]

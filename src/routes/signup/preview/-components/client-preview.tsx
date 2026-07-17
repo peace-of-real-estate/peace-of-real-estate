@@ -92,7 +92,7 @@ export function draftToClientPreviewProfile(
 export function ClientPreviewHeader({ title }: { title: string }) {
 	return (
 		<div>
-			<span className="mb-2 inline-flex rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold tracking-[0.16em] text-amber-900 uppercase">
+			<span className="border-amber/40 bg-amber/15 text-amber-foreground mb-2 inline-flex rounded-md border px-2.5 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase">
 				Preview
 			</span>
 			<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
@@ -120,9 +120,9 @@ export function ClientProfilePreviewCard({
 		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
-		<Card className="border-border bg-card gap-0 rounded-2xl p-0 shadow-sm">
+		<Card className="border-border bg-card gap-0 rounded-lg p-0 shadow-sm">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
-				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl">
+				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
 					{stateSvgPath ? (
 						<img
 							src={stateSvgPath}
