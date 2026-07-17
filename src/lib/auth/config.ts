@@ -10,6 +10,16 @@ import { sendPasswordResetEmail } from '@/lib/email.server'
 
 const appOrigin = new URL(env.BETTER_AUTH_URL).origin
 
+const socialProviders =
+	env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+		? {
+				google: {
+					clientId: env.GOOGLE_CLIENT_ID,
+					clientSecret: env.GOOGLE_CLIENT_SECRET,
+				},
+			}
+		: {}
+
 export function getAuth() {
 	return betterAuth({
 		appName: 'Peace of Real Estate',
@@ -37,12 +47,7 @@ export function getAuth() {
 				await sendPasswordResetEmail({ to: user.email, resetUrl: url })
 			},
 		},
-		socialProviders: {
-			google: {
-				clientId: env.GOOGLE_CLIENT_ID,
-				clientSecret: env.GOOGLE_CLIENT_SECRET,
-			},
-		},
+		socialProviders,
 		plugins: [
 			oAuthProxy({
 				productionURL: appOrigin,

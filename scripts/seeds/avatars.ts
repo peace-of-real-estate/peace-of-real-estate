@@ -39,13 +39,29 @@ const HEADSHOT_URLS = [
 let s3Client: S3Client | null = null
 let bucketEnsured: Promise<void> | null = null
 
+const {
+	AVATAR_BUCKET: bucket,
+	AWS_REGION: region,
+	AWS_ENDPOINT_URL: endpoint,
+	AWS_ACCESS_KEY_ID: accessKeyId,
+	AWS_SECRET_ACCESS_KEY: secretAccessKey,
+} = env
+
+const storageConfig =
+	bucket && region && endpoint && accessKeyId && secretAccessKey
+		? { bucket, region, endpoint, accessKeyId, secretAccessKey }
+		: undefined
+
 // =============================================================================
 // S3 helpers
 // =============================================================================
 
-async function ensureBucket(client: S3Client): Promise<void> {
+async function ensureBucket(
+	client: S3Client,
+	bucketName: string,
+): Promise<void> {
 	try {
-		await client.send(new CreateBucketCommand({ Bucket: env.AVATAR_BUCKET }))
+		await client.send(new CreateBucketCommand({ Bucket: bucketName }))
 	} catch (error) {
 		if (
 			error instanceof Error &&
@@ -59,23 +75,18 @@ async function ensureBucket(client: S3Client): Promise<void> {
 }
 
 function canUseS3Storage(): boolean {
-	return Boolean(
-		env.AVATAR_BUCKET &&
-		env.AWS_REGION &&
-		env.AWS_ENDPOINT_URL &&
-		env.AWS_ACCESS_KEY_ID &&
-		env.AWS_SECRET_ACCESS_KEY,
-	)
+	return storageConfig !== undefined
 }
 
 function getStorageClient(): S3Client {
+	if (!storageConfig) throw new Error('S3 storage is not configured')
 	if (!s3Client) {
 		s3Client = new S3Client({
-			region: env.AWS_REGION,
-			endpoint: env.AWS_ENDPOINT_URL,
+			region: storageConfig.region,
+			endpoint: storageConfig.endpoint,
 			credentials: {
-				accessKeyId: env.AWS_ACCESS_KEY_ID,
-				secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+				accessKeyId: storageConfig.accessKeyId,
+				secretAccessKey: storageConfig.secretAccessKey,
 			},
 			forcePathStyle: true,
 		})
@@ -119,10 +130,10 @@ export async function uploadAgentAvatar(
 	agentId: string,
 	email: string,
 ): Promise<string | null> {
-	if (!canUseS3Storage()) return null
+	if (!canUseS3Storage() || !storageConfig) return null
 
 	const client = getStorageClient()
-	bucketEnsured ??= ensureBucket(client)
+	bucketEnsured ??= ensureBucket(client, storageConfig.bucket)
 	await bucketEnsured
 
 	const headshotUrl =
@@ -133,7 +144,7 @@ export async function uploadAgentAvatar(
 	const key = `seed/avatars/${agentId}.jpg`
 	await client.send(
 		new PutObjectCommand({
-			Bucket: env.AVATAR_BUCKET,
+			Bucket: storageConfig.bucket,
 			Key: key,
 			Body: imageBuffer,
 			ContentType: 'image/jpeg',
