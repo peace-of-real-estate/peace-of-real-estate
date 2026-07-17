@@ -121,23 +121,21 @@ export function CityZipSelector({
 	}
 
 	const toggleZipCode = (zipCode: string) => {
-		setSelectedZipCodes((current) => {
-			const next = current.includes(zipCode)
-				? current.filter((item) => item !== zipCode)
-				: [...current, zipCode]
-			onChange(committedLocation, next)
-			return next
-		})
+		const next = selectedZipCodes.includes(zipCode)
+			? selectedZipCodes.filter((item) => item !== zipCode)
+			: [...selectedZipCodes, zipCode]
+		setSelectedZipCodes(next)
+		onChange(committedLocation, next)
 	}
 
 	const addManualZipCode = () => {
 		const zipCode = manualZipCode.trim()
 		if (!marketComplete || !isValidZipCode(zipCode)) return
-		setSelectedZipCodes((current) => {
-			const next = current.includes(zipCode) ? current : [...current, zipCode]
-			onChange(committedLocation, next)
-			return next
-		})
+		const next = selectedZipCodes.includes(zipCode)
+			? selectedZipCodes
+			: [...selectedZipCodes, zipCode]
+		setSelectedZipCodes(next)
+		onChange(committedLocation, next)
 		setManualZipCode('')
 	}
 
