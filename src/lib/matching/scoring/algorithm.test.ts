@@ -15,7 +15,7 @@ function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		state: 'MD',
 		typicalPriceRange: '300000-600000',
 		bestClientTypes: ['firstTime', 'moveUp'],
-		notFitFor: null,
+		notFitFor: [],
 		firstName: 'Avery',
 		lastName: 'Stone',
 		brokerageName: 'Harborline Realty',
@@ -25,6 +25,8 @@ function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		billingAddress: null,
 		licenseNumberState: 'LIC-123456-MD',
 		zipCodes: ['21201', '21202'],
+		cityCenterLatitude: null,
+		cityCenterLongitude: null,
 		yearsLicensed: '6-10',
 		averageTransactions: '6-15',
 		employmentStatus: 'Realtor',
@@ -57,6 +59,8 @@ function makeBuyer(priceRange: string): BuyerProfile {
 		state: 'MD',
 		city: 'Baltimore',
 		zipCodes: ['21201', '21205'],
+		cityCenterLatitude: null,
+		cityCenterLongitude: null,
 		timeline: 'exploring',
 		priceRange,
 		propertyTypes: ['singleFamily'],
@@ -80,7 +84,7 @@ describe('calculateFitScore', () => {
 	test('accepts min-max stored format for both client and agent', () => {
 		const agent = makeAgent({ typicalPriceRange: '400000-750000' })
 		const buyer = makeBuyer('400000-750000')
-		const result = calculateFitScore(agent, buyer, 'buyers')
+		const result = calculateFitScore(agent, buyer, 'buying')
 
 		expect(result.disqualified).toBe(false)
 		expect(
@@ -92,7 +96,7 @@ describe('calculateFitScore', () => {
 	test('accepts slug stored format for agent typicalPriceRange', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer('400000-750000')
-		const result = calculateFitScore(agent, buyer, 'buyers')
+		const result = calculateFitScore(agent, buyer, 'buying')
 
 		expect(result.disqualified).toBe(false)
 		expect(
@@ -107,23 +111,24 @@ describe('calculateFitScore', () => {
 			typicalPriceRange: '400kTo750k',
 		})
 		const buyer = makeBuyer('400000-750000')
-		const result = calculateFitScore(agent, buyer, 'buyers')
+		const result = calculateFitScore(agent, buyer, 'buying')
 
 		expect(result.disqualified).toBe(false)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
 		expect(priceFit).toBeDefined()
 		expect(priceFit?.score).toBeGreaterThan(0)
-		expect(priceFit?.explanation).toContain('covers')
+		expect(priceFit?.explanation).toContain('bucket overlap')
 		expect(result.fitScore).toBeGreaterThan(0)
 	})
 
 	test('returns zero price fit when agent range is unparseable', () => {
 		const agent = makeAgent({ typicalPriceRange: 'legacy $250k - $500k' })
 		const buyer = makeBuyer('400000-750000')
-		const result = calculateFitScore(agent, buyer, 'buyers')
+		const result = calculateFitScore(agent, buyer, 'buying')
 
-		expect(result.disqualified).toBe(false)
+		expect(result.disqualified).toBe(true)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
 		expect(priceFit?.score).toBe(0)
+		expect(result.fitScore).toBe(0)
 	})
 })

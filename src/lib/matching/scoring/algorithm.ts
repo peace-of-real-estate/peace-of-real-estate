@@ -3,7 +3,6 @@ import zipcodes from 'zipcodes'
 import {
 	AGENT_PRICE_RANGES,
 	BUCKET_ORDER,
-	parseSerializedPriceRange,
 	type PriceRange,
 	type PriceRangeValue,
 } from '@/lib/price-range'
@@ -51,6 +50,7 @@ import {
 	clamp01,
 	formatList,
 	formatPriceRangeValue,
+	parseSerializedPriceRange,
 	priceOverlapRatio,
 	round2,
 	toStars,
@@ -281,25 +281,25 @@ export function scorePriceFit(
 	agent: AgentProfile,
 ): DimensionResult {
 	const clientRange = parseSerializedPriceRange(client.priceRange)
-	const agentBucket = AGENT_PRICE_RANGES[agent.typicalPriceRange]
+	const agentRange = parseSerializedPriceRange(agent.typicalPriceRange)
 
 	const clientCell = clientRange
 		? formatPriceRangeValue(clientRange)
 		: client.priceRange
 			? `"${client.priceRange}" (unparseable)`
 			: '(none)'
-	const agentCell = agentBucket
-		? `${agent.typicalPriceRange} (${formatPriceRangeValue(agentBucket)})`
+	const agentCell = agentRange
+		? `${agent.typicalPriceRange} (${formatPriceRangeValue(agentRange)})`
 		: agent.typicalPriceRange
 			? `"${agent.typicalPriceRange}" (unknown bucket)`
 			: '(none)'
 
-	if (!clientRange || !agentBucket) {
+	if (!clientRange || !agentRange) {
 		return {
 			score: 0,
 			explanation: !clientRange
 				? 'client price range missing or unparseable'
-				: 'agent price range unparseable (expected serialized "min-max" or bucket slug)',
+				: 'agent price range missing or unparseable',
 			checks: [
 				{
 					label: 'price range',
@@ -327,7 +327,7 @@ export function scorePriceFit(
 		}
 	}
 
-	const bucketOverlap = priceOverlapRatio(clientRange, agentBucket)
+	const bucketOverlap = priceOverlapRatio(clientRange, agentRange)
 	const adjacentOverlap = adjacentBuckets.length
 		? Math.max(
 				...adjacentBuckets.map((bucket) =>
@@ -1052,10 +1052,10 @@ export function calculateFitScore(
 			: SCORING_LINEAR_WEIGHT * linear + SCORING_GEOMETRIC_WEIGHT * geometric
 
 	const clientRange = parseSerializedPriceRange(client.priceRange)
-	const agentBucket = AGENT_PRICE_RANGES[agent.typicalPriceRange]
+	const agentRange = parseSerializedPriceRange(agent.typicalPriceRange)
 	const centrality =
-		clientRange && agentBucket
-			? clamp01(bucketCentrality(clientRange, agentBucket))
+		clientRange && agentRange
+			? clamp01(bucketCentrality(clientRange, agentRange))
 			: 0
 
 	const clientTypeFit = getClientTypeFit(client, agent, side)
@@ -1172,7 +1172,7 @@ function calculateFallbackScore(
 		},
 		{
 			label: 'typicalPriceRange is valid bucket',
-			present: Boolean(AGENT_PRICE_RANGES[agent.typicalPriceRange]),
+			present: Boolean(parseSerializedPriceRange(agent.typicalPriceRange)),
 		},
 		{
 			label: 'bestClientTypes ranked',
