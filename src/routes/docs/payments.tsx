@@ -30,7 +30,7 @@ export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   typescript: true,
 })
 
-export type StripeMeta = { kind: 'intro_unlock'; userId: string; role: string }`
+export type StripeMeta = { kind: 'intro_unlock'; clientProfileId: string }`
 
 const checkoutCode = `// src/lib/payments/intro-unlock.ts
 import { stripe } from './stripe.server'
@@ -41,18 +41,19 @@ export async function createIntroUnlockCheckout(input: {
   origin: string
   returnPath: string
 }): Promise<{ url: string; sessionId: string }> {
-  const [accepted] = await tx((t) =>
-    countAcceptedIntros(t, input.userId, input.role),
-  )
+  const profile = await findClientProfile(input.userId, input.role)
+  if (!profile) throw new IntroError('NO_PROFILE')
+
+  const accepted = await countAcceptedIntros(profile.id)
   if (accepted === 0) throw new IntroError('NO_ACCEPTED_INTRO')
-  if (await hasActiveWindow(input.userId, input.role)) {
+  if (await hasActiveWindow(profile.id)) {
     throw new IntroError('WINDOW_ACTIVE')
   }
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     line_items: [{ price: env.STRIPE_INTRO_UNLOCK_PRICE_ID, quantity: 1 }],
-    metadata: { kind: 'intro_unlock', userId: input.userId, role: input.role },
+    metadata: { kind: 'intro_unlock', clientProfileId: profile.id },
     success_url: \`\${input.origin}\${input.returnPath}?unlock=success\`,
     cancel_url: \`\${input.origin}\${input.returnPath}\`,
   })
@@ -91,42 +92,37 @@ export async function fulfillIntroUnlock(
   session: Stripe.Checkout.Session,
 ): Promise<void> {
   const paymentIntentId = session.payment_intent as string
-  const { userId, role } = session.metadata as StripeMeta
+  const { clientProfileId } = session.metadata as StripeMeta
 
-  await db.transaction(async (tx) => {
-    const fulfilled = await tx
-      .select({ id: userEntitlements.id })
-      .from(userEntitlements)
-      .where(
-        and(
-          eq(userEntitlements.userId, userId),
-          eq(userEntitlements.key, \`intro_access_\${role}\`),
-          eq(userEntitlements.stripePaymentIntentId, paymentIntentId),
-        ),
-      )
-    if (fulfilled.length) return // idempotent
-
+  const fulfilled = await db.transaction(async (tx) => {
     const startsAt = new Date()
     const endsAt = addMonths(startsAt, 6)
 
-    await tx
-      .insert(userEntitlements)
+    // One row per profile. The where-clause makes replays a no-op:
+    // if the row already carries this paymentIntentId, nothing updates.
+    const rows = await tx
+      .insert(introAccessWindows)
       .values({
-        userId,
-        key: \`intro_access_\${role}\`,
+        id: crypto.randomUUID(),
+        clientProfileId,
         startsAt,
         endsAt,
         stripePaymentIntentId: paymentIntentId,
       })
       .onConflictDoUpdate({
-        target: [userEntitlements.userId, userEntitlements.key],
+        target: introAccessWindows.clientProfileId,
         set: { startsAt, endsAt, stripePaymentIntentId: paymentIntentId },
+        where: sql\`\${introAccessWindows.stripePaymentIntentId} != \${paymentIntentId}\`,
       })
+      .returning({ id: introAccessWindows.id })
 
-    await connectAcceptedIntros(tx, { userId, role })
+    if (!rows.length) return false // replayed webhook
+
+    await connectAcceptedIntros(tx, clientProfileId)
+    return true
   })
 
-  await queueConnectedEmails({ userId, role })
+  if (fulfilled) await queueConnectedEmails(clientProfileId)
 }`
 
 function Payments() {
@@ -147,27 +143,22 @@ function Payments() {
 				<StepList
 					steps={[
 						<>
-							Client calls <code>createIntroUnlockCheckout(role)</code>.
-						</>,
-						<>Server guards: at least 1 accepted intro, no active window.</>,
-						<>
-							Server creates a Stripe Checkout Session ($20, metadata:{' '}
-							<code>kind=intro_unlock</code>, userId, role).
-						</>,
-						<>Stripe hosts the checkout page; client pays.</>,
-						<>
-							Stripe sends <code>checkout.session.completed</code> to the
-							webhook route.
+							Client calls <code>createIntroUnlockCheckout(role)</code> → server
+							resolves the client profile, guards (≥ 1 accepted intro, no active
+							window) → Stripe Checkout Session ($20, metadata:{' '}
+							<code>kind=intro_unlock</code>, clientProfileId).
 						</>,
 						<>
-							Webhook verifies the signature and matches{' '}
+							Stripe hosts payment, then sends{' '}
+							<code>checkout.session.completed</code> to the webhook route,
+							which verifies the signature and matches{' '}
 							<code>metadata.kind</code>.
 						</>,
 						<>
 							Fulfillment runs in a transaction, idempotent on{' '}
-							<code>paymentIntentId</code>: upsert entitlement{' '}
-							<code>endsAt = now + 6mo</code>, transition accepted intros to
-							connected, queue "You're connected" emails.
+							<code>paymentIntentId</code>: upsert the profile&apos;s window row
+							(<code>endsAt = now + 6mo</code>), transition accepted intros to
+							connected, queue &quot;You&apos;re connected&quot; emails.
 						</>,
 						<>
 							Client redirects back and polls until the entitlement is visible.
@@ -203,31 +194,43 @@ function Payments() {
 				</DocSubSection>
 			</DocSection>
 
-			<DocSection title="Database — user_entitlements">
+			<DocSection title="Database — intro_access_windows">
 				<p className="text-muted-foreground text-[13px]">
-					Repurposed for the access window; no DDL changes.
+					Dedicated table keyed to the client profile;{' '}
+					<code>user_entitlements</code> keeps <code>agent_subscription</code>{' '}
+					only, and <code>client_lifetime_premium</code> is dropped.
 				</p>
 				<Table headers={['Column / field', 'Value / rule']}>
 					<TableRow>
 						<TableCell>
-							<code>key</code>
+							<code>client_profile_id</code>
 						</TableCell>
 						<TableCell>
-							<code>intro_access_buyer</code> / <code>intro_access_seller</code>
-							. In the EntitlementKey type, these replace the unused{' '}
-							<code>client_lifetime_premium</code>.
+							Unique — one window row per profile. The window is per role
+							because profiles are per role.
+						</TableCell>
+					</TableRow>
+					<TableRow>
+						<TableCell>
+							<code>stripe_payment_intent_id</code>
+						</TableCell>
+						<TableCell>
+							Unique. The upsert&apos;s where-clause skips rows already carrying
+							this intent, so replayed webhooks are no-ops.
 						</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell>Active window</TableCell>
 						<TableCell>
 							<code>ends_at &gt;= now()</code>; ends_at = starts_at + 6 months.
+							CHECK enforces ends_at &gt; starts_at.
 						</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell>Repeat purchase</TableCell>
 						<TableCell>
-							Updates the (user_id, key) row; purchase history lives in Stripe.
+							Updates the profile&apos;s row (new starts_at/ends_at/intent);
+							purchase history lives in Stripe.
 						</TableCell>
 					</TableRow>
 				</Table>
@@ -271,8 +274,8 @@ function Payments() {
 						and refetches for up to ~30s.
 					</li>
 					<li>
-						<b>Refunds:</b> manual via Stripe dashboard for v1; entitlement
-						revocation is a manual DB operation.
+						<b>Refunds:</b> manual via Stripe dashboard for v1; window
+						revocation is a manual DB operation (shorten or delete the row).
 					</li>
 				</BulletList>
 			</DocSection>

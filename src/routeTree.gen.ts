@@ -15,7 +15,6 @@ import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as DocsUiRouteImport } from './routes/docs/ui'
 import { Route as DocsPlanRouteImport } from './routes/docs/plan'
 import { Route as DocsPaymentsRouteImport } from './routes/docs/payments'
-import { Route as DocsLifecycleRouteImport } from './routes/docs/lifecycle'
 import { Route as DocsAntiAbuseRouteImport } from './routes/docs/anti-abuse'
 import { Route as DebugMatchesRouteImport } from './routes/debug/matches'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
@@ -84,11 +83,6 @@ const DocsPlanRoute = DocsPlanRouteImport.update({
 const DocsPaymentsRoute = DocsPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsLifecycleRoute = DocsLifecycleRouteImport.update({
-  id: '/lifecycle',
-  path: '/lifecycle',
   getParentRoute: () => DocsRouteRoute,
 } as any)
 const DocsAntiAbuseRoute = DocsAntiAbuseRouteImport.update({
@@ -318,7 +312,6 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/debug/matches': typeof DebugMatchesRoute
   '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
   '/docs/payments': typeof DocsPaymentsRoute
   '/docs/plan': typeof DocsPlanRoute
   '/docs/ui': typeof DocsUiRoute
@@ -365,7 +358,6 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/debug/matches': typeof DebugMatchesRoute
   '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
   '/docs/payments': typeof DocsPaymentsRoute
   '/docs/plan': typeof DocsPlanRoute
   '/docs/ui': typeof DocsUiRoute
@@ -414,7 +406,6 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/debug/matches': typeof DebugMatchesRoute
   '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
   '/docs/payments': typeof DocsPaymentsRoute
   '/docs/plan': typeof DocsPlanRoute
   '/docs/ui': typeof DocsUiRoute
@@ -464,7 +455,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/debug/matches'
     | '/docs/anti-abuse'
-    | '/docs/lifecycle'
     | '/docs/payments'
     | '/docs/plan'
     | '/docs/ui'
@@ -511,7 +501,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/debug/matches'
     | '/docs/anti-abuse'
-    | '/docs/lifecycle'
     | '/docs/payments'
     | '/docs/plan'
     | '/docs/ui'
@@ -559,7 +548,6 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/debug/matches'
     | '/docs/anti-abuse'
-    | '/docs/lifecycle'
     | '/docs/payments'
     | '/docs/plan'
     | '/docs/ui'
@@ -660,13 +648,6 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/docs/payments'
       preLoaderRoute: typeof DocsPaymentsRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/lifecycle': {
-      id: '/docs/lifecycle'
-      path: '/lifecycle'
-      fullPath: '/docs/lifecycle'
-      preLoaderRoute: typeof DocsLifecycleRouteImport
       parentRoute: typeof DocsRouteRoute
     }
     '/docs/anti-abuse': {
@@ -947,7 +928,6 @@ declare module '@tanstack/react-router' {
 
 interface DocsRouteRouteChildren {
   DocsAntiAbuseRoute: typeof DocsAntiAbuseRoute
-  DocsLifecycleRoute: typeof DocsLifecycleRoute
   DocsPaymentsRoute: typeof DocsPaymentsRoute
   DocsPlanRoute: typeof DocsPlanRoute
   DocsUiRoute: typeof DocsUiRoute
@@ -956,7 +936,6 @@ interface DocsRouteRouteChildren {
 
 const DocsRouteRouteChildren: DocsRouteRouteChildren = {
   DocsAntiAbuseRoute: DocsAntiAbuseRoute,
-  DocsLifecycleRoute: DocsLifecycleRoute,
   DocsPaymentsRoute: DocsPaymentsRoute,
   DocsPlanRoute: DocsPlanRoute,
   DocsUiRoute: DocsUiRoute,
