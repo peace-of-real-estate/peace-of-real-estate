@@ -102,11 +102,11 @@ export function checkSlotCap(
 }
 
 export function checkCooldown(
-  terminalRow: { status: 'declined' | 'withdrawn'; updatedAt: Date } | null,
+  terminalRow: { status: 'declined' | 'withdrawn'; closedAt: Date } | null,
   now: Date,
 ): GuardError | null {
   if (!terminalRow) return null
-  const days = (now.getTime() - terminalRow.updatedAt.getTime()) / 86_400_000
+  const days = (now.getTime() - terminalRow.closedAt.getTime()) / 86_400_000
   if (days < 30) {
     return {
       code: 'COOLDOWN',
@@ -128,7 +128,7 @@ export function checkVelocity(
 const txCode = `// src/lib/introductions/db.ts
 export async function sendIntroductions(
   db: Db,
-  input: { role: IntroductionRole; agentProfileIds: string[]; clientProfileId: string },
+  input: { agentProfileIds: string[]; clientProfileId: string },
 ): Promise<SendResult> {
   return db.transaction(async (tx) => {
     await tx.execute(
@@ -151,7 +151,6 @@ export async function sendIntroductions(
 const testCode = `// src/lib/introductions/db.test.ts
 await expect(
   sendIntroductions(db, {
-    role: 'buyer',
     agentProfileIds: [agent1, agent2, agent3, agent4],
     clientProfileId: client.id,
   }),
@@ -162,8 +161,8 @@ await expect(
 
 // concurrent sends from two tabs: second wins the lock, first fails cleanly
 const [a, b] = await Promise.all([
-  sendIntroductions(db, { role: 'buyer', agentProfileIds: [agentX], clientProfileId: client.id }),
-  sendIntroductions(db, { role: 'buyer', agentProfileIds: [agentX], clientProfileId: client.id }),
+  sendIntroductions(db, { agentProfileIds: [agentX], clientProfileId: client.id }),
+  sendIntroductions(db, { agentProfileIds: [agentX], clientProfileId: client.id }),
 ])
 expect([a.ok, b.ok].filter(Boolean).length).toBe(1)`
 

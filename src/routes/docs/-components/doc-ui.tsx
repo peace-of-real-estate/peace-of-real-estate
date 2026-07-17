@@ -14,27 +14,15 @@ import { cn } from '@/lib/utils/ui'
 export type DocPageMeta = {
 	path: string
 	title: string
-	kicker: string
 }
 
 export const docsNav: DocPageMeta[] = [
-	{ path: '/docs', title: 'Overview', kicker: 'Introductions' },
-	{
-		path: '/docs/lifecycle',
-		title: 'Lifecycle',
-		kicker: 'State machine & reveal rules',
-	},
-	{ path: '/docs/ui', title: 'UI', kicker: 'Surfaces & match list' },
-	{ path: '/docs/payments', title: 'Payments', kicker: 'Monetization' },
-	{ path: '/docs/anti-abuse', title: 'Anti-abuse', kicker: 'Trust & safety' },
-	{
-		path: '/docs/plan',
-		title: 'Implementation Plan',
-		kicker: '8 phases, one commit each',
-	},
+	{ path: '/docs', title: 'Overview' },
+	{ path: '/docs/ui', title: 'UI' },
+	{ path: '/docs/payments', title: 'Payments' },
+	{ path: '/docs/anti-abuse', title: 'Anti-abuse' },
+	{ path: '/docs/plan', title: 'Implementation Plan' },
 ]
-
-export const docsPages = docsNav
 
 // ============================================================
 // Page scaffold
@@ -49,10 +37,10 @@ export function DocPage({
 	lede?: ReactNode
 	children: ReactNode
 }) {
-	const index = docsPages.findIndex((page) => page.path === path)
-	const page = docsPages[index]
-	const prev = index > 0 ? docsPages[index - 1] : undefined
-	const next = index < docsPages.length - 1 ? docsPages[index + 1] : undefined
+	const index = docsNav.findIndex((page) => page.path === path)
+	const page = docsNav[index]
+	const prev = index > 0 ? docsNav[index - 1] : undefined
+	const next = index < docsNav.length - 1 ? docsNav[index + 1] : undefined
 
 	return (
 		<div className="w-full max-w-3xl px-6 py-10 md:pl-12">
@@ -150,7 +138,6 @@ const pillTones = {
 	gold: 'bg-amber/15 text-amber-foreground border border-amber',
 	green: 'bg-emerald-600/10 text-emerald-700 border border-emerald-600/40',
 	muted: 'bg-muted text-muted-foreground',
-	sky: 'bg-sky/20 text-primary border border-sky',
 } as const
 
 export type PillTone = keyof typeof pillTones

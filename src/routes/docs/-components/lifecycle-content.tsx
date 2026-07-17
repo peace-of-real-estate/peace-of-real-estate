@@ -1,10 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { ArrowRightIcon as ArrowRight } from '@phosphor-icons/react'
 
 import {
 	BulletList,
 	CodeBlock,
-	DocPage,
 	DocSection,
 	Pill,
 	Table,
@@ -12,10 +10,6 @@ import {
 	TableRow,
 	type PillTone,
 } from '@/routes/docs/-components/doc-ui'
-
-export const Route = createFileRoute('/docs/lifecycle')({
-	component: Lifecycle,
-})
 
 const statusTone: Record<string, PillTone> = {
 	start: 'navy',
@@ -60,10 +54,7 @@ import {
   sql,
 } from 'drizzle-orm/pg-core'
 
-export const introductionClientRole = pgEnum('introduction_client_role', [
-  'buyer',
-  'seller',
-])
+export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
 
 export const introductionStatus = pgEnum('introduction_status', [
   'pending',
@@ -73,82 +64,130 @@ export const introductionStatus = pgEnum('introduction_status', [
   'connected',
 ])
 
-export const introductions = pgTable(
-  'introductions',
+export const introductionDeclineReason = pgEnum(
+  'introduction_decline_reason',
+  ['not_available', 'not_a_fit', 'out_of_area', 'other'],
+)
+
+// One row per (user, role) — replaces buyer_profiles + seller_profiles.
+// Shared lifecycle/matching/work-style/tuning columns live here.
+export const clientProfiles = pgTable(
+  'client_profiles',
   {
     id: text().primaryKey().notNull(),
-    clientRole: introductionClientRole().notNull(),
-    buyerProfileId: text(),
-    sellerProfileId: text(),
-    agentProfileId: text().notNull(),
-    clientUserId: text().notNull(),
-    agentUserId: text().notNull(),
-    status: introductionStatus().default('pending').notNull(),
-    declineReason: text(),
-    declineNote: text(),
-    acceptedAt: timestamp({ withTimezone: true }),
-    declinedAt: timestamp({ withTimezone: true }),
-    withdrawnAt: timestamp({ withTimezone: true }),
-    connectedAt: timestamp({ withTimezone: true }),
+    userId: text().notNull(),
+    role: clientRole().notNull(),
+    // ...clientLifecycleColumns
+    // ...clientMatchingColumns
+    // ...clientWorkStyleColumns
+    // ...clientMatchTuningColumns
     createdAt: timestamp({ withTimezone: true }).notNull(),
     updatedAt: timestamp({ withTimezone: true }).notNull(),
   },
   (table) => [
     foreignKey({
-      columns: [table.buyerProfileId],
-      foreignColumns: [buyerProfiles.id],
-      name: 'introductions_buyer_profile_id_fk',
+      columns: [table.userId],
+      foreignColumns: [user.id],
+      name: 'client_profiles_user_id_fk',
+      onDelete: 'cascade',
     }),
+    uniqueIndex('client_profiles_user_role_index').on(
+      table.userId,
+      table.role,
+    ),
+    // FK target for the role-checked detail tables
+    uniqueIndex('client_profiles_id_role_index').on(table.id, table.role),
+  ],
+)
+
+// Role-specific quiz answers. No row = quiz skipped (G4 allows sending
+// without the quiz); scoring treats a missing detail row as neutral.
+export const buyerDetails = pgTable(
+  'buyer_details',
+  {
+    clientProfileId: text().primaryKey().notNull(),
+    role: clientRole().notNull().default('buyer'),
+    // ...buyerQuizColumns
+  },
+  (table) => [
+    check('buyer_details_role_check', sql\`\${table.role} = 'buyer'\`),
     foreignKey({
-      columns: [table.sellerProfileId],
-      foreignColumns: [sellerProfiles.id],
-      name: 'introductions_seller_profile_id_fk',
+      columns: [table.clientProfileId, table.role],
+      foreignColumns: [clientProfiles.id, clientProfiles.role],
+      name: 'buyer_details_profile_role_fk',
+      onDelete: 'cascade',
+    }),
+  ],
+)
+// seller_details mirrors buyer_details with role = 'seller'.
+
+export const introductions = pgTable(
+  'introductions',
+  {
+    id: text().primaryKey().notNull(),
+    clientProfileId: text().notNull(),
+    agentProfileId: text().notNull(),
+    status: introductionStatus().default('pending').notNull(),
+    declineReason: introductionDeclineReason(),
+    declineNote: text(),
+    acceptedAt: timestamp({ withTimezone: true }),
+    connectedAt: timestamp({ withTimezone: true }),
+    // set on declined/withdrawn — drives the 30-day cooldown (G2)
+    closedAt: timestamp({ withTimezone: true }),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
+    updatedAt: timestamp({ withTimezone: true }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.clientProfileId],
+      foreignColumns: [clientProfiles.id],
+      name: 'introductions_client_profile_id_fk',
     }),
     foreignKey({
       columns: [table.agentProfileId],
       foreignColumns: [agentProfiles.id],
       name: 'introductions_agent_profile_id_fk',
     }),
-    foreignKey({
-      columns: [table.clientUserId],
-      foreignColumns: [user.id],
-      name: 'introductions_client_user_id_fk',
-    }),
-    foreignKey({
-      columns: [table.agentUserId],
-      foreignColumns: [user.id],
-      name: 'introductions_agent_user_id_fk',
-    }),
-    uniqueIndex('introductions_active_agent_client_index')
-      .on(
-        table.agentProfileId,
-        table.clientRole,
-        sql\`coalesce(\${table.buyerProfileId}, \${table.sellerProfileId})\`,
-      )
-      .where(
-        sql\`\${table.status} in ('pending', 'accepted', 'connected')\`,
-      ),
-    index('introductions_client_user_created_index').on(
-      table.clientUserId,
+    uniqueIndex('introductions_active_pair_index')
+      .on(table.agentProfileId, table.clientProfileId)
+      .where(sql\`\${table.status} in ('pending', 'accepted', 'connected')\`),
+    index('introductions_client_created_index').on(
+      table.clientProfileId,
       table.createdAt,
     ),
-    index('introductions_agent_profile_status_index').on(
+    index('introductions_agent_status_index').on(
       table.agentProfileId,
       table.status,
     ),
-    index('introductions_buyer_profile_id_index').on(
-      table.buyerProfileId,
-    ),
-    index('introductions_seller_profile_id_index').on(
-      table.sellerProfileId,
+  ],
+)
+
+export const introAccessWindows = pgTable(
+  'intro_access_windows',
+  {
+    id: text().primaryKey().notNull(),
+    clientProfileId: text().notNull(),
+    stripePaymentIntentId: text().notNull(),
+    startsAt: timestamp({ withTimezone: true }).notNull(),
+    endsAt: timestamp({ withTimezone: true }).notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
+    updatedAt: timestamp({ withTimezone: true }).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.clientProfileId],
+      foreignColumns: [clientProfiles.id],
+      name: 'intro_access_windows_client_profile_id_fk',
+    }),
+    // one window row per profile; renewal replaces startsAt/endsAt
+    uniqueIndex('intro_access_windows_profile_index').on(table.clientProfileId),
+    // webhook idempotency via intent-guarded upsert (see payments doc)
+    uniqueIndex('intro_access_windows_payment_intent_index').on(
+      table.stripePaymentIntentId,
     ),
     check(
-      'introductions_role_profile_check',
-      sql\`
-        (\${table.clientRole} = 'buyer' AND \${table.buyerProfileId} IS NOT NULL AND \${table.sellerProfileId} IS NULL)
-        OR
-        (\${table.clientRole} = 'seller' AND \${table.sellerProfileId} IS NOT NULL AND \${table.buyerProfileId} IS NULL)
-      \`,
+      'intro_access_windows_range_check',
+      sql\`\${table.endsAt} > \${table.startsAt}\`,
     ),
   ],
 )`
@@ -156,7 +195,7 @@ export const introductions = pgTable(
 const typesCode = `// src/lib/introductions/types.ts
 export type Introduction = typeof introductions.$inferSelect
 export type IntroductionStatus = Introduction['status']
-export type IntroductionRole = Introduction['clientRole']
+export type ClientRole = (typeof clientRole.enumValues)[number]
 export type DeclineReason = NonNullable<Introduction['declineReason']>`
 
 const viewsCode = `// src/lib/introductions/views.ts
@@ -189,7 +228,7 @@ export type ClientIntroductionsPayload = {
 export type AgentIntroView = Pick<Introduction, 'id' | 'status' | 'createdAt'> & {
   client: {
     displayName: string
-    role: IntroductionRole
+    role: ClientRole // from the client_profiles join
     city: string
     state: string
     timeline: string
@@ -203,10 +242,10 @@ export type AgentIntroView = Pick<Introduction, 'id' | 'status' | 'createdAt'> &
 
 const serverCode = `// src/lib/introductions/server.ts
 import { createServerFn } from '@tanstack/react-start'
-import { type DeclineReason, type IntroductionRole } from './types'
+import { type ClientRole, type DeclineReason } from './types'
 
 export const sendIntroductions = createServerFn({ method: 'POST' })
-  .validator((data: { role: IntroductionRole; agentProfileIds: string[] }) => data)
+  .validator((data: { role: ClientRole; agentProfileIds: string[] }) => data)
   .handler(async ({ data }) => {
     /* TODO */
   })
@@ -238,43 +277,17 @@ export const respondToIntroduction = createServerFn({ method: 'POST' })
     /* TODO */
   })`
 
-const emailCode = `// src/lib/email.server.ts
-import { Resend } from 'resend'
-import { serverEnv as env } from '@/env.server'
+const emailCode = `// src/lib/email.server.ts — existing Resend setup; one entry point, 5 templates
+export type IntroEmail =
+  | { kind: 'sent'; to: 'agent'; data: IntroEmailData }
+  | { kind: 'accepted' | 'declined'; to: 'client'; data: IntroEmailData }
+  | { kind: 'connected'; to: 'agent' | 'client'; data: ConnectedEmailData }
 
-export async function sendIntroductionEmail(/* TODO: options */) {
-  /* TODO */
-}
+export async function sendIntroEmail(email: IntroEmail): Promise<void>`
 
-export async function sendIntroAcceptedEmail(/* TODO: options */) {
-  /* TODO */
-}
-
-export async function sendIntroDeclinedEmail(/* TODO: options */) {
-  /* TODO */
-}
-
-export async function sendConnectedEmailToClient(/* TODO: options */) {
-  /* TODO */
-}
-
-export async function sendConnectedEmailToAgent(/* TODO: options */) {
-  /* TODO */
-}`
-
-function Lifecycle() {
+export function LifecycleContent() {
 	return (
-		<DocPage
-			path="/docs/lifecycle"
-			lede={
-				<>
-					One row in <code>introductions</code> per (client profile, agent)
-					request, five statuses. Active = holds one of the client's{' '}
-					<b>3 concurrent slots</b>. Mutual reveal happens only after payment;
-					acceptance alone reveals nothing.
-				</>
-			}
-		>
+		<>
 			<DocSection title="Transitions">
 				<div className="space-y-2">
 					{transitions.map((t) => (
@@ -408,33 +421,16 @@ function Lifecycle() {
 						</TableCell>
 					</TableRow>
 				</Table>
-			</DocSection>
-
-			<DocSection title="Anonymous fit card">
-				<p className="text-sm leading-relaxed">
-					First name + last initial, role, city/state, timeline, price range,
-					property types, work-style quiz answers <i>when present</i>, fit score
-					— enough for a genuine accept/decline decision, zero identity or
-					contact leakage. Essentials always show; quiz answers only when
-					answered.
+				<p className="text-muted-foreground text-[13px]">
+					Client phone is deliberately not collected — email is enough, and
+					pre-need phones are friction plus liability.
 				</p>
 			</DocSection>
 
-			<DocSection title="Contact exchange">
+			<DocSection title="No auto-expiry">
 				<p className="text-sm leading-relaxed">
-					On <code>connected</code>, the client gets the agent's full name,
-					email, phone, and brokerage; the agent gets the client's full name and
-					email. Deliberately <b>no client phone field</b> — email is enough,
-					and collecting phones pre-need is friction plus liability.
-				</p>
-			</DocSection>
-
-			<DocSection title="No auto-expiry — withdrawal instead">
-				<p className="text-sm leading-relaxed">
-					A pending intro never expires; the client may withdraw it after{' '}
-					<b>24 hours</b>. The agent gets a guaranteed day to respond, the
-					client is never stuck behind a ghost, and the UI counts down until the
-					withdraw button appears. No <code>expired</code> status.
+					A pending intro never expires — no <code>expired</code> status;
+					withdrawal (G5) is the only exit.
 				</p>
 			</DocSection>
 
@@ -475,6 +471,6 @@ function Lifecycle() {
 			<DocSection title="src/lib/email.server.ts">
 				<CodeBlock code={emailCode} language="typescript" />
 			</DocSection>
-		</DocPage>
+		</>
 	)
 }

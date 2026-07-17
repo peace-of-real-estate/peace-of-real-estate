@@ -4,7 +4,6 @@ import {
 	BulletList,
 	DocPage,
 	DocSection,
-	DocSubSection,
 	Table,
 	TableCell,
 	TableRow,
@@ -96,68 +95,14 @@ function Ui() {
 				</BulletList>
 			</DocSection>
 
-			<DocSection title="Implementation">
-				<DocSubSection title="Routes & components">
-					<BulletList>
-						<li>
-							<code>client-matches.tsx</code>: slot meter, selection, sticky
-							send bar, confirm dialog.
-						</li>
-						<li>
-							<code>match-list.tsx</code>: toolbar, dense rows, inline expand,
-							qualitative dimension indicators.
-						</li>
-						<li>
-							<code>client-introductions.tsx</code>: tabs, paywall, withdraw,
-							unlock-success poll.
-						</li>
-						<li>
-							<code>intro-paywall.tsx</code>: unlock banner + checkout redirect.
-						</li>
-						<li>
-							<code>buyer/introductions.tsx</code> and{' '}
-							<code>seller/introductions.tsx</code>: render
-							client-introductions.
-						</li>
-						<li>
-							<code>agent/introductions.tsx</code>: fit cards, accept/decline
-							modal.
-						</li>
-						<li>
-							<code>agent/route.tsx</code>: sidebar pending badge.
-						</li>
-					</BulletList>
-				</DocSubSection>
-
-				<DocSubSection title="Server-function contracts">
-					<BulletList>
-						<li>
-							<code>loadClientIntroductions({'{ role }'})</code> →
-							ClientIntroductionsPayload.
-						</li>
-						<li>
-							<code>loadAgentIntroductions()</code> → {'{ '}
-							introductions: AgentIntroView[]; pendingCount: number {' }'}.
-						</li>
-					</BulletList>
-					<p className="text-muted-foreground text-[13px]">
-						Full lifecycle function definitions live in{' '}
-						<Link to="/docs/lifecycle" className="underline">
-							Lifecycle
-						</Link>
-						.
-					</p>
-				</DocSubSection>
-			</DocSection>
-
 			<DocSection title="Notification matrix">
 				<p className="text-muted-foreground text-[13px]">
 					All email (Resend infra exists). One in-app signal: the agent sidebar
 					badge. No notification center, no push. Decline emails are deliberate
 					— silence plus an unnoticed freed slot is worse than a gentle decline.
-					Email templates live in{' '}
-					<Link to="/docs/lifecycle" className="underline">
-						Lifecycle
+					Email templates live in the{' '}
+					<Link to="/docs" className="underline">
+						Overview
 					</Link>
 					.
 				</p>
