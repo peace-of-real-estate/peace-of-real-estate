@@ -1,8 +1,2 @@
 [env]
-_.file = [
-	".env",
-	".env.local",
-	".env.development",
-	".env.development.local",
-	".env.compose",
-]
+_.file = [".env.compose"]
