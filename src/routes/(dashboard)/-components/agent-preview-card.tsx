@@ -33,7 +33,7 @@ export interface MatchDetails {
 	isTopMatch?: boolean
 }
 
-function InitialsAvatar({
+export function InitialsAvatar({
 	name,
 	className,
 }: {
