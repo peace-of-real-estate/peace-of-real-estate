@@ -1,5 +1,6 @@
 import { vi } from 'vite-plus/test'
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
+import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
 import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
@@ -64,7 +65,7 @@ vi.mock('@/lib/profile', async () => {
 		...actual,
 		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
 		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
-		loadAgentProfile: () => Promise.resolve(null),
+		loadAgentProfile: () => Promise.resolve(makeAgent()),
 		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
 		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
 		completeAgentSignup: () => Promise.resolve({ success: true }),
