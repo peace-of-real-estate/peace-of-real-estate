@@ -1,7 +1,7 @@
 import { defineConfig } from 'drizzle-kit'
-import { serverEnv as env } from './src/env.server'
+import { loadEnvFiles } from './src/lib/utils/env'
 
-const databaseUrl = env.DATABASE_URL
+const databaseUrl = process.env.DATABASE_URL ?? loadEnvFiles().DATABASE_URL
 
 if (!databaseUrl) {
 	throw Error('Missing DATABASE_URL')
