@@ -46,7 +46,7 @@ export const mockHttpAgentMatches = [
 			email: 'sarah@example.com',
 		},
 		stats: {
-			transactions: 146,
+			transactions: '146',
 			avgDays: 18,
 			satisfaction: 4.9,
 		},

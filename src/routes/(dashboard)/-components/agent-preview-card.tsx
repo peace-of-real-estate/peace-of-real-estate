@@ -26,7 +26,7 @@ export interface MatchDetails {
 		email?: string
 	}
 	stats?: {
-		transactions: number
+		transactions: string
 		avgDays: number
 		satisfaction: number
 	}

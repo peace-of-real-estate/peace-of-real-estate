@@ -62,17 +62,20 @@ export function ClientMatches({
 }) {
 	const { loadProfile, loadMatches } = roleConfig[role]
 	const { data: session } = authClient.useSession()
+	const userId = session?.user?.id
 
 	const loadMatchesFn = useServerFn(loadMatches)
 	const loadProfileFn = useServerFn(loadProfile)
 
 	const { data: matches = [], isLoading } = useQuery({
-		queryKey: ['agent-matches', role],
+		queryKey: ['agent-matches', role, userId],
 		queryFn: () => loadMatchesFn(),
+		enabled: Boolean(userId),
 	})
 	const { data: profile } = useQuery({
-		queryKey: ['client-profile', role],
+		queryKey: ['client-profile', role, userId],
 		queryFn: () => loadProfileFn(),
+		enabled: Boolean(userId),
 	})
 	const stateCode = resolveStateCode(profile?.state ?? undefined)
 

@@ -7,9 +7,16 @@ export function readLocalStorage<T>(
 	if (typeof window === 'undefined') return null
 	const raw = window.localStorage.getItem(key)
 	if (!raw) return null
-	const parsed: unknown = JSON.parse(raw)
+	let parsed: unknown
+	try {
+		parsed = JSON.parse(raw)
+	} catch {
+		window.localStorage.removeItem(key)
+		throw new Error(`Stored draft for ${key} is corrupt and was discarded`)
+	}
 	const result = schema.safeParse(parsed)
 	if (!result.success) {
+		window.localStorage.removeItem(key)
 		throw new Error(
 			`Stored draft for ${key} is invalid and was discarded: ${result.error.message}`,
 		)

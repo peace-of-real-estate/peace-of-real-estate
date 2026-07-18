@@ -27,7 +27,10 @@ export const Route = createRootRouteWithContext<{
 		],
 	}),
 	beforeLoad: async ({ location }) => {
-		const isBetaUser = await hasBetaAccess()
+		const [isBetaUser, session] = await Promise.all([
+			hasBetaAccess(),
+			getCurrentSession(),
+		])
 
 		if (!isBetaUser && location.pathname !== '/auth/beta') {
 			throw redirect({ to: '/auth/beta' })
@@ -37,7 +40,6 @@ export const Route = createRootRouteWithContext<{
 			throw redirect({ to: '/' })
 		}
 
-		const session = await getCurrentSession()
 		const protectedPrefixes = ['/agent/', '/buyer/', '/seller/']
 
 		if (

@@ -41,11 +41,14 @@ vi.mock('@/lib/auth/functions', () => ({
 	getCurrentSession: () => authState.session,
 	redirectAuthenticatedUsers: () => undefined,
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
+	redirectNonAdminUsers: () => ({ session: authState.session }),
 }))
 
 vi.mock('@/lib/auth/session', () => ({
 	getCurrentSession: () => Promise.resolve(authState.session),
 	requireUserId: () => Promise.resolve('user-1'),
+	requireAdmin: () => Promise.resolve('user-1'),
+	getIsAdmin: () => Promise.resolve(true),
 }))
 
 vi.mock('@/lib/auth/beta', () => ({

@@ -1,6 +1,6 @@
 import type { ElementType } from 'react'
 
-import { formatPriceRange, parsePriceRange } from '@/lib/price-range'
+import { formatPriceRange, parseSerializedPriceRange } from '@/lib/price-range'
 import {
 	averageTransactions,
 	bestClientType,
@@ -77,11 +77,12 @@ function getClientSummaryItems(
 	role: 'buyer' | 'seller',
 	profile: ClientSummaryProfile,
 ): SummaryItem[] {
+	const priceRange = parseSerializedPriceRange(profile.priceRange)
 	const items: (SummaryItem | null | undefined)[] = [
-		profile.priceRange
+		priceRange
 			? {
 					label: 'Budget',
-					value: formatPriceRange(parsePriceRange(profile.priceRange)),
+					value: formatPriceRange(priceRange),
 					icon: MoneyIcon,
 				}
 			: null,
@@ -206,11 +207,12 @@ function formatQuestionSummary(
 }
 
 function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
+	const typicalPriceRange = parseSerializedPriceRange(profile.typicalPriceRange)
 	const items: (SummaryItem | null | undefined)[] = [
-		profile.typicalPriceRange
+		typicalPriceRange
 			? {
 					label: 'Typical price range',
-					value: formatPriceRange(parsePriceRange(profile.typicalPriceRange)),
+					value: formatPriceRange(typicalPriceRange),
 					icon: MoneyIcon,
 				}
 			: null,

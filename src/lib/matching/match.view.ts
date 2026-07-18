@@ -1,9 +1,5 @@
-import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
-import type {
-	FitScoreResult,
-	MatchDebugInfo,
-	ScoreBucket,
-} from './scoring/types'
+import type { AgentProfile } from '@/lib/profile/types'
+import type { FitScoreResult, ScoreBucket } from './scoring/types'
 
 const DIMENSIONS: ScoreBucket[] = [
 	'Location',
@@ -20,7 +16,7 @@ const PLACEHOLDER_AGENT_DISPLAY = {
 	avgDays: 14,
 	satisfactionSigned: 4.9,
 	satisfactionUnsigned: 4.7,
-	fallbackTransactions: 50,
+	fallbackTransactions: '50',
 }
 
 export interface AgentMatchData {
@@ -37,29 +33,22 @@ export interface AgentMatchData {
 	specialties: string[]
 	about: string
 	scores: Record<string, number>
-	contact?: {
-		phone?: string
-		email?: string
-	}
 	stats?: {
-		transactions: number
+		/** Deals-per-year range from the agent's averageTransactions answer, e.g. '6-15'. */
+		transactions: string
 		avgDays: number
 		satisfaction: number
 	}
 	isTopMatch?: boolean
 	avatar?: string
-	debug?: MatchDebugInfo
 }
 
 interface ToAgentMatchDataInput {
 	agent: AgentProfile
-	user: { name: string; email: string }
+	// Deliberately no email: agent contact info stays private until an
+	// introduction is accepted.
+	user: { name: string }
 	score: FitScoreResult
-	profile: ClientProfileRow | undefined
-	rank: number
-	totalAgents: number
-	qualifiedCount: number
-	scoreDistribution: { range: string; count: number }[]
 	avatar?: string | undefined
 }
 
@@ -67,11 +56,6 @@ export function toAgentMatchData({
 	agent,
 	user,
 	score,
-	profile,
-	rank,
-	totalAgents,
-	qualifiedCount,
-	scoreDistribution,
 	avatar,
 }: ToAgentMatchDataInput): AgentMatchData {
 	return {
@@ -90,26 +74,14 @@ export function toAgentMatchData({
 		scores: Object.fromEntries(
 			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
 		),
-		contact: {
-			email: user.email,
-		},
 		stats: {
 			transactions:
-				Number(agent.averageTransactions) ||
+				agent.averageTransactions ??
 				PLACEHOLDER_AGENT_DISPLAY.fallbackTransactions,
 			avgDays: PLACEHOLDER_AGENT_DISPLAY.avgDays,
 			satisfaction: agent.peacePactSigned
 				? PLACEHOLDER_AGENT_DISPLAY.satisfactionSigned
 				: PLACEHOLDER_AGENT_DISPLAY.satisfactionUnsigned,
-		},
-		debug: {
-			rank,
-			totalAgents,
-			qualifiedCount,
-			scoreDistribution,
-			trace: score.trace,
-			agentProfile: agent,
-			clientProfile: profile ?? null,
 		},
 		...(avatar ? { avatar } : {}),
 	}

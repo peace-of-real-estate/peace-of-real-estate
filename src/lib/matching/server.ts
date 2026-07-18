@@ -1,12 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { eq, inArray, or, sql, type SQL } from 'drizzle-orm'
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { type ClientProfileRow } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 import { toAgentMatchData, type AgentMatchData } from './match.view'
-import { calculateFitScore, rankWithTieBands, type MatchSide } from './scoring'
+import {
+	calculateFitScore,
+	rankWithTieBands,
+	type FitScoreResult,
+	type MatchSide,
+} from './scoring'
 
 function toScoringSide(side: MatchSide): 'buying' | 'selling' {
 	return side === 'buyers' ? 'buying' : 'selling'
@@ -63,6 +68,22 @@ export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
 		return loadAgentMatchesForProfile(profile, 'sellers', data)
 	})
 
+type RankedAgentScore = { agentId: string; score: FitScoreResult }
+
+const RANKED_MATCHES_CACHE_MAX_ENTRIES = 100
+const rankedMatchesCache = new Map<string, RankedAgentScore[]>()
+
+async function agentSetVersion(sideFilter: SQL | undefined): Promise<string> {
+	const [row] = await db
+		.select({
+			agentCount: sql<number>`count(*)::int`,
+			latestUpdate: sql<string>`coalesce(max(${agentProfiles.updatedAt})::text, '')`,
+		})
+		.from(agentProfiles)
+		.where(sideFilter)
+	return `${row?.agentCount ?? 0}:${row?.latestUpdate ?? ''}`
+}
+
 async function loadAgentMatchesForProfile(
 	profile: ClientProfileRow | undefined,
 	side: MatchSide,
@@ -72,21 +93,53 @@ async function loadAgentMatchesForProfile(
 	// without a profile gets no matches rather than completeness-fallback
 	// scores dressed up as fit scores.
 	if (!profile) return []
-	const results = await db
+	const { offset, limit } = pageParam
+	const sideFilter = or(
+		eq(agentProfiles.representationSide, 'both'),
+		eq(agentProfiles.representationSide, side),
+	)
+	const cacheKey = [
+		side,
+		profile.id,
+		profile.updatedAt.getTime(),
+		await agentSetVersion(sideFilter),
+	].join(':')
+	let ranked = rankedMatchesCache.get(cacheKey)
+	if (!ranked) {
+		const agents = await db
+			.select({ agent: agentProfiles })
+			.from(agentProfiles)
+			.where(sideFilter)
+			.orderBy(agentProfiles.id)
+		const scored = agents.map(({ agent }) => ({
+			agentId: agent.id,
+			score: calculateFitScore(agent, profile, toScoringSide(side)),
+		}))
+		const qualified = scored.filter(({ score }) => !score.disqualified)
+		ranked = rankWithTieBands(qualified, profile.id)
+		if (rankedMatchesCache.size >= RANKED_MATCHES_CACHE_MAX_ENTRIES) {
+			const oldest = rankedMatchesCache.keys().next().value
+			if (oldest !== undefined) rankedMatchesCache.delete(oldest)
+		}
+		rankedMatchesCache.set(cacheKey, ranked)
+	}
+	const top = ranked.slice(offset, offset + limit)
+	if (top.length === 0) return []
+	const rows = await db
 		.select({ agent: agentProfiles, user })
 		.from(agentProfiles)
 		.innerJoin(user, eq(agentProfiles.userId, user.id))
-		.orderBy(agentProfiles.id)
-	const scored = results.map((row) => ({
-		row,
-		score: calculateFitScore(row.agent, profile, toScoringSide(side)),
-	}))
-	const qualified = scored.filter(({ score }) => !score.disqualified)
-	const ranked = rankWithTieBands(qualified, profile.id)
-	const { offset, limit } = pageParam
-	const top = ranked.slice(offset, offset + limit)
-	return Promise.all(
-		top.map(async ({ row, score }) => {
+		.where(
+			inArray(
+				agentProfiles.id,
+				top.map(({ agentId }) => agentId),
+			),
+		)
+	const rowsById = new Map(rows.map((row) => [row.agent.id, row]))
+	const page = await Promise.all(
+		top.map(async ({ agentId, score }) => {
+			const row = rowsById.get(agentId)
+			if (!row) return null
 			const avatar = await getAvatarUrl(row.user.image)
 			return toAgentMatchData({
 				agent: row.agent,
@@ -96,4 +149,5 @@ async function loadAgentMatchesForProfile(
 			})
 		}),
 	)
+	return page.filter((match) => match !== null)
 }

@@ -14,9 +14,7 @@ const AGENT_COUNT = 1000
 async function main() {
 	try {
 		if (env.APP_ENV === 'production') {
-			console.error(
-				'Refusing to run seed in production. Use --force to override.',
-			)
+			console.error('Refusing to run seed in production.')
 			process.exit(1)
 		}
 

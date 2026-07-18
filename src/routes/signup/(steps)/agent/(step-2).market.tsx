@@ -25,7 +25,7 @@ import {
 	DEFAULT_PRICE_RANGE,
 	formatPriceCompact,
 	formatPriceRange,
-	parsePriceRange,
+	parseSerializedPriceRange,
 	PRICE_MAX,
 	PRICE_MIN,
 	PRICE_STEP,
@@ -73,7 +73,9 @@ export function AgentMarket({
 	)
 	const [hasTriedContinue, setHasTriedContinue] = useState(false)
 
-	const initialRange = parsePriceRange(state.typicalPriceRange)
+	const initialRange = parseSerializedPriceRange(state.typicalPriceRange) ?? {
+		...DEFAULT_PRICE_RANGE,
+	}
 	const [priceRange, setPriceRange] = useState(initialRange)
 	const [representationSide, setRepresentationSide] = useState<
 		RepresentationSide | ''

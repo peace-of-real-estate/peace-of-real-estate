@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import type { AgentMatchData } from '@/lib/matching/match.view'
 import { InitialsAvatar } from '@/routes/(dashboard)/-components/agent-preview-card'
 import {
@@ -95,10 +94,6 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 						</div>
 					)}
 				</div>
-
-				<Button variant="outline" size="sm" className="shrink-0">
-					View profile
-				</Button>
 			</div>
 		</Card>
 	)

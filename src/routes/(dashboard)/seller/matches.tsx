@@ -1,16 +1,8 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 import { ClientMatches } from '@/routes/(dashboard)/-components/client-matches'
-import { loadSellerProfile } from '@/lib/profile'
 
 export const Route = createFileRoute('/(dashboard)/seller/matches')({
-	beforeLoad: async () => {
-		const sellerProfile = await loadSellerProfile()
-
-		if (!sellerProfile) {
-			throw redirect({ to: '/signup/seller/location' })
-		}
-	},
 	component: MatchesRoute,
 })
 

@@ -7,7 +7,14 @@ import {
 } from '@tanstack/react-router'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+	type ReactNode,
+} from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -92,12 +99,15 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 		}
 	})
 
-	const goToStep = (step: TStep) => {
-		const stepPath = getStepPath(step)
-		void navigate<RegisteredRouter, string>({
-			to: stepPath.startsWith('/') ? stepPath : `${basePath}/${stepPath}`,
-		})
-	}
+	const goToStep = useCallback(
+		(step: TStep) => {
+			const stepPath = getStepPath(step)
+			void navigate<RegisteredRouter, string>({
+				to: stepPath.startsWith('/') ? stepPath : `${basePath}/${stepPath}`,
+			})
+		},
+		[navigate, getStepPath, basePath],
+	)
 	const updateState = (patch: Partial<TDraft>) => {
 		setState((current) => {
 			const next = { ...current, ...patch }
@@ -107,6 +117,24 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 	}
 	const hasDraft = getHasDraft(state)
 	const completedStepIds = getCompletedStepIds(state)
+
+	// Bounce deep-links that skip ahead of the first incomplete step, so
+	// required steps can't be bypassed by editing the URL. Runs client-side
+	// only (drafts live in localStorage); a brief flash of the target step is
+	// possible before the redirect.
+	const firstIncompleteStepId = steps.find(
+		(step) => !completedStepIds.includes(step.id),
+	)?.id
+	useEffect(() => {
+		if (!firstIncompleteStepId) return
+		const currentIndex = steps.findIndex((step) => step.id === currentStepId)
+		const firstIncompleteIndex = steps.findIndex(
+			(step) => step.id === firstIncompleteStepId,
+		)
+		if (currentIndex > firstIncompleteIndex) {
+			goToStep(firstIncompleteStepId)
+		}
+	}, [currentStepId, firstIncompleteStepId, steps, goToStep])
 
 	return (
 		<SignupWizardContext.Provider value={{ state, updateState, goToStep }}>

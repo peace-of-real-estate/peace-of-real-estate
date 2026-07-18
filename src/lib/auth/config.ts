@@ -10,7 +10,7 @@ import { sendPasswordResetEmail } from '@/lib/email.server'
 
 const appOrigin = new URL(env.BETTER_AUTH_URL).origin
 
-export function getAuth() {
+function createAuth() {
 	return betterAuth({
 		appName: 'Peace of Real Estate',
 		baseURL: {
@@ -55,4 +55,11 @@ export function getAuth() {
 			tanstackStartCookies(),
 		],
 	})
+}
+
+let auth: ReturnType<typeof createAuth> | undefined
+
+export function getAuth() {
+	auth ??= createAuth()
+	return auth
 }

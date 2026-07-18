@@ -44,6 +44,9 @@ export function createPostHogProxyRequestHandler(options: PostHogProxyOptions) {
 		}
 
 		headers.delete('host')
+		// Never forward first-party credentials to the third-party upstream.
+		headers.delete('cookie')
+		headers.delete('authorization')
 
 		const requestInit: RequestInit = {
 			method: request.method,

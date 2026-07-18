@@ -1,10 +1,12 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import {
 	DashboardShell,
 	DashboardSidebar,
 	type SidebarItem,
 } from '@/routes/(dashboard)/-components/dashboard'
+import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
+import { loadBuyerProfile } from '@/lib/profile'
 import {
 	ArrowsLeftRightIcon,
 	ChatIcon,
@@ -13,6 +15,13 @@ import {
 } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/(dashboard)/buyer')({
+	beforeLoad: async ({ location }) => {
+		await redirectUnauthenticatedUsers({ redirectTo: location.pathname })
+
+		if (!(await loadBuyerProfile())) {
+			throw redirect({ to: '/signup/buyer/location' })
+		}
+	},
 	component: BuyerDashboardLayout,
 })
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { authClient } from '@/lib/auth/client'
+import { sanitizeRedirectPath } from '@/lib/utils/redirect'
 
 export type UseGoogleAuthOptions = {
 	fallbackRedirect: string
@@ -13,10 +14,8 @@ export function useGoogleAuth({ fallbackRedirect }: UseGoogleAuthOptions) {
 
 	const signIn = async () => {
 		setIsLoading(true)
-		const callbackURL = new URL(
-			fallbackRedirect,
-			window.location.origin,
-		).toString()
+		const safeRedirect = sanitizeRedirectPath(fallbackRedirect)
+		const callbackURL = new URL(safeRedirect, window.location.origin).toString()
 
 		try {
 			const { data, error } = await authClient.signIn.social({
@@ -28,7 +27,7 @@ export function useGoogleAuth({ fallbackRedirect }: UseGoogleAuthOptions) {
 				throw error
 			}
 
-			window.location.assign(data?.url ?? fallbackRedirect)
+			window.location.assign(data?.url ?? safeRedirect)
 		} catch (error) {
 			if (
 				error &&
