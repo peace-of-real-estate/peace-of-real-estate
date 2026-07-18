@@ -1,5 +1,11 @@
 import { sql } from 'drizzle-orm'
-import { boolean, pgEnum, real, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	doublePrecision,
+	pgEnum,
+	text,
+	timestamp,
+} from 'drizzle-orm/pg-core'
 import type {
 	MultiQuestion,
 	SingleQuestion,
@@ -45,8 +51,12 @@ export const clientMatchingColumns = {
 	state: text().notNull(),
 	city: text().notNull(),
 	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
+	cityCenterLatitude: doublePrecision('city_center_latitude').default(
+		sql`NULL`,
+	),
+	cityCenterLongitude: doublePrecision('city_center_longitude').default(
+		sql`NULL`,
+	),
 	timeline: pgEnumFromDefinition(timeline)().notNull(),
 	priceRange: text().notNull(),
 	propertyTypes: pgEnumFromDefinition(propertyType)().array().notNull(),
@@ -115,8 +125,12 @@ export const agentIdentityColumns = {
 	billingAddress: text(),
 	licenseNumberState: text().notNull(),
 	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
+	cityCenterLatitude: doublePrecision('city_center_latitude').default(
+		sql`NULL`,
+	),
+	cityCenterLongitude: doublePrecision('city_center_longitude').default(
+		sql`NULL`,
+	),
 	yearsLicensed: pgEnumFromDefinition(yearsLicensed)(),
 	averageTransactions: pgEnumFromDefinition(averageTransactions)(),
 	employmentStatus: text(),

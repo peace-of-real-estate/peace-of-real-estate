@@ -22,6 +22,15 @@ async function loadOwnProfile<T>(load: () => Promise<T[]>): Promise<T | null> {
 	return profile ?? null
 }
 
+function isUniqueViolation(error: unknown): boolean {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		'code' in error &&
+		error.code === '23505'
+	)
+}
+
 async function insertProfileOnce(
 	userId: string,
 	roleName: string,
@@ -36,7 +45,38 @@ async function insertProfileOnce(
 	if (existing) throw new Error(`${roleName} profile already exists`)
 
 	const now = new Date()
-	await insert({ id: crypto.randomUUID(), userId, now })
+	try {
+		await insert({ id: crypto.randomUUID(), userId, now })
+	} catch (error) {
+		if (isUniqueViolation(error)) {
+			throw new Error(`${roleName} profile already exists`)
+		}
+		throw error
+	}
+}
+
+/**
+ * Matching falls back to city-centroid distance when a profile has no usable
+ * zips, so persist the city center at creation time. Without this the column
+ * stays NULL, the fallback never fires, and zip-less profiles score 0 on
+ * location and are disqualified from every match. Dynamic import keeps the
+ * db-backed helper out of the client bundle (this module is re-exported
+ * through '@/lib/profile').
+ */
+async function withCityCenter<
+	T extends { city?: string | undefined; state?: string | undefined },
+>(values: T): Promise<T> {
+	if (!values.city || !values.state) return values
+	const { resolveCityCenter } = await import('@/lib/geography/zip.server')
+	const center = await resolveCityCenter({
+		city: values.city,
+		state: values.state,
+	})
+	return {
+		...values,
+		cityCenterLatitude: center?.latitude ?? null,
+		cityCenterLongitude: center?.longitude ?? null,
+	}
 }
 
 export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(
@@ -70,14 +110,16 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 					.from(buyerProfiles)
 					.where(eq(buyerProfiles.userId, userId))
 					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(buyerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
+			async ({ id, userId, now }) =>
+				db.insert(buyerProfiles).values(
+					await withCityCenter({
+						id,
+						userId,
+						...insert,
+						createdAt: now,
+						updatedAt: now,
+					}),
+				),
 		)
 
 		return { success: true }
@@ -114,14 +156,16 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 					.from(sellerProfiles)
 					.where(eq(sellerProfiles.userId, userId))
 					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(sellerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
+			async ({ id, userId, now }) =>
+				db.insert(sellerProfiles).values(
+					await withCityCenter({
+						id,
+						userId,
+						...insert,
+						createdAt: now,
+						updatedAt: now,
+					}),
+				),
 		)
 
 		return { success: true }
@@ -131,6 +175,7 @@ export const completeAgentSignup = createServerFn({ method: 'POST' })
 	.validator((data: unknown) => agentInsertSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
+		const values = await withCityCenter(data)
 		await insertProfileOnce(
 			userId,
 			'Agent',
@@ -144,7 +189,7 @@ export const completeAgentSignup = createServerFn({ method: 'POST' })
 				db.insert(agentProfiles).values({
 					id,
 					userId,
-					...data,
+					...values,
 					createdAt: now,
 					updatedAt: now,
 				}),

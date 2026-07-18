@@ -94,36 +94,24 @@ async function seedCityData() {
 	}
 
 	const cityRows = []
-	const zipRows = []
 	for (const group of cityGroups.values()) {
-		const id = crypto.randomUUID()
 		const centerLat =
 			group.lats.length > 0
-				? String(group.lats.reduce((a, b) => a + b, 0) / group.lats.length)
-				: '0'
+				? group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+				: 0
 		const centerLng =
 			group.lngs.length > 0
-				? String(group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length)
-				: '0'
+				? group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
+				: 0
 
 		cityRows.push({
-			id,
+			id: crypto.randomUUID(),
 			city: group.city,
 			state: group.state,
 			centerLat,
 			centerLng,
 			createdAt: now,
 		})
-
-		for (const zip of group.zips) {
-			zipRows.push({
-				id: crypto.randomUUID(),
-				city: group.city,
-				state: group.state,
-				zip,
-				createdAt: now,
-			})
-		}
 	}
 
 	for (let i = 0; i < cityRows.length; i += BATCH_SIZE_CITIES) {
@@ -138,12 +126,34 @@ async function seedCityData() {
 		)
 	}
 
+	// Read ids back: onConflictDoNothing means pre-existing cities keep their id.
+	const persistedCities = await db
+		.select({ id: cities.id, city: cities.city, state: cities.state })
+		.from(cities)
+	const cityIdByKey = new Map(
+		persistedCities.map((row) => [`${row.city}|${row.state}`, row.id]),
+	)
+
+	const zipRows = []
+	for (const group of cityGroups.values()) {
+		const cityId = cityIdByKey.get(`${group.city}|${group.state}`)
+		if (!cityId) continue
+		for (const zip of group.zips) {
+			zipRows.push({
+				id: crypto.randomUUID(),
+				cityId,
+				zip,
+				createdAt: now,
+			})
+		}
+	}
+
 	for (let i = 0; i < zipRows.length; i += BATCH_SIZE_ZIPS) {
 		await db
 			.insert(cityZips)
 			.values(zipRows.slice(i, i + BATCH_SIZE_ZIPS))
 			.onConflictDoNothing({
-				target: [cityZips.city, cityZips.state, cityZips.zip],
+				target: [cityZips.cityId, cityZips.zip],
 			})
 		console.log(
 			`  city_zips ${Math.min(i + BATCH_SIZE_ZIPS, zipRows.length)}/${zipRows.length}`,
