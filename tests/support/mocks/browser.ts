@@ -13,6 +13,14 @@ export function setMockSession(session: MockSession) {
 	authState.session = session
 }
 
+const profileState = vi.hoisted<{ agentProfile: unknown }>(() => ({
+	agentProfile: null,
+}))
+
+export function setMockAgentProfile(profile: unknown) {
+	profileState.agentProfile = profile
+}
+
 vi.mock('@/lib/auth/client', () => ({
 	authClient: {
 		useSession: () => ({ data: authState.session, isPending: false }),
@@ -64,7 +72,7 @@ vi.mock('@/lib/profile', async () => {
 		...actual,
 		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
 		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
-		loadAgentProfile: () => Promise.resolve(null),
+		loadAgentProfile: () => Promise.resolve(profileState.agentProfile),
 		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
 		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
 		completeAgentSignup: () => Promise.resolve({ success: true }),

@@ -4,17 +4,26 @@ name: E2E
 # Playwright suite against each successful PR environment deployment.
 on:
   deployment_status:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: >-
+          Public URL of the Railway PR environment to test, e.g.
+          https://service-environment.up.railway.app
+        required: true
+        type: string
 
 concurrency:
-  group: e2e-${{ github.event.deployment.environment }}
+  group: e2e-${{ github.event.deployment.environment || inputs.base_url }}
   cancel-in-progress: true
 
 jobs:
   e2e:
     # Railway PR environments are named like "<branch>-pr-<n>"
     if: >-
-      github.event.deployment_status.state == 'success' &&
-      contains(github.event.deployment.environment, 'pr-')
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment.environment, 'pr-'))
     runs-on: ubuntu-latest
     steps:
       # Railway reports dashboard URLs in deployment_status URL fields. The
@@ -22,12 +31,17 @@ jobs:
       - name: Resolve deployment URL
         env:
           DEPLOYMENT_ENVIRONMENT: ${{ github.event.deployment.environment }}
+          MANUAL_BASE_URL: ${{ inputs.base_url }}
         run: |
-          service="${DEPLOYMENT_ENVIRONMENT%%/*}"
-          environment="${DEPLOYMENT_ENVIRONMENT##*/}"
-          service="${service//[[:space:]]/}"
-          environment="${environment//[[:space:]]/}"
-          base_url="https://${service}-${environment}.up.railway.app"
+          if [ -n "$MANUAL_BASE_URL" ]; then
+            base_url="${MANUAL_BASE_URL%/}"
+          else
+            service="${DEPLOYMENT_ENVIRONMENT%%/*}"
+            environment="${DEPLOYMENT_ENVIRONMENT##*/}"
+            service="${service//[[:space:]]/}"
+            environment="${environment//[[:space:]]/}"
+            base_url="https://${service}-${environment}.up.railway.app"
+          fi
           echo "BASE_URL=$base_url" >> "$GITHUB_ENV"
           echo "Testing against $base_url"
       - name: Check deployment URL
@@ -40,6 +54,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v6
         with:
+          # Manual dispatch: empty ref checks out the branch picked in the UI;
+          # select the PR branch there.
           ref: ${{ github.event.deployment.sha }}
       - name: setup vite+
         uses: voidzero-dev/setup-vp@v1
