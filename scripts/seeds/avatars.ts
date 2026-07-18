@@ -6,6 +6,7 @@ import {
 	PutObjectCommand,
 	S3Client,
 } from '@aws-sdk/client-s3'
+import { z } from 'zod'
 import { serverEnv as env } from '../../src/env.server'
 
 // =============================================================================
@@ -156,7 +157,12 @@ async function fetchWithRetry(
 				return null
 			}
 			const arrayBuffer = await response.arrayBuffer()
-			return Buffer.from(arrayBuffer)
+			const buffer = Buffer.from(arrayBuffer)
+			if (!isJpeg(buffer)) {
+				console.warn(`Skipping non-JPEG avatar response: ${url}`)
+				return null
+			}
+			return buffer
 		} catch (error) {
 			if (attempt < maxAttempts) {
 				await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
@@ -169,6 +175,15 @@ async function fetchWithRetry(
 	return null
 }
 
+function isJpeg(buffer: Buffer): boolean {
+	return (
+		buffer.length > 2 &&
+		buffer[0] === 0xff &&
+		buffer[1] === 0xd8 &&
+		buffer[2] === 0xff
+	)
+}
+
 // =============================================================================
 // Pool storage
 // =============================================================================
@@ -177,6 +192,11 @@ type AvatarPoolManifest = {
 	attemptedUrls: string[]
 	updatedAt: string
 }
+
+const avatarPoolManifestSchema = z.object({
+	attemptedUrls: z.array(z.string()),
+	updatedAt: z.string(),
+})
 
 async function listPoolKeys(client: S3Client): Promise<string[]> {
 	const keys: string[] = []
@@ -211,11 +231,17 @@ async function loadManifest(client: S3Client): Promise<AvatarPoolManifest> {
 			new GetObjectCommand({ Bucket: env.AVATAR_BUCKET, Key: MANIFEST_KEY }),
 		)
 		const body = await response.Body?.transformToString()
-		if (!body) throw new Error('empty manifest')
-		const parsed: AvatarPoolManifest = JSON.parse(body)
-		return parsed
-	} catch {
-		return { attemptedUrls: [], updatedAt: new Date().toISOString() }
+		if (!body) throw new Error('Avatar manifest body is empty')
+		const parsed = avatarPoolManifestSchema.safeParse(JSON.parse(body))
+		if (!parsed.success) {
+			throw new Error('Avatar manifest has an unexpected shape')
+		}
+		return parsed.data
+	} catch (error) {
+		if (error instanceof Error && error.name === 'NoSuchKey') {
+			return { attemptedUrls: [], updatedAt: new Date().toISOString() }
+		}
+		throw error
 	}
 }
 
@@ -275,12 +301,21 @@ export async function ensureAvatarPool(targetSize: number): Promise<string[]> {
 			`(${remaining.length} sources left to try)...`,
 	)
 
+	let saveChain: Promise<void> = Promise.resolve()
+	const queueManifestSave = (): Promise<void> => {
+		const snapshot: AvatarPoolManifest = {
+			...manifest,
+			attemptedUrls: [...manifest.attemptedUrls],
+		}
+		saveChain = saveChain.then(() => saveManifest(client, snapshot))
+		return saveChain
+	}
+
 	let cursor = 0
 	const workers = Array.from({ length: FETCH_CONCURRENCY }, async () => {
 		while (cursor < remaining.length && poolKeys.size < targetSize) {
 			const sourceUrl = remaining[cursor++]!
 			const buffer = await fetchWithRetry(sourceUrl)
-			manifest.attemptedUrls.push(sourceUrl)
 
 			if (buffer) {
 				const hash = createHash('md5').update(buffer).digest('hex')
@@ -301,13 +336,15 @@ export async function ensureAvatarPool(targetSize: number): Promise<string[]> {
 				}
 			}
 
+			manifest.attemptedUrls.push(sourceUrl)
 			if (manifest.attemptedUrls.length % MANIFEST_SAVE_EVERY === 0) {
-				await saveManifest(client, manifest)
+				await queueManifestSave()
 			}
 			await new Promise((resolve) => setTimeout(resolve, FETCH_DELAY_MS))
 		}
 	})
 	await Promise.all(workers)
+	await saveChain
 	await saveManifest(client, manifest)
 
 	console.log(`Avatar pool ready with ${poolKeys.size} photos`)

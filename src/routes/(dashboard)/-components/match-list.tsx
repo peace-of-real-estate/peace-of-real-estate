@@ -23,8 +23,8 @@ export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 
 function MatchCard({ match }: { match: AgentMatchData }) {
 	const topSpecialties = match.specialties.slice(0, 3)
-	const [avatarFailed, setAvatarFailed] = useState(false)
-	const showAvatar = Boolean(match.avatar) && !avatarFailed
+	const [failedAvatar, setFailedAvatar] = useState<string>()
+	const showAvatar = Boolean(match.avatar) && match.avatar !== failedAvatar
 
 	return (
 		<Card className="hover:border-primary/20 overflow-hidden transition-colors">
@@ -35,7 +35,7 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 							src={match.avatar}
 							alt={`${match.name} headshot`}
 							className="h-16 w-16 rounded-full object-cover"
-							onError={() => setAvatarFailed(true)}
+							onError={() => setFailedAvatar(match.avatar)}
 						/>
 					) : (
 						<InitialsAvatar

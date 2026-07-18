@@ -25,7 +25,11 @@ function SellerLocationRoute() {
 		ClientSignupStep
 	>()
 
-	const rawInitialLocation = state.city ?? ''
+	const rawInitialLocation = state.city
+		? state.state
+			? `${state.city}, ${state.state}`
+			: state.city
+		: ''
 	const [committedLocation, setCommittedLocation] = useState(rawInitialLocation)
 	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(
 		state.zipCodes ?? [],

@@ -62,7 +62,11 @@ export function AgentMarket({
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
-	const rawInitialLocation = state.city ?? ''
+	const rawInitialLocation = state.city
+		? state.state
+			? `${state.city}, ${state.state}`
+			: state.city
+		: ''
 	const [committedLocation, setCommittedLocation] = useState(rawInitialLocation)
 	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(
 		state.zipCodes ?? [],
