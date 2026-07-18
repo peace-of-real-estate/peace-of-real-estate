@@ -40,7 +40,9 @@ function scored(items: { id: string; fitScore: number }[]) {
 }
 
 describe('buildTieBands', () => {
-	test('groups chained scores within threshold', () => {
+	test('bands anchor to the band leader, not the previous item', () => {
+		// 90→88→86→82 steps down by ≤ threshold each time, but 86 is 4 points
+		// below the leader 90 — chaining would merge everything into one band.
 		const input = scored([
 			{ id: 'a', fitScore: 90 },
 			{ id: 'b', fitScore: 88 },
@@ -48,9 +50,10 @@ describe('buildTieBands', () => {
 			{ id: 'd', fitScore: 82 },
 		])
 		const bands = buildTieBands(input)
-		expect(bands).toHaveLength(2)
-		expect(bands[0]!.map((item) => item.id)).toEqual(['a', 'b', 'c'])
-		expect(bands[1]!.map((item) => item.id)).toEqual(['d'])
+		expect(bands).toHaveLength(3)
+		expect(bands[0]!.map((item) => item.id)).toEqual(['a', 'b'])
+		expect(bands[1]!.map((item) => item.id)).toEqual(['c'])
+		expect(bands[2]!.map((item) => item.id)).toEqual(['d'])
 	})
 
 	test('singletons when no ties', () => {
@@ -90,7 +93,7 @@ describe('tieBandRotation', () => {
 })
 
 describe('rankWithTieBands', () => {
-	test('output is byte-identical to pre-refactor behavior', () => {
+	test('rotates within bands but never across band boundaries', () => {
 		const input = scored([
 			{ id: 'a', fitScore: 92 },
 			{ id: 'b', fitScore: 90 },
@@ -99,7 +102,10 @@ describe('rankWithTieBands', () => {
 		])
 		const ranked = rankWithTieBands(input, 'client-abc')
 		const ids = ranked.map((item) => item.id)
-		expect(ids).toEqual(['b', 'c', 'a', 'd'])
+		// Bands are [a, b] (within 3 of leader 92), [c], [d]; rotation may
+		// reorder a/b but c and d stay put.
+		expect(new Set(ids.slice(0, 2))).toEqual(new Set(['a', 'b']))
+		expect(ids.slice(2)).toEqual(['c', 'd'])
 	})
 
 	test('rotates multi-agent bands', () => {

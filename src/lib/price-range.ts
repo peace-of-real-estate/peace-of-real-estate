@@ -49,7 +49,6 @@ export function parsePriceRange(value: string | undefined | null): PriceRange {
 	}
 }
 
-export const parseSerializedPriceRange = parseMinMaxRange
 export function serializePriceRange(range: PriceRange): string {
 	return `${range.min}-${range.max}`
 }
@@ -80,13 +79,21 @@ export function clampPrice(value: number): number {
 	return Math.max(PRICE_MIN, Math.min(value, PRICE_MAX))
 }
 
-export function priceRangeOverlaps(
-	clientRange: string | undefined | null,
-	agentRange: string | undefined | null,
-): boolean {
-	const client = parsePriceRange(clientRange)
-	const agentSlug = agentRange?.trim() ?? ''
-	const agent = AGENT_PRICE_RANGES[agentSlug]
-	if (!agent) return false
-	return client.min < agent.max && client.max > agent.min
+/**
+ * Parses the stored price range formats used by the app.
+ * Accepts the serialized 'min-max' format (e.g. '400000-750000')
+ * and the agent bucket slugs from AGENT_PRICE_RANGES (e.g. '400kTo750k').
+ * Returns undefined for anything else so callers can trace unparseable data
+ * instead of silently substituting defaults.
+ */
+export function parseSerializedPriceRange(
+	value: string | null | undefined,
+): PriceRangeValue | undefined {
+	const minMax = parseMinMaxRange(value)
+	if (minMax) return minMax
+	const slug = value?.trim()
+	if (!slug) return undefined
+	const range = AGENT_PRICE_RANGES[slug]
+	if (range) return { ...range }
+	return undefined
 }

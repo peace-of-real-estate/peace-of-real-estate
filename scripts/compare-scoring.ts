@@ -1,11 +1,6 @@
 import { db } from '../src/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles } from '../src/db/tables'
 import {
-	AGENT_PRICE_RANGES,
-	BUCKET_ORDER,
-	parseSerializedPriceRange,
-} from '../src/lib/price-range'
-import {
 	calculateFitScore,
 	type ScoringVariant,
 } from '../src/lib/matching/scoring'
@@ -35,33 +30,6 @@ const TIE_BAND_POINTS = 3
 const SYNTHETIC_CLIENT_COUNT = 20
 
 type Client = { profile: ClientProfileRow; side: 'buying' | 'selling' }
-
-/**
- * KNOWN DATA BUG (2026-07): agent signup serializes typicalPriceRange as raw
- * "min-max" while scorePriceFit expects an AGENT_PRICE_RANGES bucket slug, so
- * every such agent fails the price gate. Until that is fixed, map raw ranges
- * to the closest bucket in-memory (applied identically to base and variants)
- * so ranking comparisons measure blend effects rather than the bug.
- */
-function normalizeAgentBucket(agent: AgentProfile): AgentProfile {
-	if (AGENT_PRICE_RANGES[agent.typicalPriceRange]) return agent
-	const range = parseSerializedPriceRange(agent.typicalPriceRange)
-	if (!range) return agent
-
-	let best: string | undefined
-	let bestOverlap = 0
-	for (const slug of BUCKET_ORDER) {
-		const bucket = AGENT_PRICE_RANGES[slug]
-		if (!bucket) continue
-		const overlap =
-			Math.min(range.max, bucket.max) - Math.max(range.min, bucket.min)
-		if (overlap > bestOverlap) {
-			bestOverlap = overlap
-			best = slug
-		}
-	}
-	return best ? { ...agent, typicalPriceRange: best } : agent
-}
 
 type Ranked = { agentId: string; score: number }
 
@@ -284,17 +252,7 @@ function compareClients(
 
 async function main() {
 	const agentRows = await db.select().from(agentProfiles)
-	const agents = agentRows.map((agent) => ({
-		agent: normalizeAgentBucket(agent),
-	}))
-	const normalized = agents.filter(
-		({ agent }, index) => agent !== agentRows[index],
-	).length
-	if (normalized > 0) {
-		console.log(
-			`normalized ${normalized} agents with raw "min-max" typicalPriceRange to bucket slugs (see script comment — this is masking a data bug)`,
-		)
-	}
+	const agents = agentRows.map((agent) => ({ agent }))
 	const buyers = await db.select().from(buyerProfiles)
 	const sellers = await db.select().from(sellerProfiles)
 

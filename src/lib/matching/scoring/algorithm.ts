@@ -53,6 +53,7 @@ import {
 	parseSerializedPriceRange,
 	priceOverlapRatio,
 	round2,
+	snapToAgentBucket,
 	toStars,
 } from './utils'
 
@@ -312,9 +313,10 @@ export function scorePriceFit(
 		}
 	}
 
-	const bucketIndex = BUCKET_ORDER.findIndex(
-		(bucket) => bucket === agent.typicalPriceRange,
-	)
+	// Snap to the nearest bucket so serialized 'min-max' agents get the same
+	// adjacent-bucket credit as bucket-slug agents.
+	const agentBucket = snapToAgentBucket(agentRange)
+	const bucketIndex = agentBucket ? BUCKET_ORDER.indexOf(agentBucket) : -1
 	const adjacentBuckets: PriceRange[] = []
 	if (bucketIndex >= 0) {
 		if (bucketIndex > 0) {
@@ -776,27 +778,28 @@ function baseRank(): DimensionId[] {
 	)
 }
 
-function applyPriorityRanking(
-	baseRanks: DimensionId[],
+function priorityDimensionsFor(
 	priorities: string[] | null | undefined,
 ): DimensionId[] {
-	const ranked = [...baseRanks]
 	const priorityDimensions: DimensionId[] = []
 	for (const priority of priorities ?? []) {
 		const dimension = priorityToDimension[priority]
-		if (dimension !== undefined) priorityDimensions.push(dimension)
-	}
-	const seen = new Set<DimensionId>()
-	for (const dimension of priorityDimensions) {
-		if (seen.has(dimension)) continue
-		seen.add(dimension)
-		const index = ranked.indexOf(dimension)
-		if (index > 0) {
-			ranked.splice(index, 1)
-			ranked.splice(index - 1, 0, dimension)
+		if (dimension !== undefined && !priorityDimensions.includes(dimension)) {
+			priorityDimensions.push(dimension)
 		}
 	}
-	return ranked
+	return priorityDimensions
+}
+
+function applyPriorityRanking(
+	baseRanks: DimensionId[],
+	priorityDimensions: DimensionId[],
+): DimensionId[] {
+	if (priorityDimensions.length === 0) return [...baseRanks]
+	const rest = baseRanks.filter(
+		(dimension) => !priorityDimensions.includes(dimension),
+	)
+	return [...priorityDimensions, ...rest]
 }
 
 function addModulations(
@@ -878,7 +881,8 @@ export function resolveDimensionWeights(
 	boosted: Set<DimensionId>
 } {
 	const baseRanks = baseRank()
-	const priorityRanks = applyPriorityRanking(baseRanks, client.matchPriorities)
+	const priorityDimensions = priorityDimensionsFor(client.matchPriorities)
+	const priorityRanks = applyPriorityRanking(baseRanks, priorityDimensions)
 	const rocWeights = rankOrderCentroidWeights(priorityRanks)
 
 	const raw: Record<DimensionId, number> = { ...baseDimensionWeights }
@@ -887,9 +891,9 @@ export function resolveDimensionWeights(
 			(baseDimensionWeights[dimension] + rocWeights[dimension]) / 2
 	}
 
-	const { weights: modulated } = applyModulations
+	const { weights: modulated, modulators } = applyModulations
 		? applyModulation(raw, client, side)
-		: { weights: raw }
+		: { weights: raw, modulators: [] }
 
 	const total = Object.values(modulated).reduce(
 		(sum, weight) => sum + weight,
@@ -902,11 +906,13 @@ export function resolveDimensionWeights(
 		)
 	}
 
-	const boosted = new Set<DimensionId>()
-	for (const dimension of DIMENSION_IDS) {
-		if (weights[dimension] > baseDimensionWeights[dimension]) {
-			boosted.add(dimension)
-		}
+	// Boosted means an explicit client signal raised the dimension — a stated
+	// priority or a positive experience/stakes modulation. Comparing normalized
+	// weights to base weights instead would flag top-ranked dimensions even for
+	// clients with no priorities (ROC averaging + normalization skew them up).
+	const boosted = new Set<DimensionId>(priorityDimensions)
+	for (const { dimension, delta } of modulators) {
+		if (delta > 0) boosted.add(dimension)
 	}
 
 	return { weights, boosted }
@@ -1245,8 +1251,10 @@ export function buildTieBands<T extends { score: { fitScore: number } }>(
 			continue
 		}
 
-		const lastScore = currentBand[currentBand.length - 1]!.score.fitScore
-		if (Math.abs(lastScore - item.score.fitScore) <= TIE_BAND_THRESHOLD) {
+		// Anchor to the band leader, not the previous item — otherwise scores
+		// stepping down by ≤ threshold chain into one arbitrarily wide band.
+		const bandLeadScore = currentBand[0]!.score.fitScore
+		if (Math.abs(bandLeadScore - item.score.fitScore) <= TIE_BAND_THRESHOLD) {
 			currentBand.push(item)
 		} else {
 			bands.push(currentBand)
