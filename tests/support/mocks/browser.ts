@@ -1,6 +1,5 @@
 import { vi } from 'vite-plus/test'
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
-import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
 import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
@@ -12,6 +11,14 @@ const authState = vi.hoisted<{ session: MockSession }>(() => ({
 
 export function setMockSession(session: MockSession) {
 	authState.session = session
+}
+
+const profileState = vi.hoisted<{ agentProfile: unknown }>(() => ({
+	agentProfile: null,
+}))
+
+export function setMockAgentProfile(profile: unknown) {
+	profileState.agentProfile = profile
 }
 
 vi.mock('@/lib/auth/client', () => ({
@@ -65,7 +72,7 @@ vi.mock('@/lib/profile', async () => {
 		...actual,
 		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
 		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
-		loadAgentProfile: () => Promise.resolve(makeAgent()),
+		loadAgentProfile: () => Promise.resolve(profileState.agentProfile),
 		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
 		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
 		completeAgentSignup: () => Promise.resolve({ success: true }),

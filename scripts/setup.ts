@@ -72,11 +72,10 @@ function sanitizeDatabaseName(value: string): string {
 	let result = value
 		.replace(/[A-Z]/g, (character) => character.toLowerCase())
 		.replace(/[^a-z0-9]+/g, '_')
-
-	if (!result) return ''
+		.replace(/^_+/, '')
+	if (!result) result = 'workspace'
 	result = result.slice(0, 44)
 	if (!result.endsWith('_')) result += '_'
-
 	return `${result}${shortHash(value)}`
 }
 
