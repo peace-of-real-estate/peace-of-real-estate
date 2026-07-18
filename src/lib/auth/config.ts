@@ -37,12 +37,16 @@ export function getAuth() {
 				await sendPasswordResetEmail({ to: user.email, resetUrl: url })
 			},
 		},
-		socialProviders: {
-			google: {
-				clientId: env.GOOGLE_CLIENT_ID,
-				clientSecret: env.GOOGLE_CLIENT_SECRET,
-			},
-		},
+		...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+			? {
+					socialProviders: {
+						google: {
+							clientId: env.GOOGLE_CLIENT_ID,
+							clientSecret: env.GOOGLE_CLIENT_SECRET,
+						},
+					},
+				}
+			: {}),
 		plugins: [
 			oAuthProxy({
 				productionURL: appOrigin,
