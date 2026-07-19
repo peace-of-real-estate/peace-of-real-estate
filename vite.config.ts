@@ -1,4 +1,5 @@
 import { nitro } from 'nitro/vite'
+import { varlockVitePlugin } from '@varlock/vite-integration'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
@@ -127,6 +128,7 @@ export default defineConfig({
 			include: '**/*.svg',
 			svgrOptions: { exportType: 'default' },
 		}),
+		varlockVitePlugin({ ssrInjectMode: 'resolved-env' }),
 	],
 	fmt: fmt,
 	lint: lint,

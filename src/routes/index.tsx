@@ -150,7 +150,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 						<div className="flex flex-wrap items-center gap-3">
 							<Button
 								size="lg"
-								className="h-12 cursor-pointer px-7 text-base font-semibold"
+								className="h-12 cursor-pointer rounded-xl px-7 text-base font-semibold"
 								onClick={onOpenProfileType}
 							>
 								Find an Agent

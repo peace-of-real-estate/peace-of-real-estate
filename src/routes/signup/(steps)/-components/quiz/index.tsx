@@ -1,5 +1,3 @@
-import type { Icon } from '@phosphor-icons/react'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
@@ -235,7 +233,6 @@ export function PreferencesStep<
 	freeForm,
 }: {
 	title: string
-	icon: Icon
 	stepNumber: number
 	totalSteps: number
 	stepKey: string

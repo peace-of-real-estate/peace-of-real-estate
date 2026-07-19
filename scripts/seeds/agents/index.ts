@@ -242,8 +242,10 @@ export async function seedAgents(count: number) {
 	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
 
 	const poolKeys = await ensureAvatarPool(count)
-	const fallbackUrls = poolKeys.length === 0 ? getAvatarFallbackUrls() : []
-	const sources = poolKeys.length > 0 ? poolKeys : fallbackUrls
+	const sources =
+		poolKeys.length >= count
+			? poolKeys
+			: [...poolKeys, ...getAvatarFallbackUrls()]
 	const imageFor = (index: number) => sources[index % sources.length]!
 
 	for (let i = 0; i < count; i++) {

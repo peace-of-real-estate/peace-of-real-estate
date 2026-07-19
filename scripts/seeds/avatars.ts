@@ -318,7 +318,7 @@ export async function ensureAvatarPool(targetSize: number): Promise<string[]> {
 			const buffer = await fetchWithRetry(sourceUrl)
 
 			if (buffer) {
-				const hash = createHash('md5').update(buffer).digest('hex')
+				const hash = createHash('sha256').update(buffer).digest('hex')
 				const key = `${POOL_PREFIX}${hash}.jpg`
 				if (!poolKeys.has(key)) {
 					await client.send(

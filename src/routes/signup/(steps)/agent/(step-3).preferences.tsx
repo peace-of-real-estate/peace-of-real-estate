@@ -1,4 +1,3 @@
-import { ChartLineIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import type { AgentDraft } from '@/lib/profile'
@@ -26,7 +25,6 @@ function AgentPreferencesRoute() {
 	return (
 		<PreferencesStep
 			title="Preferences"
-			icon={ChartLineIcon}
 			stepNumber={3}
 			totalSteps={5}
 			stepKey="preferences"
