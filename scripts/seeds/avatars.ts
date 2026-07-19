@@ -1,15 +1,37 @@
+import { createHash } from 'node:crypto'
 import {
 	CreateBucketCommand,
+	GetObjectCommand,
+	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client,
 } from '@aws-sdk/client-s3'
+import { z } from 'zod'
 import { serverEnv as env } from '../../src/env.server'
 
 // =============================================================================
-// Headshot pool
+// Pool layout
 // =============================================================================
 
-const HEADSHOT_URLS = [
+/**
+ * Avatars live in a persistent pool inside the bucket and are never deleted
+ * by the seed. New fetches go under POOL_PREFIX; objects uploaded by older
+ * seeds under LEGACY_PREFIX are reused as-is. The manifest records every
+ * source URL already attempted so each URL is fetched at most once, ever.
+ */
+const POOL_PREFIX = 'pool/avatars/'
+const LEGACY_PREFIX = 'seed/avatars/'
+const MANIFEST_KEY = 'pool/avatar-manifest.json'
+
+const FETCH_CONCURRENCY = 3
+const FETCH_DELAY_MS = 150
+const MANIFEST_SAVE_EVERY = 25
+
+// =============================================================================
+// Photo sources
+// =============================================================================
+
+const UNSPLASH_HEADSHOTS = [
 	'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
 	'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face',
 	'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
@@ -31,6 +53,30 @@ const HEADSHOT_URLS = [
 	'https://images.unsplash.com/photo-1520975661595-6453be3f7070?w=400&h=400&fit=crop&crop=face',
 	'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=400&fit=crop&crop=face',
 ] as const
+
+function buildCandidateUrls(): string[] {
+	const urls: string[] = []
+	for (let i = 0; i <= 99; i++) {
+		urls.push(`https://randomuser.me/api/portraits/men/${i}.jpg`)
+	}
+	for (let i = 0; i <= 99; i++) {
+		urls.push(`https://randomuser.me/api/portraits/women/${i}.jpg`)
+	}
+	for (let i = 1; i <= 70; i++) {
+		urls.push(`https://i.pravatar.cc/400?img=${i}`)
+	}
+	for (let i = 1; i <= 89; i++) {
+		urls.push(`https://xsgames.co/randomusers/assets/avatars/male/${i}.jpg`)
+	}
+	for (let i = 1; i <= 89; i++) {
+		urls.push(`https://xsgames.co/randomusers/assets/avatars/female/${i}.jpg`)
+	}
+	urls.push(...UNSPLASH_HEADSHOTS)
+	for (let i = 1; i <= 70; i++) {
+		urls.push(`https://loremflickr.com/400/400/portrait?lock=${i}`)
+	}
+	return urls
+}
 
 // =============================================================================
 // S3 setup
@@ -87,58 +133,225 @@ function getStorageClient(): S3Client {
 // Helpers
 // =============================================================================
 
-function hashStringToIndex(input: string, max: number): number {
-	let hash = 0
-	for (let i = 0; i < input.length; i++) {
-		hash = (hash << 5) - hash + input.charCodeAt(i)
-		hash |= 0
-	}
-	return Math.abs(hash) % max
-}
-
-async function fetchHeadshot(url: string): Promise<Buffer | null> {
-	try {
-		const response = await fetch(url)
-		if (!response.ok) {
-			console.warn(`Failed to fetch avatar: ${url} (${response.status})`)
+async function fetchWithRetry(
+	url: string,
+	maxAttempts = 4,
+): Promise<Buffer | null> {
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		try {
+			const response = await fetch(url, {
+				headers: {
+					connection: 'close',
+					'user-agent':
+						'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+				},
+				signal: AbortSignal.timeout(30_000),
+			})
+			if (response.status === 404) return null
+			if (!response.ok) {
+				if (attempt < maxAttempts) {
+					await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
+					continue
+				}
+				console.warn(`Failed to fetch avatar: ${url} (${response.status})`)
+				return null
+			}
+			const arrayBuffer = await response.arrayBuffer()
+			const buffer = Buffer.from(arrayBuffer)
+			if (!isJpeg(buffer)) {
+				console.warn(`Skipping non-JPEG avatar response: ${url}`)
+				return null
+			}
+			return buffer
+		} catch (error) {
+			if (attempt < maxAttempts) {
+				await new Promise((resolve) => setTimeout(resolve, 1000 * attempt))
+				continue
+			}
+			console.warn(`Error fetching avatar: ${url}`, error)
 			return null
 		}
-		const arrayBuffer = await response.arrayBuffer()
-		return Buffer.from(arrayBuffer)
-	} catch (error) {
-		console.warn(`Error fetching avatar: ${url}`, error)
-		return null
 	}
+	return null
+}
+
+function isJpeg(buffer: Buffer): boolean {
+	return (
+		buffer.length > 2 &&
+		buffer[0] === 0xff &&
+		buffer[1] === 0xd8 &&
+		buffer[2] === 0xff
+	)
+}
+
+// =============================================================================
+// Pool storage
+// =============================================================================
+
+type AvatarPoolManifest = {
+	attemptedUrls: string[]
+	updatedAt: string
+}
+
+const avatarPoolManifestSchema = z.object({
+	attemptedUrls: z.array(z.string()),
+	updatedAt: z.string(),
+})
+
+async function listPoolKeys(client: S3Client): Promise<string[]> {
+	const keys: string[] = []
+
+	for (const prefix of [POOL_PREFIX, LEGACY_PREFIX]) {
+		let continuationToken: string | undefined
+		do {
+			const listed = await client.send(
+				new ListObjectsV2Command({
+					Bucket: env.AVATAR_BUCKET,
+					Prefix: prefix,
+					ContinuationToken: continuationToken,
+				}),
+			)
+			for (const object of listed.Contents ?? []) {
+				if (object.Key && object.Key !== MANIFEST_KEY) {
+					keys.push(object.Key)
+				}
+			}
+			continuationToken = listed.IsTruncated
+				? listed.NextContinuationToken
+				: undefined
+		} while (continuationToken)
+	}
+
+	return keys
+}
+
+async function loadManifest(client: S3Client): Promise<AvatarPoolManifest> {
+	try {
+		const response = await client.send(
+			new GetObjectCommand({ Bucket: env.AVATAR_BUCKET, Key: MANIFEST_KEY }),
+		)
+		const body = await response.Body?.transformToString()
+		if (!body) throw new Error('Avatar manifest body is empty')
+		const parsed = avatarPoolManifestSchema.safeParse(JSON.parse(body))
+		if (!parsed.success) {
+			throw new Error('Avatar manifest has an unexpected shape')
+		}
+		return parsed.data
+	} catch (error) {
+		if (error instanceof Error && error.name === 'NoSuchKey') {
+			return { attemptedUrls: [], updatedAt: new Date().toISOString() }
+		}
+		throw error
+	}
+}
+
+async function saveManifest(
+	client: S3Client,
+	manifest: AvatarPoolManifest,
+): Promise<void> {
+	manifest.updatedAt = new Date().toISOString()
+	await client.send(
+		new PutObjectCommand({
+			Bucket: env.AVATAR_BUCKET,
+			Key: MANIFEST_KEY,
+			Body: JSON.stringify(manifest),
+			ContentType: 'application/json',
+		}),
+	)
 }
 
 // =============================================================================
 // Public API
 // =============================================================================
 
-export async function uploadAgentAvatar(
-	agentId: string,
-	email: string,
-): Promise<string | null> {
-	if (!canUseS3Storage()) return null
+/**
+ * Returns the keys of the persistent avatar pool, topping it up from the
+ * candidate sources until it reaches `targetSize` (or the sources run out).
+ * Pool objects are never deleted, and every source URL is fetched at most
+ * once across all runs, so reseeds do zero network fetching once the pool
+ * is populated.
+ */
+export async function ensureAvatarPool(targetSize: number): Promise<string[]> {
+	if (!canUseS3Storage()) return []
 
 	const client = getStorageClient()
 	bucketEnsured ??= ensureBucket(client)
 	await bucketEnsured
 
-	const headshotUrl =
-		HEADSHOT_URLS[hashStringToIndex(email, HEADSHOT_URLS.length)]!
-	const imageBuffer = await fetchHeadshot(headshotUrl)
-	if (!imageBuffer) return null
+	const poolKeys = new Set(await listPoolKeys(client))
+	console.log(`Avatar pool holds ${poolKeys.size} photos`)
 
-	const key = `seed/avatars/${agentId}.jpg`
-	await client.send(
-		new PutObjectCommand({
-			Bucket: env.AVATAR_BUCKET,
-			Key: key,
-			Body: imageBuffer,
-			ContentType: 'image/jpeg',
-		}),
+	if (poolKeys.size >= targetSize) {
+		return [...poolKeys]
+	}
+
+	const manifest = await loadManifest(client)
+	const attempted = new Set(manifest.attemptedUrls)
+	const remaining = buildCandidateUrls().filter((url) => !attempted.has(url))
+
+	if (remaining.length === 0) {
+		console.log(
+			`Avatar pool exhausted all sources (${poolKeys.size} photos available)`,
+		)
+		return [...poolKeys]
+	}
+
+	console.log(
+		`Fetching up to ${targetSize - poolKeys.size} new photos ` +
+			`(${remaining.length} sources left to try)...`,
 	)
 
-	return key
+	let saveChain: Promise<void> = Promise.resolve()
+	const queueManifestSave = (): Promise<void> => {
+		const snapshot: AvatarPoolManifest = {
+			...manifest,
+			attemptedUrls: [...manifest.attemptedUrls],
+		}
+		saveChain = saveChain.then(() => saveManifest(client, snapshot))
+		return saveChain
+	}
+
+	let cursor = 0
+	const workers = Array.from({ length: FETCH_CONCURRENCY }, async () => {
+		while (cursor < remaining.length && poolKeys.size < targetSize) {
+			const sourceUrl = remaining[cursor++]!
+			const buffer = await fetchWithRetry(sourceUrl)
+
+			if (buffer) {
+				const hash = createHash('sha256').update(buffer).digest('hex')
+				const key = `${POOL_PREFIX}${hash}.jpg`
+				if (!poolKeys.has(key)) {
+					await client.send(
+						new PutObjectCommand({
+							Bucket: env.AVATAR_BUCKET,
+							Key: key,
+							Body: buffer,
+							ContentType: 'image/jpeg',
+						}),
+					)
+					poolKeys.add(key)
+					if (poolKeys.size % 50 === 0) {
+						console.log(`  ${poolKeys.size} photos in pool`)
+					}
+				}
+			}
+
+			manifest.attemptedUrls.push(sourceUrl)
+			if (manifest.attemptedUrls.length % MANIFEST_SAVE_EVERY === 0) {
+				await queueManifestSave()
+			}
+			await new Promise((resolve) => setTimeout(resolve, FETCH_DELAY_MS))
+		}
+	})
+	await Promise.all(workers)
+	await saveChain
+	await saveManifest(client, manifest)
+
+	console.log(`Avatar pool ready with ${poolKeys.size} photos`)
+	return [...poolKeys]
+}
+
+/** Direct source URLs, used only when S3 storage is not configured. */
+export function getAvatarFallbackUrls(): string[] {
+	return buildCandidateUrls()
 }

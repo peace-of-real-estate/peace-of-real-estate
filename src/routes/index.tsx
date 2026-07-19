@@ -1,7 +1,6 @@
 import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import { Star, ShieldCheck, Clock } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -14,6 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import {
 	ArrowRightIcon,
+	CaretRightIcon,
 	CheckCircleIcon,
 	HouseIcon,
 	TagIcon,
@@ -73,14 +73,14 @@ function LandingHeader({
 					<Link
 						to="/auth/login"
 						search={{ redirect: '/' }}
-						className="hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium whitespace-nowrap transition-colors"
+						className="hover:bg-muted hover:text-foreground inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium whitespace-nowrap transition-colors"
 					>
 						Log in
 					</Link>
 					<button
 						type="button"
 						onClick={onOpenProfileType}
-						className="bg-primary text-primary-foreground hover:bg-primary/85 inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium whitespace-nowrap transition-colors"
+						className="bg-primary text-primary-foreground hover:bg-primary/85 inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium whitespace-nowrap transition-colors"
 					>
 						Sign Up
 					</button>
@@ -138,7 +138,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 					<h1 className="font-heading mt-2 text-4xl leading-[1.05] font-bold tracking-tight text-balance md:mt-4 md:text-5xl lg:text-[3.25rem]">
 						Perfect Agent.
 						<br />
-						<span className="text-sky">Perfect Home.</span>
+						<span className="text-brand">Perfect Home.</span>
 					</h1>
 
 					<p className="text-muted-foreground max-w-md text-lg leading-8 md:text-xl md:leading-9">
@@ -150,7 +150,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 						<div className="flex flex-wrap items-center gap-3">
 							<Button
 								size="lg"
-								className="h-12 cursor-pointer rounded-xl px-7 text-base font-semibold shadow-md"
+								className="h-12 cursor-pointer rounded-xl px-7 text-base font-semibold"
 								onClick={onOpenProfileType}
 							>
 								Find an Agent
@@ -159,32 +159,20 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 							<Button
 								variant="outline"
 								size="lg"
-								className="h-12 rounded-xl px-5 text-base font-medium"
+								className="h-12 px-5 text-base font-medium"
 								asChild
 							>
 								<Link to="/signup/agent">I am an Agent</Link>
 							</Button>
 						</div>
 
-						<div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-xs font-medium md:text-sm">
-							<span className="inline-flex items-center gap-1.5">
-								<Star className="text-gold h-3.5 w-3.5" weight="fill" />
-								Free
-							</span>
-							<span className="inline-flex items-center gap-1.5">
-								<ShieldCheck className="text-gold h-3.5 w-3.5" />
-								No signup
-							</span>
-							<span className="inline-flex items-center gap-1.5">
-								<Clock className="text-gold h-3.5 w-3.5" />
-								About 2 minutes
-							</span>
-						</div>
+						<p className="text-muted-foreground pt-1 text-sm">
+							Free&ensp;·&ensp;No signup&ensp;·&ensp;About 2 minutes
+						</p>
 					</div>
 				</div>
 
 				<div className="relative flex items-center justify-center">
-					<div className="bg-sky/15 absolute inset-0 rounded-full blur-3xl" />
 					<img
 						src="/hero.png"
 						alt="Buyer and real estate agent shaking hands outside a home"
@@ -213,42 +201,29 @@ function ProfileTypeDialog({
 				<DialogHeader>
 					<DialogTitle>What are you planning to do?</DialogTitle>
 					<DialogDescription>
-						Choose the path that fits you. You can specialize the buyer and
-						seller flows separately from here.
+						Pick a path — you can always set up the other later.
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="grid gap-3 sm:grid-cols-2">
+				<div className="grid gap-2">
 					<Link
 						to="/signup/buyer/location"
-						className="hover:border-primary hover:bg-primary/5 group rounded-2xl border p-5 text-left transition-colors"
+						className="group hover:border-primary/50 hover:bg-muted/50 flex items-center gap-4 rounded-md border p-4 text-left transition-colors"
 						onClick={() => onOpenChange(false)}
 					>
-						<div className="bg-primary/10 text-primary mb-4 flex size-11 items-center justify-center rounded-xl">
-							<HouseIcon className="size-5" />
-						</div>
-						<h3 className="font-heading text-lg font-semibold">
-							I want to buy
-						</h3>
-						<p className="text-muted-foreground mt-1 text-sm">
-							Find agents who fit your home search.
-						</p>
+						<HouseIcon className="text-brand size-5 shrink-0" />
+						<span className="min-w-0 flex-1 font-semibold">I'm a buyer</span>
+						<CaretRightIcon className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
 					</Link>
 
 					<Link
 						to="/signup/seller/location"
-						className="hover:border-primary hover:bg-primary/5 group rounded-2xl border p-5 text-left transition-colors"
+						className="group hover:border-primary/50 hover:bg-muted/50 flex items-center gap-4 rounded-md border p-4 text-left transition-colors"
 						onClick={() => onOpenChange(false)}
 					>
-						<div className="bg-primary/10 text-primary mb-4 flex size-11 items-center justify-center rounded-xl">
-							<TagIcon className="size-5" />
-						</div>
-						<h3 className="font-heading text-lg font-semibold">
-							I want to sell
-						</h3>
-						<p className="text-muted-foreground mt-1 text-sm">
-							Find agents who fit your listing goals.
-						</p>
+						<TagIcon className="text-brand size-5 shrink-0" />
+						<span className="min-w-0 flex-1 font-semibold">I'm a seller</span>
+						<CaretRightIcon className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
 					</Link>
 				</div>
 			</DialogContent>
@@ -298,7 +273,7 @@ function HowItWorksSection() {
 					{howItWorksSteps.map((step) => (
 						<div
 							key={step.id}
-							className="border-border bg-card relative flex flex-col items-center rounded-2xl border p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+							className="border-border bg-card relative flex flex-col items-center rounded-lg border p-6 text-center shadow-sm transition-shadow hover:shadow-md"
 						>
 							<div className="mb-5 flex h-40 w-full items-center justify-center overflow-hidden rounded-xl">
 								<img
@@ -369,11 +344,10 @@ function FeaturesSection({
 		<section id="buyers" className="bg-card w-full py-16 md:py-20">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-2 md:gap-16 lg:px-10">
 				<div className="relative flex w-full justify-center md:justify-start">
-					<div className="bg-sky/10 absolute inset-x-8 top-14 bottom-10 rounded-full blur-3xl" />
 					<img
 						src="/match.png"
 						alt="Agent match preview on a phone"
-						className="relative z-10 w-full max-w-lg rounded-[2rem] object-contain"
+						className="relative z-10 w-full max-w-lg rounded-lg object-contain"
 					/>
 				</div>
 

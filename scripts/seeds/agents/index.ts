@@ -35,7 +35,7 @@ import {
 	user,
 	userEntitlements,
 } from '../../../src/db/tables'
-import { uploadAgentAvatar } from '../avatars'
+import { ensureAvatarPool, getAvatarFallbackUrls } from '../avatars'
 
 const agentAnswerPickers: {
 	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>
@@ -147,14 +147,12 @@ function generateEmail(firstName: string, lastName: string): string {
 	return `${firstName.toLowerCase()}.${lastName.toLowerCase()}${randInt(1, 999)}@example.com`
 }
 
-async function insertAgent(location: City, now: Date) {
+async function insertAgent(location: City, now: Date, imageKey: string) {
 	const persona = generatePersona()
 	const { firstName, lastName, fullName } = generateName()
 	const email = generateEmail(firstName, lastName)
 	const userId = crypto.randomUUID()
 	const agentId = crypto.randomUUID()
-
-	const imageKey = await uploadAgentAvatar(agentId, email)
 
 	await db.insert(user).values({
 		id: userId,
@@ -243,8 +241,15 @@ export async function seedAgents(count: number) {
 
 	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
 
+	const poolKeys = await ensureAvatarPool(count)
+	const sources =
+		poolKeys.length >= count
+			? poolKeys
+			: [...poolKeys, ...getAvatarFallbackUrls()]
+	const imageFor = (index: number) => sources[index % sources.length]!
+
 	for (let i = 0; i < count; i++) {
-		await insertAgent(pickCity(), now)
+		await insertAgent(pickCity(), now, imageFor(i))
 
 		if ((i + 1) % 50 === 0 || i === count - 1) {
 			console.log(`  ${i + 1}/${count} agents seeded`)

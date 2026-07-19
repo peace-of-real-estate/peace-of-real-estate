@@ -1,5 +1,3 @@
-import type { Icon } from '@phosphor-icons/react'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
@@ -200,7 +198,7 @@ export function QuizQuestionContent<
 			const freeFormAnswer = (answer as string | null | undefined) ?? null
 			return (
 				<>
-					<QuestionPrompt title={question.title} label={question.label} />
+					<QuestionPrompt title={question.title} />
 					<FreeFormQuestionCard
 						question={freeFormQuestion}
 						value={freeFormAnswer}
@@ -222,7 +220,6 @@ export function PreferencesStep<
 	TStep extends string,
 >({
 	title,
-	icon,
 	stepNumber,
 	totalSteps,
 	stepKey,
@@ -236,7 +233,6 @@ export function PreferencesStep<
 	freeForm,
 }: {
 	title: string
-	icon: Icon
 	stepNumber: number
 	totalSteps: number
 	stepKey: string
@@ -278,13 +274,11 @@ export function PreferencesStep<
 						stepNumber={stepNumber}
 						totalSteps={totalSteps}
 						title={title}
-						icon={icon}
 					/>
 					<StepProgressHeader
 						stepNumber={stepNumber}
 						totalSteps={totalSteps}
 						title={title}
-						activeIndex={currentQuestionIndex}
 						items={answeredFlags}
 						showTitle={false}
 					/>

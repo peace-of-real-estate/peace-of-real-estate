@@ -1,4 +1,3 @@
-import { UserIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 
 import type { SellerDraft } from '@/lib/profile'
@@ -22,7 +21,6 @@ function SellerPreferencesRoute() {
 	return (
 		<PreferencesStep
 			title="Preferences"
-			icon={UserIcon}
 			stepNumber={3}
 			totalSteps={3}
 			stepKey="preferences"

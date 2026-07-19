@@ -17,7 +17,7 @@ if [[ -n "$main_root" && "$main_root" != "$PWD" ]]; then
 fi
 
 vp i
-vp run setup
+vp exec tsx scripts/setup.ts
 vp run compose:up
 vp run db:migrate
 vp run db:init

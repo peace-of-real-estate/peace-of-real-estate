@@ -110,14 +110,11 @@ function SignupForm<TData>({
 			<form className="space-y-3 lg:space-y-4" onSubmit={handleSubmit}>
 				<FieldGroup className="gap-2 lg:gap-7">
 					<Field>
-						<FieldLabel
-							htmlFor={nameId}
-							className="sr-only lg:not-sr-only lg:text-white/80"
-						>
+						<FieldLabel htmlFor={nameId} className="sr-only lg:not-sr-only">
 							Full name
 						</FieldLabel>
 						<div className="relative">
-							<UserIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<UserIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
 							<Input
 								id={nameId}
 								placeholder="Jordan Lee"
@@ -125,19 +122,16 @@ function SignupForm<TData>({
 								onChange={(event) => setName(event.target.value)}
 								disabled={isSubmitting || isGoogleLoading}
 								required
-								className="h-9 rounded-xl border-white/20 bg-white/10 pl-10 text-sm text-white placeholder:text-white/40 lg:h-11 lg:text-base"
+								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
 							/>
 						</div>
 					</Field>
 					<Field>
-						<FieldLabel
-							htmlFor={emailId}
-							className="sr-only lg:not-sr-only lg:text-white/80"
-						>
+						<FieldLabel htmlFor={emailId} className="sr-only lg:not-sr-only">
 							Email address
 						</FieldLabel>
 						<div className="relative">
-							<EnvelopeIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<EnvelopeIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
 							<Input
 								id={emailId}
 								type="email"
@@ -147,19 +141,16 @@ function SignupForm<TData>({
 								disabled={isSubmitting || isGoogleLoading}
 								autoComplete="email"
 								required
-								className="h-9 rounded-xl border-white/20 bg-white/10 pl-10 text-sm text-white placeholder:text-white/40 lg:h-11 lg:text-base"
+								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
 							/>
 						</div>
 					</Field>
 					<Field>
-						<FieldLabel
-							htmlFor={passwordId}
-							className="sr-only lg:not-sr-only lg:text-white/80"
-						>
+						<FieldLabel htmlFor={passwordId} className="sr-only lg:not-sr-only">
 							Password
 						</FieldLabel>
 						<div className="relative">
-							<LockIcon className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/50" />
+							<LockIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
 							<Input
 								id={passwordId}
 								type="password"
@@ -169,14 +160,14 @@ function SignupForm<TData>({
 								disabled={isSubmitting || isGoogleLoading}
 								autoComplete="new-password"
 								required
-								className="h-9 rounded-xl border-white/20 bg-white/10 pl-10 text-sm text-white placeholder:text-white/40 lg:h-11 lg:text-base"
+								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
 							/>
 						</div>
 					</Field>
 					<Button
 						type="submit"
 						disabled={isSubmitting || isGoogleLoading}
-						className="bg-accent text-accent-foreground hover:bg-accent/90 h-9 w-full rounded-xl text-sm font-semibold lg:h-11 lg:text-base"
+						className="h-9 w-full text-sm font-semibold lg:h-11 lg:text-base"
 					>
 						{isSubmitting ? (
 							<SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
@@ -188,16 +179,16 @@ function SignupForm<TData>({
 
 			{googleAvailable ? (
 				<>
-					<div className="relative py-0 text-center text-xs text-white/40 lg:py-1">
-						<span className="relative z-10 px-3 text-white/50">or</span>
-						<div className="absolute top-1/2 left-0 h-px w-full bg-white/20" />
+					<div className="text-muted-foreground relative py-0 text-center text-xs lg:py-1">
+						<span className="bg-sidebar relative z-10 px-3">or</span>
+						<div className="bg-border absolute top-1/2 left-0 h-px w-full" />
 					</div>
 
 					<GoogleAuthButton
 						fallbackRedirect={oauthRedirect}
 						onClick={handleGoogleSignIn}
 						isLoading={isGoogleLoading}
-						className="h-9 w-full rounded-xl border-white bg-white text-sm font-medium text-slate-950 hover:bg-slate-100 hover:text-slate-950 lg:h-11 lg:text-base"
+						className="h-9 w-full text-sm font-medium lg:h-11 lg:text-base"
 						disabled={isSubmitting}
 					>
 						Continue with Google
@@ -206,18 +197,18 @@ function SignupForm<TData>({
 			) : null}
 
 			{showTerms ? (
-				<p className="text-center text-[10px] leading-snug text-white/50 lg:text-xs">
+				<p className="text-muted-foreground text-center text-xs leading-snug">
 					By creating an account, you agree to our{' '}
 					<a
 						href="/terms"
-						className="text-white/80 underline underline-offset-2 hover:text-white"
+						className="text-brand hover:text-primary underline underline-offset-2"
 					>
 						Terms of Service
 					</a>{' '}
 					and{' '}
 					<a
 						href="/privacy"
-						className="text-white/80 underline underline-offset-2 hover:text-white"
+						className="text-brand hover:text-primary underline underline-offset-2"
 					>
 						Privacy Policy
 					</a>
@@ -247,31 +238,31 @@ export function SignupPreviewShell<TData>({
 	...signupFormProps
 }: SignupPreviewShellProps<TData>) {
 	return (
-		<div className="min-h-dvh w-full bg-slate-50">
+		<div className="bg-background min-h-dvh w-full">
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ duration: 0.45, ease: 'easeOut' }}
-				className="mx-auto grid min-h-dvh w-full max-w-[1440px] lg:grid-cols-[minmax(420px,1fr)_1.4fr]"
+				className="mx-auto grid min-h-dvh w-full lg:grid-cols-[minmax(420px,1fr)_1.4fr]"
 			>
-				<div className="bg-primary relative order-2 hidden flex-col justify-center px-6 py-10 text-white sm:px-10 lg:sticky lg:top-0 lg:order-1 lg:flex lg:h-dvh lg:px-12 lg:py-16 xl:px-20">
+				<div className="bg-sidebar relative order-2 hidden flex-col justify-center border-r px-6 py-10 sm:px-10 lg:sticky lg:top-0 lg:order-1 lg:flex lg:h-dvh lg:px-12 lg:py-16 xl:px-20">
 					<div className="mx-auto w-full max-w-md">
 						<div className="mb-3 lg:mb-8">
 							<Link
 								to="/"
-								className="mb-8 hidden items-center gap-3 text-lg font-semibold text-white hover:text-white lg:inline-flex"
+								className="text-foreground mb-8 hidden items-center gap-3 text-lg font-semibold lg:inline-flex"
 							>
 								<img
-									src="/logomark-light.svg"
+									src="/logomark-theme.svg"
 									alt="Peace of Real Estate"
 									className="h-10 w-10"
 								/>
 								Peace of Real Estate
 							</Link>
-							<h1 className="font-heading text-xl tracking-tight text-white lg:text-3xl xl:text-4xl">
+							<h1 className="font-heading text-xl tracking-tight lg:text-3xl xl:text-4xl">
 								{panelTitle}
 							</h1>
-							<p className="mt-1 text-xs leading-relaxed text-white/70 lg:mt-3 lg:text-base">
+							<p className="text-muted-foreground mt-1 text-xs leading-relaxed lg:mt-3 lg:text-base">
 								{panelDescription}
 							</p>
 						</div>
@@ -308,25 +299,25 @@ function MobileSignupBanner<TData>({
 
 	return (
 		<Sheet>
-			<div className="bg-primary fixed inset-x-0 bottom-0 z-30 rounded-t-3xl px-4 pt-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] text-white shadow-2xl shadow-slate-950/30 lg:hidden">
+			<div className="bg-card fixed inset-x-0 bottom-0 z-30 border-t px-4 pt-5 pb-[calc(1.75rem+env(safe-area-inset-bottom))] shadow-lg lg:hidden">
 				<div className="mx-auto w-full max-w-md space-y-3">
 					<div>
-						<h2 className="font-heading text-xl leading-tight font-bold text-white">
+						<h2 className="font-heading text-xl leading-tight font-bold">
 							{title}
 						</h2>
-						<p className="mt-1 text-sm leading-snug text-white/70">
+						<p className="text-muted-foreground mt-1 text-sm leading-snug">
 							{subtitle}
 						</p>
 					</div>
 					<div className="grid grid-cols-2 gap-2">
 						<SheetTrigger asChild>
-							<Button className="bg-accent text-accent-foreground hover:bg-accent/90 h-11 rounded-xl px-4 text-sm font-semibold">
+							<Button className="h-11 px-4 text-sm font-semibold">
 								{ctaLabel}
 							</Button>
 						</SheetTrigger>
 						<GoogleAuthButton
 							fallbackRedirect={oauthRedirect}
-							className="h-11 rounded-xl border-white bg-white px-4 text-sm font-semibold text-slate-950 hover:bg-slate-100 hover:text-slate-950"
+							className="h-11 px-4 text-sm font-semibold"
 							aria-label="Continue with Google"
 						>
 							Google
@@ -337,13 +328,13 @@ function MobileSignupBanner<TData>({
 
 			<SheetContent
 				side="bottom"
-				className="bg-primary max-h-[92dvh] overflow-y-auto rounded-t-3xl border-white/10 px-4 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] text-white lg:hidden"
+				className="max-h-[92dvh] overflow-y-auto px-4 pt-5 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:hidden"
 			>
 				<SheetHeader className="px-0 pt-0 pb-4 text-left">
-					<SheetTitle className="font-heading pr-10 text-2xl tracking-tight text-white">
+					<SheetTitle className="font-heading pr-10 text-2xl tracking-tight">
 						Create your profile
 					</SheetTitle>
-					<SheetDescription className="text-white/70">
+					<SheetDescription>
 						Save your profile and start matching.
 					</SheetDescription>
 				</SheetHeader>

@@ -1,4 +1,5 @@
 import { nitro } from 'nitro/vite'
+import { varlockVitePlugin } from '@varlock/vite-integration'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
@@ -8,7 +9,6 @@ import svgr from 'vite-plugin-svgr'
 import { resolve } from 'node:path'
 import { defineConfig, type UserConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
-import { loadPublicEnvIntoProcess } from './src/lib/utils/env'
 
 const fmt = {
 	singleQuote: true,
@@ -97,91 +97,86 @@ const lint = {
 
 const root = import.meta.dirname
 
-export default defineConfig(({ mode }) => {
-	const environmentName =
-		process.env.RAILWAY_ENVIRONMENT_NAME ?? process.env.APP_ENV ?? mode
-	loadPublicEnvIntoProcess(environmentName)
-
-	return {
-		root,
-		resolve: {
-			tsconfigPaths: true,
-			dedupe: ['react', 'react-dom'],
-			alias: [
-				{ find: '@', replacement: resolve(root, 'src') },
-				{ find: '@tests', replacement: resolve(root, 'tests') },
-			],
-		},
-		optimizeDeps: {
-			include: [
-				'vite-plus/test',
-				'vite-plus/test/browser',
-				'vitest-browser-react',
-			],
-		},
-		plugins: [
-			tanstackStart({
-				router: { routeFileIgnorePattern: '(\\.test\\.tsx$|__screenshots__)' },
-			}),
-			...(process.env.VITEST === 'true'
-				? []
-				: [devtools({ injectSource: { enabled: false } }), nitro()]),
-			tailwindcss(),
-			viteReact(),
-			babel({ presets: [reactCompilerPreset()] }),
-			svgr({
-				include: '**/*.svg',
-				svgrOptions: { exportType: 'default' },
-			}),
+export default defineConfig({
+	root,
+	resolve: {
+		tsconfigPaths: true,
+		dedupe: ['react', 'react-dom'],
+		alias: [
+			{ find: '@', replacement: resolve(root, 'src') },
+			{ find: '@tests', replacement: resolve(root, 'tests') },
 		],
-		fmt: fmt,
-		lint: lint,
-		staged: {
-			'*': 'vp check --fix',
-		},
-		test: {
-			passWithNoTests: true,
-			// CI adds the official HTML report plus a single-file visual diff
-			// page; both get uploaded as artifacts when tests fail
-			reporters: process.env.CI
-				? ['default', 'html', './tests/support/visual-diff-reporter.ts']
-				: ['default'],
-			projects: [
-				{
-					extends: true,
-					test: {
-						name: 'unit',
-						include: [
-							'src/**/*.test.unit.ts',
-							'src/**/*.test.ts',
-							'!src/**/*.{server,db}.test.ts',
-						],
+	},
+	optimizeDeps: {
+		include: [
+			'vite-plus/test',
+			'vite-plus/test/browser',
+			'vitest-browser-react',
+		],
+	},
+	plugins: [
+		tanstackStart({
+			router: { routeFileIgnorePattern: '(\\.test\\.tsx$|__screenshots__)' },
+		}),
+		...(process.env.VITEST === 'true'
+			? []
+			: [devtools({ injectSource: { enabled: false } }), nitro()]),
+		tailwindcss(),
+		viteReact(),
+		babel({ presets: [reactCompilerPreset()] }),
+		svgr({
+			include: '**/*.svg',
+			svgrOptions: { exportType: 'default' },
+		}),
+		varlockVitePlugin({ ssrInjectMode: 'resolved-env' }),
+	],
+	fmt: fmt,
+	lint: lint,
+	staged: {
+		'*': 'vp check --fix',
+	},
+	test: {
+		passWithNoTests: true,
+		// CI adds the official HTML report plus a single-file visual diff
+		// page; both get uploaded as artifacts when tests fail
+		reporters: process.env.CI
+			? ['default', 'html', './tests/support/visual-diff-reporter.ts']
+			: ['default'],
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'unit',
+					include: [
+						'src/**/*.test.unit.ts',
+						'src/**/*.test.ts',
+						'!src/**/*.{server,db}.test.ts',
+					],
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: 'server',
+					include: ['src/**/*.{server,db}.test.ts'],
+					testTimeout: 5_000,
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: 'browser',
+					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
+					setupFiles: ['./tests/support/mocks/styles.ts'],
+					testTimeout: 15_000,
+					browser: {
+						instances: [{ browser: 'chromium' }],
+						provider: playwright(),
+						enabled: true,
+						headless: true,
 					},
 				},
-				{
-					extends: true,
-					test: {
-						name: 'server',
-						include: ['src/**/*.{server,db}.test.ts'],
-						testTimeout: 5_000,
-					},
-				},
-				{
-					extends: true,
-					test: {
-						name: 'browser',
-						include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
-						setupFiles: ['./tests/support/mocks/styles.ts'],
-						testTimeout: 15_000,
-						browser: {
-							instances: [{ browser: 'chromium' }],
-							provider: playwright(),
-							enabled: true,
-							headless: true,
-						},
-					},
-				},
-			],
-		},
-	}
+			},
+		],
+	},
 })

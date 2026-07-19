@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ShieldCheckIcon } from '@phosphor-icons/react'
 
 import { useState } from 'react'
 
@@ -12,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { cn } from '@/lib/utils/ui'
 import type { AgentDraft } from '@/lib/profile'
 import type { AgentFlowStep } from './route'
 import { ArrowRightIcon } from '@phosphor-icons/react'
@@ -65,12 +63,7 @@ export function AgentCompliance({
 		<AnimatedStepCard stepKey="compliance">
 			<Card size="sm" className="shadow-sm">
 				<CardContent className="space-y-6">
-					<StepHeader
-						stepNumber={4}
-						totalSteps={5}
-						title="Compliance"
-						icon={ShieldCheckIcon}
-					/>
+					<StepHeader stepNumber={4} totalSteps={5} title="Compliance" />
 
 					<Label className="flex items-start gap-3 border p-5 text-sm leading-relaxed">
 						<input
@@ -119,12 +112,7 @@ export function AgentCompliance({
 							onClick={handleContinue}
 							disabled={!canContinue}
 							size="lg"
-							className={cn(
-								'w-full gap-2 rounded-4xl px-8 transition-all duration-300',
-								canContinue
-									? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg'
-									: 'bg-muted text-muted-foreground',
-							)}
+							className="w-full gap-2"
 						>
 							Continue
 							<ArrowRightIcon className="h-4 w-4" />

@@ -1,6 +1,9 @@
+import { useState } from 'react'
+
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { AgentMatchData } from '@/lib/matching/match.view'
+import { InitialsAvatar } from '@/routes/(dashboard)/-components/agent-preview-card'
 import {
 	ClockIcon,
 	MapPinIcon,
@@ -20,24 +23,36 @@ export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 
 function MatchCard({ match }: { match: AgentMatchData }) {
 	const topSpecialties = match.specialties.slice(0, 3)
+	const [failedAvatar, setFailedAvatar] = useState<string>()
+	const showAvatar = Boolean(match.avatar) && match.avatar !== failedAvatar
 
 	return (
 		<Card className="hover:border-primary/20 overflow-hidden transition-colors">
 			<div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
-				<div className="bg-background flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl border">
-					<div className="text-xl leading-none font-semibold">
+				<div className="relative shrink-0">
+					{showAvatar ? (
+						<img
+							src={match.avatar}
+							alt={`${match.name} headshot`}
+							className="h-16 w-16 rounded-full object-cover"
+							onError={() => setFailedAvatar(match.avatar)}
+						/>
+					) : (
+						<InitialsAvatar
+							name={match.name}
+							className="h-16 w-16 rounded-full text-lg"
+						/>
+					)}
+					<span className="bg-background absolute -right-1 -bottom-1 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold">
 						{match.fitScore}%
-					</div>
-					<div className="text-muted-foreground mt-1 text-[10px] tracking-wide uppercase">
-						Fit
-					</div>
+					</span>
 				</div>
 
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
 						<h3 className="truncate text-lg font-semibold">{match.name}</h3>
 						{match.isTopMatch && (
-							<span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold">
+							<span className="bg-amber/15 text-amber-foreground inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold">
 								<StarIcon className="h-3 w-3 fill-current" />
 								Top match
 							</span>
@@ -72,7 +87,7 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 							{topSpecialties.map((specialty) => (
 								<span
 									key={specialty}
-									className="bg-secondary text-secondary-foreground inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
+									className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium"
 								>
 									{specialty}
 								</span>

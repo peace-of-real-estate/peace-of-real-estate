@@ -43,8 +43,8 @@ export function SellerPreview({ profile }: { profile: ClientProfile }) {
 			clearDraft={sellerDraftStorage.clear}
 			panelTitle={
 				<>
-					Create your profile to <span className="text-accent">unlock</span>{' '}
-					your matches
+					Create your profile to <span className="text-brand">unlock</span> your
+					matches
 				</>
 			}
 			panelDescription="Save your personalized seller profile, view ranked agent matches, and connect with agents who fit your style."
