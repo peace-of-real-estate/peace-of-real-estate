@@ -24,12 +24,6 @@ jobs:
         uses: voidzero-dev/setup-vp@v1
         with:
           version: '0.2.1'
-      - name: debug formatting mismatch
-        run: |
-          cp AGENTS.md /tmp/agents-before.md
-          vp fmt AGENTS.md --write
-          diff /tmp/agents-before.md AGENTS.md || true
-          xxd AGENTS.md | tail -10
       - run: vp check
       - run: vp test run --project unit
 
@@ -54,7 +48,6 @@ jobs:
         uses: voidzero-dev/setup-vp@v1
         with:
           version: '0.2.1'
-          node-version: '24'
       - name: Install Playwright Browsers
         run: vpx playwright install --with-deps --only-shell
       - name: Run Tests
