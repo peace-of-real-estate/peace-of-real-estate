@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       GITHUB_STEP_SUMMARY: /tmp/vitest-check-summary.md
     steps:
@@ -34,7 +34,7 @@ jobs:
       - run: vp test run --project unit
 
   test-db:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: checkout
         uses: actions/checkout@v6
@@ -46,7 +46,7 @@ jobs:
         run: vp test run --project server
 
   test-visual:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: checkout
         uses: actions/checkout@v6
