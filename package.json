@@ -27,6 +27,10 @@
 		"db:push": "varlock run -- drizzle-kit push",
 		"db:generate": "varlock run -- drizzle-kit generate",
 		"db:migrate": "varlock run -- tsx scripts/migrate.ts",
+		"stripe:sandbox:check": "bash scripts/stripe-sandbox.sh check",
+		"stripe:sandbox:create": "bash scripts/stripe-sandbox.sh create",
+		"stripe:sandbox:provision": "bash scripts/stripe-sandbox.sh provision",
+		"stripe:sandbox:listen": "bash scripts/stripe-sandbox.sh listen",
 		"prepare": "vp config --hooks-only",
 		"update-pnpm": "corepack use pnpm@latest",
 		"dead-code": "fallow dead-code"
