@@ -4,3 +4,7 @@ import { Pool } from 'pg'
 
 const pool = new Pool({ connectionString: env.DATABASE_URL })
 export const db = drizzle({ client: pool, casing: 'snake_case' })
+
+export async function closeDb() {
+	await pool.end()
+}

@@ -9,15 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DocsRouteRouteImport } from './routes/docs/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DocsIndexRouteImport } from './routes/docs/index'
-import { Route as DocsUiRouteImport } from './routes/docs/ui'
-import { Route as DocsPlanRouteImport } from './routes/docs/plan'
-import { Route as DocsPaymentsRouteImport } from './routes/docs/payments'
-import { Route as DocsLifecycleRouteImport } from './routes/docs/lifecycle'
-import { Route as DocsAntiAbuseRouteImport } from './routes/docs/anti-abuse'
-import { Route as DebugMatchesRouteImport } from './routes/debug/matches'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -56,49 +48,9 @@ import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/s
 import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
 import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/signup/(steps)/agent/(step-1).identity'
 
-const DocsRouteRoute = DocsRouteRouteImport.update({
-  id: '/docs',
-  path: '/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsIndexRoute = DocsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsUiRoute = DocsUiRouteImport.update({
-  id: '/ui',
-  path: '/ui',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsPlanRoute = DocsPlanRouteImport.update({
-  id: '/plan',
-  path: '/plan',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsPaymentsRoute = DocsPaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsLifecycleRoute = DocsLifecycleRouteImport.update({
-  id: '/lifecycle',
-  path: '/lifecycle',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DocsAntiAbuseRoute = DocsAntiAbuseRouteImport.update({
-  id: '/anti-abuse',
-  path: '/anti-abuse',
-  getParentRoute: () => DocsRouteRoute,
-} as any)
-const DebugMatchesRoute = DebugMatchesRouteImport.update({
-  id: '/debug/matches',
-  path: '/debug/matches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
@@ -307,7 +259,6 @@ const SignupstepsAgentstep1IdentityRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/docs': typeof DocsRouteRouteWithChildren
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -316,13 +267,6 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/debug/matches': typeof DebugMatchesRoute
-  '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
-  '/docs/payments': typeof DocsPaymentsRoute
-  '/docs/plan': typeof DocsPlanRoute
-  '/docs/ui': typeof DocsUiRoute
-  '/docs/': typeof DocsIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -363,13 +307,6 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/debug/matches': typeof DebugMatchesRoute
-  '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
-  '/docs/payments': typeof DocsPaymentsRoute
-  '/docs/plan': typeof DocsPlanRoute
-  '/docs/ui': typeof DocsUiRoute
-  '/docs': typeof DocsIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -403,7 +340,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/docs': typeof DocsRouteRouteWithChildren
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -412,13 +348,6 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/debug/matches': typeof DebugMatchesRoute
-  '/docs/anti-abuse': typeof DocsAntiAbuseRoute
-  '/docs/lifecycle': typeof DocsLifecycleRoute
-  '/docs/payments': typeof DocsPaymentsRoute
-  '/docs/plan': typeof DocsPlanRoute
-  '/docs/ui': typeof DocsUiRoute
-  '/docs/': typeof DocsIndexRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -453,7 +382,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/docs'
     | '/agent'
     | '/buyer'
     | '/seller'
@@ -462,13 +390,6 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/debug/matches'
-    | '/docs/anti-abuse'
-    | '/docs/lifecycle'
-    | '/docs/payments'
-    | '/docs/plan'
-    | '/docs/ui'
-    | '/docs/'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -509,13 +430,6 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/debug/matches'
-    | '/docs/anti-abuse'
-    | '/docs/lifecycle'
-    | '/docs/payments'
-    | '/docs/plan'
-    | '/docs/ui'
-    | '/docs'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -548,7 +462,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/docs'
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
@@ -557,13 +470,6 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/debug/matches'
-    | '/docs/anti-abuse'
-    | '/docs/lifecycle'
-    | '/docs/payments'
-    | '/docs/plan'
-    | '/docs/ui'
-    | '/docs/'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -597,7 +503,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DocsRouteRoute: typeof DocsRouteRouteWithChildren
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
@@ -606,7 +511,6 @@ export interface RootRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  DebugMatchesRoute: typeof DebugMatchesRoute
   SignupstepsAgentRouteRoute: typeof SignupstepsAgentRouteRouteWithChildren
   SignupstepsBuyerRouteRoute: typeof SignupstepsBuyerRouteRouteWithChildren
   SignupstepsSellerRouteRoute: typeof SignupstepsSellerRouteRouteWithChildren
@@ -620,67 +524,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs/': {
-      id: '/docs/'
-      path: '/'
-      fullPath: '/docs/'
-      preLoaderRoute: typeof DocsIndexRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/ui': {
-      id: '/docs/ui'
-      path: '/ui'
-      fullPath: '/docs/ui'
-      preLoaderRoute: typeof DocsUiRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/plan': {
-      id: '/docs/plan'
-      path: '/plan'
-      fullPath: '/docs/plan'
-      preLoaderRoute: typeof DocsPlanRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/payments': {
-      id: '/docs/payments'
-      path: '/payments'
-      fullPath: '/docs/payments'
-      preLoaderRoute: typeof DocsPaymentsRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/lifecycle': {
-      id: '/docs/lifecycle'
-      path: '/lifecycle'
-      fullPath: '/docs/lifecycle'
-      preLoaderRoute: typeof DocsLifecycleRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/docs/anti-abuse': {
-      id: '/docs/anti-abuse'
-      path: '/anti-abuse'
-      fullPath: '/docs/anti-abuse'
-      preLoaderRoute: typeof DocsAntiAbuseRouteImport
-      parentRoute: typeof DocsRouteRoute
-    }
-    '/debug/matches': {
-      id: '/debug/matches'
-      path: '/debug/matches'
-      fullPath: '/debug/matches'
-      preLoaderRoute: typeof DebugMatchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password': {
@@ -945,28 +793,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface DocsRouteRouteChildren {
-  DocsAntiAbuseRoute: typeof DocsAntiAbuseRoute
-  DocsLifecycleRoute: typeof DocsLifecycleRoute
-  DocsPaymentsRoute: typeof DocsPaymentsRoute
-  DocsPlanRoute: typeof DocsPlanRoute
-  DocsUiRoute: typeof DocsUiRoute
-  DocsIndexRoute: typeof DocsIndexRoute
-}
-
-const DocsRouteRouteChildren: DocsRouteRouteChildren = {
-  DocsAntiAbuseRoute: DocsAntiAbuseRoute,
-  DocsLifecycleRoute: DocsLifecycleRoute,
-  DocsPaymentsRoute: DocsPaymentsRoute,
-  DocsPlanRoute: DocsPlanRoute,
-  DocsUiRoute: DocsUiRoute,
-  DocsIndexRoute: DocsIndexRoute,
-}
-
-const DocsRouteRouteWithChildren = DocsRouteRoute._addFileChildren(
-  DocsRouteRouteChildren,
-)
-
 interface dashboardAgentRouteRouteChildren {
   dashboardAgentIntroductionsRoute: typeof dashboardAgentIntroductionsRoute
 }
@@ -1073,7 +899,6 @@ const SignupstepsSellerRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DocsRouteRoute: DocsRouteRouteWithChildren,
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,
@@ -1082,7 +907,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
-  DebugMatchesRoute: DebugMatchesRoute,
   SignupstepsAgentRouteRoute: SignupstepsAgentRouteRouteWithChildren,
   SignupstepsBuyerRouteRoute: SignupstepsBuyerRouteRouteWithChildren,
   SignupstepsSellerRouteRoute: SignupstepsSellerRouteRouteWithChildren,

@@ -26,7 +26,7 @@
 		"db:seed": "varlock run -- tsx scripts/seed.ts",
 		"db:push": "varlock run -- drizzle-kit push",
 		"db:generate": "varlock run -- drizzle-kit generate",
-		"db:migrate": "varlock run -- drizzle-kit migrate",
+		"db:migrate": "varlock run -- tsx scripts/migrate.ts",
 		"prepare": "vp config --hooks-only",
 		"update-pnpm": "corepack use pnpm@latest",
 		"knip": "knip"
