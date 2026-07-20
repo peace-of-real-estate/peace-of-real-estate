@@ -161,7 +161,7 @@ function scoredAgentToDebugMatch(
 	}
 }
 
-export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
+const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<DebugClientOption[]> => {
 		await requireUserId()
 
@@ -272,7 +272,7 @@ async function loadScoreAgentsForProfile({
 	}
 }
 
-export const loadDebugMatches = createServerFn({ method: 'GET' })
+const loadDebugMatches = createServerFn({ method: 'GET' })
 	.validator((data: { clientId: string; side: 'buying' | 'selling' }) =>
 		loadDebugMatchesInput.parse(data),
 	)

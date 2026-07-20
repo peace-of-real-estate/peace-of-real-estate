@@ -19,6 +19,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils/ui'
+import { useHydrated } from '@/hooks/use-hydrated'
 import { WarningIcon } from '@phosphor-icons/react'
 
 export type SignupWizardStep<TStep extends string = string> = {
@@ -78,6 +79,7 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 	getCompletedStepIds: (draft: TDraft) => Exclude<TStep, 'preview'>[]
 }) {
 	const navigate = useNavigate()
+	const hydrated = useHydrated()
 	const [showLeaveDialog, setShowLeaveDialog] = useState(false)
 	const [state, setState] = useState<TDraft>(() => {
 		try {
@@ -120,7 +122,9 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 				onStepClick={(step) => goToStep(step)}
 				completedStepIds={completedStepIds}
 			>
-				<Outlet />
+				<fieldset disabled={!hydrated} className="contents">
+					<Outlet />
+				</fieldset>
 			</WizardChrome>
 			<LeaveDialog
 				open={showLeaveDialog}

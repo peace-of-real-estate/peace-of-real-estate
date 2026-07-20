@@ -1,57 +1,25 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useRef } from 'react'
+import { createFileRoute } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { authenticateBeta } from '@/lib/auth/functions'
 import { SUPPORT_EMAIL } from '@/lib/constants'
+import { authenticateBeta } from '@/lib/auth/beta.functions'
 import {
 	ArrowRightIcon,
 	LockIcon,
 	ShieldCheckIcon,
 	SparkleIcon,
 } from '@phosphor-icons/react'
-
-async function authenticateBetaWithPassword(password: string) {
-	try {
-		const data = await authenticateBeta({ data: { password } })
-		return data.success ? 'success' : 'invalid'
-	} catch {
-		return 'server-error'
-	}
-}
+import { z } from 'zod'
 
 export const Route = createFileRoute('/auth/beta')({
+	validateSearch: z.object({ error: z.enum(['invalid', 'server']).optional() }),
 	component: BetaLogin,
 })
 
 function BetaLogin() {
-	const navigate = useNavigate()
-	const [password, setPassword] = useState('')
-	const [error, setError] = useState<'invalid' | 'server' | null>(null)
-	const [success, setSuccess] = useState(false)
-	const inputRef = useRef<HTMLInputElement>(null)
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		const authResult = await authenticateBetaWithPassword(password)
-
-		if (authResult === 'success') {
-			setError(null)
-			setSuccess(true)
-			setTimeout(async () => {
-				await navigate({ to: '/' })
-			}, 800)
-		} else if (authResult === 'server-error') {
-			setError('server')
-			inputRef.current?.focus()
-		} else {
-			setError('invalid')
-			setPassword('')
-			inputRef.current?.focus()
-		}
-	}
+	const { error } = Route.useSearch()
 
 	return (
 		<div className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden px-6 py-12">
@@ -78,18 +46,18 @@ function BetaLogin() {
 						</p>
 					</div>
 
-					<form onSubmit={handleSubmit} className="space-y-4">
+					<form
+						action={authenticateBeta.url}
+						method="post"
+						className="space-y-4"
+					>
 						<div className="relative">
 							<LockIcon className="text-muted-foreground absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2" />
 							<Input
-								ref={inputRef}
+								name="password"
 								type="password"
-								value={password}
-								onChange={(e) => {
-									setPassword(e.target.value)
-									setError(null)
-								}}
 								placeholder="Enter invite password"
+								required
 								className="pl-11"
 							/>
 						</div>
@@ -107,12 +75,8 @@ function BetaLogin() {
 							</p>
 						) : null}
 
-						{success ? (
-							<p className="text-center text-xs">Access granted. Welcome in.</p>
-						) : null}
-
-						<Button type="submit" disabled={success} className="w-full">
-							{success ? 'Entering...' : 'Unlock Preview'}
+						<Button type="submit" className="w-full">
+							Unlock Preview
 							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
 					</form>

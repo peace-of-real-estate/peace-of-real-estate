@@ -41,7 +41,12 @@ vi.mock('@/lib/auth/functions', () => ({
 	getCurrentSession: () => authState.session,
 	redirectAuthenticatedUsers: () => undefined,
 	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
-	authenticateBeta: async () => ({ success: true }),
+}))
+
+vi.mock('@/lib/auth/beta.functions', () => ({
+	authenticateBeta: Object.assign(async () => ({ success: true }), {
+		url: '/server-fn',
+	}),
 	hasBetaAccess: () => true,
 }))
 

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { useState } from 'react'
+import { useRef } from 'react'
 
 import {
 	AnimatedStepCard,
@@ -15,16 +15,41 @@ import type { AgentDraft } from '@/lib/profile'
 import type { AgentFlowStep } from './route'
 import {
 	averageTransactions as averageTransactionsEnum,
-	parseSlug,
 	yearsLicensed as yearsLicensedEnum,
 } from '@/lib/profile'
 import { ArrowRightIcon } from '@phosphor-icons/react'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/signup/(steps)/agent/(step-1)/identity')(
 	{
 		component: AgentIdentityRoute,
 	},
 )
+
+const optionalText = z
+	.string()
+	.trim()
+	.transform((value) => value || null)
+
+const agentIdentitySchema = z.object({
+	firstName: z.string().trim().min(1),
+	lastName: z.string().trim().min(1),
+	brokerageName: z.string().trim().min(1),
+	licenseNumberState: z.string().trim().min(1),
+	email: optionalText,
+	phone: optionalText,
+	businessAddress: optionalText,
+	licenseProof: optionalText,
+	yearsLicensed: z
+		.enum(yearsLicensedEnum.slugs)
+		.or(z.literal(''))
+		.transform((value) => value || null),
+	averageTransactions: z
+		.enum(averageTransactionsEnum.slugs)
+		.or(z.literal(''))
+		.transform((value) => value || null),
+	employmentStatus: optionalText,
+})
 
 function AgentIdentityRoute() {
 	const { state, updateState, goToStep } = useSignupWizardContext<
@@ -50,202 +75,181 @@ function AgentIdentity({
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
-	const [firstName, setFirstName] = useState(state.firstName ?? '')
-	const [lastName, setLastName] = useState(state.lastName ?? '')
-	const [brokerageName, setBrokerageName] = useState(state.brokerageName ?? '')
-	const [email, setEmail] = useState(state.email ?? '')
-	const [phone, setPhone] = useState(state.phone ?? '')
-	const [businessAddress, setBusinessAddress] = useState(
-		state.businessAddress ?? '',
-	)
-	const [licenseNumberState, setLicenseNumberState] = useState(
-		state.licenseNumberState ?? '',
-	)
-	const [licenseProof, setLicenseProof] = useState(state.licenseProof ?? '')
-	const [yearsLicensed, setYearsLicensed] = useState(state.yearsLicensed ?? '')
-	const [averageTransactions, setAverageTransactions] = useState(
-		state.averageTransactions ?? '',
-	)
-	const [employmentStatus, setEmploymentStatus] = useState(
-		state.employmentStatus ?? '',
-	)
+	const formRef = useRef<HTMLFormElement>(null)
 
-	const canContinue =
-		firstName.trim().length > 0 &&
-		lastName.trim().length > 0 &&
-		brokerageName.trim().length > 0 &&
-		licenseNumberState.trim().length > 0
-
-	const handleContinue = () => {
-		if (!canContinue) return
-		onUpdate({
-			firstName,
-			lastName,
-			brokerageName,
-			email,
-			phone,
-			businessAddress,
-			licenseNumberState,
-			licenseProof,
-			yearsLicensed: parseSlug(yearsLicensedEnum, yearsLicensed),
-			averageTransactions: parseSlug(
-				averageTransactionsEnum,
-				averageTransactions,
-			),
-			employmentStatus,
-		})
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault()
+		const result = agentIdentitySchema.safeParse(
+			Object.fromEntries(new FormData(event.currentTarget)),
+		)
+		if (!result.success) return
+		onUpdate(result.data)
 		onContinue()
 	}
 
 	const fillDebugData = () => {
-		setFirstName('Alex')
-		setLastName('Morgan')
-		setBrokerageName('PRE Realty Group')
-		setEmail('alex.morgan@example.com')
-		setPhone('555-123-4567')
-		setBusinessAddress('123 Main St, Austin, TX 78701')
-		setLicenseNumberState('TX-12345678')
-		setLicenseProof('https://license.example.com/alex-morgan')
-		setYearsLicensed('6-10')
-		setAverageTransactions('16-30')
-		setEmploymentStatus('Full time')
+		const values = {
+			firstName: 'Alex',
+			lastName: 'Morgan',
+			brokerageName: 'PRE Realty Group',
+			email: 'alex.morgan@example.com',
+			phone: '555-123-4567',
+			businessAddress: '123 Main St, Austin, TX 78701',
+			licenseNumberState: 'TX-12345678',
+			licenseProof: 'https://license.example.com/alex-morgan',
+			yearsLicensed: '6-10',
+			averageTransactions: '16-30',
+			employmentStatus: 'Full time',
+		}
+
+		for (const [name, value] of Object.entries(values)) {
+			const control = formRef.current?.elements.namedItem(name)
+			if (
+				control instanceof HTMLInputElement ||
+				control instanceof HTMLSelectElement
+			) {
+				control.value = value
+			}
+		}
 	}
 
 	return (
 		<AnimatedStepCard stepKey="identity">
 			<Card size="sm" className="shadow-sm">
-				<CardContent className="space-y-6">
-					<div className="flex items-start justify-between gap-4">
-						<StepHeader stepNumber={1} totalSteps={5} title="Identity" />
-						{import.meta.env.DEV ? (
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={fillDebugData}
-								className="shrink-0"
-							>
-								Fill test data
+				<CardContent>
+					<form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+						<div className="flex items-start justify-between gap-4">
+							<StepHeader stepNumber={1} totalSteps={5} title="Identity" />
+							{import.meta.env.DEV ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={fillDebugData}
+									className="shrink-0"
+								>
+									Fill test data
+								</Button>
+							) : null}
+						</div>
+
+						<div className="grid gap-4 sm:grid-cols-2">
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								First name
+								<Input
+									name="firstName"
+									defaultValue={state.firstName}
+									placeholder="Jane"
+									required
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Last name
+								<Input
+									name="lastName"
+									defaultValue={state.lastName}
+									placeholder="Doe"
+									required
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Brokerage name
+								<Input
+									name="brokerageName"
+									defaultValue={state.brokerageName}
+									required
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Email
+								<Input
+									type="email"
+									name="email"
+									defaultValue={state.email ?? undefined}
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Phone
+								<Input
+									type="tel"
+									name="phone"
+									defaultValue={state.phone ?? undefined}
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								License number & state
+								<Input
+									name="licenseNumberState"
+									defaultValue={state.licenseNumberState}
+									placeholder="CA-DRE-01234567"
+									required
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase sm:col-span-2">
+								Business address
+								<Input
+									name="businessAddress"
+									defaultValue={state.businessAddress ?? undefined}
+								/>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Years licensed
+								<select
+									name="yearsLicensed"
+									defaultValue={state.yearsLicensed ?? undefined}
+									className="h-10 w-full rounded-md border px-3"
+								>
+									<option value="">Select...</option>
+									{yearsLicensedEnum.slugs.map((option) => (
+										<option key={option} value={option}>
+											{yearsLicensedEnum.labels[option]}
+										</option>
+									))}
+								</select>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Avg transactions / year
+								<select
+									name="averageTransactions"
+									defaultValue={state.averageTransactions ?? undefined}
+									className="h-10 w-full rounded-md border px-3"
+								>
+									<option value="">Select...</option>
+									{averageTransactionsEnum.slugs.map((option) => (
+										<option key={option} value={option}>
+											{averageTransactionsEnum.labels[option]}
+										</option>
+									))}
+								</select>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								Full / part time
+								<select
+									name="employmentStatus"
+									defaultValue={state.employmentStatus ?? undefined}
+									className="h-10 w-full rounded-md border px-3"
+								>
+									<option value="">Select...</option>
+									<option value="Full time">Full time</option>
+									<option value="Part time">Part time</option>
+								</select>
+							</Label>
+							<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
+								License proof URL / note
+								<Input
+									name="licenseProof"
+									defaultValue={state.licenseProof ?? undefined}
+								/>
+							</Label>
+						</div>
+
+						<div>
+							<Button type="submit" size="lg" className="w-full gap-2">
+								Continue
+								<ArrowRightIcon className="h-4 w-4" />
 							</Button>
-						) : null}
-					</div>
-
-					<div className="grid gap-4 sm:grid-cols-2">
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							First name
-							<Input
-								value={firstName}
-								onChange={(event) => setFirstName(event.target.value)}
-								placeholder="Jane"
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Last name
-							<Input
-								value={lastName}
-								onChange={(event) => setLastName(event.target.value)}
-								placeholder="Doe"
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Brokerage name
-							<Input
-								value={brokerageName}
-								onChange={(event) => setBrokerageName(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Email
-							<Input
-								type="email"
-								value={email}
-								onChange={(event) => setEmail(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Phone
-							<Input
-								type="tel"
-								value={phone}
-								onChange={(event) => setPhone(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							License number & state
-							<Input
-								value={licenseNumberState}
-								onChange={(event) => setLicenseNumberState(event.target.value)}
-								placeholder="CA-DRE-01234567"
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase sm:col-span-2">
-							Business address
-							<Input
-								value={businessAddress}
-								onChange={(event) => setBusinessAddress(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Years licensed
-							<select
-								value={yearsLicensed}
-								onChange={(event) => setYearsLicensed(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								{yearsLicensedEnum.slugs.map((option) => (
-									<option key={option} value={option}>
-										{yearsLicensedEnum.labels[option]}
-									</option>
-								))}
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Avg transactions / year
-							<select
-								value={averageTransactions}
-								onChange={(event) => setAverageTransactions(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								{averageTransactionsEnum.slugs.map((option) => (
-									<option key={option} value={option}>
-										{averageTransactionsEnum.labels[option]}
-									</option>
-								))}
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Full / part time
-							<select
-								value={employmentStatus}
-								onChange={(event) => setEmploymentStatus(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								<option value="Full time">Full time</option>
-								<option value="Part time">Part time</option>
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							License proof URL / note
-							<Input
-								value={licenseProof}
-								onChange={(event) => setLicenseProof(event.target.value)}
-							/>
-						</Label>
-					</div>
-
-					<div>
-						<Button
-							onClick={handleContinue}
-							disabled={!canContinue}
-							size="lg"
-							className="w-full gap-2"
-						>
-							Continue
-							<ArrowRightIcon className="h-4 w-4" />
-						</Button>
-					</div>
+						</div>
+					</form>
 				</CardContent>
 			</Card>
 		</AnimatedStepCard>

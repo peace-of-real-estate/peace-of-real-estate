@@ -57,9 +57,9 @@ import {
 } from './utils'
 
 const SCORING_GEOMETRIC_FLOOR = 0.05
-export const SCORING_LINEAR_WEIGHT = 0.7
-export const SCORING_GEOMETRIC_WEIGHT = 0.3
-export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
+const SCORING_LINEAR_WEIGHT = 0.7
+const SCORING_GEOMETRIC_WEIGHT = 0.3
+const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
 
 const propertyTypeToClientTypes: Record<
 	PropertyTypeSlug,
@@ -129,9 +129,9 @@ function haversineMiles(
 	const a =
 		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 		Math.cos((lat1 * Math.PI) / 180) *
-			Math.cos((lat2 * Math.PI) / 180) *
-			Math.sin(dLng / 2) *
-			Math.sin(dLng / 2)
+		Math.cos((lat2 * Math.PI) / 180) *
+		Math.sin(dLng / 2) *
+		Math.sin(dLng / 2)
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 	return R * c
 }
@@ -258,15 +258,15 @@ export function scoreLocation(
 		geo: {
 			client: clientCenter
 				? {
-						...clientCenter,
-						source: clientStoredCenter ? 'cityCenter' : 'zipCentroid',
-					}
+					...clientCenter,
+					source: clientStoredCenter ? 'cityCenter' : 'zipCentroid',
+				}
 				: undefined,
 			agent: agentCenter
 				? {
-						...agentCenter,
-						source: agentStoredCenter ? 'cityCenter' : 'zipCentroid',
-					}
+					...agentCenter,
+					source: agentStoredCenter ? 'cityCenter' : 'zipCentroid',
+				}
 				: undefined,
 			centroidMiles:
 				centroidMiles === undefined ? undefined : round2(centroidMiles),
@@ -330,10 +330,10 @@ function scorePriceFit(
 	const bucketOverlap = priceOverlapRatio(clientRange, agentRange)
 	const adjacentOverlap = adjacentBuckets.length
 		? Math.max(
-				...adjacentBuckets.map((bucket) =>
-					priceOverlapRatio(clientRange, bucket),
-				),
-			)
+			...adjacentBuckets.map((bucket) =>
+				priceOverlapRatio(clientRange, bucket),
+			),
+		)
 		: 0
 
 	const score = Math.min(1, bucketOverlap + 0.4 * adjacentOverlap)
@@ -1064,9 +1064,9 @@ export function calculateFitScore(
 		variant?.reciprocity === 'multiplier'
 			? consumerScore * (0.75 + 0.25 * agentFit)
 			: harmonicMean(
-					consumerScore,
-					SCORING_RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit,
-				)
+				consumerScore,
+				SCORING_RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit,
+			)
 
 	const baseFinalScore = Math.round(reciprocalBlend * 100)
 
@@ -1138,9 +1138,9 @@ export function calculateFitScore(
 			fitScore,
 			formula: disqualified
 				? `disqualified (${disqualifiers
-						.filter((entry) => entry.disqualified)
-						.map((entry) => entry.label)
-						.join(', ')}) — ${fullFormula}`
+					.filter((entry) => entry.disqualified)
+					.map((entry) => entry.label)
+					.join(', ')}) — ${fullFormula}`
 				: fullFormula,
 			agentFit: round2(agentFit),
 			reciprocalBlend: round2(reciprocalBlend),
@@ -1151,10 +1151,10 @@ export function calculateFitScore(
 			},
 			notFitPenalty: notFitPenalty.penalized
 				? {
-						reason: notFitPenalty.reason,
-						scoreBefore: round2(baseFinalScore / 100),
-						scoreAfter: round2(notFitPenalty.score),
-					}
+					reason: notFitPenalty.reason,
+					scoreBefore: round2(baseFinalScore / 100),
+					scoreAfter: round2(notFitPenalty.score),
+				}
 				: undefined,
 			geo: results.location.geo,
 		},

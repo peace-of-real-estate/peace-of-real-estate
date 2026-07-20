@@ -1,21 +1,22 @@
 {
 	// scripts/setup.ts is invoked from scripts/bootstrap.sh (invisible to the import graph)
-	"entry": ["scripts/setup.ts"],
-	// shadcn-generated components ship unused subcomponents by design
-	"ignoreExports": [{ "file": "src/components/ui/**", "exports": ["*"] }],
-	// shadcn components not yet consumed anywhere (kept for regen parity)
+	"entry": [
+		"scripts/setup.ts"
+	],
+	"ignoreExports": [
+		{
+			"file": "src/components/ui/**",
+			"exports": [
+				"*"
+			]
+		}
+	],
 	"ignorePatterns": [
-		"src/components/ui/breadcrumb.tsx",
-		"src/components/ui/typography.tsx",
+		"src/components/ui/**"
 	],
 	"ignoreDependencies": [
 		// planned features not yet wired up
-		"stripe",
 		"ai",
-		"@ai-sdk/openai-compatible",
-		// auto-injected by the @tanstack/react-start vite plugin in dev
-		"@tanstack/react-router-devtools",
-		// used via `@import 'shadcn/tailwind.css'` in src/styles.css and the shadcn CLI
-		"shadcn",
-	],
+		"@ai-sdk/openai-compatible"
+	]
 }
