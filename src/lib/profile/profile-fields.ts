@@ -85,13 +85,16 @@ export const timeline = defineEnum('timeline', [
 
 // --- Question option sets shared across roles ---
 
-const quickCommunicationChannel = defineEnum('quick_communication_channel', [
-	['text', 'Text'],
-	['phone', 'Phone'],
-	['either', 'Either is fine'],
-])
+export const quickCommunicationChannel = defineEnum(
+	'quick_communication_channel',
+	[
+		['text', 'Text'],
+		['phone', 'Phone'],
+		['either', 'Either is fine'],
+	],
+)
 
-const updateDeliveryMethod = defineEnum('update_delivery_method', [
+export const updateDeliveryMethod = defineEnum('update_delivery_method', [
 	['email', 'Email'],
 	['textWithAttachments', 'Text with attachments'],
 	['phoneThenEmailRecap', 'Phone, then email recap'],
@@ -104,18 +107,18 @@ const responseTimeEntries = [
 	['within24Hours', 'Within 24 hours'],
 ] as const
 
-const responseTimeExpectation = defineEnum(
+export const responseTimeExpectation = defineEnum(
 	'response_time_expectation',
 	responseTimeEntries,
 )
 
-const involvementLevel = defineEnum('involvement_level', [
+export const involvementLevel = defineEnum('involvement_level', [
 	['veryInvolved', 'Very involved'],
 	['keyDetails', 'Key details only'],
 	['handsOff', 'Hands off'],
 ])
 
-const commissionComfort = defineEnum('commission_comfort', [
+export const commissionComfort = defineEnum('commission_comfort', [
 	['negotiate', 'I want to negotiate'],
 	['openOptions', 'I want to understand options'],
 	['payFairRate', "I'll pay a fair rate for the right fit"],
