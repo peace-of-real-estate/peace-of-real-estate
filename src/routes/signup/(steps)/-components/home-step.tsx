@@ -1,8 +1,10 @@
 import {
+	BuildingApartmentIcon,
+	BuildingsIcon,
 	CalendarBlankIcon,
 	ClockIcon,
+	FarmIcon,
 	HouseIcon,
-	MoneyIcon,
 } from '@phosphor-icons/react'
 
 import { useState } from 'react'
@@ -12,7 +14,6 @@ import { ChipSelect } from '@/components/ui/chip-select'
 import { SegmentedControl } from '@/components/ui/segmented-control'
 import { Slider } from '@/components/ui/slider'
 import {
-	formatPriceRange,
 	parsePriceRange,
 	PRICE_MAX,
 	PRICE_MIN,
@@ -34,6 +35,13 @@ import {
 import { ContinueButton } from './ui/continue-button'
 import { FieldSection } from './ui/field-section'
 import { PriceInput } from './price-selector'
+
+const propertyTypeIcons = {
+	singleFamily: HouseIcon,
+	condoTownhome: BuildingApartmentIcon,
+	multiFamily: BuildingsIcon,
+	land: FarmIcon,
+} satisfies Record<PropertyTypeSlug, typeof HouseIcon>
 
 export function HomeStep<TStep extends string>({
 	priceTitle,
@@ -82,9 +90,58 @@ export function HomeStep<TStep extends string>({
 					<StepHeader stepNumber={2} totalSteps={3} title="Home" />
 					<div className="space-y-8">
 						<FieldSection
+							title="Home type"
+							description="Select all that apply."
+							action={
+								propertyComplete ? (
+									<span className="text-muted-foreground text-xs font-medium whitespace-nowrap">
+										{propertyTypes.length} selected
+									</span>
+								) : null
+							}
+						>
+							<ChipSelect
+								options={propertyType.slugs.map((slug) => ({
+									value: slug,
+									label: propertyType.labels[slug],
+									icon: propertyTypeIcons[slug],
+								}))}
+								selected={propertyTypes}
+								onChange={setPropertyTypes}
+							/>
+						</FieldSection>
+						<FieldSection
+							title={priceTitle}
+							description="Set your minimum and maximum."
+						>
+							<div className="grid grid-cols-2 gap-3">
+								<PriceInput
+									id="price-min"
+									label="Low"
+									value={priceRange.min}
+									onChange={(nextMin) =>
+										setPriceRange((current) => ({
+											...current,
+											min: Math.min(nextMin, current.max),
+										}))
+									}
+								/>
+								<PriceInput
+									id="price-max"
+									label="High"
+									value={priceRange.max}
+									onChange={(nextMax) =>
+										setPriceRange((current) => ({
+											...current,
+											max: Math.max(nextMax, current.min),
+										}))
+									}
+								/>
+							</div>
+						</FieldSection>
+						<FieldSection
 							title="Timeline"
 							description="Let agents know how urgent your plans are."
-							icon={CalendarBlankIcon}
 						>
 							<SegmentedControl
 								options={[
@@ -130,62 +187,6 @@ export function HomeStep<TStep extends string>({
 									<span>{firstDeadline?.label}</span>
 									<span>{lastDeadline?.label}</span>
 								</div>
-							</div>
-						</FieldSection>
-						<FieldSection
-							title="Home type"
-							description="Select all that apply."
-							icon={HouseIcon}
-							action={
-								propertyComplete ? (
-									<span className="bg-primary/10 text-primary rounded-md px-2.5 py-1 text-xs font-semibold whitespace-nowrap">
-										{propertyTypes.length} selected
-									</span>
-								) : null
-							}
-						>
-							<ChipSelect
-								options={propertyType.slugs.map((slug) => ({
-									value: slug,
-									label: propertyType.labels[slug],
-								}))}
-								selected={propertyTypes}
-								onChange={setPropertyTypes}
-							/>
-						</FieldSection>
-						<FieldSection
-							title={priceTitle}
-							description="Set your minimum and maximum."
-							icon={MoneyIcon}
-							action={
-								<span className="bg-primary/10 text-primary rounded-md px-3 py-1 text-sm font-semibold whitespace-nowrap">
-									{formatPriceRange(priceRange)}
-								</span>
-							}
-						>
-							<div className="grid grid-cols-2 gap-3">
-								<PriceInput
-									id="price-min"
-									label="Low"
-									value={priceRange.min}
-									onChange={(nextMin) =>
-										setPriceRange((current) => ({
-											...current,
-											min: Math.min(nextMin, current.max),
-										}))
-									}
-								/>
-								<PriceInput
-									id="price-max"
-									label="High"
-									value={priceRange.max}
-									onChange={(nextMax) =>
-										setPriceRange((current) => ({
-											...current,
-											max: Math.max(nextMax, current.min),
-										}))
-									}
-								/>
 							</div>
 						</FieldSection>
 					</div>

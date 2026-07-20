@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog'
 import {
 	ArrowRightIcon,
-	CaretRightIcon,
 	CheckCircleIcon,
 	HouseIcon,
 	TagIcon,
@@ -142,8 +141,8 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 					</h1>
 
 					<p className="text-muted-foreground max-w-md text-lg leading-8 md:text-xl md:leading-9">
-						The right agent makes every difference. Get matched on working
-						style, communication, and true fit. Not ad spend.
+						Get matched on working style, communication, and true fit. Not ad
+						spend.
 					</p>
 
 					<div className="flex flex-col gap-4 pt-1">
@@ -159,7 +158,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 							<Button
 								variant="outline"
 								size="lg"
-								className="h-12 px-5 text-base font-medium"
+								className="h-12 rounded-xl px-5 text-base font-medium"
 								asChild
 							>
 								<Link to="/signup/agent">I am an Agent</Link>
@@ -197,7 +196,7 @@ function ProfileTypeDialog({
 }) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-lg">
+			<DialogContent className="sm:max-w-sm">
 				<DialogHeader>
 					<DialogTitle>What are you planning to do?</DialogTitle>
 					<DialogDescription>
@@ -205,25 +204,23 @@ function ProfileTypeDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="grid gap-2">
+				<div className="grid grid-cols-2 gap-3">
 					<Link
 						to="/signup/buyer/location"
-						className="group hover:border-primary/50 hover:bg-muted/50 flex items-center gap-4 rounded-md border p-4 text-left transition-colors"
+						className="hover:border-primary/50 hover:bg-muted/50 flex h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors"
 						onClick={() => onOpenChange(false)}
 					>
-						<HouseIcon className="text-brand size-5 shrink-0" />
-						<span className="min-w-0 flex-1 font-semibold">I'm a buyer</span>
-						<CaretRightIcon className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
+						<HouseIcon className="text-brand size-4" weight="duotone" />
+						I'm a buyer
 					</Link>
 
 					<Link
 						to="/signup/seller/location"
-						className="group hover:border-primary/50 hover:bg-muted/50 flex items-center gap-4 rounded-md border p-4 text-left transition-colors"
+						className="hover:border-primary/50 hover:bg-muted/50 flex h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors"
 						onClick={() => onOpenChange(false)}
 					>
-						<TagIcon className="text-brand size-5 shrink-0" />
-						<span className="min-w-0 flex-1 font-semibold">I'm a seller</span>
-						<CaretRightIcon className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-colors" />
+						<TagIcon className="text-brand size-4" weight="duotone" />
+						I'm a seller
 					</Link>
 				</div>
 			</DialogContent>
@@ -264,9 +261,6 @@ function HowItWorksSection() {
 					<h2 className="font-heading text-3xl font-semibold tracking-tight md:text-4xl">
 						How It Works
 					</h2>
-					<p className="text-muted-foreground mt-3 text-lg">
-						Three simple steps to your perfect agent match
-					</p>
 				</div>
 
 				<div className="grid gap-8 md:grid-cols-3">
@@ -331,7 +325,7 @@ const featureItems = [
 	},
 	{
 		lead: 'Built for both sides',
-		rest: 'PRE serves you and the transparent, authentic agent at once; when the fit is right, everyone wins',
+		rest: 'when the fit is right, you and your agent both win',
 	},
 ]
 
