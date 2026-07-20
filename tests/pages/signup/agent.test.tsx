@@ -1,15 +1,17 @@
 import type { AgentDraft } from '@/lib/profile'
-import { test, vi, beforeEach } from 'vitest'
+import { test, vi, beforeEach, expect } from 'vitest'
 
+import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 
 var mockAgentDraft: AgentDraft | null = null
+var saveAgentDraft = vi.fn()
 
 vi.mock('@/lib/utils/localstorage', () => ({
 	createLocalStorage: () => ({
 		load: () => mockAgentDraft,
-		save: () => {},
+		save: saveAgentDraft,
 		clear: () => {
 			mockAgentDraft = null
 		},
@@ -18,6 +20,7 @@ vi.mock('@/lib/utils/localstorage', () => ({
 
 beforeEach(() => {
 	mockAgentDraft = null
+	saveAgentDraft.mockReset()
 })
 
 const identity: AgentDraft = {
@@ -68,6 +71,29 @@ test('identity step screenshot', async () => {
 	mockAgentDraft = identity
 	await renderRoute({ path: '/signup/agent/identity' })
 	await expectScreenshot(document.body, { name: 'step-1-identity' })
+})
+
+test('identity step submits the draft and advances to market', async () => {
+	await renderRoute({ path: '/signup/agent/identity' })
+
+	await page.getByRole('textbox', { name: 'First name' }).fill('Alex')
+	await page.getByRole('textbox', { name: 'Last name' }).fill('Morgan')
+	await page
+		.getByRole('textbox', { name: 'Brokerage name' })
+		.fill('PRE Realty Group')
+	await page
+		.getByRole('textbox', { name: 'License number & state' })
+		.fill('TX-12345678')
+	await page.getByRole('button', { name: 'Continue' }).click()
+
+	await vi.waitFor(() => {
+		expect(saveAgentDraft).toHaveBeenCalledWith(
+			expect.objectContaining({ firstName: 'Alex', lastName: 'Morgan' }),
+		)
+	})
+	await expect
+		.element(page.getByRole('heading', { name: 'Market', exact: true }))
+		.toBeVisible()
 })
 
 test('market step screenshot', async () => {

@@ -1,4 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import {
+	createFileRoute,
+	useHydrated,
+	useNavigate,
+} from '@tanstack/react-router'
 import { useState, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -28,6 +32,7 @@ export const Route = createFileRoute('/auth/beta')({
 
 function BetaLogin() {
 	const navigate = useNavigate()
+	const hydrated = useHydrated()
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState<'invalid' | 'server' | null>(null)
 	const [success, setSuccess] = useState(false)
@@ -85,6 +90,7 @@ function BetaLogin() {
 								ref={inputRef}
 								type="password"
 								value={password}
+								disabled={!hydrated}
 								onChange={(e) => {
 									setPassword(e.target.value)
 									setError(null)
@@ -111,7 +117,11 @@ function BetaLogin() {
 							<p className="text-center text-xs">Access granted. Welcome in.</p>
 						) : null}
 
-						<Button type="submit" disabled={success} className="w-full">
+						<Button
+							type="submit"
+							disabled={!hydrated || success}
+							className="w-full"
+						>
 							{success ? 'Entering...' : 'Unlock Preview'}
 							<ArrowRightIcon className="h-4 w-4" />
 						</Button>
