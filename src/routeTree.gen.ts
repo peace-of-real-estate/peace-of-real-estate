@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChooseRoleRouteImport } from './routes/choose-role'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
@@ -55,6 +56,11 @@ import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/s
 import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
 import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/signup/(steps)/agent/(step-1).identity'
 
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -302,6 +308,7 @@ const SignupstepsAgentstep1IdentityRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/choose-role': typeof ChooseRoleRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -315,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -361,6 +369,7 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/choose-role': typeof ChooseRoleRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -408,6 +418,7 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/choose-role'
+    | '/admin'
     | '/agent'
     | '/buyer'
     | '/seller'
@@ -456,6 +468,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin/'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -502,6 +515,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -535,6 +549,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/choose-role'
+    | '/admin'
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
@@ -548,6 +563,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin/'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -582,6 +598,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChooseRoleRoute: typeof ChooseRoleRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
@@ -604,6 +621,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -922,6 +946,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminInvitationsRoute: typeof AdminInvitationsRoute
+  AdminMatchesRoute: typeof AdminMatchesRoute
+  AdminRoleSwitchRoute: typeof AdminRoleSwitchRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminInvitationsRoute: AdminInvitationsRoute,
+  AdminMatchesRoute: AdminMatchesRoute,
+  AdminRoleSwitchRoute: AdminRoleSwitchRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 interface dashboardAgentRouteRouteChildren {
   dashboardAgentIntroductionsRoute: typeof dashboardAgentIntroductionsRoute
 }
@@ -1029,6 +1073,7 @@ const SignupstepsSellerRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChooseRoleRoute: ChooseRoleRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,

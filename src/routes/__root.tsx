@@ -11,6 +11,7 @@ import { PostHogProvider } from 'posthog-js/react'
 import { NotFoundComponent, ServerErrorComponent } from '@/components/errors'
 import { hasBetaAccess } from '@/lib/auth/functions'
 import { getCurrentSession } from '@/lib/auth/session'
+import { ImpersonationBanner } from '@/routes/(dashboard)/-components/impersonation-banner'
 
 import appCss from '../styles.css?url'
 
@@ -60,7 +61,12 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
 	const posthogKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
 	const analyticsEnabled = import.meta.env.MODE === 'production' && posthogKey
-	const content = <Outlet />
+	const content = (
+		<>
+			<ImpersonationBanner />
+			<Outlet />
+		</>
+	)
 
 	return (
 		<html lang="en">
