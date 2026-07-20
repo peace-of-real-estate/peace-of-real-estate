@@ -34,7 +34,7 @@ export const docsNav: DocPageMeta[] = [
 	},
 ]
 
-export const docsPages = docsNav
+const docsPages = docsNav
 
 // ============================================================
 // Page scaffold

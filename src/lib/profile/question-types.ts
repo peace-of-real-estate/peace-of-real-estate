@@ -49,8 +49,6 @@ export function parseSlug<TSlug extends string>(
 	return def.slugs.find((slug) => slug === value) ?? null
 }
 
-export type AnswerValue = string | string[]
-
 /** Per-option UI affordances. Domain data (slugs, labels) lives on the EnumDef. */
 export type OptionMeta = {
 	level?: 1 | 2 | 3

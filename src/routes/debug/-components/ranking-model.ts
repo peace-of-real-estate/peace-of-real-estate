@@ -30,7 +30,7 @@ export interface RankingFilters {
 
 export const EMPTY_FILTERS: RankingFilters = { text: '', dqGate: undefined }
 
-export function dimensionScore(
+function dimensionScore(
 	match: DebugMatch,
 	id: DimensionId,
 ): number | undefined {

@@ -15,9 +15,6 @@ vi.mock('@/lib/utils/localstorage', () => ({
 			mockBuyerDraft = null
 		},
 	}),
-	readLocalStorage: () => null,
-	writeLocalStorage: () => {},
-	removeLocalStorage: () => {},
 }))
 
 beforeEach(() => {

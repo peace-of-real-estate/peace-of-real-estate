@@ -29,7 +29,7 @@ function SellerPreviewRoute() {
 	)
 }
 
-export function SellerPreview({ profile }: { profile: ClientProfile }) {
+function SellerPreview({ profile }: { profile: ClientProfile }) {
 	return (
 		<SignupPreviewShell
 			redirect="/seller/matches"

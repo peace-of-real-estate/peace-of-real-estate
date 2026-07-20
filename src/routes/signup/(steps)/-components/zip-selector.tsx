@@ -350,7 +350,7 @@ export function CityZipSelector({
 	)
 }
 
-export type ZipCodeMapProps = {
+type ZipCodeMapProps = {
 	boundaries: FeatureCollection
 	selectedZipCodes: string[]
 	onToggleZipCode?: ((zipCode: string) => void) | undefined
@@ -619,7 +619,7 @@ function ZipCodeMapImpl({
 	)
 }
 
-export function ZipCodeMap(props: ZipCodeMapProps) {
+function ZipCodeMap(props: ZipCodeMapProps) {
 	const [Inner, setInner] =
 		useState<React.ComponentType<ZipCodeMapProps> | null>(null)
 
