@@ -53,7 +53,7 @@ function AgentMarketRoute() {
 	)
 }
 
-export function AgentMarket({
+function AgentMarket({
 	state,
 	onUpdate,
 	onContinue,

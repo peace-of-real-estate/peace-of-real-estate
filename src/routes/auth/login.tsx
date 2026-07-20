@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import { GoogleAuthButton } from '@/components/google-auth-button'
 import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
-import { useGoogleAuth } from '@/hooks/use-google-auth'
+import { useGoogleAuth } from '@/lib/auth/use-google-auth'
 import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -29,7 +29,7 @@ function LoginRoute() {
 	return <Login {...(search.redirect ? { redirect: search.redirect } : {})} />
 }
 
-export function Login({ redirect }: { redirect?: string }) {
+function Login({ redirect }: { redirect?: string }) {
 	const resolvedRedirect =
 		redirect && redirect !== '/account' ? redirect : DEFAULT_POST_AUTH_REDIRECT
 	const [email, setEmail] = useState('')

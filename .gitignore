@@ -9,8 +9,6 @@
 env.d.ts
 
 # Build
-.turbo
-.vercel
 .output
 .nitro
 .tanstack
@@ -20,9 +18,7 @@ node_modules
 .DS_Store
 Thumbs.db
 
-# Testing 
-test-results/
-playwright-report/
+# Testing
 .playwright
 .vitest-attachments
 visual-diffs.html
@@ -30,7 +26,6 @@ visual-diffs.html
 e2e/.auth
 
 # Vitest failure screenshots (not baseline snapshots)
-tests/routes/__screenshots__/*-matches-desktop-screenshot-*.png
 src/**/__screenshots__/*-matches-desktop-screenshot-*.png
 
 .pnpm-store

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { GoogleAuthButton } from '@/components/google-auth-button'
-import { useGoogleAuth } from '@/hooks/use-google-auth'
+import { useGoogleAuth } from '@/lib/auth/use-google-auth'
 import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import {

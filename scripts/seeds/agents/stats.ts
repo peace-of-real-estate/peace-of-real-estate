@@ -26,19 +26,6 @@ export function sample<T>(arr: readonly T[], count: number): T[] {
 	return shuffled.slice(0, count)
 }
 
-export function approxLabel(
-	map: Record<number, string>,
-	value: number,
-): string {
-	const keys = Object.keys(map)
-		.map(Number)
-		.sort((a, b) => a - b)
-	for (const k of keys) {
-		if (value <= k) return map[k]!
-	}
-	return map[keys[keys.length - 1]!]!
-}
-
 export function buildAddress(location: City): string {
 	const streetNum = randInt(100, 9999)
 	const street = pick(STREETS)

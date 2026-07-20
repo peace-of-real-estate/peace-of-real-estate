@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { buildDebugPayload } from '@/lib/matching/debug'
 import type { ScoredAgent } from '@/lib/matching/debug'
 import { TIE_BAND_THRESHOLD } from '@/lib/matching/scoring'
+import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
 import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 
 const buyer = mockBuyerProfile
@@ -14,47 +15,7 @@ function makeScoredAgent(
 ): ScoredAgent {
 	return {
 		row: {
-			agent: {
-				id,
-				userId: 'user-' + id,
-				representationSide: 'buyers',
-				city: 'Baltimore',
-				state: 'MD',
-				typicalPriceRange: '400kTo750k',
-				bestClientTypes: ['firstTime'],
-				notFitFor: [] satisfies string[],
-				firstName: 'A',
-				lastName: 'B',
-				brokerageName: 'Brokerage',
-				email: 'a@b.com',
-				phone: null,
-				businessAddress: null,
-				billingAddress: null,
-				licenseNumberState: 'LIC',
-				zipCodes: ['21201'],
-				cityCenterLatitude: null,
-				cityCenterLongitude: null,
-				yearsLicensed: '6-10',
-				averageTransactions: '6-15',
-				employmentStatus: 'Realtor',
-				licenseProof: null,
-				usePaxWriter: true,
-				licenseAttested: true,
-				eoInsuranceStatus: 'Active',
-				peacePactSigned: true,
-				peacePactSignature: 'A B',
-				peacePactSignedAt: new Date(),
-				clientDescription: 'strategicDataDriven',
-				communicationFrequency: 'scheduled',
-				quickCommunicationChannel: 'text',
-				updateDeliveryMethod: 'email',
-				difficultDealInstinct: 'factsFast',
-				responseTime: 'within30Min',
-				commissionApproach: 'proactiveOpen',
-				unrepresentedBuyerApproach: 'referSeparateBrokerage',
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			},
+			agent: makeAgent({ id, userId: 'user-' + id }),
 			user: {
 				id: 'user-' + id,
 				name: 'Agent ' + id,

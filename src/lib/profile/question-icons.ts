@@ -18,7 +18,7 @@ import {
 	UserIcon,
 } from '@phosphor-icons/react'
 
-export const questionIconMap = {
+const questionIconMap = {
 	// Buyer
 	experienceLevel: StarIcon,
 	idealAgentRelationship: ChatIcon,

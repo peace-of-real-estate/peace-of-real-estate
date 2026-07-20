@@ -1,4 +1,3 @@
-import { serializePriceRange } from '../../../src/lib/price-range'
 import { bestClientType } from '../../../src/lib/profile'
 import type { WeightedOption } from './stats'
 
@@ -162,7 +161,7 @@ export const LAST_NAMES = [
 	'Collins',
 ] as const
 
-export const LUXURY_BROKERAGES = [
+const LUXURY_BROKERAGES = [
 	"Sotheby's International Realty",
 	'Compass',
 	'Douglas Elliman',
@@ -174,7 +173,7 @@ export const LUXURY_BROKERAGES = [
 	'Luxury Portfolio International',
 ] as const
 
-export const MEGA_BROKERAGES = [
+const MEGA_BROKERAGES = [
 	'EXP Realty',
 	'Coldwell Banker',
 	'Keller Williams',
@@ -184,7 +183,7 @@ export const MEGA_BROKERAGES = [
 	'Redfin',
 ] as const
 
-export const INDEPENDENT_BROKERAGES = [
+const INDEPENDENT_BROKERAGES = [
 	'Realty ONE Group',
 	'United Real Estate',
 	'Real Brokerage',
@@ -1320,79 +1319,12 @@ export const STREETS = [
 	'Ash Blvd',
 ] as const
 
-// Stored in the app's serialized "min-max" format (see serializePriceRange),
-// matching what the agent signup market step writes. Values stay within the
-// app's 0–2M price slider bounds.
-const PRICE_RANGES_BY_TIER: Record<string, { min: number; max: number }[]> = {
-	entry: [
-		{ min: 100_000, max: 250_000 },
-		{ min: 150_000, max: 350_000 },
-		{ min: 200_000, max: 400_000 },
-	],
-	mid: [
-		{ min: 250_000, max: 500_000 },
-		{ min: 300_000, max: 600_000 },
-		{ min: 400_000, max: 750_000 },
-		{ min: 500_000, max: 750_000 },
-	],
-	premium: [
-		{ min: 500_000, max: 1_000_000 },
-		{ min: 750_000, max: 1_500_000 },
-		{ min: 1_000_000, max: 2_000_000 },
-	],
-	luxury: [
-		{ min: 1_000_000, max: 2_000_000 },
-		{ min: 1_500_000, max: 2_000_000 },
-	],
-	investor: [
-		{ min: 200_000, max: 500_000 },
-		{ min: 300_000, max: 1_000_000 },
-		{ min: 500_000, max: 2_000_000 },
-	],
-}
-
-export const PRICE_BY_TIER: Record<string, string[]> = Object.fromEntries(
-	Object.entries(PRICE_RANGES_BY_TIER).map(([tier, ranges]) => [
-		tier,
-		ranges.map((range) => serializePriceRange(range)),
-	]),
-)
-
-export const YEARS_LABELS: Record<number, string> = {
-	1: 'Less than 1 year',
-	2: '1-2 years',
-	3: '3-5 years',
-	5: '5-10 years',
-	10: '10-15 years',
-	15: '15-20 years',
-	20: '20+ years',
-}
-
-export const TRANSACTION_LABELS: Record<number, string> = {
-	5: '3-5 per year',
-	10: '5-10 per year',
-	15: '10-15 per year',
-	20: '15-20 per year',
-	30: '20-30 per year',
-	40: '30-40 per year',
-	50: '40-50 per year',
-	60: '50+ per year',
-}
-
 export const REPRESENTATION_SIDES: WeightedOption<
 	'buyers' | 'sellers' | 'both'
 >[] = [
 	{ value: 'both', weight: 50 },
 	{ value: 'buyers', weight: 30 },
 	{ value: 'sellers', weight: 20 },
-]
-
-export const PRICE_TIERS: WeightedOption<keyof typeof PRICE_BY_TIER>[] = [
-	{ value: 'entry', weight: 15 },
-	{ value: 'mid', weight: 35 },
-	{ value: 'premium', weight: 30 },
-	{ value: 'luxury', weight: 12 },
-	{ value: 'investor', weight: 8 },
 ]
 
 // Slugs from bestClientType — the format the agent signup market step
@@ -1416,20 +1348,6 @@ export const EO_INSURANCE_STATUSES = [
 	'Pending',
 	'Not required',
 ] as const
-
-export const NOT_FIT_FOR = [
-	'I do not work with commercial properties or fix-and-flip investors.',
-	'I am not a good fit for clients seeking entry-level properties.',
-	'I do not handle luxury properties or estate sales.',
-	'I do not work with renters or short-term rentals.',
-	'I do not represent clients outside my licensed metro area.',
-	'I am not a good fit for clients who want daily updates.',
-	'I do not take listings under $200k.',
-	'I do not work with unrepresented buyers in dual-agency situations.',
-	// Leave some agents without a "not fit for" note to match the nullable column
-	null,
-	null,
-]
 
 export const BROKERAGE_POOLS = [
 	...LUXURY_BROKERAGES,

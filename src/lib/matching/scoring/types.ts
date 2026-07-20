@@ -1,18 +1,7 @@
+import type { PriceRange } from '@/lib/price-range'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 
-/**
- * Experience and trust signals are intentionally not scoring dimensions:
- * trust attestations (peace pact, license, E&O) are required at signup, so
- * they cannot differentiate agents, and years licensed / volume said little
- * about fit for a specific client.
- */
-export type DimensionId =
-	| 'location'
-	| 'priceFit'
-	| 'specialization'
-	| 'workingStyle'
-	| 'communication'
-	| 'businessTerms'
+import type { DimensionId } from '../affinities'
 
 export type MatchSide = 'buyers' | 'sellers'
 
@@ -122,7 +111,4 @@ export interface FitScoreResult {
 	trace: ScoreTrace
 }
 
-export interface PriceRangeValue {
-	min: number
-	max: number
-}
+export type PriceRangeValue = PriceRange

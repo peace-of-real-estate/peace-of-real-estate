@@ -110,18 +110,6 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 		return matches.map((row) => row.label)
 	})
 
-const loadCityZipCodes = createServerFn({ method: 'GET' })
-	.validator((data: CityState) => data)
-	.handler(async ({ data }) => {
-		const rows = await db
-			.select({ zip: cityZips.zip })
-			.from(cityZips)
-			.where(and(eq(cityZips.city, data.city), eq(cityZips.state, data.state)))
-			.orderBy(cityZips.zip)
-
-		return rows.map((row) => row.zip)
-	})
-
 const loadCityCenter = createServerFn({ method: 'GET' })
 	.validator((data: CityState) => data)
 	.handler(async ({ data }) => {
@@ -172,9 +160,4 @@ const loadZipCodeBoundaries = createServerFn({ method: 'GET' })
 		} satisfies FeatureCollection
 	})
 
-export {
-	loadCitySuggestions,
-	loadCityZipCodes,
-	loadCityCenter,
-	loadZipCodeBoundaries,
-}
+export { loadCitySuggestions, loadCityCenter, loadZipCodeBoundaries }

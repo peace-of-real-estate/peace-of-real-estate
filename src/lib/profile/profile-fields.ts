@@ -18,8 +18,6 @@ export const profileStatus = defineEnum('profile_status', [
 	['enriched', 'Enriched'],
 ])
 
-export type ProfileStatus = SlugOf<typeof profileStatus>
-
 export const representationSide = defineEnum('representation_side', [
 	['buyers', 'Buyers'],
 	['sellers', 'Sellers'],
@@ -84,8 +82,6 @@ export const timeline = defineEnum('timeline', [
 	['11months', '11 months'],
 	['12monthsPlus', '12+ months'],
 ])
-
-export type TimelineSlug = SlugOf<typeof timeline>
 
 // --- Question option sets shared across roles ---
 
@@ -358,8 +354,6 @@ const agentQuestionList = [
 ] as const
 
 export const agentQuestionIds = questionIds(agentQuestionList)
-export type AgentQuestionId = (typeof agentQuestionIds)[number]
-
 export const agentQuestions = questionRecord(agentQuestionList)
 
 export const notFitForQuestion = freeForm('notFitFor', {

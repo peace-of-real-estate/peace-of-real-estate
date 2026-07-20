@@ -21,7 +21,7 @@ import { QuestionPrompt } from './question-prompt'
 import { useQuestionFlow } from './use-question-flow'
 import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
-export function QuestionFlow({
+function QuestionFlow({
 	currentStepIndex,
 	totalSteps,
 	canAdvance,
@@ -129,7 +129,7 @@ export function QuestionFlow({
 	)
 }
 
-export function QuizQuestionContent<
+function QuizQuestionContent<
 	TDraft extends Record<string, unknown>,
 	TQuestionId extends keyof TDraft & string,
 >({
@@ -322,5 +322,3 @@ export function PreferencesStep<
 		</AnimatedStepCard>
 	)
 }
-
-export { useQuestionFlow }
