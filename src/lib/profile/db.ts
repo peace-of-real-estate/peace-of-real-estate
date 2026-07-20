@@ -1,6 +1,13 @@
 import { sql } from 'drizzle-orm'
-import { boolean, pgEnum, real, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	doublePrecision,
+	pgEnum,
+	text,
+	timestamp,
+} from 'drizzle-orm/pg-core'
 
+import { BUCKET_ORDER } from '@/lib/price-range'
 import {
 	agentQuestions,
 	averageTransactions,
@@ -91,6 +98,10 @@ export const agentCommissionApproachEnum = pgEnumFromDefinition(
 export const agentUnrepresentedBuyerApproachEnum = pgEnumFromDefinition(
 	agentQuestions.unrepresentedBuyerApproach.options,
 )
+export const agentPriceBucketEnum = pgEnumFromDefinition({
+	dbName: 'agent_price_bucket',
+	slugs: BUCKET_ORDER,
+})
 
 export const clientLifecycleColumns = {
 	status: profileStatusEnum().default('draft').notNull(),
@@ -100,8 +111,12 @@ export const clientMatchingColumns = {
 	state: text().notNull(),
 	city: text().notNull(),
 	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
+	cityCenterLatitude: doublePrecision('city_center_latitude').default(
+		sql`NULL`,
+	),
+	cityCenterLongitude: doublePrecision('city_center_longitude').default(
+		sql`NULL`,
+	),
 	timeline: timelineEnum().notNull(),
 	priceRange: text().notNull(),
 	propertyTypes: propertyTypeEnum().array().notNull(),
@@ -142,7 +157,7 @@ export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	typicalPriceRange: text().notNull(),
+	typicalPriceRange: agentPriceBucketEnum().notNull(),
 	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
 	notFitFor: text().array().notNull().default([]),
 }
@@ -157,8 +172,12 @@ export const agentIdentityColumns = {
 	billingAddress: text(),
 	licenseNumberState: text().notNull(),
 	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
+	cityCenterLatitude: doublePrecision('city_center_latitude').default(
+		sql`NULL`,
+	),
+	cityCenterLongitude: doublePrecision('city_center_longitude').default(
+		sql`NULL`,
+	),
 	yearsLicensed: yearsLicensedEnum(),
 	averageTransactions: averageTransactionsEnum(),
 	employmentStatus: text(),

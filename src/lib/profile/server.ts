@@ -2,9 +2,16 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
+import { agentProfiles, clientProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
+import { resolveCityCenter } from '@/lib/geography/zip.server'
 
+import {
+	insertBuyerProfile,
+	insertSellerProfile,
+	loadBuyerProfileByUserId,
+	loadSellerProfileByUserId,
+} from './repository'
 import {
 	agentInsertSchema,
 	buyerInsertSchema,
@@ -13,44 +20,18 @@ import {
 	type SellerDraft,
 } from './types'
 
-const roleTables = {
-	buyer: buyerProfiles,
-	seller: sellerProfiles,
-	agent: agentProfiles,
-} as const
-
-async function loadOwnProfile<T>(load: () => Promise<T[]>): Promise<T | null> {
-	const [profile] = await load()
-	return profile ?? null
-}
-
 async function insertProfileOnce(
-	userId: string,
 	roleName: string,
-	findExisting: () => Promise<{ id: string }[]>,
-	insert: (values: {
-		id: string
-		userId: string
-		now: Date
-	}) => Promise<unknown>,
+	insert: () => Promise<boolean>,
 ) {
-	const [existing] = await findExisting()
-	if (existing) throw new Error(`${roleName} profile already exists`)
-
-	const now = new Date()
-	await insert({ id: crypto.randomUUID(), userId, now })
+	const inserted = await insert()
+	if (!inserted) throw new Error(`${roleName} profile already exists`)
 }
 
 export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(buyerProfiles)
-				.where(eq(buyerProfiles.userId, userId))
-				.limit(1),
-		)
+		return (await loadBuyerProfileByUserId(userId)) ?? null
 	},
 )
 
@@ -58,28 +39,30 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 	.validator((data: BuyerDraft) => data)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
-		const insert = buyerInsertSchema.parse({
+		const {
+			experienceLevel,
+			idealAgentRelationship,
+			decisionMakingNeed,
+			biddingWarResponse,
+			...base
+		} = buyerInsertSchema.parse({
 			...data,
 			status: 'active',
 		})
 
-		await insertProfileOnce(
-			userId,
-			'Buyer',
-			() =>
-				db
-					.select({ id: buyerProfiles.id })
-					.from(buyerProfiles)
-					.where(eq(buyerProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(buyerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
+		await insertProfileOnce('Buyer', () =>
+			insertBuyerProfile({
+				id: crypto.randomUUID(),
+				userId,
+				now: new Date(),
+				base,
+				details: {
+					experienceLevel,
+					idealAgentRelationship,
+					decisionMakingNeed,
+					biddingWarResponse,
+				},
+			}),
 		)
 
 		return { success: true }
@@ -88,13 +71,7 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 export const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(sellerProfiles)
-				.where(eq(sellerProfiles.userId, userId))
-				.limit(1),
-		)
+		return (await loadSellerProfileByUserId(userId)) ?? null
 	},
 )
 
@@ -102,28 +79,34 @@ export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 	.validator((data: SellerDraft) => data)
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
-		const insert = sellerInsertSchema.parse({
+		const {
+			saleMotivation,
+			successfulSaleLooksLike,
+			homeConnection,
+			agentSilencePreference,
+			representationPreference,
+			agentDeliveryExpectations,
+			...base
+		} = sellerInsertSchema.parse({
 			...data,
 			status: 'active',
 		})
 
-		await insertProfileOnce(
-			userId,
-			'Seller',
-			() =>
-				db
-					.select({ id: sellerProfiles.id })
-					.from(sellerProfiles)
-					.where(eq(sellerProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(sellerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
+		await insertProfileOnce('Seller', () =>
+			insertSellerProfile({
+				id: crypto.randomUUID(),
+				userId,
+				now: new Date(),
+				base,
+				details: {
+					saleMotivation,
+					successfulSaleLooksLike,
+					homeConnection,
+					agentSilencePreference,
+					representationPreference,
+					agentDeliveryExpectations,
+				},
+			}),
 		)
 
 		return { success: true }
@@ -133,37 +116,38 @@ export const completeAgentSignup = createServerFn({ method: 'POST' })
 	.validator((data: unknown) => agentInsertSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
-		await insertProfileOnce(
-			userId,
-			'Agent',
-			() =>
-				db
-					.select({ id: agentProfiles.id })
-					.from(agentProfiles)
-					.where(eq(agentProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(agentProfiles).values({
-					id,
+		const center = await resolveCityCenter({
+			city: data.city,
+			state: data.state,
+		})
+		await insertProfileOnce('Agent', async () => {
+			const [profile] = await db
+				.insert(agentProfiles)
+				.values({
+					id: crypto.randomUUID(),
 					userId,
 					...data,
-					createdAt: now,
-					updatedAt: now,
-				}),
-		)
+					cityCenterLatitude: data.cityCenterLatitude ?? center?.latitude,
+					cityCenterLongitude: data.cityCenterLongitude ?? center?.longitude,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.onConflictDoNothing({ target: agentProfiles.userId })
+				.returning({ id: agentProfiles.id })
+			return profile !== undefined
+		})
 		return { success: true }
 	})
 
 export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(agentProfiles)
-				.where(eq(agentProfiles.userId, userId))
-				.limit(1),
-		)
+		const [profile] = await db
+			.select()
+			.from(agentProfiles)
+			.where(eq(agentProfiles.userId, userId))
+			.limit(1)
+		return profile ?? null
 	},
 )
 
@@ -171,20 +155,20 @@ export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
 
-		for (const [role, table] of [
-			['agent', roleTables.agent],
-			['buyer', roleTables.buyer],
-			['seller', roleTables.seller],
-		] as const) {
-			const [profile] = await db
-				.select({ id: table.id })
-				.from(table)
-				.where(eq(table.userId, userId))
-				.limit(1)
-			if (profile) {
-				return role === 'agent' ? '/agent/introductions' : `/${role}/matches`
-			}
-		}
+		const [agent] = await db
+			.select({ id: agentProfiles.id })
+			.from(agentProfiles)
+			.where(eq(agentProfiles.userId, userId))
+			.limit(1)
+		if (agent) return '/agent/introductions'
+
+		const roles = await db
+			.select({ role: clientProfiles.role })
+			.from(clientProfiles)
+			.where(eq(clientProfiles.userId, userId))
+
+		if (roles.some((row) => row.role === 'buyer')) return '/buyer/matches'
+		if (roles.some((row) => row.role === 'seller')) return '/seller/matches'
 
 		return '/buyer/matches'
 	},

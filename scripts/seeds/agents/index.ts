@@ -2,14 +2,15 @@ import { db } from '../../../src/db/connection'
 import {
 	account,
 	agentProfiles,
-	buyerProfiles,
-	sellerProfiles,
+	buyerDetails,
+	clientProfiles,
+	sellerDetails,
 	session,
 	user,
 	userEntitlements,
 } from '../../../src/db/tables'
 import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
-import { AGENT_PRICE_RANGES } from '../../../src/lib/price-range'
+import { BUCKET_ORDER } from '../../../src/lib/price-range'
 import {
 	agentQuestions,
 	averageTransactions,
@@ -64,7 +65,7 @@ function pickAnswer<K extends keyof AgentWorkStyle>(
 // option sets, so the cast is safe.
 type AgentPersona = {
 	representationSide: AgentProfile['representationSide']
-	typicalPriceRange: string
+	typicalPriceRange: AgentProfile['typicalPriceRange']
 	bestClientTypes: AgentProfile['bestClientTypes']
 	notFitFor: AgentProfile['notFitFor']
 	yearsLicensed: YearsLicensed
@@ -96,7 +97,7 @@ function generatePersona(): AgentPersona {
 
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
-		typicalPriceRange: pick(Object.keys(AGENT_PRICE_RANGES)),
+		typicalPriceRange: pick(BUCKET_ORDER),
 		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
 		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
@@ -119,8 +120,9 @@ function generatePersona(): AgentPersona {
 async function clearFakeData() {
 	console.log('Clearing existing seed data...')
 
-	await db.delete(sellerProfiles)
-	await db.delete(buyerProfiles)
+	await db.delete(buyerDetails)
+	await db.delete(sellerDetails)
+	await db.delete(clientProfiles)
 	await db.delete(agentProfiles)
 	await db.delete(session)
 	await db.delete(account)

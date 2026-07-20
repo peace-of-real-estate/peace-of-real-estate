@@ -9,6 +9,7 @@ import {
 	buyerClientProfileSchema,
 	sellerClientProfileSchema,
 	type ClientProfile,
+	type ClientRole,
 } from '@/lib/profile'
 import {
 	AgentPreviewCard,
@@ -79,7 +80,7 @@ const clientPreviewMatches: MatchDetails[] = [
 ]
 
 export function draftToClientPreviewProfile(
-	role: 'buyer' | 'seller',
+	role: ClientRole,
 	draft: Record<string, unknown> | null | undefined,
 ): ClientProfile {
 	const input = draft ?? {}

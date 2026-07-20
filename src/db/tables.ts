@@ -1,13 +1,20 @@
+import { sql } from 'drizzle-orm'
 import {
 	boolean,
+	check,
+	doublePrecision,
 	foreignKey,
 	index,
+	jsonb,
+	pgEnum,
 	pgTable,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
+import type { IntroductionData } from '@/lib/introductions/intro-data'
 import {
 	agentComplianceColumns,
 	agentIdentityColumns,
@@ -21,9 +28,16 @@ import {
 	sellerQuizColumns,
 } from '@/lib/profile/db'
 
-type EntitlementKey = 'client_lifetime_premium' | 'agent_subscription'
+export const entitlementKey = pgEnum('entitlement_key', [
+	'client_lifetime_premium',
+	'agent_subscription',
+])
 
-type EntitlementSource = 'manual' | 'stripe_checkout' | 'stripe_subscription'
+export const entitlementSource = pgEnum('entitlement_source', [
+	'manual',
+	'stripe_checkout',
+	'stripe_subscription',
+])
 
 export const user = pgTable(
 	'user',
@@ -33,6 +47,13 @@ export const user = pgTable(
 		email: text().notNull(),
 		emailVerified: boolean().default(false).notNull(),
 		image: text(),
+		// better-auth admin plugin fields. `role` is only ever read by the plugin
+		// itself to authorize impersonation — this app's own admin check stays
+		// the ADMIN_EMAILS allowlist in src/lib/auth/session.ts.
+		role: text(),
+		banned: boolean().default(false),
+		banReason: text(),
+		banExpires: timestamp({ withTimezone: true }),
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
@@ -44,8 +65,8 @@ export const userEntitlements = pgTable(
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
-		key: text().$type<EntitlementKey>().notNull(),
-		source: text().$type<EntitlementSource>().notNull(),
+		key: entitlementKey().notNull(),
+		source: entitlementSource().notNull(),
 		stripeCustomerId: text(),
 		stripePaymentIntentId: text(),
 		stripeSubscriptionId: text(),
@@ -74,6 +95,9 @@ export const session = pgTable(
 		expiresAt: timestamp({ withTimezone: true }).notNull(),
 		ipAddress: text(),
 		userAgent: text(),
+		// better-auth admin plugin: set while an admin is impersonating this
+		// session's user; cleared by stopImpersonating.
+		impersonatedBy: text(),
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
@@ -143,49 +167,63 @@ export const verification = pgTable(
 	],
 )
 
-export const buyerProfiles = pgTable(
-	'buyer_profiles',
+export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
+
+export const clientProfiles = pgTable(
+	'client_profiles',
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
+		role: clientRole().notNull(),
 		...clientLifecycleColumns,
 		...clientMatchingColumns,
 		...clientWorkStyleColumns,
 		...clientMatchTuningColumns,
-		...buyerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
-		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
+		uniqueIndex('client_profiles_user_role_index').on(table.userId, table.role),
+		unique('client_profiles_id_role_index').on(table.id, table.role),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
-			name: 'buyer_profiles_user_id_fk',
-		}),
+			name: 'client_profiles_user_id_fk',
+		}).onDelete('cascade'),
 	],
 )
 
-export const sellerProfiles = pgTable(
-	'seller_profiles',
+export const buyerDetails = pgTable(
+	'buyer_details',
 	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...clientLifecycleColumns,
-		...clientMatchingColumns,
-		...clientWorkStyleColumns,
-		...clientMatchTuningColumns,
-		...sellerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('buyer'),
+		...buyerQuizColumns,
 	},
 	(table) => [
-		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
+		check('buyer_details_role_check', sql`${table.role} = 'buyer'`),
 		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'seller_profiles_user_id_fk',
-		}),
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'buyer_details_profile_role_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const sellerDetails = pgTable(
+	'seller_details',
+	{
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('seller'),
+		...sellerQuizColumns,
+	},
+	(table) => [
+		check('seller_details_role_check', sql`${table.role} = 'seller'`),
+		foreignKey({
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'seller_details_profile_role_fk',
+		}).onDelete('cascade'),
 	],
 )
 
@@ -198,7 +236,7 @@ export const agentProfiles = pgTable(
 		...agentIdentityColumns,
 		...agentQuizColumns,
 		...agentComplianceColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
@@ -207,7 +245,7 @@ export const agentProfiles = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'agent_profiles_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -217,9 +255,9 @@ export const cities = pgTable(
 		id: text().primaryKey().notNull(),
 		city: text().notNull(),
 		state: text().notNull(),
-		centerLat: text().notNull(),
-		centerLng: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		centerLat: doublePrecision().notNull(),
+		centerLng: doublePrecision().notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		uniqueIndex('cities_city_state_index').on(table.city, table.state),
@@ -227,14 +265,28 @@ export const cities = pgTable(
 	],
 )
 
+export const introductionStatus = pgEnum('introduction_status', [
+	'pending',
+	'accepted',
+	'declined',
+	'withdrawn',
+	'connected',
+])
+
+export const introductionNotificationKind = pgEnum(
+	'introduction_notification_kind',
+	['sent', 'accepted', 'declined'],
+)
+
 export const cityZips = pgTable(
 	'city_zips',
 	{
 		id: text().primaryKey().notNull(),
+		cityId: text().notNull(),
 		city: text().notNull(),
 		state: text().notNull(),
 		zip: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		index('city_zips_city_state_index').on(table.city, table.state),
@@ -244,5 +296,181 @@ export const cityZips = pgTable(
 			table.zip,
 		),
 		index('city_zips_zip_index').on(table.zip),
+		index('city_zips_city_id_index').on(table.cityId),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'city_zips_city_id_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const introductions = pgTable(
+	'introductions',
+	{
+		id: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		agentProfileId: text().notNull(),
+		status: introductionStatus().default('pending').notNull(),
+		data: jsonb('data')
+			.$type<IntroductionData>()
+			.notNull()
+			.default(sql`'{}'::jsonb`),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'introductions_client_profile_id_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.agentProfileId],
+			foreignColumns: [agentProfiles.id],
+			name: 'introductions_agent_profile_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('introductions_active_pair_index')
+			.on(table.agentProfileId, table.clientProfileId)
+			.where(sql`${table.status} in ('pending', 'accepted', 'connected')`),
+		index('introductions_client_active_index')
+			.on(table.clientProfileId)
+			.where(sql`${table.status} in ('pending', 'accepted')`),
+		index('introductions_client_created_index').on(
+			table.clientProfileId,
+			table.createdAt,
+		),
+		index('introductions_agent_status_index').on(
+			table.agentProfileId,
+			table.status,
+		),
+		check(
+			'introductions_pending_data_check',
+			sql`${table.status} <> 'pending' OR ${table.data} = '{}'::jsonb`,
+		),
+		check(
+			'introductions_accepted_data_check',
+			sql`${table.status} <> 'accepted' OR (${table.data} ? 'acceptedAt' AND NOT (${table.data} ? 'connectedAt') AND NOT (${table.data} ? 'closedAt'))`,
+		),
+		check(
+			'introductions_connected_data_check',
+			sql`${table.status} <> 'connected' OR (${table.data} ? 'acceptedAt' AND ${table.data} ? 'connectedAt' AND NOT (${table.data} ? 'closedAt'))`,
+		),
+		check(
+			'introductions_closed_data_check',
+			sql`${table.status} NOT IN ('declined', 'withdrawn') OR (${table.data} ? 'closedAt' AND NOT (${table.data} ? 'connectedAt'))`,
+		),
+	],
+)
+
+export const connectionNotificationJobs = pgTable(
+	'connection_notification_jobs',
+	{
+		introductionId: text().primaryKey().notNull(),
+		agentSentAt: timestamp({ withTimezone: true }),
+		clientSentAt: timestamp({ withTimezone: true }),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.introductionId],
+			foreignColumns: [introductions.id],
+			name: 'connection_notification_jobs_introduction_id_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const introductionNotificationJobs = pgTable(
+	'introduction_notification_jobs',
+	{
+		id: text().primaryKey().notNull(),
+		introductionId: text().notNull(),
+		kind: introductionNotificationKind().notNull(),
+		sentAt: timestamp({ withTimezone: true }),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.introductionId],
+			foreignColumns: [introductions.id],
+			name: 'introduction_notification_jobs_introduction_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('introduction_notification_jobs_intro_kind_index').on(
+			table.introductionId,
+			table.kind,
+		),
+		index('introduction_notification_jobs_pending_index')
+			.on(table.kind)
+			.where(sql`${table.sentAt} is null`),
+	],
+)
+
+export const introAccessWindows = pgTable(
+	'intro_access_windows',
+	{
+		id: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		stripePaymentIntentId: text().notNull(),
+		startsAt: timestamp({ withTimezone: true }).notNull(),
+		endsAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'intro_access_windows_client_profile_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('intro_access_windows_profile_index').on(table.clientProfileId),
+		uniqueIndex('intro_access_windows_payment_intent_index').on(
+			table.stripePaymentIntentId,
+		),
+		check(
+			'intro_access_windows_range_check',
+			sql`${table.endsAt} > ${table.startsAt}`,
+		),
+	],
+)
+
+export const introUnlockFulfillments = pgTable(
+	'intro_unlock_fulfillments',
+	{
+		stripePaymentIntentId: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		fulfilledAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'intro_unlock_fulfillments_client_profile_id_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const introCheckoutReservations = pgTable(
+	'intro_checkout_reservations',
+	{
+		id: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		stripeSessionId: text(),
+		selectedIntroductionIds: jsonb().$type<string[]>(),
+		expiresAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'intro_checkout_reservations_client_profile_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('intro_checkout_reservations_profile_index').on(
+			table.clientProfileId,
+		),
+		uniqueIndex('intro_checkout_reservations_session_index').on(
+			table.stripeSessionId,
+		),
 	],
 )

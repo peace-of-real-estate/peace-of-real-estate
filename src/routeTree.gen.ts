@@ -10,82 +10,59 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
-import { Route as AuthBetaRouteImport } from './routes/auth/beta'
-import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
-import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as dashboardAgentRouteRouteImport } from './routes/(dashboard)/agent/route'
-import { Route as SignupPreviewSellerRouteImport } from './routes/signup/preview/seller'
-import { Route as SignupPreviewBuyerRouteImport } from './routes/signup/preview/buyer'
-import { Route as SignupPreviewAgentRouteImport } from './routes/signup/preview/agent'
-import { Route as ApiIngestSplatRouteImport } from './routes/api/ingest.$'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
-import { Route as dashboardSellerSearchPreferencesRouteImport } from './routes/(dashboard)/seller/search-preferences'
-import { Route as dashboardSellerPracticeNegotiatingRouteImport } from './routes/(dashboard)/seller/practice-negotiating'
-import { Route as dashboardSellerMatchesRouteImport } from './routes/(dashboard)/seller/matches'
-import { Route as dashboardSellerIntroductionsRouteImport } from './routes/(dashboard)/seller/introductions'
-import { Route as dashboardBuyerSearchPreferencesRouteImport } from './routes/(dashboard)/buyer/search-preferences'
-import { Route as dashboardBuyerPracticeNegotiatingRouteImport } from './routes/(dashboard)/buyer/practice-negotiating'
-import { Route as dashboardBuyerMatchesRouteImport } from './routes/(dashboard)/buyer/matches'
-import { Route as dashboardBuyerIntroductionsRouteImport } from './routes/(dashboard)/buyer/introductions'
+import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
+import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminInvitationsRouteImport } from './routes/admin/invitations'
+import { Route as AdminMatchesRouteImport } from './routes/admin/matches'
+import { Route as AdminRoleSwitchRouteImport } from './routes/admin/role-switch'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe-webhook'
+import { Route as AuthBetaRouteImport } from './routes/auth/beta'
+import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as dashboardAgentIntroductionsRouteImport } from './routes/(dashboard)/agent/introductions'
-import { Route as SignupstepsSellerRouteRouteImport } from './routes/signup/(steps)/seller/route'
-import { Route as SignupstepsBuyerRouteRouteImport } from './routes/signup/(steps)/buyer/route'
+import { Route as dashboardBuyerIntroductionsRouteImport } from './routes/(dashboard)/buyer/introductions'
+import { Route as dashboardBuyerMatchesRouteImport } from './routes/(dashboard)/buyer/matches'
+import { Route as dashboardBuyerPracticeNegotiatingRouteImport } from './routes/(dashboard)/buyer/practice-negotiating'
+import { Route as dashboardBuyerSearchPreferencesRouteImport } from './routes/(dashboard)/buyer/search-preferences'
+import { Route as dashboardSellerIntroductionsRouteImport } from './routes/(dashboard)/seller/introductions'
+import { Route as dashboardSellerMatchesRouteImport } from './routes/(dashboard)/seller/matches'
+import { Route as dashboardSellerPracticeNegotiatingRouteImport } from './routes/(dashboard)/seller/practice-negotiating'
+import { Route as dashboardSellerSearchPreferencesRouteImport } from './routes/(dashboard)/seller/search-preferences'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiIngestSplatRouteImport } from './routes/api/ingest.$'
 import { Route as SignupstepsAgentRouteRouteImport } from './routes/signup/(steps)/agent/route'
+import { Route as SignupstepsBuyerRouteRouteImport } from './routes/signup/(steps)/buyer/route'
+import { Route as SignupstepsSellerRouteRouteImport } from './routes/signup/(steps)/seller/route'
+import { Route as SignupPreviewAgentRouteImport } from './routes/signup/preview/agent'
+import { Route as SignupPreviewBuyerRouteImport } from './routes/signup/preview/buyer'
+import { Route as SignupPreviewSellerRouteImport } from './routes/signup/preview/seller'
 import { Route as ApiIngestStaticSplatRouteImport } from './routes/api/ingest.static.$'
-import { Route as SignupstepsSellerstep3PreferencesRouteImport } from './routes/signup/(steps)/seller/(step-3).preferences'
-import { Route as SignupstepsSellerstep2LocationRouteImport } from './routes/signup/(steps)/seller/(step-2).location'
-import { Route as SignupstepsSellerstep1HomeRouteImport } from './routes/signup/(steps)/seller/(step-1).home'
-import { Route as SignupstepsBuyerstep3PreferencesRouteImport } from './routes/signup/(steps)/buyer/(step-3).preferences'
-import { Route as SignupstepsBuyerstep2LocationRouteImport } from './routes/signup/(steps)/buyer/(step-2).location'
-import { Route as SignupstepsBuyerstep1HomeRouteImport } from './routes/signup/(steps)/buyer/(step-1).home'
-import { Route as SignupstepsAgentstep5PeacePactRouteImport } from './routes/signup/(steps)/agent/(step-5).peace-pact'
-import { Route as SignupstepsAgentstep4ComplianceRouteImport } from './routes/signup/(steps)/agent/(step-4).compliance'
-import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/signup/(steps)/agent/(step-3).preferences'
-import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
 import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/signup/(steps)/agent/(step-1).identity'
+import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
+import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/signup/(steps)/agent/(step-3).preferences'
+import { Route as SignupstepsAgentstep4ComplianceRouteImport } from './routes/signup/(steps)/agent/(step-4).compliance'
+import { Route as SignupstepsAgentstep5PeacePactRouteImport } from './routes/signup/(steps)/agent/(step-5).peace-pact'
+import { Route as SignupstepsBuyerstep1HomeRouteImport } from './routes/signup/(steps)/buyer/(step-1).home'
+import { Route as SignupstepsBuyerstep2LocationRouteImport } from './routes/signup/(steps)/buyer/(step-2).location'
+import { Route as SignupstepsBuyerstep3PreferencesRouteImport } from './routes/signup/(steps)/buyer/(step-3).preferences'
+import { Route as SignupstepsSellerstep1HomeRouteImport } from './routes/signup/(steps)/seller/(step-1).home'
+import { Route as SignupstepsSellerstep2LocationRouteImport } from './routes/signup/(steps)/seller/(step-2).location'
+import { Route as SignupstepsSellerstep3PreferencesRouteImport } from './routes/signup/(steps)/seller/(step-3).preferences'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/auth/login',
-  path: '/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthCompleteRoute = AuthCompleteRouteImport.update({
-  id: '/auth/complete',
-  path: '/auth/complete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthBetaRoute = AuthBetaRouteImport.update({
-  id: '/auth/beta',
-  path: '/auth/beta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const dashboardSellerRouteRoute = dashboardSellerRouteRouteImport.update({
-  id: '/(dashboard)/seller',
-  path: '/seller',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const dashboardBuyerRouteRoute = dashboardBuyerRouteRouteImport.update({
-  id: '/(dashboard)/buyer',
-  path: '/buyer',
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const dashboardAgentRouteRoute = dashboardAgentRouteRouteImport.update({
@@ -93,64 +70,81 @@ const dashboardAgentRouteRoute = dashboardAgentRouteRouteImport.update({
   path: '/agent',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupPreviewSellerRoute = SignupPreviewSellerRouteImport.update({
-  id: '/signup/preview/seller',
-  path: '/signup/preview/seller',
+const dashboardBuyerRouteRoute = dashboardBuyerRouteRouteImport.update({
+  id: '/(dashboard)/buyer',
+  path: '/buyer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupPreviewBuyerRoute = SignupPreviewBuyerRouteImport.update({
-  id: '/signup/preview/buyer',
-  path: '/signup/preview/buyer',
+const dashboardSellerRouteRoute = dashboardSellerRouteRouteImport.update({
+  id: '/(dashboard)/seller',
+  path: '/seller',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupPreviewAgentRoute = SignupPreviewAgentRouteImport.update({
-  id: '/signup/preview/agent',
-  path: '/signup/preview/agent',
-  getParentRoute: () => rootRouteImport,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const ApiIngestSplatRoute = ApiIngestSplatRouteImport.update({
-  id: '/api/ingest/$',
-  path: '/api/ingest/$',
-  getParentRoute: () => rootRouteImport,
+const AdminInvitationsRoute = AdminInvitationsRouteImport.update({
+  id: '/invitations',
+  path: '/invitations',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const dashboardSellerSearchPreferencesRoute =
-  dashboardSellerSearchPreferencesRouteImport.update({
-    id: '/search-preferences',
-    path: '/search-preferences',
-    getParentRoute: () => dashboardSellerRouteRoute,
-  } as any)
-const dashboardSellerPracticeNegotiatingRoute =
-  dashboardSellerPracticeNegotiatingRouteImport.update({
-    id: '/practice-negotiating',
-    path: '/practice-negotiating',
-    getParentRoute: () => dashboardSellerRouteRoute,
-  } as any)
-const dashboardSellerMatchesRoute = dashboardSellerMatchesRouteImport.update({
+const AdminMatchesRoute = AdminMatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
-  getParentRoute: () => dashboardSellerRouteRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const dashboardSellerIntroductionsRoute =
-  dashboardSellerIntroductionsRouteImport.update({
+const AdminRoleSwitchRoute = AdminRoleSwitchRouteImport.update({
+  id: '/role-switch',
+  path: '/role-switch',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe-webhook',
+  path: '/api/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthBetaRoute = AuthBetaRouteImport.update({
+  id: '/auth/beta',
+  path: '/auth/beta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCompleteRoute = AuthCompleteRouteImport.update({
+  id: '/auth/complete',
+  path: '/auth/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const dashboardAgentIntroductionsRoute =
+  dashboardAgentIntroductionsRouteImport.update({
     id: '/introductions',
     path: '/introductions',
-    getParentRoute: () => dashboardSellerRouteRoute,
+    getParentRoute: () => dashboardAgentRouteRoute,
   } as any)
-const dashboardBuyerSearchPreferencesRoute =
-  dashboardBuyerSearchPreferencesRouteImport.update({
-    id: '/search-preferences',
-    path: '/search-preferences',
-    getParentRoute: () => dashboardBuyerRouteRoute,
-  } as any)
-const dashboardBuyerPracticeNegotiatingRoute =
-  dashboardBuyerPracticeNegotiatingRouteImport.update({
-    id: '/practice-negotiating',
-    path: '/practice-negotiating',
+const dashboardBuyerIntroductionsRoute =
+  dashboardBuyerIntroductionsRouteImport.update({
+    id: '/introductions',
+    path: '/introductions',
     getParentRoute: () => dashboardBuyerRouteRoute,
   } as any)
 const dashboardBuyerMatchesRoute = dashboardBuyerMatchesRouteImport.update({
@@ -158,26 +152,49 @@ const dashboardBuyerMatchesRoute = dashboardBuyerMatchesRouteImport.update({
   path: '/matches',
   getParentRoute: () => dashboardBuyerRouteRoute,
 } as any)
-const dashboardBuyerIntroductionsRoute =
-  dashboardBuyerIntroductionsRouteImport.update({
-    id: '/introductions',
-    path: '/introductions',
+const dashboardBuyerPracticeNegotiatingRoute =
+  dashboardBuyerPracticeNegotiatingRouteImport.update({
+    id: '/practice-negotiating',
+    path: '/practice-negotiating',
     getParentRoute: () => dashboardBuyerRouteRoute,
   } as any)
-const dashboardAgentIntroductionsRoute =
-  dashboardAgentIntroductionsRouteImport.update({
+const dashboardBuyerSearchPreferencesRoute =
+  dashboardBuyerSearchPreferencesRouteImport.update({
+    id: '/search-preferences',
+    path: '/search-preferences',
+    getParentRoute: () => dashboardBuyerRouteRoute,
+  } as any)
+const dashboardSellerIntroductionsRoute =
+  dashboardSellerIntroductionsRouteImport.update({
     id: '/introductions',
     path: '/introductions',
-    getParentRoute: () => dashboardAgentRouteRoute,
+    getParentRoute: () => dashboardSellerRouteRoute,
   } as any)
-const SignupstepsSellerRouteRoute = SignupstepsSellerRouteRouteImport.update({
-  id: '/signup/(steps)/seller',
-  path: '/signup/seller',
+const dashboardSellerMatchesRoute = dashboardSellerMatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => dashboardSellerRouteRoute,
+} as any)
+const dashboardSellerPracticeNegotiatingRoute =
+  dashboardSellerPracticeNegotiatingRouteImport.update({
+    id: '/practice-negotiating',
+    path: '/practice-negotiating',
+    getParentRoute: () => dashboardSellerRouteRoute,
+  } as any)
+const dashboardSellerSearchPreferencesRoute =
+  dashboardSellerSearchPreferencesRouteImport.update({
+    id: '/search-preferences',
+    path: '/search-preferences',
+    getParentRoute: () => dashboardSellerRouteRoute,
+  } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupstepsBuyerRouteRoute = SignupstepsBuyerRouteRouteImport.update({
-  id: '/signup/(steps)/buyer',
-  path: '/signup/buyer',
+const ApiIngestSplatRoute = ApiIngestSplatRouteImport.update({
+  id: '/api/ingest/$',
+  path: '/api/ingest/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupstepsAgentRouteRoute = SignupstepsAgentRouteRouteImport.update({
@@ -185,63 +202,40 @@ const SignupstepsAgentRouteRoute = SignupstepsAgentRouteRouteImport.update({
   path: '/signup/agent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupstepsBuyerRouteRoute = SignupstepsBuyerRouteRouteImport.update({
+  id: '/signup/(steps)/buyer',
+  path: '/signup/buyer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupstepsSellerRouteRoute = SignupstepsSellerRouteRouteImport.update({
+  id: '/signup/(steps)/seller',
+  path: '/signup/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupPreviewAgentRoute = SignupPreviewAgentRouteImport.update({
+  id: '/signup/preview/agent',
+  path: '/signup/preview/agent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupPreviewBuyerRoute = SignupPreviewBuyerRouteImport.update({
+  id: '/signup/preview/buyer',
+  path: '/signup/preview/buyer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupPreviewSellerRoute = SignupPreviewSellerRouteImport.update({
+  id: '/signup/preview/seller',
+  path: '/signup/preview/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiIngestStaticSplatRoute = ApiIngestStaticSplatRouteImport.update({
   id: '/api/ingest/static/$',
   path: '/api/ingest/static/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupstepsSellerstep3PreferencesRoute =
-  SignupstepsSellerstep3PreferencesRouteImport.update({
-    id: '/(step-3)/preferences',
-    path: '/preferences',
-    getParentRoute: () => SignupstepsSellerRouteRoute,
-  } as any)
-const SignupstepsSellerstep2LocationRoute =
-  SignupstepsSellerstep2LocationRouteImport.update({
-    id: '/(step-2)/location',
-    path: '/location',
-    getParentRoute: () => SignupstepsSellerRouteRoute,
-  } as any)
-const SignupstepsSellerstep1HomeRoute =
-  SignupstepsSellerstep1HomeRouteImport.update({
-    id: '/(step-1)/home',
-    path: '/home',
-    getParentRoute: () => SignupstepsSellerRouteRoute,
-  } as any)
-const SignupstepsBuyerstep3PreferencesRoute =
-  SignupstepsBuyerstep3PreferencesRouteImport.update({
-    id: '/(step-3)/preferences',
-    path: '/preferences',
-    getParentRoute: () => SignupstepsBuyerRouteRoute,
-  } as any)
-const SignupstepsBuyerstep2LocationRoute =
-  SignupstepsBuyerstep2LocationRouteImport.update({
-    id: '/(step-2)/location',
-    path: '/location',
-    getParentRoute: () => SignupstepsBuyerRouteRoute,
-  } as any)
-const SignupstepsBuyerstep1HomeRoute =
-  SignupstepsBuyerstep1HomeRouteImport.update({
-    id: '/(step-1)/home',
-    path: '/home',
-    getParentRoute: () => SignupstepsBuyerRouteRoute,
-  } as any)
-const SignupstepsAgentstep5PeacePactRoute =
-  SignupstepsAgentstep5PeacePactRouteImport.update({
-    id: '/(step-5)/peace-pact',
-    path: '/peace-pact',
-    getParentRoute: () => SignupstepsAgentRouteRoute,
-  } as any)
-const SignupstepsAgentstep4ComplianceRoute =
-  SignupstepsAgentstep4ComplianceRouteImport.update({
-    id: '/(step-4)/compliance',
-    path: '/compliance',
-    getParentRoute: () => SignupstepsAgentRouteRoute,
-  } as any)
-const SignupstepsAgentstep3PreferencesRoute =
-  SignupstepsAgentstep3PreferencesRouteImport.update({
-    id: '/(step-3)/preferences',
-    path: '/preferences',
+const SignupstepsAgentstep1IdentityRoute =
+  SignupstepsAgentstep1IdentityRouteImport.update({
+    id: '/(step-1)/identity',
+    path: '/identity',
     getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
 const SignupstepsAgentstep2MarketRoute =
@@ -250,23 +244,78 @@ const SignupstepsAgentstep2MarketRoute =
     path: '/market',
     getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupstepsAgentstep1IdentityRoute =
-  SignupstepsAgentstep1IdentityRouteImport.update({
-    id: '/(step-1)/identity',
-    path: '/identity',
+const SignupstepsAgentstep3PreferencesRoute =
+  SignupstepsAgentstep3PreferencesRouteImport.update({
+    id: '/(step-3)/preferences',
+    path: '/preferences',
     getParentRoute: () => SignupstepsAgentRouteRoute,
+  } as any)
+const SignupstepsAgentstep4ComplianceRoute =
+  SignupstepsAgentstep4ComplianceRouteImport.update({
+    id: '/(step-4)/compliance',
+    path: '/compliance',
+    getParentRoute: () => SignupstepsAgentRouteRoute,
+  } as any)
+const SignupstepsAgentstep5PeacePactRoute =
+  SignupstepsAgentstep5PeacePactRouteImport.update({
+    id: '/(step-5)/peace-pact',
+    path: '/peace-pact',
+    getParentRoute: () => SignupstepsAgentRouteRoute,
+  } as any)
+const SignupstepsBuyerstep1HomeRoute =
+  SignupstepsBuyerstep1HomeRouteImport.update({
+    id: '/(step-1)/home',
+    path: '/home',
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
+  } as any)
+const SignupstepsBuyerstep2LocationRoute =
+  SignupstepsBuyerstep2LocationRouteImport.update({
+    id: '/(step-2)/location',
+    path: '/location',
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
+  } as any)
+const SignupstepsBuyerstep3PreferencesRoute =
+  SignupstepsBuyerstep3PreferencesRouteImport.update({
+    id: '/(step-3)/preferences',
+    path: '/preferences',
+    getParentRoute: () => SignupstepsBuyerRouteRoute,
+  } as any)
+const SignupstepsSellerstep1HomeRoute =
+  SignupstepsSellerstep1HomeRouteImport.update({
+    id: '/(step-1)/home',
+    path: '/home',
+    getParentRoute: () => SignupstepsSellerRouteRoute,
+  } as any)
+const SignupstepsSellerstep2LocationRoute =
+  SignupstepsSellerstep2LocationRouteImport.update({
+    id: '/(step-2)/location',
+    path: '/location',
+    getParentRoute: () => SignupstepsSellerRouteRoute,
+  } as any)
+const SignupstepsSellerstep3PreferencesRoute =
+  SignupstepsSellerstep3PreferencesRouteImport.update({
+    id: '/(step-3)/preferences',
+    path: '/preferences',
+    getParentRoute: () => SignupstepsSellerRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/admin/invitations': typeof AdminInvitationsRoute
+  '/admin/matches': typeof AdminMatchesRoute
+  '/admin/role-switch': typeof AdminRoleSwitchRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -302,11 +351,17 @@ export interface FileRoutesByTo {
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/admin/invitations': typeof AdminInvitationsRoute
+  '/admin/matches': typeof AdminMatchesRoute
+  '/admin/role-switch': typeof AdminRoleSwitchRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -340,14 +395,21 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/admin/invitations': typeof AdminInvitationsRoute
+  '/admin/matches': typeof AdminMatchesRoute
+  '/admin/role-switch': typeof AdminRoleSwitchRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -382,14 +444,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/agent'
     | '/buyer'
     | '/seller'
+    | '/admin/invitations'
+    | '/admin/matches'
+    | '/admin/role-switch'
+    | '/admin/users'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin/'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -425,11 +494,17 @@ export interface FileRouteTypes {
     | '/agent'
     | '/buyer'
     | '/seller'
+    | '/admin/invitations'
+    | '/admin/matches'
+    | '/admin/role-switch'
+    | '/admin/users'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -462,14 +537,21 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
+    | '/admin/invitations'
+    | '/admin/matches'
+    | '/admin/role-switch'
+    | '/admin/users'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
+    | '/admin/'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -503,9 +585,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   AuthBetaRoute: typeof AuthBetaRoute
   AuthCompleteRoute: typeof AuthCompleteRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -531,53 +615,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/login': {
-      id: '/auth/login'
-      path: '/auth/login'
-      fullPath: '/auth/login'
-      preLoaderRoute: typeof AuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/complete': {
-      id: '/auth/complete'
-      path: '/auth/complete'
-      fullPath: '/auth/complete'
-      preLoaderRoute: typeof AuthCompleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/beta': {
-      id: '/auth/beta'
-      path: '/auth/beta'
-      fullPath: '/auth/beta'
-      preLoaderRoute: typeof AuthBetaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(dashboard)/seller': {
-      id: '/(dashboard)/seller'
-      path: '/seller'
-      fullPath: '/seller'
-      preLoaderRoute: typeof dashboardSellerRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(dashboard)/buyer': {
-      id: '/(dashboard)/buyer'
-      path: '/buyer'
-      fullPath: '/buyer'
-      preLoaderRoute: typeof dashboardBuyerRouteRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(dashboard)/agent': {
@@ -587,81 +629,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardAgentRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/preview/seller': {
-      id: '/signup/preview/seller'
-      path: '/signup/preview/seller'
-      fullPath: '/signup/preview/seller'
-      preLoaderRoute: typeof SignupPreviewSellerRouteImport
+    '/(dashboard)/buyer': {
+      id: '/(dashboard)/buyer'
+      path: '/buyer'
+      fullPath: '/buyer'
+      preLoaderRoute: typeof dashboardBuyerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/preview/buyer': {
-      id: '/signup/preview/buyer'
-      path: '/signup/preview/buyer'
-      fullPath: '/signup/preview/buyer'
-      preLoaderRoute: typeof SignupPreviewBuyerRouteImport
+    '/(dashboard)/seller': {
+      id: '/(dashboard)/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof dashboardSellerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/preview/agent': {
-      id: '/signup/preview/agent'
-      path: '/signup/preview/agent'
-      fullPath: '/signup/preview/agent'
-      preLoaderRoute: typeof SignupPreviewAgentRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/api/ingest/$': {
-      id: '/api/ingest/$'
-      path: '/api/ingest/$'
-      fullPath: '/api/ingest/$'
-      preLoaderRoute: typeof ApiIngestSplatRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/invitations': {
+      id: '/admin/invitations'
+      path: '/invitations'
+      fullPath: '/admin/invitations'
+      preLoaderRoute: typeof AdminInvitationsRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/(dashboard)/seller/search-preferences': {
-      id: '/(dashboard)/seller/search-preferences'
-      path: '/search-preferences'
-      fullPath: '/seller/search-preferences'
-      preLoaderRoute: typeof dashboardSellerSearchPreferencesRouteImport
-      parentRoute: typeof dashboardSellerRouteRoute
-    }
-    '/(dashboard)/seller/practice-negotiating': {
-      id: '/(dashboard)/seller/practice-negotiating'
-      path: '/practice-negotiating'
-      fullPath: '/seller/practice-negotiating'
-      preLoaderRoute: typeof dashboardSellerPracticeNegotiatingRouteImport
-      parentRoute: typeof dashboardSellerRouteRoute
-    }
-    '/(dashboard)/seller/matches': {
-      id: '/(dashboard)/seller/matches'
+    '/admin/matches': {
+      id: '/admin/matches'
       path: '/matches'
-      fullPath: '/seller/matches'
-      preLoaderRoute: typeof dashboardSellerMatchesRouteImport
-      parentRoute: typeof dashboardSellerRouteRoute
+      fullPath: '/admin/matches'
+      preLoaderRoute: typeof AdminMatchesRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/(dashboard)/seller/introductions': {
-      id: '/(dashboard)/seller/introductions'
+    '/admin/role-switch': {
+      id: '/admin/role-switch'
+      path: '/role-switch'
+      fullPath: '/admin/role-switch'
+      preLoaderRoute: typeof AdminRoleSwitchRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/api/stripe-webhook': {
+      id: '/api/stripe-webhook'
+      path: '/api/stripe-webhook'
+      fullPath: '/api/stripe-webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/beta': {
+      id: '/auth/beta'
+      path: '/auth/beta'
+      fullPath: '/auth/beta'
+      preLoaderRoute: typeof AuthBetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/complete': {
+      id: '/auth/complete'
+      path: '/auth/complete'
+      fullPath: '/auth/complete'
+      preLoaderRoute: typeof AuthCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(dashboard)/agent/introductions': {
+      id: '/(dashboard)/agent/introductions'
       path: '/introductions'
-      fullPath: '/seller/introductions'
-      preLoaderRoute: typeof dashboardSellerIntroductionsRouteImport
-      parentRoute: typeof dashboardSellerRouteRoute
+      fullPath: '/agent/introductions'
+      preLoaderRoute: typeof dashboardAgentIntroductionsRouteImport
+      parentRoute: typeof dashboardAgentRouteRoute
     }
-    '/(dashboard)/buyer/search-preferences': {
-      id: '/(dashboard)/buyer/search-preferences'
-      path: '/search-preferences'
-      fullPath: '/buyer/search-preferences'
-      preLoaderRoute: typeof dashboardBuyerSearchPreferencesRouteImport
-      parentRoute: typeof dashboardBuyerRouteRoute
-    }
-    '/(dashboard)/buyer/practice-negotiating': {
-      id: '/(dashboard)/buyer/practice-negotiating'
-      path: '/practice-negotiating'
-      fullPath: '/buyer/practice-negotiating'
-      preLoaderRoute: typeof dashboardBuyerPracticeNegotiatingRouteImport
+    '/(dashboard)/buyer/introductions': {
+      id: '/(dashboard)/buyer/introductions'
+      path: '/introductions'
+      fullPath: '/buyer/introductions'
+      preLoaderRoute: typeof dashboardBuyerIntroductionsRouteImport
       parentRoute: typeof dashboardBuyerRouteRoute
     }
     '/(dashboard)/buyer/matches': {
@@ -671,32 +741,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof dashboardBuyerMatchesRouteImport
       parentRoute: typeof dashboardBuyerRouteRoute
     }
-    '/(dashboard)/buyer/introductions': {
-      id: '/(dashboard)/buyer/introductions'
-      path: '/introductions'
-      fullPath: '/buyer/introductions'
-      preLoaderRoute: typeof dashboardBuyerIntroductionsRouteImport
+    '/(dashboard)/buyer/practice-negotiating': {
+      id: '/(dashboard)/buyer/practice-negotiating'
+      path: '/practice-negotiating'
+      fullPath: '/buyer/practice-negotiating'
+      preLoaderRoute: typeof dashboardBuyerPracticeNegotiatingRouteImport
       parentRoute: typeof dashboardBuyerRouteRoute
     }
-    '/(dashboard)/agent/introductions': {
-      id: '/(dashboard)/agent/introductions'
-      path: '/introductions'
-      fullPath: '/agent/introductions'
-      preLoaderRoute: typeof dashboardAgentIntroductionsRouteImport
-      parentRoute: typeof dashboardAgentRouteRoute
+    '/(dashboard)/buyer/search-preferences': {
+      id: '/(dashboard)/buyer/search-preferences'
+      path: '/search-preferences'
+      fullPath: '/buyer/search-preferences'
+      preLoaderRoute: typeof dashboardBuyerSearchPreferencesRouteImport
+      parentRoute: typeof dashboardBuyerRouteRoute
     }
-    '/signup/(steps)/seller': {
-      id: '/signup/(steps)/seller'
-      path: '/signup/seller'
-      fullPath: '/signup/seller'
-      preLoaderRoute: typeof SignupstepsSellerRouteRouteImport
+    '/(dashboard)/seller/introductions': {
+      id: '/(dashboard)/seller/introductions'
+      path: '/introductions'
+      fullPath: '/seller/introductions'
+      preLoaderRoute: typeof dashboardSellerIntroductionsRouteImport
+      parentRoute: typeof dashboardSellerRouteRoute
+    }
+    '/(dashboard)/seller/matches': {
+      id: '/(dashboard)/seller/matches'
+      path: '/matches'
+      fullPath: '/seller/matches'
+      preLoaderRoute: typeof dashboardSellerMatchesRouteImport
+      parentRoute: typeof dashboardSellerRouteRoute
+    }
+    '/(dashboard)/seller/practice-negotiating': {
+      id: '/(dashboard)/seller/practice-negotiating'
+      path: '/practice-negotiating'
+      fullPath: '/seller/practice-negotiating'
+      preLoaderRoute: typeof dashboardSellerPracticeNegotiatingRouteImport
+      parentRoute: typeof dashboardSellerRouteRoute
+    }
+    '/(dashboard)/seller/search-preferences': {
+      id: '/(dashboard)/seller/search-preferences'
+      path: '/search-preferences'
+      fullPath: '/seller/search-preferences'
+      preLoaderRoute: typeof dashboardSellerSearchPreferencesRouteImport
+      parentRoute: typeof dashboardSellerRouteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/(steps)/buyer': {
-      id: '/signup/(steps)/buyer'
-      path: '/signup/buyer'
-      fullPath: '/signup/buyer'
-      preLoaderRoute: typeof SignupstepsBuyerRouteRouteImport
+    '/api/ingest/$': {
+      id: '/api/ingest/$'
+      path: '/api/ingest/$'
+      fullPath: '/api/ingest/$'
+      preLoaderRoute: typeof ApiIngestSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup/(steps)/agent': {
@@ -706,6 +804,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupstepsAgentRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup/(steps)/buyer': {
+      id: '/signup/(steps)/buyer'
+      path: '/signup/buyer'
+      fullPath: '/signup/buyer'
+      preLoaderRoute: typeof SignupstepsBuyerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/(steps)/seller': {
+      id: '/signup/(steps)/seller'
+      path: '/signup/seller'
+      fullPath: '/signup/seller'
+      preLoaderRoute: typeof SignupstepsSellerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/preview/agent': {
+      id: '/signup/preview/agent'
+      path: '/signup/preview/agent'
+      fullPath: '/signup/preview/agent'
+      preLoaderRoute: typeof SignupPreviewAgentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/preview/buyer': {
+      id: '/signup/preview/buyer'
+      path: '/signup/preview/buyer'
+      fullPath: '/signup/preview/buyer'
+      preLoaderRoute: typeof SignupPreviewBuyerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup/preview/seller': {
+      id: '/signup/preview/seller'
+      path: '/signup/preview/seller'
+      fullPath: '/signup/preview/seller'
+      preLoaderRoute: typeof SignupPreviewSellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/ingest/static/$': {
       id: '/api/ingest/static/$'
       path: '/api/ingest/static/$'
@@ -713,67 +846,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIngestStaticSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup/(steps)/seller/(step-3)/preferences': {
-      id: '/signup/(steps)/seller/(step-3)/preferences'
-      path: '/preferences'
-      fullPath: '/signup/seller/preferences'
-      preLoaderRoute: typeof SignupstepsSellerstep3PreferencesRouteImport
-      parentRoute: typeof SignupstepsSellerRouteRoute
-    }
-    '/signup/(steps)/seller/(step-2)/location': {
-      id: '/signup/(steps)/seller/(step-2)/location'
-      path: '/location'
-      fullPath: '/signup/seller/location'
-      preLoaderRoute: typeof SignupstepsSellerstep2LocationRouteImport
-      parentRoute: typeof SignupstepsSellerRouteRoute
-    }
-    '/signup/(steps)/seller/(step-1)/home': {
-      id: '/signup/(steps)/seller/(step-1)/home'
-      path: '/home'
-      fullPath: '/signup/seller/home'
-      preLoaderRoute: typeof SignupstepsSellerstep1HomeRouteImport
-      parentRoute: typeof SignupstepsSellerRouteRoute
-    }
-    '/signup/(steps)/buyer/(step-3)/preferences': {
-      id: '/signup/(steps)/buyer/(step-3)/preferences'
-      path: '/preferences'
-      fullPath: '/signup/buyer/preferences'
-      preLoaderRoute: typeof SignupstepsBuyerstep3PreferencesRouteImport
-      parentRoute: typeof SignupstepsBuyerRouteRoute
-    }
-    '/signup/(steps)/buyer/(step-2)/location': {
-      id: '/signup/(steps)/buyer/(step-2)/location'
-      path: '/location'
-      fullPath: '/signup/buyer/location'
-      preLoaderRoute: typeof SignupstepsBuyerstep2LocationRouteImport
-      parentRoute: typeof SignupstepsBuyerRouteRoute
-    }
-    '/signup/(steps)/buyer/(step-1)/home': {
-      id: '/signup/(steps)/buyer/(step-1)/home'
-      path: '/home'
-      fullPath: '/signup/buyer/home'
-      preLoaderRoute: typeof SignupstepsBuyerstep1HomeRouteImport
-      parentRoute: typeof SignupstepsBuyerRouteRoute
-    }
-    '/signup/(steps)/agent/(step-5)/peace-pact': {
-      id: '/signup/(steps)/agent/(step-5)/peace-pact'
-      path: '/peace-pact'
-      fullPath: '/signup/agent/peace-pact'
-      preLoaderRoute: typeof SignupstepsAgentstep5PeacePactRouteImport
-      parentRoute: typeof SignupstepsAgentRouteRoute
-    }
-    '/signup/(steps)/agent/(step-4)/compliance': {
-      id: '/signup/(steps)/agent/(step-4)/compliance'
-      path: '/compliance'
-      fullPath: '/signup/agent/compliance'
-      preLoaderRoute: typeof SignupstepsAgentstep4ComplianceRouteImport
-      parentRoute: typeof SignupstepsAgentRouteRoute
-    }
-    '/signup/(steps)/agent/(step-3)/preferences': {
-      id: '/signup/(steps)/agent/(step-3)/preferences'
-      path: '/preferences'
-      fullPath: '/signup/agent/preferences'
-      preLoaderRoute: typeof SignupstepsAgentstep3PreferencesRouteImport
+    '/signup/(steps)/agent/(step-1)/identity': {
+      id: '/signup/(steps)/agent/(step-1)/identity'
+      path: '/identity'
+      fullPath: '/signup/agent/identity'
+      preLoaderRoute: typeof SignupstepsAgentstep1IdentityRouteImport
       parentRoute: typeof SignupstepsAgentRouteRoute
     }
     '/signup/(steps)/agent/(step-2)/market': {
@@ -783,15 +860,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupstepsAgentstep2MarketRouteImport
       parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(steps)/agent/(step-1)/identity': {
-      id: '/signup/(steps)/agent/(step-1)/identity'
-      path: '/identity'
-      fullPath: '/signup/agent/identity'
-      preLoaderRoute: typeof SignupstepsAgentstep1IdentityRouteImport
+    '/signup/(steps)/agent/(step-3)/preferences': {
+      id: '/signup/(steps)/agent/(step-3)/preferences'
+      path: '/preferences'
+      fullPath: '/signup/agent/preferences'
+      preLoaderRoute: typeof SignupstepsAgentstep3PreferencesRouteImport
       parentRoute: typeof SignupstepsAgentRouteRoute
+    }
+    '/signup/(steps)/agent/(step-4)/compliance': {
+      id: '/signup/(steps)/agent/(step-4)/compliance'
+      path: '/compliance'
+      fullPath: '/signup/agent/compliance'
+      preLoaderRoute: typeof SignupstepsAgentstep4ComplianceRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
+    }
+    '/signup/(steps)/agent/(step-5)/peace-pact': {
+      id: '/signup/(steps)/agent/(step-5)/peace-pact'
+      path: '/peace-pact'
+      fullPath: '/signup/agent/peace-pact'
+      preLoaderRoute: typeof SignupstepsAgentstep5PeacePactRouteImport
+      parentRoute: typeof SignupstepsAgentRouteRoute
+    }
+    '/signup/(steps)/buyer/(step-1)/home': {
+      id: '/signup/(steps)/buyer/(step-1)/home'
+      path: '/home'
+      fullPath: '/signup/buyer/home'
+      preLoaderRoute: typeof SignupstepsBuyerstep1HomeRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
+    }
+    '/signup/(steps)/buyer/(step-2)/location': {
+      id: '/signup/(steps)/buyer/(step-2)/location'
+      path: '/location'
+      fullPath: '/signup/buyer/location'
+      preLoaderRoute: typeof SignupstepsBuyerstep2LocationRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
+    }
+    '/signup/(steps)/buyer/(step-3)/preferences': {
+      id: '/signup/(steps)/buyer/(step-3)/preferences'
+      path: '/preferences'
+      fullPath: '/signup/buyer/preferences'
+      preLoaderRoute: typeof SignupstepsBuyerstep3PreferencesRouteImport
+      parentRoute: typeof SignupstepsBuyerRouteRoute
+    }
+    '/signup/(steps)/seller/(step-1)/home': {
+      id: '/signup/(steps)/seller/(step-1)/home'
+      path: '/home'
+      fullPath: '/signup/seller/home'
+      preLoaderRoute: typeof SignupstepsSellerstep1HomeRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
+    }
+    '/signup/(steps)/seller/(step-2)/location': {
+      id: '/signup/(steps)/seller/(step-2)/location'
+      path: '/location'
+      fullPath: '/signup/seller/location'
+      preLoaderRoute: typeof SignupstepsSellerstep2LocationRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
+    }
+    '/signup/(steps)/seller/(step-3)/preferences': {
+      id: '/signup/(steps)/seller/(step-3)/preferences'
+      path: '/preferences'
+      fullPath: '/signup/seller/preferences'
+      preLoaderRoute: typeof SignupstepsSellerstep3PreferencesRouteImport
+      parentRoute: typeof SignupstepsSellerRouteRoute
     }
   }
 }
+
+interface AdminRouteRouteChildren {
+  AdminInvitationsRoute: typeof AdminInvitationsRoute
+  AdminMatchesRoute: typeof AdminMatchesRoute
+  AdminRoleSwitchRoute: typeof AdminRoleSwitchRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminInvitationsRoute: AdminInvitationsRoute,
+  AdminMatchesRoute: AdminMatchesRoute,
+  AdminRoleSwitchRoute: AdminRoleSwitchRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface dashboardAgentRouteRouteChildren {
   dashboardAgentIntroductionsRoute: typeof dashboardAgentIntroductionsRoute
@@ -899,9 +1052,11 @@ const SignupstepsSellerRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   AuthBetaRoute: AuthBetaRoute,
   AuthCompleteRoute: AuthCompleteRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,

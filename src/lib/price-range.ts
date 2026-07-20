@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export type PriceRange = {
 	min: number
 	max: number
@@ -8,13 +10,6 @@ export const PRICE_MAX = 2_000_000
 export const PRICE_STEP = 50_000
 export const DEFAULT_PRICE_RANGE: PriceRange = { min: 400_000, max: 600_000 }
 
-export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
-	under400k: { min: 0, max: 400_000 },
-	'400kTo750k': { min: 400_000, max: 750_000 },
-	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
-	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
-}
-
 export const BUCKET_ORDER = [
 	'under400k',
 	'400kTo750k',
@@ -23,6 +18,29 @@ export const BUCKET_ORDER = [
 ] as const
 
 export type AgentPriceBucket = (typeof BUCKET_ORDER)[number]
+
+export const AGENT_PRICE_RANGES: Record<AgentPriceBucket, PriceRange> = {
+	under400k: { min: 0, max: 400_000 },
+	'400kTo750k': { min: 400_000, max: 750_000 },
+	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
+	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
+}
+
+export const agentPriceBucketSchema = z.enum(BUCKET_ORDER)
+
+export const AGENT_PRICE_BUCKET_LABELS: Record<AgentPriceBucket, string> = {
+	under400k: 'Under $400k',
+	'400kTo750k': '$400k – $750k',
+	'750kTo1_5m': '$750k – $1.5M',
+	'1_5mPlus': '$1.5M+',
+}
+
+export function toAgentPriceBucket(
+	value: string | null | undefined,
+): AgentPriceBucket | undefined {
+	const parsed = agentPriceBucketSchema.safeParse(value)
+	return parsed.success ? parsed.data : undefined
+}
 
 export function parseMinMaxRange(
 	value: string | undefined | null,

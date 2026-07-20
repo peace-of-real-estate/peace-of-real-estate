@@ -285,18 +285,6 @@ describe('scoreLocation', () => {
 })
 
 describe('calculateFitScore', () => {
-	test('accepts min-max stored format for both client and agent', () => {
-		const agent = makeAgent({ typicalPriceRange: '400000-750000' })
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
-		const result = calculateFitScore(agent, buyer, 'buying')
-
-		expect(result.disqualified).toBe(false)
-		expect(
-			result.trace.dimensions.find((d) => d.id === 'priceFit')?.score,
-		).toBe(1)
-		expect(result.fitScore).toBeGreaterThan(0)
-	})
-
 	test('accepts slug stored format for agent typicalPriceRange', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer({ priceRange: '400000-750000' })
@@ -323,17 +311,6 @@ describe('calculateFitScore', () => {
 		expect(priceFit?.score).toBeGreaterThan(0)
 		expect(priceFit?.explanation).toContain('bucket overlap')
 		expect(result.fitScore).toBeGreaterThan(0)
-	})
-
-	test('returns zero price fit when agent range is unparseable', () => {
-		const agent = makeAgent({ typicalPriceRange: 'legacy $250k - $500k' })
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
-		const result = calculateFitScore(agent, buyer, 'buying')
-
-		expect(result.disqualified).toBe(true)
-		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
-		expect(priceFit?.score).toBe(0)
-		expect(result.fitScore).toBe(0)
 	})
 
 	test('perfect buyer match scores 100', () => {
@@ -398,12 +375,6 @@ describe('calculateFitScore', () => {
 		const result = calculateFitScore(agent)
 		expect(result.fitScore).toBe(100)
 		expect(result.trace.mode).toBe('fallback')
-	})
-
-	test('fallback penalizes invalid price bucket', () => {
-		const agent = makeAgent({ typicalPriceRange: 'legacy $250k - $500k' })
-		const result = calculateFitScore(agent)
-		expect(result.fitScore).toBeLessThan(100)
 	})
 
 	test('priority boost raises priceFit weight', () => {
@@ -688,5 +659,14 @@ describe('rankWithTieBandsDetailed', () => {
 		const first = rankWithTieBandsDetailed(input, 'client-a')
 		const second = rankWithTieBandsDetailed(input, 'client-a')
 		expect(first).toEqual(second)
+	})
+
+	test('slug agent earns adjacent-bucket credit', () => {
+		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
+		const buyer = makeBuyer({ priceRange: '750000-900000' })
+		const result = calculateFitScore(agent, buyer, 'buying')
+		expect(result.disqualified).toBe(false)
+		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
+		expect(priceFit?.score).toBe(0.4)
 	})
 })

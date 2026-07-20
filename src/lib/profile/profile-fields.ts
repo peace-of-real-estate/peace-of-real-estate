@@ -18,6 +18,8 @@ export const profileStatus = defineEnum('profile_status', [
 	['enriched', 'Enriched'],
 ])
 
+export type ProfileStatus = SlugOf<typeof profileStatus>
+
 export const representationSide = defineEnum('representation_side', [
 	['buyers', 'Buyers'],
 	['sellers', 'Sellers'],
@@ -165,6 +167,15 @@ const commissionComfortQuestion = (title: string) =>
 		label: 'Commission',
 		options: commissionComfort,
 	})
+
+const clientWorkStyleQuestionList = [
+	...sharedClientQuestions,
+	commissionComfortQuestion('How do you plan to handle agent commission?'),
+] as const
+
+export const clientWorkStyleQuestionIds = questionIds(
+	clientWorkStyleQuestionList,
+)
 
 const buyerQuestionList = [
 	single('experienceLevel', {
