@@ -36,7 +36,7 @@ function AgentComplianceRoute() {
 	)
 }
 
-export function AgentCompliance({
+function AgentCompliance({
 	state,
 	onUpdate,
 	onContinue,

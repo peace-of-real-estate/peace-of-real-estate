@@ -106,13 +106,13 @@ const agentPreviewProfileSchema = agentDraftSchema.extend({
 	bestClientTypes: z.array(z.enum(bestClientType.slugs)).default([]),
 })
 
-export type AgentPreviewProfile = z.infer<typeof agentPreviewProfileSchema>
+type AgentPreviewProfile = z.infer<typeof agentPreviewProfileSchema>
 
-export function draftToPreviewProfile(draft: AgentDraft): AgentPreviewProfile {
+function draftToPreviewProfile(draft: AgentDraft): AgentPreviewProfile {
 	return agentPreviewProfileSchema.parse(draft)
 }
 
-export function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
+function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 	return (
 		<SignupPreviewShell
 			redirect="/agent/introductions"

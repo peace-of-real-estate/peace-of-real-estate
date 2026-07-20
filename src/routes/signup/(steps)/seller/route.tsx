@@ -7,7 +7,6 @@ import { HouseLineIcon, MapPinIcon, UserIcon } from '@phosphor-icons/react'
 
 import {
 	SignupWizardShell,
-	type SignupWizardContextValue,
 	type SignupWizardStep,
 } from '../-components/signup-shell'
 import { createLocalStorage } from '@/lib/utils/localstorage'
@@ -23,11 +22,6 @@ export const sellerDraftStorage = createLocalStorage<SellerDraft>(
 )
 
 export type ClientSignupStep = 'location' | 'home' | 'preferences' | 'preview'
-
-export type SellerWizardContext = SignupWizardContextValue<
-	SellerDraft,
-	ClientSignupStep
->
 
 const sellerSteps = [
 	{ id: 'location', label: 'Location', icon: MapPinIcon },
@@ -90,5 +84,3 @@ function SellerWizardRoute() {
 		/>
 	)
 }
-
-export { isSellerPreferencesComplete }

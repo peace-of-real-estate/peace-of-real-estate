@@ -1,4 +1,4 @@
-import { hasBetaAccess } from '@/lib/auth/beta'
+import { hasBetaAccess } from '@/lib/auth/functions'
 import { getCurrentSession } from '@/lib/auth/session'
 import type { QueryClient } from '@tanstack/react-query'
 import {

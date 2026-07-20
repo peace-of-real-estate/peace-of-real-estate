@@ -1,9 +1,6 @@
 import { z } from 'zod'
 
-export function readLocalStorage<T>(
-	key: string,
-	schema: z.ZodType<T>,
-): T | null {
+function readLocalStorage<T>(key: string, schema: z.ZodType<T>): T | null {
 	if (typeof window === 'undefined') return null
 	const raw = window.localStorage.getItem(key)
 	if (!raw) return null
@@ -17,12 +14,12 @@ export function readLocalStorage<T>(
 	return result.data
 }
 
-export function writeLocalStorage(key: string, value: unknown) {
+function writeLocalStorage(key: string, value: unknown) {
 	if (typeof window === 'undefined') return
 	window.localStorage.setItem(key, JSON.stringify(value))
 }
 
-export function removeLocalStorage(key: string) {
+function removeLocalStorage(key: string) {
 	if (typeof window === 'undefined') return
 	window.localStorage.removeItem(key)
 }
