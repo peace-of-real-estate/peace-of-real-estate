@@ -164,21 +164,6 @@ export function CityZipSelector({
 						)}
 					>
 						<span className="flex min-w-0 flex-1 items-center gap-2.5">
-							<MapPinIcon
-								weight={marketComplete ? 'fill' : 'regular'}
-								className={cn(
-									'h-4 w-4 shrink-0',
-									marketComplete ? 'text-primary' : 'text-muted-foreground',
-								)}
-							/>
-							<span
-								className={cn(
-									'truncate',
-									!committedLocation && 'text-muted-foreground',
-								)}
-							>
-								{cityState ? cityState.city : committedLocation || placeholder}
-							</span>
 							{cityState?.state ? (
 								<Badge
 									variant="muted"
@@ -187,6 +172,14 @@ export function CityZipSelector({
 									{cityState.state}
 								</Badge>
 							) : null}
+							<span
+								className={cn(
+									'truncate',
+									!committedLocation && 'text-muted-foreground',
+								)}
+							>
+								{cityState ? cityState.city : committedLocation || placeholder}
+							</span>
 						</span>
 						<CaretUpDownIcon className="text-muted-foreground h-4 w-4 shrink-0" />
 					</Button>
@@ -220,18 +213,18 @@ export function CityZipSelector({
 											onSelect={selectCity}
 											className="gap-2 rounded-md px-2.5 py-2"
 										>
+											{parsed?.state ? (
+												<Badge
+													variant="muted"
+													className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+												>
+													{parsed.state}
+												</Badge>
+											) : null}
 											<span className="truncate font-medium">
 												{parsed?.city ?? suggestion}
 											</span>
 											<span className="ml-auto flex shrink-0 items-center gap-1.5">
-												{parsed?.state ? (
-													<Badge
-														variant="muted"
-														className="px-1.5 text-[10px] font-semibold tracking-wider"
-													>
-														{parsed.state}
-													</Badge>
-												) : null}
 												<CheckIcon
 													className={cn(
 														'h-4 w-4',
