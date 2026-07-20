@@ -63,7 +63,11 @@ function parseBetaCookie(
 export const authenticateBeta = createServerFn({ method: 'POST' })
 	.validator((data: { password: string }) => data)
 	.handler(async ({ data }) => {
-		const isValid = data.password === env.BETA_PASSWORD
+		const expectedBuffer = Buffer.from(env.BETA_PASSWORD)
+		const passwordBuffer = Buffer.from(data.password)
+		const isValid =
+			expectedBuffer.length === passwordBuffer.length &&
+			timingSafeEqual(expectedBuffer, passwordBuffer)
 
 		if (isValid) {
 			const signature = await signBetaValue(BETA_VALUE)
@@ -71,6 +75,8 @@ export const authenticateBeta = createServerFn({ method: 'POST' })
 				path: '/',
 				sameSite: 'lax',
 				maxAge: 60 * 60 * 24 * 30,
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
 			})
 		}
 

@@ -7,16 +7,23 @@ export type UseGoogleAuthOptions = {
 	fallbackRedirect: string
 }
 
+export function sanitizeRedirect(candidate: string): string {
+	try {
+		const url = new URL(candidate, window.location.origin)
+		if (url.origin !== window.location.origin) return '/'
+		return url.pathname + url.search + url.hash
+	} catch {
+		return '/'
+	}
+}
+
 export function useGoogleAuth({ fallbackRedirect }: UseGoogleAuthOptions) {
 	const [isLoading, setIsLoading] = useState(false)
 	const [isAvailable, setIsAvailable] = useState(true)
 
 	const signIn = async () => {
 		setIsLoading(true)
-		const safeRedirect =
-			fallbackRedirect.startsWith('/') && !fallbackRedirect.startsWith('//')
-				? fallbackRedirect
-				: '/'
+		const safeRedirect = sanitizeRedirect(fallbackRedirect)
 		const callbackURL = new URL(safeRedirect, window.location.origin).toString()
 
 		try {
