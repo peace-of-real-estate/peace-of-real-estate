@@ -3,8 +3,6 @@ export type PriceRange = {
 	max: number
 }
 
-export type PriceRangeValue = PriceRange
-
 export const PRICE_MIN = 0
 export const PRICE_MAX = 2_000_000
 export const PRICE_STEP = 50_000
@@ -49,7 +47,6 @@ export function parsePriceRange(value: string | undefined | null): PriceRange {
 	}
 }
 
-export const parseSerializedPriceRange = parseMinMaxRange
 export function serializePriceRange(range: PriceRange): string {
 	return `${range.min}-${range.max}`
 }
@@ -58,35 +55,10 @@ export function formatPriceRange(range: PriceRange): string {
 	return `${formatPriceCompact(range.min)} - ${formatPriceCompact(range.max)}`
 }
 
-export function formatPrice(value: number): string {
-	return `$${value.toLocaleString()}`
-}
-
 export function formatPriceCompact(value: number): string {
 	if (value >= 1_000_000) {
 		const millions = value / 1_000_000
 		return `$${millions % 1 === 0 ? millions : millions.toFixed(1)}M`
 	}
 	return `$${value / 1000}k`
-}
-
-export function parseRawPrice(value: string): number | undefined {
-	const digits = value.replace(/\D/g, '')
-	const parsed = Number.parseInt(digits, 10)
-	return Number.isNaN(parsed) ? undefined : parsed
-}
-
-export function clampPrice(value: number): number {
-	return Math.max(PRICE_MIN, Math.min(value, PRICE_MAX))
-}
-
-export function priceRangeOverlaps(
-	clientRange: string | undefined | null,
-	agentRange: string | undefined | null,
-): boolean {
-	const client = parsePriceRange(clientRange)
-	const agentSlug = agentRange?.trim() ?? ''
-	const agent = AGENT_PRICE_RANGES[agentSlug]
-	if (!agent) return false
-	return client.min < agent.max && client.max > agent.min
 }

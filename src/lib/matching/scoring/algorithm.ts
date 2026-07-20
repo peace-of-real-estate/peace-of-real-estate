@@ -4,7 +4,6 @@ import {
 	AGENT_PRICE_RANGES,
 	BUCKET_ORDER,
 	type PriceRange,
-	type PriceRangeValue,
 } from '@/lib/price-range'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 import type {
@@ -14,6 +13,7 @@ import type {
 
 import {
 	baseDimensionWeights,
+	type DimensionId,
 	buyerBiddingWarMatrix,
 	buyerDecisionMakingMatrix,
 	buyerIdealRelationshipMatrix,
@@ -37,12 +37,12 @@ import {
 	sellerStakesModulation,
 } from '../affinities'
 import type {
-	DimensionId,
 	DimensionResult,
 	DimensionTrace,
 	DisqualifierTrace,
 	FitScoreResult,
 	MatchSide,
+	PriceRangeValue,
 	ScoreBucket,
 	SubCheck,
 } from './types'
@@ -56,7 +56,7 @@ import {
 	toStars,
 } from './utils'
 
-export const SCORING_GEOMETRIC_FLOOR = 0.05
+const SCORING_GEOMETRIC_FLOOR = 0.05
 export const SCORING_LINEAR_WEIGHT = 0.7
 export const SCORING_GEOMETRIC_WEIGHT = 0.3
 export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
@@ -276,7 +276,7 @@ export function scoreLocation(
 	}
 }
 
-export function scorePriceFit(
+function scorePriceFit(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 ): DimensionResult {
@@ -401,7 +401,7 @@ export function deriveExpectedClientTypes(
 	return [...expectedClientTypeSources(client, side).keys()]
 }
 
-export function scoreSpecialization(
+function scoreSpecialization(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 	side: 'buying' | 'selling',
@@ -648,7 +648,7 @@ function scoreSellerWorkingStyle(
 	}
 }
 
-export function scoreWorkingStyle(
+function scoreWorkingStyle(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 	side: 'buying' | 'selling',
@@ -658,7 +658,7 @@ export function scoreWorkingStyle(
 	}
 	return scoreSellerWorkingStyle(client, agent)
 }
-export function scoreCommunication(
+function scoreCommunication(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 	side: 'buying' | 'selling',
@@ -727,7 +727,7 @@ export function scoreCommunication(
 	}
 }
 
-export function scoreBusinessTerms(
+function scoreBusinessTerms(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 ): DimensionResult {
@@ -869,7 +869,7 @@ function applyModulation(
 	return { weights: adjusted, modulators }
 }
 
-export function resolveDimensionWeights(
+function resolveDimensionWeights(
 	client: ClientProfileRow,
 	side: 'buying' | 'selling',
 	applyModulations = true,

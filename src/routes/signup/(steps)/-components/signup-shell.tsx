@@ -28,7 +28,7 @@ export type SignupWizardStep<TStep extends string = string> = {
 	description?: string
 }
 
-export type SignupWizardContextValue<TDraft, TStep extends string> = {
+type SignupWizardContextValue<TDraft, TStep extends string> = {
 	state: TDraft
 	updateState: (patch: Partial<TDraft>) => void
 	goToStep: (step: TStep) => void
@@ -40,7 +40,7 @@ type DraftStorage<TDraft> = {
 	clear: () => void
 }
 
-export const SignupWizardContext = createContext<unknown>(null)
+const SignupWizardContext = createContext<unknown>(null)
 
 function assertIsContext<TDraft, TStep extends string>(
 	context: unknown,
@@ -161,7 +161,7 @@ function StepDot({
 	)
 }
 
-export function WizardChrome<TStep extends string>({
+function WizardChrome<TStep extends string>({
 	steps,
 	currentStepId,
 	progress,

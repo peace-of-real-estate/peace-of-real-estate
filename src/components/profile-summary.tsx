@@ -40,8 +40,6 @@ export interface AgentSummaryProfile {
 	eoInsuranceStatus?: string | null | undefined
 }
 
-export type SummaryRole = 'buyer' | 'seller' | 'agent'
-
 export type SummaryItem = {
 	label: string
 	value: string

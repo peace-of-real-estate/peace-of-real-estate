@@ -1,21 +1,19 @@
 export type AffinityMatrix = Record<string, Record<string, number>>
 
-export type CommunicationFrequency = 'scheduled' | 'milestones' | 'clientLed'
-
-export type ResponseTimeSlug =
+type ResponseTimeSlug =
 	| 'within10Min'
 	| 'within30Min'
 	| 'fewHours'
 	| 'within24Hours'
 
-export const RESPONSE_TIME_STEPS: ResponseTimeSlug[] = [
+const RESPONSE_TIME_STEPS: ResponseTimeSlug[] = [
 	'within10Min',
 	'within30Min',
 	'fewHours',
 	'within24Hours',
 ]
 
-export function responseTimeIndex(slug: string): number {
+function responseTimeIndex(slug: string): number {
 	return RESPONSE_TIME_STEPS.findIndex((step) => step === slug)
 }
 
@@ -215,7 +213,7 @@ export const commissionMatrix: AffinityMatrix = {
 	},
 }
 
-export const frequencyMatrix: AffinityMatrix = {
+const frequencyMatrix: AffinityMatrix = {
 	veryInvolved: {
 		scheduled: 1.0,
 		milestones: 0.4,
@@ -233,7 +231,7 @@ export const frequencyMatrix: AffinityMatrix = {
 	},
 }
 
-export const sellerFrequencyMatrix: AffinityMatrix = {
+const sellerFrequencyMatrix: AffinityMatrix = {
 	scheduled: {
 		scheduled: 1.0,
 		milestones: 0.4,
@@ -260,10 +258,6 @@ export function scoreChannel(
 	return 0.2
 }
 
-export type DeliverySlug =
-	| 'email'
-	| 'textWithAttachments'
-	| 'phoneThenEmailRecap'
 export function scoreDelivery(
 	clientDelivery: string,
 	agentDelivery: string,
@@ -326,6 +320,12 @@ export const notFitForClientTypeHits: Record<string, string[]> = {
 
 export const notFitForNegativeScore = 0.3
 
+/**
+ * Experience and trust signals are intentionally not scoring dimensions:
+ * trust attestations (peace pact, license, E&O) are required at signup, so
+ * they cannot differentiate agents, and years licensed / volume said little
+ * about fit for a specific client.
+ */
 export const baseDimensionWeights = {
 	location: 22,
 	priceFit: 16,
@@ -399,11 +399,4 @@ export function lookUpAffinity(
 	const row = matrix[clientSlug]
 	if (!row) return undefined
 	return row[agentSlug]
-}
-
-export const responseTimeLabels: Record<ResponseTimeSlug, string> = {
-	within10Min: 'Within 10 minutes',
-	within30Min: 'Within 30 minutes',
-	fewHours: 'A few hours',
-	within24Hours: 'Within 24 hours',
 }

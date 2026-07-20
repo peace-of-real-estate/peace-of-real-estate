@@ -26,7 +26,7 @@ function BuyerPreviewRoute() {
 	)
 }
 
-export function BuyerPreview({ profile }: { profile: ClientProfile }) {
+function BuyerPreview({ profile }: { profile: ClientProfile }) {
 	return (
 		<SignupPreviewShell
 			redirect="/buyer/matches"

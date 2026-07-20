@@ -16,7 +16,6 @@ import {
 
 import {
 	SignupWizardShell,
-	type SignupWizardContextValue,
 	type SignupWizardStep,
 } from '../-components/signup-shell'
 import {
@@ -40,11 +39,6 @@ export type AgentFlowStep =
 	| 'compliance'
 	| 'peacePact'
 	| 'preview'
-
-export type AgentWizardContext = SignupWizardContextValue<
-	AgentDraft,
-	AgentFlowStep
->
 
 export const agentDraftStorage = createLocalStorage<AgentDraft>(
 	'pre-agent-draft',
@@ -146,7 +140,7 @@ function AgentWizardRoute() {
 	)
 }
 
-export function stepPath(step: AgentFlowStep) {
+function stepPath(step: AgentFlowStep) {
 	if (step === 'preview') return '/signup/preview/agent'
 	if (step === 'preferences') return 'preferences'
 	return step === 'peacePact' ? 'peace-pact' : step
@@ -156,8 +150,4 @@ export function getRepresentationIcon(side: RepresentationSide): Icon {
 	if (side === 'buyers') return UsersIcon
 	if (side === 'sellers') return ChartLineIcon
 	return BriefcaseIcon
-}
-
-export function getAgentFlowSteps() {
-	return agentFlowSteps
 }

@@ -148,30 +148,3 @@ export const agentComplianceColumns = {
 		withTimezone: true,
 	}),
 }
-
-export const profileFieldsByFacet = {
-	buyer: {
-		lifecycle: Object.keys(clientLifecycleColumns),
-		matching: Object.keys(clientMatchingColumns),
-		workStyle: [
-			...Object.keys(clientWorkStyleColumns),
-			...Object.keys(buyerQuizColumns),
-		],
-		matchTuning: Object.keys(clientMatchTuningColumns),
-	},
-	seller: {
-		lifecycle: Object.keys(clientLifecycleColumns),
-		matching: Object.keys(clientMatchingColumns),
-		workStyle: [
-			...Object.keys(clientWorkStyleColumns),
-			...Object.keys(sellerQuizColumns),
-		],
-		matchTuning: Object.keys(clientMatchTuningColumns),
-	},
-	agent: {
-		matching: Object.keys(agentMatchingColumns),
-		identity: Object.keys(agentIdentityColumns),
-		workStyle: Object.keys(agentQuizColumns),
-		compliance: Object.keys(agentComplianceColumns),
-	},
-} as const

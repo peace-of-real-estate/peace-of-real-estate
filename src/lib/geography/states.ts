@@ -1,4 +1,4 @@
-export const STATE_ABBREVIATIONS = new Set([
+const STATE_ABBREVIATIONS = new Set([
 	'AL',
 	'AK',
 	'AZ',
