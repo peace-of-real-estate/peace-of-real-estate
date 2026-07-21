@@ -1,6 +1,7 @@
 import { setupWorker } from 'msw/browser'
-import { createMswFixture } from './msw-fixture'
 import type { SetupWorker } from 'msw/browser'
+
+import { createMswFixture } from './msw-fixture'
 
 export type MswBrowserFixture = {
 	msw: SetupWorker

@@ -1,15 +1,15 @@
+import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
+import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
+import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 import { describe, expect, test } from 'vitest'
 
+import { AGENT_PRICE_RANGES } from '@/lib/price-range'
+import type { AgentPriceBucket } from '@/lib/price-range'
 import type {
 	AgentProfile,
 	BuyerProfile,
 	SellerProfile,
 } from '@/lib/profile/types'
-import { AGENT_PRICE_RANGES } from '@/lib/price-range'
-import type { AgentPriceBucket } from '@/lib/price-range'
-import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
-import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
-import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
 
 import {
 	buildTieBands,

@@ -6,6 +6,7 @@ import { getCookie, setCookie } from '@tanstack/react-start/server'
 
 import { serverEnv as env } from '@/env.server'
 import { getUserDashboardPath } from '@/lib/profile'
+
 import { getCurrentSession } from './session'
 
 export async function redirectAuthenticatedUsers() {

@@ -1,9 +1,7 @@
-import { useState, type ElementType, type ReactNode } from 'react'
+import { QuestionIcon, SignOutIcon } from '@phosphor-icons/react'
 import { Link, useRouterState } from '@tanstack/react-router'
+import { useState, type ElementType, type ReactNode } from 'react'
 
-import { authClient } from '@/lib/auth/client'
-import { SUPPORT_EMAIL } from '@/lib/constants'
-import { cn } from '@/lib/utils/ui'
 import { Button } from '@/components/ui/button'
 import {
 	Dialog,
@@ -16,7 +14,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { Textarea } from '@/components/ui/textarea'
 import {
 	Sidebar,
 	SidebarContent,
@@ -31,7 +28,10 @@ import {
 	SidebarMenuItem,
 	SidebarProvider,
 } from '@/components/ui/sidebar'
-import { QuestionIcon, SignOutIcon } from '@phosphor-icons/react'
+import { Textarea } from '@/components/ui/textarea'
+import { authClient } from '@/lib/auth/client'
+import { SUPPORT_EMAIL } from '@/lib/constants'
+import { cn } from '@/lib/utils/ui'
 
 // ============================================================
 // Types

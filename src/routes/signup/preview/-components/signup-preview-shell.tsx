@@ -1,15 +1,19 @@
+import {
+	EnvelopeIcon,
+	LockIcon,
+	SpinnerIcon,
+	UserIcon,
+} from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
-
-import { motion } from 'framer-motion'
 import { useNavigate } from '@tanstack/react-router'
-
+import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { GoogleAuthButton } from '@/components/google-auth-button'
-import { useGoogleAuth } from '@/lib/auth/use-google-auth'
-import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import {
 	Sheet,
 	SheetContent,
@@ -18,14 +22,8 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from '@/components/ui/sheet'
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import {
-	EnvelopeIcon,
-	LockIcon,
-	SpinnerIcon,
-	UserIcon,
-} from '@phosphor-icons/react'
+import { authClient } from '@/lib/auth/client'
+import { useGoogleAuth } from '@/lib/auth/use-google-auth'
 
 export type SignupFormProps<TData = unknown> = {
 	idPrefix?: string

@@ -1,5 +1,5 @@
+import { SpinnerIcon } from '@phosphor-icons/react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 
@@ -19,7 +19,6 @@ import {
 import { agentDraftStorage } from '@/routes/signup/(steps)/agent/route'
 import { buyerDraftStorage } from '@/routes/signup/(steps)/buyer/route'
 import { sellerDraftStorage } from '@/routes/signup/(steps)/seller/route'
-import { SpinnerIcon } from '@phosphor-icons/react'
 
 const completeSearchSchema = z.object({
 	role: z.enum(['agent', 'buyer', 'seller']),

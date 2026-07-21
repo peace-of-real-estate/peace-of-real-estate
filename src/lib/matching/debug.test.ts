@@ -1,10 +1,10 @@
+import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
+import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { describe, expect, test } from 'vitest'
 
 import { buildDebugPayload } from '@/lib/matching/debug'
 import type { ScoredAgent } from '@/lib/matching/debug'
 import { TIE_BAND_THRESHOLD } from '@/lib/matching/scoring'
-import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
-import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 
 const buyer = mockBuyerProfile
 

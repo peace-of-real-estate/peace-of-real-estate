@@ -1,7 +1,7 @@
-import { vi } from 'vite-plus/test'
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
 import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { vi } from 'vite-plus/test'
 
 type MockSession = unknown
 

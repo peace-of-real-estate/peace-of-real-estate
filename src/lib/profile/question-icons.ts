@@ -1,10 +1,3 @@
-import type { ElementType } from 'react'
-
-import type {
-	AgentWorkStyleQuestionId,
-	BuyerQuestionId,
-	SellerQuestionId,
-} from './profile-fields'
 import {
 	ChatIcon,
 	ClockIcon,
@@ -17,6 +10,13 @@ import {
 	TargetIcon,
 	UserIcon,
 } from '@phosphor-icons/react'
+import type { ElementType } from 'react'
+
+import type {
+	AgentWorkStyleQuestionId,
+	BuyerQuestionId,
+	SellerQuestionId,
+} from './profile-fields'
 
 const questionIconMap = {
 	// Buyer

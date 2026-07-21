@@ -1,9 +1,9 @@
-import { and, eq, ilike, or, sql } from 'drizzle-orm'
 import { createServerFn } from '@tanstack/react-start'
+import { and, eq, ilike, or, sql } from 'drizzle-orm'
+import type { FeatureCollection } from 'geojson'
 
 import { db } from '@/db/connection'
 import { cities, cityZips } from '@/db/tables'
-import type { FeatureCollection } from 'geojson'
 
 const TIGERWEB_ZCTA_URL =
 	'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/2/query'

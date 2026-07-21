@@ -1,6 +1,7 @@
 import { setupServer } from 'msw/node'
-import { createMswFixture } from './msw-fixture'
 import type { SetupServer } from 'msw/node'
+
+import { createMswFixture } from './msw-fixture'
 
 export type MswServerFixture = {
 	msw: SetupServer

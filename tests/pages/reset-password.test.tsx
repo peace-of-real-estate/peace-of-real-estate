@@ -1,6 +1,5 @@
-import { test, expect } from 'vitest'
-
 import { renderRoute } from '@tests/support/render/route'
+import { test, expect } from 'vitest'
 
 test('reset password page renders', async () => {
 	await renderRoute({ path: '/auth/reset-password?token=test-token' })

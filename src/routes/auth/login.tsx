@@ -1,18 +1,17 @@
+import { SpinnerIcon } from '@phosphor-icons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { GoogleAuthButton } from '@/components/google-auth-button'
-import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
-import { useGoogleAuth, sanitizeRedirect } from '@/lib/auth/use-google-auth'
-import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { SpinnerIcon } from '@phosphor-icons/react'
+import { authClient } from '@/lib/auth/client'
+import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
+import { useGoogleAuth, sanitizeRedirect } from '@/lib/auth/use-google-auth'
 
 const DEFAULT_POST_AUTH_REDIRECT = '/'
 

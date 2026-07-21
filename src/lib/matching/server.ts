@@ -1,10 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
+
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { type ClientProfileRow } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
+
 import {
 	buildScoreDistribution,
 	toAgentMatchData,

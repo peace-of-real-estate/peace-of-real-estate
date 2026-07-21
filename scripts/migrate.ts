@@ -1,4 +1,5 @@
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
+
 import { closeDb, db } from '../src/db/connection'
 
 // Wraps drizzle-orm's migrator instead of `drizzle-kit migrate` because the

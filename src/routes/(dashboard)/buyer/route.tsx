@@ -1,3 +1,9 @@
+import {
+	ArrowsLeftRightIcon,
+	ChatIcon,
+	MagnifyingGlassIcon,
+	UsersIcon,
+} from '@phosphor-icons/react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import {
@@ -5,12 +11,6 @@ import {
 	DashboardSidebar,
 	type SidebarItem,
 } from '@/routes/(dashboard)/-components/dashboard'
-import {
-	ArrowsLeftRightIcon,
-	ChatIcon,
-	MagnifyingGlassIcon,
-	UsersIcon,
-} from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/(dashboard)/buyer')({
 	component: BuyerDashboardLayout,

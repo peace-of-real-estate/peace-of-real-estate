@@ -1,5 +1,10 @@
 import { createFileRoute, ClientOnly } from '@tanstack/react-router'
 
+import { createBuyerProfileFromDraft } from '@/lib/profile'
+import type { ClientProfile } from '@/lib/profile'
+import { buyerInsertSchema } from '@/lib/profile/types'
+
+import { buyerDraftStorage } from '../(steps)/buyer/route'
 import {
 	ClientMatchesPreview,
 	ClientPreviewHeader,
@@ -7,10 +12,6 @@ import {
 	draftToClientPreviewProfile,
 } from './-components/client-preview'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
-import { buyerDraftStorage } from '../(steps)/buyer/route'
-import { createBuyerProfileFromDraft } from '@/lib/profile'
-import { buyerInsertSchema } from '@/lib/profile/types'
-import type { ClientProfile } from '@/lib/profile'
 
 export const Route = createFileRoute('/signup/preview/buyer')({
 	component: BuyerPreviewRoute,

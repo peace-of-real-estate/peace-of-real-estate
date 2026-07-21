@@ -1,8 +1,8 @@
-import type { SellerDraft } from '@/lib/profile'
-import { test, vi, beforeEach } from 'vitest'
-
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import { test, vi, beforeEach } from 'vitest'
+
+import type { SellerDraft } from '@/lib/profile'
 
 var mockSellerDraft: SellerDraft | null = null
 

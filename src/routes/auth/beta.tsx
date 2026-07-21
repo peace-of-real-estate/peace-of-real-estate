@@ -1,4 +1,10 @@
 import {
+	ArrowRightIcon,
+	LockIcon,
+	ShieldCheckIcon,
+	SparkleIcon,
+} from '@phosphor-icons/react'
+import {
 	createFileRoute,
 	useHydrated,
 	useNavigate,
@@ -10,12 +16,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { authenticateBeta } from '@/lib/auth/functions'
 import { SUPPORT_EMAIL } from '@/lib/constants'
-import {
-	ArrowRightIcon,
-	LockIcon,
-	ShieldCheckIcon,
-	SparkleIcon,
-} from '@phosphor-icons/react'
 
 async function authenticateBetaWithPassword(password: string) {
 	try {

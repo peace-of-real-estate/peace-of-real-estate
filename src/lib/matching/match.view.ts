@@ -1,4 +1,5 @@
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
+
 import type {
 	FitScoreResult,
 	MatchDebugInfo,

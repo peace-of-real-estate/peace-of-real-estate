@@ -1,3 +1,11 @@
+import {
+	BriefcaseIcon,
+	HouseIcon,
+	MoneyIcon,
+	ShieldIcon,
+	StarIcon,
+	UserIcon,
+} from '@phosphor-icons/react'
 import type { ElementType } from 'react'
 
 import { formatPriceRange, parsePriceRange } from '@/lib/price-range'
@@ -13,14 +21,6 @@ import {
 	sellerQuestions,
 	yearsLicensed,
 } from '@/lib/profile'
-import {
-	BriefcaseIcon,
-	HouseIcon,
-	MoneyIcon,
-	ShieldIcon,
-	StarIcon,
-	UserIcon,
-} from '@phosphor-icons/react'
 
 export interface ClientSummaryProfile {
 	city?: string | null | undefined

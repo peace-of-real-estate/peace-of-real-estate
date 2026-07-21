@@ -1,15 +1,15 @@
-import { useState } from 'react'
-
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import type { AgentMatchData } from '@/lib/matching/match.view'
-import { InitialsAvatar } from '@/routes/(dashboard)/-components/agent-preview-card'
 import {
 	ClockIcon,
 	MapPinIcon,
 	StarIcon,
 	UsersIcon,
 } from '@phosphor-icons/react'
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import type { AgentMatchData } from '@/lib/matching/match.view'
+import { InitialsAvatar } from '@/routes/(dashboard)/-components/agent-preview-card'
 
 export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 	return (

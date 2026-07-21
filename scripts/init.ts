@@ -1,6 +1,7 @@
+import * as zipcodes from 'zipcodes'
+
 import { db } from '../src/db/connection'
 import { cities, cityZips } from '../src/db/tables'
-import * as zipcodes from 'zipcodes'
 
 const BATCH_SIZE_CITIES = 1000
 const BATCH_SIZE_ZIPS = 2000

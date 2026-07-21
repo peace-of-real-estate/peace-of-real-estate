@@ -1,5 +1,10 @@
 import { createFileRoute, ClientOnly } from '@tanstack/react-router'
 
+import { createSellerProfileFromDraft } from '@/lib/profile'
+import type { ClientProfile } from '@/lib/profile'
+import { sellerInsertSchema } from '@/lib/profile/types'
+
+import { sellerDraftStorage } from '../(steps)/seller/route'
 import {
 	ClientMatchesPreview,
 	ClientPreviewHeader,
@@ -7,10 +12,6 @@ import {
 	draftToClientPreviewProfile,
 } from './-components/client-preview'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
-import { sellerDraftStorage } from '../(steps)/seller/route'
-import { createSellerProfileFromDraft } from '@/lib/profile'
-import { sellerInsertSchema } from '@/lib/profile/types'
-import type { ClientProfile } from '@/lib/profile'
 
 export const Route = createFileRoute('/signup/preview/seller')({
 	component: SellerPreviewRoute,

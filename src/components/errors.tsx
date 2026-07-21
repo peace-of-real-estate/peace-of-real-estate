@@ -1,8 +1,3 @@
-import type { ErrorComponentProps } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
-
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
 	ArrowLeftIcon,
 	ArrowsClockwiseIcon,
@@ -10,6 +5,11 @@ import {
 	MapPinIcon,
 	WarningIcon,
 } from '@phosphor-icons/react'
+import type { ErrorComponentProps } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 // ========================================================================
 // * Not Found

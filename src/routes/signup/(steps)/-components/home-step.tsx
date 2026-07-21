@@ -6,7 +6,6 @@ import {
 	FarmIcon,
 	HouseIcon,
 } from '@phosphor-icons/react'
-
 import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -27,6 +26,8 @@ import {
 	type SellerDraft,
 } from '@/lib/profile'
 import { cn } from '@/lib/utils/ui'
+
+import { PriceInput } from './price-selector'
 import {
 	AnimatedStepCard,
 	StepHeader,
@@ -34,7 +35,6 @@ import {
 } from './signup-shell'
 import { ContinueButton } from './ui/continue-button'
 import { FieldSection } from './ui/field-section'
-import { PriceInput } from './price-selector'
 
 const propertyTypeIcons = {
 	singleFamily: HouseIcon,

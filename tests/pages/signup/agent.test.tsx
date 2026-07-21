@@ -1,9 +1,9 @@
-import type { AgentDraft } from '@/lib/profile'
-import { test, vi, beforeEach, expect } from 'vitest'
-
-import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import { page } from 'vite-plus/test/browser'
+import { test, vi, beforeEach, expect } from 'vitest'
+
+import type { AgentDraft } from '@/lib/profile'
 
 var mockAgentDraft: AgentDraft | null = null
 var saveAgentDraft = vi.fn()

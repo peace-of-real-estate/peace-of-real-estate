@@ -1,7 +1,7 @@
-import { test, expect } from 'vitest'
-import { page } from 'vite-plus/test/browser'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import { page } from 'vite-plus/test/browser'
+import { test, expect } from 'vitest'
 
 test('landing page renders', async () => {
 	await renderRoute({ path: '/' })

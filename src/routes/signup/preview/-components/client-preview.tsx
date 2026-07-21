@@ -1,9 +1,9 @@
 import { MapPinIcon, UserIcon } from '@phosphor-icons/react'
 
 import {
-	AgentPreviewCard,
-	type MatchDetails,
-} from '@/routes/(dashboard)/-components/agent-preview-card'
+	getProfileSummary,
+	ProfileSummaryGrid,
+} from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import {
 	buyerClientProfileSchema,
@@ -11,9 +11,9 @@ import {
 	type ClientProfile,
 } from '@/lib/profile'
 import {
-	getProfileSummary,
-	ProfileSummaryGrid,
-} from '@/components/profile-summary'
+	AgentPreviewCard,
+	type MatchDetails,
+} from '@/routes/(dashboard)/-components/agent-preview-card'
 
 const clientPreviewMatches: MatchDetails[] = [
 	{

@@ -1,5 +1,6 @@
-import { DashboardPage } from '@/routes/(dashboard)/-components/dashboard'
 import { HardHatIcon } from '@phosphor-icons/react'
+
+import { DashboardPage } from '@/routes/(dashboard)/-components/dashboard'
 
 export function Wip({ title }: { title: string }) {
 	return (

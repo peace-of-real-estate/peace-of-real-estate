@@ -1,9 +1,4 @@
 import {
-	createFileRoute,
-	redirect,
-	useRouterState,
-} from '@tanstack/react-router'
-import {
 	BriefcaseIcon,
 	ChartLineIcon,
 	MapPinIcon,
@@ -13,11 +8,13 @@ import {
 	UsersIcon,
 	type Icon,
 } from '@phosphor-icons/react'
-
 import {
-	SignupWizardShell,
-	type SignupWizardStep,
-} from '../-components/signup-shell'
+	createFileRoute,
+	redirect,
+	useRouterState,
+} from '@tanstack/react-router'
+
+import { getCurrentSession } from '@/lib/auth/session'
 import {
 	agentDraftSchema,
 	agentQuestionIds,
@@ -28,9 +25,13 @@ import {
 	type RepresentationSide,
 } from '@/lib/profile'
 import type { AgentDraft } from '@/lib/profile'
-import { isAnswered } from '../-components/quiz/use-question-flow'
 import { createLocalStorage } from '@/lib/utils/localstorage'
-import { getCurrentSession } from '@/lib/auth/session'
+
+import { isAnswered } from '../-components/quiz/use-question-flow'
+import {
+	SignupWizardShell,
+	type SignupWizardStep,
+} from '../-components/signup-shell'
 
 export type AgentFlowStep =
 	| 'identity'

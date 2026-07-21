@@ -1,6 +1,7 @@
+import { SpinnerIcon } from '@phosphor-icons/react'
+
 import { Button } from '@/components/ui/button'
 import { useGoogleAuth } from '@/lib/auth/use-google-auth'
-import { SpinnerIcon } from '@phosphor-icons/react'
 
 type GoogleAuthButtonProps = {
 	fallbackRedirect: string

@@ -1,5 +1,4 @@
 import '@tests/support/mocks/browser'
-
 import { QueryClientProvider } from '@tanstack/react-query'
 import {
 	createMemoryHistory,
@@ -7,10 +6,11 @@ import {
 	RouterProvider,
 	type AnyRouter,
 } from '@tanstack/react-router'
-import { render, type RenderResult } from 'vitest-browser-react'
-import { createTestQueryClient } from './component'
-import { setMockSession } from '@tests/support/mocks/browser'
 import { testSession } from '@tests/support/fixtures/data/session'
+import { setMockSession } from '@tests/support/mocks/browser'
+import { render, type RenderResult } from 'vitest-browser-react'
+
+import { createTestQueryClient } from './component'
 
 type RouteTarget =
 	| { path: string; name?: string }

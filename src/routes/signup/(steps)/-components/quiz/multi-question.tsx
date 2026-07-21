@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
 
 import type { MultiQuestion } from '@/lib/profile'
-import { QuestionPrompt } from './question-prompt'
+
 import { SelectionCard } from '../ui/selection-card'
+import { QuestionPrompt } from './question-prompt'
 
 export function MultiSelectQuestionCard<TSlug extends string>({
 	question,
