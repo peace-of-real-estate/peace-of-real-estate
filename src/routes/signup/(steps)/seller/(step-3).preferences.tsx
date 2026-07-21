@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import type { SellerDraft } from '@/lib/profile'
 import { sellerQuestionIds, sellerQuestions } from '@/lib/profile'
+
 import { PreferencesStep } from '../-components/quiz'
 import { useSignupWizardContext } from '../-components/signup-shell'
 import type { ClientSignupStep } from './route'

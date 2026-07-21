@@ -1,8 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
+
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
+
 import {
 	agentInsertSchema,
 	buyerInsertSchema,

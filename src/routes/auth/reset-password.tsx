@@ -1,15 +1,14 @@
+import { SpinnerIcon } from '@phosphor-icons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { SpinnerIcon } from '@phosphor-icons/react'
+import { authClient } from '@/lib/auth/client'
 
 export const Route = createFileRoute('/auth/reset-password')({
 	validateSearch: z.object({

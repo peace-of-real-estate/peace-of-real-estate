@@ -1,9 +1,8 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
-
 import { MapPinIcon } from '@phosphor-icons/react'
+import { CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import type { Feature, FeatureCollection } from 'geojson'
-
 import { useEffect, useRef, useState } from 'react'
 import Map, { Layer, Source } from 'react-map-gl/maplibre'
 import type {
@@ -29,8 +28,6 @@ import {
 	PopoverTrigger,
 } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { StepLabel } from './signup-shell'
-import { cn } from '@/lib/utils/ui'
 import { cartoRasterStyle } from '@/lib/geography/basemap'
 import {
 	isValidZipCode,
@@ -39,7 +36,9 @@ import {
 	loadZipCodeBoundaries,
 	parseCityState,
 } from '@/lib/geography/zip'
-import { CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react'
+import { cn } from '@/lib/utils/ui'
+
+import { StepLabel } from './signup-shell'
 
 export type CityZipSelectorProps = {
 	id?: string

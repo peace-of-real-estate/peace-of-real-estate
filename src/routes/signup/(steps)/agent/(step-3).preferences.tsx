@@ -6,6 +6,7 @@ import {
 	agentWorkStyleQuestions,
 	notFitForQuestion,
 } from '@/lib/profile'
+
 import { PreferencesStep } from '../-components/quiz'
 import { useSignupWizardContext } from '../-components/signup-shell'
 import type { AgentFlowStep } from './route'

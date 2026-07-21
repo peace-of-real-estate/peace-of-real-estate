@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils/ui'
 import { CheckIcon } from '@phosphor-icons/react'
 import type { ElementType } from 'react'
+
+import { cn } from '@/lib/utils/ui'
 
 type ChipSelectOption<TValue extends string = string> = {
 	value: TValue

@@ -1,11 +1,11 @@
 import type { Icon } from '@phosphor-icons/react'
+import { WarningIcon } from '@phosphor-icons/react'
 import {
 	Link,
 	Outlet,
 	useNavigate,
 	type RegisteredRouter,
 } from '@tanstack/react-router'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
@@ -19,7 +19,6 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils/ui'
-import { WarningIcon } from '@phosphor-icons/react'
 
 export type SignupWizardStep<TStep extends string = string> = {
 	id: TStep

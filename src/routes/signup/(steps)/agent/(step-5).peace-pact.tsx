@@ -1,19 +1,19 @@
+import { ArrowRightIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
-
 import { useState } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import type { AgentDraft } from '@/lib/profile'
 
 import {
 	AnimatedStepCard,
 	StepHeader,
 	useSignupWizardContext,
 } from '../-components/signup-shell'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import type { AgentDraft } from '@/lib/profile'
 import type { AgentFlowStep } from './route'
-import { ArrowRightIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute(
 	'/signup/(steps)/agent/(step-5)/peace-pact',

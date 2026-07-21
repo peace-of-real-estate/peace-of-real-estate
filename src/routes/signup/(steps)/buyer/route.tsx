@@ -1,20 +1,21 @@
+import { HouseLineIcon, MapPinIcon, UserIcon } from '@phosphor-icons/react'
 import {
 	createFileRoute,
 	redirect,
 	useRouterState,
 } from '@tanstack/react-router'
-import { HouseLineIcon, MapPinIcon, UserIcon } from '@phosphor-icons/react'
 
-import {
-	SignupWizardShell,
-	type SignupWizardStep,
-} from '../-components/signup-shell'
-import { createLocalStorage } from '@/lib/utils/localstorage'
 import { getCurrentSession } from '@/lib/auth/session'
 import { buyerDraftSchema, loadBuyerProfile } from '@/lib/profile'
 import type { BuyerDraft } from '@/lib/profile'
 import { buyerQuestionIds } from '@/lib/profile'
+import { createLocalStorage } from '@/lib/utils/localstorage'
+
 import { isAnswered } from '../-components/quiz/use-question-flow'
+import {
+	SignupWizardShell,
+	type SignupWizardStep,
+} from '../-components/signup-shell'
 
 export const buyerDraftStorage = createLocalStorage<BuyerDraft>(
 	'pre-buyer-draft',

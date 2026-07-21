@@ -1,5 +1,5 @@
-import { page } from 'vite-plus/test/browser'
 import { expect } from 'vite-plus/test'
+import { page } from 'vite-plus/test/browser'
 
 const defaultViewport = { width: 1440, height: 900 }
 

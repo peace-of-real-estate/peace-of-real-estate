@@ -1,8 +1,10 @@
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
-import { test as baseTest } from './server'
+
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
+
+import { test as baseTest } from './server'
 
 const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
 const DEFAULT_IMAGE = 'postgres:17'

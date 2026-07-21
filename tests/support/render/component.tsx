@@ -1,5 +1,4 @@
 import '@tests/support/mocks/browser'
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
 	createMemoryHistory,
@@ -7,8 +6,8 @@ import {
 	createRouter,
 	RouterProvider,
 } from '@tanstack/react-router'
-import { render, type RenderResult } from 'vitest-browser-react'
 import type { ReactElement } from 'react'
+import { render, type RenderResult } from 'vitest-browser-react'
 
 export interface RenderComponentOptions {
 	element: ReactElement

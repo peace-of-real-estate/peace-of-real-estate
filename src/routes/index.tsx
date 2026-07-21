@@ -1,6 +1,10 @@
-import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
+import {
+	ArrowRightIcon,
+	CheckCircleIcon,
+	HouseIcon,
+	TagIcon,
+} from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,12 +15,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import {
-	ArrowRightIcon,
-	CheckCircleIcon,
-	HouseIcon,
-	TagIcon,
-} from '@phosphor-icons/react'
+import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 
 export const Route = createFileRoute('/')({
 	beforeLoad: redirectAuthenticatedUsers,

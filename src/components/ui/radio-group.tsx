@@ -1,7 +1,7 @@
+import { CircleIcon } from '@phosphor-icons/react'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 
 import { cn } from '@/lib/utils/ui'
-import { CircleIcon } from '@phosphor-icons/react'
 
 function RadioGroup({
 	className,

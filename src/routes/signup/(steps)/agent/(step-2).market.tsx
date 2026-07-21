@@ -1,25 +1,10 @@
+import { ArrowRightIcon, CheckIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
-
 import { useState } from 'react'
 
-import { CityZipSelector } from '../-components/zip-selector'
-import {
-	AnimatedStepCard,
-	StepHeader,
-	StepProgressHeader,
-	useSignupWizardContext,
-} from '../-components/signup-shell'
-import { PriceInput } from '../-components/price-selector'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Slider } from '@/components/ui/slider'
-import { cn } from '@/lib/utils/ui'
-import type { AgentDraft, RepresentationSide } from '@/lib/profile'
-import {
-	bestClientType,
-	representationSide as representationSideEnum,
-	type BestClientTypeSlug,
-} from '@/lib/profile'
 import { parseCityState } from '@/lib/geography/zip'
 import {
 	DEFAULT_PRICE_RANGE,
@@ -31,8 +16,23 @@ import {
 	PRICE_STEP,
 	serializePriceRange,
 } from '@/lib/price-range'
+import type { AgentDraft, RepresentationSide } from '@/lib/profile'
+import {
+	bestClientType,
+	representationSide as representationSideEnum,
+	type BestClientTypeSlug,
+} from '@/lib/profile'
+import { cn } from '@/lib/utils/ui'
+
+import { PriceInput } from '../-components/price-selector'
+import {
+	AnimatedStepCard,
+	StepHeader,
+	StepProgressHeader,
+	useSignupWizardContext,
+} from '../-components/signup-shell'
+import { CityZipSelector } from '../-components/zip-selector'
 import { agentConfig, getRepresentationIcon, type AgentFlowStep } from './route'
-import { ArrowRightIcon, CheckIcon } from '@phosphor-icons/react'
 
 export const Route = createFileRoute('/signup/(steps)/agent/(step-2)/market')({
 	component: AgentMarketRoute,

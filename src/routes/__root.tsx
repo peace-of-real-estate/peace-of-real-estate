@@ -1,5 +1,3 @@
-import { hasBetaAccess } from '@/lib/auth/functions'
-import { getCurrentSession } from '@/lib/auth/session'
 import type { QueryClient } from '@tanstack/react-query'
 import {
 	HeadContent,
@@ -8,9 +6,13 @@ import {
 	createRootRouteWithContext,
 	redirect,
 } from '@tanstack/react-router'
-import { NotFoundComponent, ServerErrorComponent } from '@/components/errors'
-import appCss from '../styles.css?url'
 import { PostHogProvider } from 'posthog-js/react'
+
+import { NotFoundComponent, ServerErrorComponent } from '@/components/errors'
+import { hasBetaAccess } from '@/lib/auth/functions'
+import { getCurrentSession } from '@/lib/auth/session'
+
+import appCss from '../styles.css?url'
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient

@@ -1,4 +1,25 @@
-import { buildAddress, buildPhone, pick, randInt } from './stats'
+import { db } from '../../../src/db/connection'
+import {
+	account,
+	agentProfiles,
+	buyerProfiles,
+	sellerProfiles,
+	session,
+	user,
+	userEntitlements,
+} from '../../../src/db/tables'
+import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
+import { AGENT_PRICE_RANGES } from '../../../src/lib/price-range'
+import {
+	agentQuestions,
+	averageTransactions,
+	yearsLicensed,
+	type AgentProfile,
+	type AgentWorkStyle,
+	type AverageTransactions,
+	type YearsLicensed,
+} from '../../../src/lib/profile'
+import { ensureAvatarPool, getAvatarFallbackUrls } from '../avatars'
 import {
 	BROKERAGE_POOLS,
 	CITIES,
@@ -10,32 +31,8 @@ import {
 	REPRESENTATION_SIDES,
 	type City,
 } from './mocks'
-
-import { AGENT_PRICE_RANGES } from '../../../src/lib/price-range'
-import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
-
+import { buildAddress, buildPhone, pick, randInt } from './stats'
 import { pickWeighted, sample, type WeightedOption } from './stats'
-
-import { db } from '../../../src/db/connection'
-import {
-	agentQuestions,
-	averageTransactions,
-	yearsLicensed,
-	type AgentProfile,
-	type AgentWorkStyle,
-	type AverageTransactions,
-	type YearsLicensed,
-} from '../../../src/lib/profile'
-import {
-	account,
-	agentProfiles,
-	buyerProfiles,
-	sellerProfiles,
-	session,
-	user,
-	userEntitlements,
-} from '../../../src/db/tables'
-import { ensureAvatarPool, getAvatarFallbackUrls } from '../avatars'
 
 const agentAnswerPickers: {
 	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>

@@ -1,12 +1,11 @@
+import { UserIcon } from '@phosphor-icons/react'
 import { createFileRoute, ClientOnly } from '@tanstack/react-router'
-
 import { z } from 'zod'
 
 import {
-	AgentPreviewCard,
-	type MatchDetails,
-} from '@/routes/(dashboard)/-components/agent-preview-card'
-import { SignupPreviewShell } from './-components/signup-preview-shell'
+	getProfileSummary,
+	ProfileSummaryGrid,
+} from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import {
 	agentDraftSchema,
@@ -16,11 +15,12 @@ import {
 import type { AgentDraft } from '@/lib/profile'
 import { bestClientType } from '@/lib/profile'
 import {
-	getProfileSummary,
-	ProfileSummaryGrid,
-} from '@/components/profile-summary'
+	AgentPreviewCard,
+	type MatchDetails,
+} from '@/routes/(dashboard)/-components/agent-preview-card'
+
 import { agentDraftStorage } from '../(steps)/agent/route'
-import { UserIcon } from '@phosphor-icons/react'
+import { SignupPreviewShell } from './-components/signup-preview-shell'
 
 const agentPreviewMatches: MatchDetails[] = [
 	{

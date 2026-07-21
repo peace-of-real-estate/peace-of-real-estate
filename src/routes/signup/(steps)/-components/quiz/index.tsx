@@ -1,3 +1,4 @@
+import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
@@ -9,6 +10,7 @@ import type {
 	QuestionRecord,
 	SingleQuestion,
 } from '@/lib/profile'
+
 import {
 	AnimatedStepCard,
 	StepHeader,
@@ -16,10 +18,9 @@ import {
 } from '../signup-shell'
 import { FreeFormQuestionCard } from './free-form'
 import { MultiSelectQuestionCard } from './multi-question'
-import { QuestionCard } from './single-question'
 import { QuestionPrompt } from './question-prompt'
+import { QuestionCard } from './single-question'
 import { useQuestionFlow } from './use-question-flow'
-import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 
 function QuestionFlow({
 	currentStepIndex,

@@ -1,8 +1,8 @@
+import { MapPinIcon, StarIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils/ui'
-import { MapPinIcon, StarIcon } from '@phosphor-icons/react'
 
 export type MatchStatus = 'pending' | 'accepted' | 'completed' | 'new'
 

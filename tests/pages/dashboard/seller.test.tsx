@@ -1,6 +1,6 @@
-import { describe, test } from 'vitest'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
+import { describe, test } from 'vitest'
 
 describe('seller dashboard pages', () => {
 	test('matches page', async () => {

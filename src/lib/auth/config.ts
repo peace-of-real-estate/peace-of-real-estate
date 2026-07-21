@@ -1,11 +1,11 @@
-import { db } from '@/db/connection'
-import { account, session, user, verification } from '@/db/tables'
-import { serverEnv as env } from '@/env.server'
 import { drizzleAdapter } from '@better-auth/drizzle-adapter'
 import { betterAuth } from 'better-auth'
 import { oAuthProxy } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 
+import { db } from '@/db/connection'
+import { account, session, user, verification } from '@/db/tables'
+import { serverEnv as env } from '@/env.server'
 import { sendPasswordResetEmail } from '@/lib/email.server'
 
 const appOrigin = new URL(env.BETTER_AUTH_URL).origin

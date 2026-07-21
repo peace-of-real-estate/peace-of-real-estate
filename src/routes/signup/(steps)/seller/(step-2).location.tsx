@@ -1,16 +1,17 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
-import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
-import type { SellerDraft } from '@/lib/profile'
 import { parseCityState } from '@/lib/geography/zip'
+import type { SellerDraft } from '@/lib/profile'
+
 import {
 	AnimatedStepCard,
 	StepHeader,
 	useSignupWizardContext,
 } from '../-components/signup-shell'
-import { CityZipSelector } from '../-components/zip-selector'
 import { ContinueButton } from '../-components/ui/continue-button'
+import { CityZipSelector } from '../-components/zip-selector'
 import type { ClientSignupStep } from './route'
 
 export const Route = createFileRoute(

@@ -5,11 +5,11 @@ import {
 	BUCKET_ORDER,
 	type PriceRange,
 } from '@/lib/price-range'
-import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 import type {
 	BestClientTypeSlug,
 	PropertyTypeSlug,
 } from '@/lib/profile/profile-fields'
+import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 
 import {
 	baseDimensionWeights,

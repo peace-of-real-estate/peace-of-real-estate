@@ -3,8 +3,9 @@ import { useState } from 'react'
 
 import type { SingleQuestion } from '@/lib/profile'
 import { cn } from '@/lib/utils/ui'
-import { QuestionPrompt } from './question-prompt'
+
 import { SelectionCard } from '../ui/selection-card'
+import { QuestionPrompt } from './question-prompt'
 
 export function QuestionCard<TAnswer extends string>({
 	question,

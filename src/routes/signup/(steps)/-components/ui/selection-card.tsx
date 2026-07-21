@@ -1,7 +1,7 @@
+import { CheckIcon } from '@phosphor-icons/react'
 import type { ElementType, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils/ui'
-import { CheckIcon } from '@phosphor-icons/react'
 
 type SelectionCardLayout = 'vertical' | 'horizontal'
 type SelectionCardVariant = 'solid' | 'subtle'
