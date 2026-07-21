@@ -1,12 +1,13 @@
-import { nitro } from 'nitro/vite'
-import { varlockVitePlugin } from '@varlock/vite-integration'
+import { resolve } from 'node:path'
+
+import babel from '@rolldown/plugin-babel'
+import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { varlockVitePlugin } from '@varlock/vite-integration'
 import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import babel from '@rolldown/plugin-babel'
+import { nitro } from 'nitro/vite'
 import svgr from 'vite-plugin-svgr'
-import { resolve } from 'node:path'
 import { defineConfig, type UserConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 
@@ -15,6 +16,7 @@ const fmt = {
 	semi: false,
 	useTabs: true,
 	experimentalTailwindcss: {},
+	experimentalSortImports: {},
 	printWidth: 80,
 	experimentalSortPackageJson: false,
 	proseWrap: 'always',
