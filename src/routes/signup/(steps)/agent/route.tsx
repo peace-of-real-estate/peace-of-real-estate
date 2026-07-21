@@ -70,6 +70,7 @@ export const agentConfig = {
 }
 
 export const Route = createFileRoute('/signup/(steps)/agent')({
+	ssr: false,
 	beforeLoad: async ({ location }) => {
 		const session = await getCurrentSession()
 		if (session && (await loadAgentProfile())) {

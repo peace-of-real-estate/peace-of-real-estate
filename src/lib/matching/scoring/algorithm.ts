@@ -57,9 +57,9 @@ import {
 } from './utils'
 
 const SCORING_GEOMETRIC_FLOOR = 0.05
-export const SCORING_LINEAR_WEIGHT = 0.7
-export const SCORING_GEOMETRIC_WEIGHT = 0.3
-export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
+const SCORING_LINEAR_WEIGHT = 0.7
+const SCORING_GEOMETRIC_WEIGHT = 0.3
+const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
 
 const propertyTypeToClientTypes: Record<
 	PropertyTypeSlug,

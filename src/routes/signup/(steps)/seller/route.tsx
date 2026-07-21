@@ -30,6 +30,7 @@ const sellerSteps = [
 ] satisfies SignupWizardStep<Exclude<ClientSignupStep, 'preview'>>[]
 
 export const Route = createFileRoute('/signup/(steps)/seller')({
+	ssr: false,
 	beforeLoad: async () => {
 		const session = await getCurrentSession()
 		if (session && (await loadSellerProfile())) {

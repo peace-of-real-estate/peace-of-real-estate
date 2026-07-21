@@ -23,6 +23,7 @@ const fmt = {
 		'**/dist/**',
 		'pnpm-lock.yaml',
 		'**/routeTree.gen.ts',
+		'src/db/migrations/**',
 	],
 	overrides: [
 		{
