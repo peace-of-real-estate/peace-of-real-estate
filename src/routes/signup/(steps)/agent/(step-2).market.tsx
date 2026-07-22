@@ -4,17 +4,14 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Slider } from '@/components/ui/slider'
 import { parseCityState } from '@/lib/geography/zip'
 import {
-	DEFAULT_PRICE_RANGE,
-	formatPriceCompact,
+	AGENT_PRICE_BUCKET_LABELS,
+	AGENT_PRICE_RANGES,
+	BUCKET_ORDER,
 	formatPriceRange,
-	parsePriceRange,
-	PRICE_MAX,
-	PRICE_MIN,
-	PRICE_STEP,
-	serializePriceRange,
+	toAgentPriceBucket,
+	type AgentPriceBucket,
 } from '@/lib/price-range'
 import type { AgentDraft, RepresentationSide } from '@/lib/profile'
 import {
@@ -24,7 +21,6 @@ import {
 } from '@/lib/profile'
 import { cn } from '@/lib/utils/ui'
 
-import { PriceInput } from '../-components/price-selector'
 import {
 	AnimatedStepCard,
 	StepHeader,
@@ -73,8 +69,9 @@ function AgentMarket({
 	)
 	const [hasTriedContinue, setHasTriedContinue] = useState(false)
 
-	const initialRange = parsePriceRange(state.typicalPriceRange)
-	const [priceRange, setPriceRange] = useState(initialRange)
+	const [priceBucket, setPriceBucket] = useState<AgentPriceBucket | ''>(
+		toAgentPriceBucket(state.typicalPriceRange) ?? '',
+	)
 	const [representationSide, setRepresentationSide] = useState<
 		RepresentationSide | ''
 	>(state.representationSide ? state.representationSide : '')
@@ -83,8 +80,7 @@ function AgentMarket({
 	)
 
 	const marketComplete = committedLocation.trim().length >= 2
-	const priceComplete =
-		priceRange.min >= PRICE_MIN && priceRange.max <= PRICE_MAX
+	const priceComplete = priceBucket !== ''
 	const sideComplete = representationSide.length > 0
 	const clientsComplete = bestClientTypes.length > 0
 	const canContinue =
@@ -111,6 +107,7 @@ function AgentMarket({
 			return
 		}
 		if (!representationSide) return
+		if (!priceBucket) return
 
 		const locationUpdate = cityState
 			? { city: cityState.city, state: cityState.state }
@@ -118,7 +115,7 @@ function AgentMarket({
 		onUpdate({
 			...locationUpdate,
 			zipCodes: selectedZipCodes,
-			typicalPriceRange: serializePriceRange(priceRange),
+			typicalPriceRange: priceBucket,
 			representationSide,
 			bestClientTypes,
 		})
@@ -149,63 +146,38 @@ function AgentMarket({
 						<p className="text-destructive text-xs">Enter a city.</p>
 					) : null}
 
-					<div className="space-y-5 border-t pt-5">
-						<div className="flex items-center justify-between gap-3">
-							<p className="text-sm font-semibold">Typical price range</p>
-							<span className="bg-primary/10 text-primary rounded-md px-3 py-1 text-sm font-semibold whitespace-nowrap">
-								{formatPriceRange(priceRange)}
-							</span>
-						</div>
+					<div className="space-y-3 border-t pt-5">
+						<p className="text-sm font-semibold">Typical price range</p>
 						<div className="grid grid-cols-2 gap-3">
-							<PriceInput
-								id="agent-price-min"
-								label="Low"
-								value={priceRange.min}
-								onChange={(nextMin) =>
-									setPriceRange((current) => ({
-										...current,
-										min: Math.min(nextMin, current.max),
-									}))
-								}
-							/>
-							<PriceInput
-								id="agent-price-max"
-								label="High"
-								value={priceRange.max}
-								onChange={(nextMax) =>
-									setPriceRange((current) => ({
-										...current,
-										max: Math.max(nextMax, current.min),
-									}))
-								}
-							/>
-						</div>
-						<Slider
-							value={[priceRange.min, priceRange.max]}
-							min={PRICE_MIN}
-							max={PRICE_MAX}
-							step={PRICE_STEP}
-							onValueChange={([nextMin, nextMax]) => {
-								setPriceRange({
-									min: nextMin ?? DEFAULT_PRICE_RANGE.min,
-									max: nextMax ?? DEFAULT_PRICE_RANGE.max,
-								})
-							}}
-						/>
-						<div className="relative h-4">
-							{[0, 500_000, 1_000_000, 1_500_000, 2_000_000].map((value) => {
-								const percent = (value / PRICE_MAX) * 100
+							{BUCKET_ORDER.map((bucket) => {
+								const isSelected = priceBucket === bucket
 								return (
-									<div
-										key={value}
-										className="absolute top-0 flex -translate-x-1/2 flex-col items-center gap-0.5"
-										style={{ left: `${percent}%` }}
+									<button
+										key={bucket}
+										type="button"
+										onClick={() => setPriceBucket(bucket)}
+										className={cn(
+											'group flex flex-col items-start gap-0.5 rounded-md border px-4 py-3 text-left transition',
+											isSelected
+												? 'border-primary bg-primary text-primary-foreground shadow-sm'
+												: 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-background',
+										)}
+										aria-pressed={isSelected}
 									>
-										<span className="bg-muted-foreground/30 h-1 w-px rounded-full" />
-										<span className="text-muted-foreground text-xs font-medium">
-											{formatPriceCompact(value)}
+										<span className="text-sm font-semibold">
+											{AGENT_PRICE_BUCKET_LABELS[bucket]}
 										</span>
-									</div>
+										<span
+											className={cn(
+												'text-xs',
+												isSelected
+													? 'text-primary-foreground/80'
+													: 'text-muted-foreground',
+											)}
+										>
+											{formatPriceRange(AGENT_PRICE_RANGES[bucket])}
+										</span>
+									</button>
 								)
 							})}
 						</div>

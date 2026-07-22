@@ -2,10 +2,13 @@ import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
+import { agentPriceBucketSchema } from '@/lib/price-range'
 import { agentQuestionIds } from '@/lib/profile/profile-fields'
 import type { PreferencesFor } from '@/lib/profile/question-types'
 
-export const agentInsertSchema = createInsertSchema(agentProfiles).omit({
+export const agentInsertSchema = createInsertSchema(agentProfiles, {
+	typicalPriceRange: agentPriceBucketSchema,
+}).omit({
 	id: true,
 	userId: true,
 	createdAt: true,

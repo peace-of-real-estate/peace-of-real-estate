@@ -39,7 +39,7 @@ const market: AgentDraft = {
 	city: 'Austin',
 	state: 'TX',
 	zipCodes: ['78701', '78704'],
-	typicalPriceRange: '400000-1000000',
+	typicalPriceRange: '400kTo750k',
 	representationSide: 'both',
 	bestClientTypes: ['firstTime', 'moveUp'],
 	yearsLicensed: '6-10',

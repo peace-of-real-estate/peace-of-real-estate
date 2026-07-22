@@ -3,6 +3,8 @@ import zipcodes from 'zipcodes'
 import {
 	AGENT_PRICE_RANGES,
 	BUCKET_ORDER,
+	parseMinMaxRange,
+	toAgentPriceBucket,
 	type PriceRange,
 } from '@/lib/price-range'
 import type {
@@ -50,16 +52,15 @@ import {
 	clamp01,
 	formatList,
 	formatPriceRangeValue,
-	parseSerializedPriceRange,
 	priceOverlapRatio,
 	round2,
 	toStars,
 } from './utils'
 
-const SCORING_GEOMETRIC_FLOOR = 0.05
-const SCORING_LINEAR_WEIGHT = 0.7
-const SCORING_GEOMETRIC_WEIGHT = 0.3
-const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
+export const SCORING_GEOMETRIC_FLOOR = 0.05
+export const SCORING_LINEAR_WEIGHT = 0.7
+export const SCORING_GEOMETRIC_WEIGHT = 0.3
+export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
 
 const propertyTypeToClientTypes: Record<
 	PropertyTypeSlug,
@@ -280,8 +281,9 @@ function scorePriceFit(
 	client: ClientProfileRow,
 	agent: AgentProfile,
 ): DimensionResult {
-	const clientRange = parseSerializedPriceRange(client.priceRange)
-	const agentRange = parseSerializedPriceRange(agent.typicalPriceRange)
+	const clientRange = parseMinMaxRange(client.priceRange)
+	const agentBucket = toAgentPriceBucket(agent.typicalPriceRange)
+	const agentRange = agentBucket ? AGENT_PRICE_RANGES[agentBucket] : undefined
 
 	const clientCell = clientRange
 		? formatPriceRangeValue(clientRange)
@@ -312,9 +314,7 @@ function scorePriceFit(
 		}
 	}
 
-	const bucketIndex = BUCKET_ORDER.findIndex(
-		(bucket) => bucket === agent.typicalPriceRange,
-	)
+	const bucketIndex = agentBucket ? BUCKET_ORDER.indexOf(agentBucket) : -1
 	const adjacentBuckets: PriceRange[] = []
 	if (bucketIndex >= 0) {
 		if (bucketIndex > 0) {
@@ -382,7 +382,7 @@ function expectedClientTypeSources(
 			}
 		}
 	}
-	const clientRange = parseSerializedPriceRange(client.priceRange)
+	const clientRange = parseMinMaxRange(client.priceRange)
 	if (clientRange && clientRange.min >= LUXURY_PRICE_FLOOR) {
 		add('luxury', 'budget ≥ $1M')
 	}
@@ -1051,8 +1051,9 @@ export function calculateFitScore(
 			? linear
 			: SCORING_LINEAR_WEIGHT * linear + SCORING_GEOMETRIC_WEIGHT * geometric
 
-	const clientRange = parseSerializedPriceRange(client.priceRange)
-	const agentRange = parseSerializedPriceRange(agent.typicalPriceRange)
+	const clientRange = parseMinMaxRange(client.priceRange)
+	const agentBucket = toAgentPriceBucket(agent.typicalPriceRange)
+	const agentRange = agentBucket ? AGENT_PRICE_RANGES[agentBucket] : undefined
 	const centrality =
 		clientRange && agentRange
 			? clamp01(bucketCentrality(clientRange, agentRange))
@@ -1172,7 +1173,7 @@ function calculateFallbackScore(
 		},
 		{
 			label: 'typicalPriceRange is valid bucket',
-			present: Boolean(parseSerializedPriceRange(agent.typicalPriceRange)),
+			present: toAgentPriceBucket(agent.typicalPriceRange) !== undefined,
 		},
 		{
 			label: 'bestClientTypes ranked',
