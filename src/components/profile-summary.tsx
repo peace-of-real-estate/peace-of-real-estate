@@ -8,7 +8,12 @@ import {
 } from '@phosphor-icons/react'
 import type { ElementType } from 'react'
 
-import { formatPriceRange, parsePriceRange } from '@/lib/price-range'
+import {
+	AGENT_PRICE_BUCKET_LABELS,
+	formatPriceRange,
+	parsePriceRange,
+	toAgentPriceBucket,
+} from '@/lib/price-range'
 import {
 	averageTransactions,
 	bestClientType,
@@ -20,6 +25,7 @@ import {
 	sellerQuestionIds,
 	sellerQuestions,
 	yearsLicensed,
+	type ClientRole,
 } from '@/lib/profile'
 
 export interface ClientSummaryProfile {
@@ -72,7 +78,7 @@ export function getProfileSummary(input: ProfileSummaryInput): SummaryItem[] {
 }
 
 function getClientSummaryItems(
-	role: 'buyer' | 'seller',
+	role: ClientRole,
 	profile: ClientSummaryProfile,
 ): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
@@ -203,12 +209,18 @@ function formatQuestionSummary(
 	}
 }
 
+function formatAgentPriceRange(value: string): string {
+	const bucket = toAgentPriceBucket(value)
+	if (bucket) return AGENT_PRICE_BUCKET_LABELS[bucket]
+	return formatPriceRange(parsePriceRange(value))
+}
+
 function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
 		profile.typicalPriceRange
 			? {
 					label: 'Typical price range',
-					value: formatPriceRange(parsePriceRange(profile.typicalPriceRange)),
+					value: formatAgentPriceRange(profile.typicalPriceRange),
 					icon: MoneyIcon,
 				}
 			: null,
