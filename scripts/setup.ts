@@ -167,6 +167,7 @@ function main(): void {
 			`APP_PORT=${appPort}`,
 			`POSTGRES_PORT=${postgresPort}`,
 			`POSTGRES_DB=${database}`,
+			`DATABASE_URL=postgres://peace_user:peace_test@localhost:${postgresPort}/${database}`,
 			`MINIO_PORT=${minioPort}`,
 			`MINIO_CONSOLE_PORT=${minioConsolePort}`,
 			'',
@@ -174,7 +175,6 @@ function main(): void {
 	)
 
 	updateEnvFile('.env.development.local', {
-		DATABASE_URL: `postgres://peace_user:peace_test@localhost:${postgresPort}/${database}`,
 		AWS_ENDPOINT_URL: `http://localhost:${minioPort}`,
 	})
 

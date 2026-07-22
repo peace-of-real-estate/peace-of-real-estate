@@ -1,2 +1,5 @@
 [env]
 _.file = [".env.compose"]
+
+[tools]
+"npm:varlock" = "1.7.2"
