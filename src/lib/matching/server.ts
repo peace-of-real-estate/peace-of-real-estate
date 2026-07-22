@@ -7,11 +7,7 @@ import { requireUserId } from '@/lib/auth/session'
 import { type ClientProfileRow } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 
-import {
-	buildScoreDistribution,
-	toAgentMatchData,
-	type AgentMatchData,
-} from './match.view'
+import { toAgentMatchData, type AgentMatchData } from './match.view'
 import { calculateFitScore, type MatchSide } from './scoring'
 
 function toScoringSide(side: MatchSide): 'buying' | 'selling' {
@@ -76,21 +72,13 @@ async function loadAgentMatchesForProfile(
 	qualified.sort(byComputedScore)
 	const { offset, limit } = pageParam
 	const top = qualified.slice(offset, offset + limit)
-	const scoreDistribution = buildScoreDistribution(
-		scored.map(({ score }) => score),
-	)
 	return Promise.all(
-		top.map(async ({ row, score }, index) => {
+		top.map(async ({ row, score }) => {
 			const avatar = await getAvatarUrl(row.user.image)
 			return toAgentMatchData({
 				agent: row.agent,
 				user: row.user,
 				score,
-				profile,
-				rank: offset + index + 1,
-				totalAgents: scored.length,
-				qualifiedCount: qualified.length,
-				scoreDistribution,
 				avatar: avatar ?? undefined,
 			})
 		}),
