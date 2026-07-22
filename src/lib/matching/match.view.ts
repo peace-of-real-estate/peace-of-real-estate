@@ -27,7 +27,6 @@ export interface AgentMatchData {
 	stats?: {
 		transactions: string
 	}
-	isTopMatch?: boolean
 	avatar?: string
 }
 

@@ -17,7 +17,6 @@ export const mockAgentMatches = [
 			'Price Fit': 4.7,
 			'Client Fit': 4.8,
 		},
-		isTopMatch: true,
 	},
 ]
 
@@ -50,7 +49,6 @@ export const mockHttpAgentMatches = [
 			avgDays: 18,
 			satisfaction: 4.9,
 		},
-		isTopMatch: true,
 	},
 	{
 		id: '2',
