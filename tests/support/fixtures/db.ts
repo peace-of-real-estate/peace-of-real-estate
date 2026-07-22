@@ -78,7 +78,9 @@ export const test = baseTest.extend<DbFixture>({
 			const client = new Pool({
 				connectionString: container.getConnectionUri(),
 			})
-			const db = Object.assign(drizzle({ client }), { $client: client })
+			const db = Object.assign(drizzle({ client, casing: 'snake_case' }), {
+				$client: client,
+			})
 
 			try {
 				await seedDatabase(db, { schemaPath, seedFunction })
@@ -116,14 +118,16 @@ export async function seedDatabase(
 		extensions = DEFAULT_EXTENSIONS,
 	}: SeedDatabaseOptions,
 ) {
-	const { pushSchema } = await import('drizzle-kit/api')
+	const { migrate } = await import('drizzle-orm/node-postgres/migrator')
 	const { reset } = await import('drizzle-seed')
 	const schema = await import(/* @vite-ignore */ schemaPath)
 
 	for (const ext of extensions) {
 		await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
 	}
-	await (await pushSchema(schema, db)).apply()
+	await migrate(db, {
+		migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
+	})
 	await reset(db, schema)
 	if (seedFunction) await seedFunction(db)
 }

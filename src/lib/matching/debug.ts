@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { agentProfiles, clientProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
 import {
@@ -12,6 +12,10 @@ import {
 	TIE_BAND_THRESHOLD,
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
+import {
+	loadBuyerProfileById,
+	loadSellerProfileById,
+} from '@/lib/profile/repository'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 
 export type DebugClientOption = {
@@ -164,44 +168,24 @@ function scoredAgentToDebugMatch(
 export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<DebugClientOption[]> => {
 		await requireUserId()
+		const clients = await db
+			.select({ profile: clientProfiles, user })
+			.from(clientProfiles)
+			.innerJoin(user, eq(clientProfiles.userId, user.id))
+			.orderBy(clientProfiles.role)
 
-		const [buyers, sellers] = await Promise.all([
-			db
-				.select({
-					buyer: buyerProfiles,
-					user,
-				})
-				.from(buyerProfiles)
-				.innerJoin(user, eq(buyerProfiles.userId, user.id)),
-			db
-				.select({
-					seller: sellerProfiles,
-					user,
-				})
-				.from(sellerProfiles)
-				.innerJoin(user, eq(sellerProfiles.userId, user.id)),
-		])
-
-		return [
-			...buyers.map((row) => ({
-				id: row.buyer.id,
-				side: 'buying' as const,
-				name: row.user.name,
-				email: row.user.email,
-				city: row.buyer.city,
-				state: row.buyer.state,
-				priceRange: row.buyer.priceRange,
-			})),
-			...sellers.map((row) => ({
-				id: row.seller.id,
-				side: 'selling' as const,
-				name: row.user.name,
-				email: row.user.email,
-				city: row.seller.city,
-				state: row.seller.state,
-				priceRange: row.seller.priceRange,
-			})),
-		]
+		return clients.map((row) => ({
+			id: row.profile.id,
+			side:
+				row.profile.role === 'buyer'
+					? ('buying' as const)
+					: ('selling' as const),
+			name: row.user.name,
+			email: row.user.email,
+			city: row.profile.city,
+			state: row.profile.state,
+			priceRange: row.profile.priceRange,
+		}))
 	},
 )
 
@@ -209,12 +193,10 @@ async function loadProfile(
 	clientId: string,
 	side: 'buying' | 'selling',
 ): Promise<ClientProfileRow | null> {
-	const table = side === 'buying' ? buyerProfiles : sellerProfiles
-	const [profile] = await db
-		.select()
-		.from(table)
-		.where(eq(table.id, clientId))
-		.limit(1)
+	const profile =
+		side === 'buying'
+			? await loadBuyerProfileById(clientId)
+			: await loadSellerProfileById(clientId)
 	return profile ?? null
 }
 
@@ -235,6 +217,7 @@ async function loadScoreAgentsForProfile({
 		.select({ agent: agentProfiles, user })
 		.from(agentProfiles)
 		.innerJoin(user, eq(agentProfiles.userId, user.id))
+		.orderBy(agentProfiles.id)
 
 	const scored = results.map((row) => ({
 		row: {

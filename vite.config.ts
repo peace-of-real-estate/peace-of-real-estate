@@ -158,7 +158,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					include: ['src/**/*.{server,db}.test.ts'],
-					testTimeout: 5_000,
+					testTimeout: 10_000,
 				},
 			},
 			{

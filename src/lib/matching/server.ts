@@ -2,8 +2,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { agentProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
+import {
+	loadBuyerProfileByUserId,
+	loadSellerProfileByUserId,
+} from '@/lib/profile/repository'
 import { type ClientProfileRow } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 
@@ -31,11 +35,7 @@ export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
 	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(buyerProfiles)
-			.where(eq(buyerProfiles.userId, userId))
-			.limit(1)
+		const profile = await loadBuyerProfileByUserId(userId)
 		return loadAgentMatchesForProfile(profile, 'buyers', data)
 	})
 
@@ -43,11 +43,7 @@ export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
 	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(sellerProfiles)
-			.where(eq(sellerProfiles.userId, userId))
-			.limit(1)
+		const profile = await loadSellerProfileByUserId(userId)
 		return loadAgentMatchesForProfile(profile, 'sellers', data)
 	})
 

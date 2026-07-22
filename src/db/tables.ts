@@ -1,11 +1,15 @@
+import { sql } from 'drizzle-orm'
 import {
 	boolean,
+	check,
 	doublePrecision,
 	foreignKey,
 	index,
+	pgEnum,
 	pgTable,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
@@ -22,9 +26,16 @@ import {
 	sellerQuizColumns,
 } from '@/lib/profile/db'
 
-type EntitlementKey = 'client_lifetime_premium' | 'agent_subscription'
+export const entitlementKey = pgEnum('entitlement_key', [
+	'client_lifetime_premium',
+	'agent_subscription',
+])
 
-type EntitlementSource = 'manual' | 'stripe_checkout' | 'stripe_subscription'
+export const entitlementSource = pgEnum('entitlement_source', [
+	'manual',
+	'stripe_checkout',
+	'stripe_subscription',
+])
 
 export const user = pgTable(
 	'user',
@@ -45,8 +56,8 @@ export const userEntitlements = pgTable(
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
-		key: text().$type<EntitlementKey>().notNull(),
-		source: text().$type<EntitlementSource>().notNull(),
+		key: entitlementKey().notNull(),
+		source: entitlementSource().notNull(),
 		stripeCustomerId: text(),
 		stripePaymentIntentId: text(),
 		stripeSubscriptionId: text(),
@@ -144,49 +155,63 @@ export const verification = pgTable(
 	],
 )
 
-export const buyerProfiles = pgTable(
-	'buyer_profiles',
+export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
+
+export const clientProfiles = pgTable(
+	'client_profiles',
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
+		role: clientRole().notNull(),
 		...clientLifecycleColumns,
 		...clientMatchingColumns,
 		...clientWorkStyleColumns,
 		...clientMatchTuningColumns,
-		...buyerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
-		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
+		uniqueIndex('client_profiles_user_role_index').on(table.userId, table.role),
+		unique('client_profiles_id_role_index').on(table.id, table.role),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
-			name: 'buyer_profiles_user_id_fk',
-		}),
+			name: 'client_profiles_user_id_fk',
+		}).onDelete('cascade'),
 	],
 )
 
-export const sellerProfiles = pgTable(
-	'seller_profiles',
+export const buyerDetails = pgTable(
+	'buyer_details',
 	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...clientLifecycleColumns,
-		...clientMatchingColumns,
-		...clientWorkStyleColumns,
-		...clientMatchTuningColumns,
-		...sellerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('buyer'),
+		...buyerQuizColumns,
 	},
 	(table) => [
-		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
+		check('buyer_details_role_check', sql`${table.role} = 'buyer'`),
 		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'seller_profiles_user_id_fk',
-		}),
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'buyer_details_profile_role_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const sellerDetails = pgTable(
+	'seller_details',
+	{
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('seller'),
+		...sellerQuizColumns,
+	},
+	(table) => [
+		check('seller_details_role_check', sql`${table.role} = 'seller'`),
+		foreignKey({
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'seller_details_profile_role_fk',
+		}).onDelete('cascade'),
 	],
 )
 
@@ -199,7 +224,7 @@ export const agentProfiles = pgTable(
 		...agentIdentityColumns,
 		...agentQuizColumns,
 		...agentComplianceColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
@@ -208,7 +233,7 @@ export const agentProfiles = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'agent_profiles_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
