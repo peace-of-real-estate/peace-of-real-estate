@@ -1,5 +1,7 @@
+import { sql } from 'drizzle-orm'
 import {
 	boolean,
+	check,
 	foreignKey,
 	index,
 	pgTable,
@@ -163,6 +165,10 @@ export const buyerProfiles = pgTable(
 			foreignColumns: [user.id],
 			name: 'buyer_profiles_user_id_fk',
 		}),
+		check(
+			'buyer_profiles_price_range_check',
+			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+		),
 	],
 )
 
@@ -186,6 +192,10 @@ export const sellerProfiles = pgTable(
 			foreignColumns: [user.id],
 			name: 'seller_profiles_user_id_fk',
 		}),
+		check(
+			'seller_profiles_price_range_check',
+			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+		),
 	],
 )
 
