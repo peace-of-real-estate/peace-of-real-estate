@@ -10,15 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as dashboardAgentRouteRouteImport } from './routes/(dashboard)/agent/route'
 import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
 import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminInvitationsRouteImport } from './routes/admin/invitations'
-import { Route as AdminMatchesRouteImport } from './routes/admin/matches'
-import { Route as AdminRoleSwitchRouteImport } from './routes/admin/role-switch'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AuthBetaRouteImport } from './routes/auth/beta'
 import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -59,11 +53,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRouteRoute = AdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const dashboardAgentRouteRoute = dashboardAgentRouteRouteImport.update({
   id: '/(dashboard)/agent',
   path: '/agent',
@@ -78,31 +67,6 @@ const dashboardSellerRouteRoute = dashboardSellerRouteRouteImport.update({
   id: '/(dashboard)/seller',
   path: '/seller',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminInvitationsRoute = AdminInvitationsRouteImport.update({
-  id: '/invitations',
-  path: '/invitations',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminMatchesRoute = AdminMatchesRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminRoleSwitchRoute = AdminRoleSwitchRouteImport.update({
-  id: '/role-switch',
-  path: '/role-switch',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AuthBetaRoute = AuthBetaRouteImport.update({
   id: '/auth/beta',
@@ -295,20 +259,14 @@ const SignupstepsSellerstep3PreferencesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
-  '/admin/invitations': typeof AdminInvitationsRoute
-  '/admin/matches': typeof AdminMatchesRoute
-  '/admin/role-switch': typeof AdminRoleSwitchRoute
-  '/admin/users': typeof AdminUsersRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/admin/': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -344,16 +302,11 @@ export interface FileRoutesByTo {
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
-  '/admin/invitations': typeof AdminInvitationsRoute
-  '/admin/matches': typeof AdminMatchesRoute
-  '/admin/role-switch': typeof AdminRoleSwitchRoute
-  '/admin/users': typeof AdminUsersRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/admin': typeof AdminIndexRoute
   '/signup/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -387,20 +340,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteRouteWithChildren
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
-  '/admin/invitations': typeof AdminInvitationsRoute
-  '/admin/matches': typeof AdminMatchesRoute
-  '/admin/role-switch': typeof AdminRoleSwitchRoute
-  '/admin/users': typeof AdminUsersRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
-  '/admin/': typeof AdminIndexRoute
   '/signup/(steps)/agent': typeof SignupstepsAgentRouteRouteWithChildren
   '/signup/(steps)/buyer': typeof SignupstepsBuyerRouteRouteWithChildren
   '/signup/(steps)/seller': typeof SignupstepsSellerRouteRouteWithChildren
@@ -435,20 +382,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/agent'
     | '/buyer'
     | '/seller'
-    | '/admin/invitations'
-    | '/admin/matches'
-    | '/admin/role-switch'
-    | '/admin/users'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/admin/'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -484,16 +425,11 @@ export interface FileRouteTypes {
     | '/agent'
     | '/buyer'
     | '/seller'
-    | '/admin/invitations'
-    | '/admin/matches'
-    | '/admin/role-switch'
-    | '/admin/users'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/admin'
     | '/signup/agent'
     | '/signup/buyer'
     | '/signup/seller'
@@ -526,20 +462,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
-    | '/admin/invitations'
-    | '/admin/matches'
-    | '/admin/role-switch'
-    | '/admin/users'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/reset-password'
-    | '/admin/'
     | '/signup/(steps)/agent'
     | '/signup/(steps)/buyer'
     | '/signup/(steps)/seller'
@@ -573,7 +503,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
@@ -602,13 +531,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(dashboard)/agent': {
       id: '/(dashboard)/agent'
       path: '/agent'
@@ -629,41 +551,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/seller'
       preLoaderRoute: typeof dashboardSellerRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/invitations': {
-      id: '/admin/invitations'
-      path: '/invitations'
-      fullPath: '/admin/invitations'
-      preLoaderRoute: typeof AdminInvitationsRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/matches': {
-      id: '/admin/matches'
-      path: '/matches'
-      fullPath: '/admin/matches'
-      preLoaderRoute: typeof AdminMatchesRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/role-switch': {
-      id: '/admin/role-switch'
-      path: '/role-switch'
-      fullPath: '/admin/role-switch'
-      preLoaderRoute: typeof AdminRoleSwitchRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRouteRoute
     }
     '/auth/beta': {
       id: '/auth/beta'
@@ -906,26 +793,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminRouteRouteChildren {
-  AdminInvitationsRoute: typeof AdminInvitationsRoute
-  AdminMatchesRoute: typeof AdminMatchesRoute
-  AdminRoleSwitchRoute: typeof AdminRoleSwitchRoute
-  AdminUsersRoute: typeof AdminUsersRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-}
-
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminInvitationsRoute: AdminInvitationsRoute,
-  AdminMatchesRoute: AdminMatchesRoute,
-  AdminRoleSwitchRoute: AdminRoleSwitchRoute,
-  AdminUsersRoute: AdminUsersRoute,
-  AdminIndexRoute: AdminIndexRoute,
-}
-
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
-
 interface dashboardAgentRouteRouteChildren {
   dashboardAgentIntroductionsRoute: typeof dashboardAgentIntroductionsRoute
 }
@@ -1032,7 +899,6 @@ const SignupstepsSellerRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,
