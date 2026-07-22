@@ -426,6 +426,33 @@ export const Agent = {
 		return toAgentProfile(row.agent, row.city, geographyRows)
 	},
 
+	async loadByIds(
+		profileIds: string[],
+		executor: DbOrTx = db,
+	): Promise<AgentProfile[]> {
+		if (profileIds.length === 0) return []
+		const rows = await executor
+			.select({ agent: agentProfiles, city: cities })
+			.from(agentProfiles)
+			.innerJoin(cities, eq(agentProfiles.cityId, cities.id))
+			.where(inArray(agentProfiles.id, profileIds))
+		const rowsByProfile = groupByProfile(
+			await loadGeographyRows(
+				agentProfileZips,
+				rows.map((row) => row.agent.id),
+				executor,
+			),
+		)
+		return rows.map((row) => {
+			const { cityId: _, ...agent } = row.agent
+			return {
+				...agent,
+				city: resolveCity(row.city),
+				geography: toZipGeography(rowsByProfile.get(row.agent.id) ?? []),
+			}
+		})
+	},
+
 	// `filter.state` pushes the matching algorithm's state disqualifier into
 	// SQL for callers that only serve qualified matches; debug tooling calls
 	// this without a filter precisely because it displays the disqualified.
