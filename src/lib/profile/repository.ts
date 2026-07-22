@@ -1,14 +1,6 @@
-import {
-	and,
-	eq,
-	inArray,
-	type ExtractTablesWithRelations,
-	type SQL,
-} from 'drizzle-orm'
-import type { NodePgTransaction } from 'drizzle-orm/node-postgres'
+import { and, eq, inArray, type SQL } from 'drizzle-orm'
 
 import { db } from '@/db/connection'
-import * as schema from '@/db/tables'
 import {
 	agentProfiles,
 	agentProfileZips,
@@ -31,10 +23,7 @@ import type {
 	SellerProfile,
 } from './types'
 
-type Tx = NodePgTransaction<
-	typeof schema,
-	ExtractTablesWithRelations<typeof schema>
->
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
 export type DbOrTx = typeof db | Tx
 
