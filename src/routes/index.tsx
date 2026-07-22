@@ -15,7 +15,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
+import { redirectAuthenticatedUsers } from '@/lib/auth/redirects'
 
 export const Route = createFileRoute('/')({
 	beforeLoad: redirectAuthenticatedUsers,

@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { db } from '@/db/connection'
 import { agentProfiles, clientProfiles, user } from '@/db/tables'
-import { requireUserId } from '@/lib/auth/session'
+import { requireAdmin } from '@/lib/auth/session'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
 import {
 	calculateFitScore,
@@ -167,7 +167,8 @@ function scoredAgentToDebugMatch(
 
 export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<DebugClientOption[]> => {
-		await requireUserId()
+		await requireAdmin()
+
 		const clients = await db
 			.select({ profile: clientProfiles, user })
 			.from(clientProfiles)
@@ -260,7 +261,7 @@ export const loadDebugMatches = createServerFn({ method: 'GET' })
 		loadDebugMatchesInput.parse(data),
 	)
 	.handler(async ({ data }): Promise<DebugMatchesPayload> => {
-		await requireUserId()
+		await requireAdmin()
 
 		const { profile, scored } = await loadScoreAgentsForProfile({ data })
 		return buildDebugPayload(profile, data.side, scored)
