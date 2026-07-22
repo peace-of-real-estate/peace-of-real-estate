@@ -3,13 +3,18 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { buyerProfiles, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
+import {
+	loadAgentProfilesWithCityCenter,
+	loadClientProfileWithCityCenter,
+} from '@/lib/matching/profiles'
 import {
 	calculateFitScore,
 	rankWithTieBandsDetailed,
 	TIE_BAND_THRESHOLD,
+	type ClientProfileForScoring,
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
 import type { PriceRange } from '@/lib/price-range'
@@ -209,13 +214,12 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 async function loadProfile(
 	clientId: string,
 	side: 'buying' | 'selling',
-): Promise<ClientProfileRow | null> {
+): Promise<ClientProfileForScoring | null> {
 	const table = side === 'buying' ? buyerProfiles : sellerProfiles
-	const [profile] = await db
-		.select()
-		.from(table)
-		.where(eq(table.id, clientId))
-		.limit(1)
+	const profile = await loadClientProfileWithCityCenter(
+		table,
+		eq(table.id, clientId),
+	)
 	return profile ?? null
 }
 
@@ -232,10 +236,7 @@ async function loadScoreAgentsForProfile({
 		throw new Error(`Client profile not found: ${data.clientId}`)
 	}
 
-	const results = await db
-		.select({ agent: agentProfiles, user })
-		.from(agentProfiles)
-		.innerJoin(user, eq(agentProfiles.userId, user.id))
+	const results = await loadAgentProfilesWithCityCenter()
 
 	const scored = results.map((row) => ({
 		row: {

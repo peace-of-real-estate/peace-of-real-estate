@@ -19,6 +19,7 @@ export function getAuth() {
 				'localhost:*',
 				'peaceofrealestate.com',
 				'www.peaceofrealestate.com',
+				'beta.peaceofrealestate.com',
 				'peace-of-real-estate-*.up.railway.app',
 			],
 			protocol: 'auto',

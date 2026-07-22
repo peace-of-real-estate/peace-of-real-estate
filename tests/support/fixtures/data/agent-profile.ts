@@ -21,8 +21,6 @@ export function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		billingAddress: null,
 		licenseNumberState: 'LIC-123456-MD',
 		zipCodes: ['21201', '21202'],
-		cityCenterLatitude: null,
-		cityCenterLongitude: null,
 		yearsLicensed: '6-10',
 		averageTransactions: '6-15',
 		employmentStatus: 'Realtor',

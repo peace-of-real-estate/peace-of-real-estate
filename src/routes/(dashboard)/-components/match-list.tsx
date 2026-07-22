@@ -1,9 +1,4 @@
-import {
-	ClockIcon,
-	MapPinIcon,
-	StarIcon,
-	UsersIcon,
-} from '@phosphor-icons/react'
+import { ClockIcon, MapPinIcon, UsersIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -51,12 +46,6 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
 						<h3 className="truncate text-lg font-semibold">{match.name}</h3>
-						{match.isTopMatch && (
-							<span className="bg-amber/15 text-amber-foreground inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold">
-								<StarIcon className="h-3 w-3 fill-current" />
-								Top match
-							</span>
-						)}
 					</div>
 					<p className="text-muted-foreground truncate text-sm">
 						{match.agency} · {match.location}
