@@ -15,6 +15,13 @@
       "when": 1784753198174,
       "tag": "0001_bucket_agent_price_ranges",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784753222640,
+      "tag": "0002_zipcode",
+      "breakpoints": true
     }
   ]
 }
