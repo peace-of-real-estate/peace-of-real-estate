@@ -2,7 +2,7 @@ import { BriefcaseIcon, HouseIcon, TagIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
+import { redirectUnauthenticatedUsers } from '@/lib/auth/redirects'
 import { loadExistingProfileRoles } from '@/lib/profile'
 import {
 	dashboardPaths,
