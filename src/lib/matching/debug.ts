@@ -12,6 +12,7 @@ import {
 	TIE_BAND_THRESHOLD,
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
+import type { PriceRange } from '@/lib/price-range'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 
 export type DebugClientOption = {
@@ -21,7 +22,7 @@ export type DebugClientOption = {
 	email: string | null
 	city: string
 	state: string
-	priceRange: string
+	priceRange: PriceRange
 }
 
 export type DebugMatch = {
@@ -190,7 +191,7 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 				email: row.user.email,
 				city: row.buyer.city,
 				state: row.buyer.state,
-				priceRange: row.buyer.priceRange,
+				priceRange: { min: row.buyer.priceMin, max: row.buyer.priceMax },
 			})),
 			...sellers.map((row) => ({
 				id: row.seller.id,
@@ -199,7 +200,7 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 				email: row.user.email,
 				city: row.seller.city,
 				state: row.seller.state,
-				priceRange: row.seller.priceRange,
+				priceRange: { min: row.seller.priceMin, max: row.seller.priceMax },
 			})),
 		]
 	},

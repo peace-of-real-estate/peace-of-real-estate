@@ -39,7 +39,7 @@ const market: AgentDraft = {
 	city: 'Austin',
 	state: 'TX',
 	zipCodes: ['78701', '78704'],
-	typicalPriceRange: '400000-1000000',
+	typicalPriceRange: '400kTo750k',
 	representationSide: 'both',
 	bestClientTypes: ['firstTime', 'moveUp'],
 	yearsLicensed: '6-10',
@@ -126,6 +126,14 @@ test('peace pact step screenshot', async () => {
 	await expectScreenshot(document.body, { name: 'step-5-peace-pact' })
 })
 
+test('preview redirects incomplete drafts to the first step', async () => {
+	mockAgentDraft = { ...identity, ...market, ...compliance, ...peacePact }
+	await renderRoute({ path: '/signup/preview/agent' })
+	await expect
+		.element(page.getByRole('heading', { name: 'Identity', exact: true }))
+		.toBeVisible()
+})
+
 test('preview screenshot', async () => {
 	mockAgentDraft = {
 		...identity,
@@ -135,5 +143,6 @@ test('preview screenshot', async () => {
 		...peacePact,
 	}
 	await renderRoute({ path: '/signup/preview/agent' })
+	await expect.element(page.getByText('$400k – $750k')).toBeVisible()
 	await expectScreenshot(document.body, { name: 'step-6-preview' })
 })

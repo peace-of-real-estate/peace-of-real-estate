@@ -8,6 +8,13 @@
       "when": 1784609198129,
       "tag": "0000_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784753198174,
+      "tag": "0001_bucket_agent_price_ranges",
+      "breakpoints": true
     }
   ]
 }

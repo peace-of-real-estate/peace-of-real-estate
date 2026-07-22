@@ -5,11 +5,7 @@ import {
 	ProfileSummaryGrid,
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
-import {
-	buyerClientProfileSchema,
-	sellerClientProfileSchema,
-	type ClientProfile,
-} from '@/lib/profile'
+import type { ClientPreviewProfile } from '@/lib/profile'
 import {
 	AgentPreviewCard,
 	type MatchDetails,
@@ -78,17 +74,6 @@ const clientPreviewMatches: MatchDetails[] = [
 	},
 ]
 
-export function draftToClientPreviewProfile(
-	role: 'buyer' | 'seller',
-	draft: Record<string, unknown> | null | undefined,
-): ClientProfile {
-	const input = draft ?? {}
-	if (role === 'buyer') {
-		return buyerClientProfileSchema.parse({ role, ...input })
-	}
-	return sellerClientProfileSchema.parse({ role, ...input })
-}
-
 export function ClientPreviewHeader({ title }: { title: string }) {
 	return (
 		<div>
@@ -108,7 +93,7 @@ export function ClientPreviewHeader({ title }: { title: string }) {
 export function ClientProfilePreviewCard({
 	profile,
 }: {
-	profile: ClientProfile
+	profile: ClientPreviewProfile
 }) {
 	const stateSvgPath = profile.state
 		? `/states/${profile.state}.svg`

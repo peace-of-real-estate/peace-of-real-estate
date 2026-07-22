@@ -7,10 +7,10 @@ import { requireUserId } from '@/lib/auth/session'
 
 import {
 	agentInsertSchema,
+	buyerCompletedDraftSchema,
 	buyerInsertSchema,
+	sellerCompletedDraftSchema,
 	sellerInsertSchema,
-	type BuyerDraft,
-	type SellerDraft,
 } from './types'
 
 const roleTables = {
@@ -55,7 +55,7 @@ export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(
 )
 
 export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
-	.validator((data: BuyerDraft) => data)
+	.validator((data: unknown) => buyerCompletedDraftSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const insert = buyerInsertSchema.parse({
@@ -99,7 +99,7 @@ export const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
 )
 
 export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
-	.validator((data: SellerDraft) => data)
+	.validator((data: unknown) => sellerCompletedDraftSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const insert = sellerInsertSchema.parse({

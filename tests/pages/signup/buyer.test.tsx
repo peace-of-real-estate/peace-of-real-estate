@@ -28,7 +28,8 @@ const step1: BuyerDraft = {
 }
 
 const step2: BuyerDraft = {
-	priceRange: '400000-750000',
+	priceMin: 400_000,
+	priceMax: 750_000,
 	propertyTypes: ['singleFamily'],
 	timeline: 'exploring',
 }
@@ -61,6 +62,20 @@ test('preferences step screenshot', async () => {
 	mockBuyerDraft = { ...step1, ...step2, ...step3 }
 	await renderRoute({ path: '/signup/buyer/preferences' })
 	await expectScreenshot(document.body, { name: 'step-3-preferences' })
+})
+
+test('preview redirects incomplete drafts to the first step', async () => {
+	mockBuyerDraft = {
+		...step1,
+		...step3,
+		priceMin: step2.priceMin,
+		priceMax: step2.priceMax,
+		propertyTypes: step2.propertyTypes,
+	}
+	await renderRoute({ path: '/signup/preview/buyer' })
+	await expect
+		.element(page.getByRole('heading', { name: 'Location', exact: true }))
+		.toBeVisible()
 })
 
 test('preview screenshot', async () => {

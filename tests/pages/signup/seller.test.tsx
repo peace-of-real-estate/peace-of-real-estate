@@ -1,6 +1,7 @@
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
-import { test, vi, beforeEach } from 'vitest'
+import { page } from 'vite-plus/test/browser'
+import { test, vi, beforeEach, expect } from 'vitest'
 
 import type { SellerDraft } from '@/lib/profile'
 
@@ -27,7 +28,8 @@ const step1: SellerDraft = {
 }
 
 const step2: SellerDraft = {
-	priceRange: '400000-750000',
+	priceMin: 400_000,
+	priceMax: 750_000,
 	propertyTypes: ['singleFamily'],
 	timeline: 'exploring',
 }
@@ -62,6 +64,14 @@ test('preferences step screenshot', async () => {
 	mockSellerDraft = { ...step1, ...step2, ...step3 }
 	await renderRoute({ path: '/signup/seller/preferences' })
 	await expectScreenshot(document.body, { name: 'step-3-preferences' })
+})
+
+test('preview redirects incomplete drafts to the first step', async () => {
+	mockSellerDraft = step1
+	await renderRoute({ path: '/signup/preview/seller' })
+	await expect
+		.element(page.getByRole('heading', { name: 'Location', exact: true }))
+		.toBeVisible()
 })
 
 test('preview screenshot', async () => {

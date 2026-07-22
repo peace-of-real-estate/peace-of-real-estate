@@ -12,12 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { ChipSelect } from '@/components/ui/chip-select'
 import { SegmentedControl } from '@/components/ui/segmented-control'
 import { Slider } from '@/components/ui/slider'
-import {
-	parsePriceRange,
-	PRICE_MAX,
-	PRICE_MIN,
-	serializePriceRange,
-} from '@/lib/price-range'
+import { PRICE_MAX, PRICE_MIN, type PriceRange } from '@/lib/price-range'
 import {
 	propertyType,
 	timeline,
@@ -43,6 +38,8 @@ const propertyTypeIcons = {
 	land: FarmIcon,
 } satisfies Record<PropertyTypeSlug, typeof HouseIcon>
 
+const initialPriceRange: PriceRange = { min: 400_000, max: 600_000 }
+
 export function HomeStep<TStep extends string>({
 	priceTitle,
 	preferencesStep,
@@ -55,8 +52,10 @@ export function HomeStep<TStep extends string>({
 		TStep
 	>()
 
-	const [priceRange, setPriceRange] = useState(
-		parsePriceRange(state.priceRange),
+	const [priceRange, setPriceRange] = useState<PriceRange>(
+		state.priceMin !== undefined && state.priceMax !== undefined
+			? { min: state.priceMin, max: state.priceMax }
+			: initialPriceRange,
 	)
 	const [propertyTypes, setPropertyTypes] = useState<PropertyTypeSlug[]>(
 		state.propertyTypes ?? [],
@@ -195,7 +194,8 @@ export function HomeStep<TStep extends string>({
 						onClick={() => {
 							if (!canContinue) return
 							updateState({
-								priceRange: serializePriceRange(priceRange),
+								priceMin: priceRange.min,
+								priceMax: priceRange.max,
 								propertyTypes,
 								timeline: selectedTimeline,
 							})

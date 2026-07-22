@@ -139,7 +139,7 @@ function PreferencesSummaryCard({
 	if (profile?.state) {
 		locationItems.push({ label: 'State', value: profile.state, icon: MapPin })
 	}
-	const summaryItems = getProfileSummary({ role, profile })
+	const summaryItems = profile ? getProfileSummary({ role, profile }) : []
 	const items = [...locationItems, ...summaryItems]
 	const stateSvgFile = state ? `/states/${state}.svg` : null
 
