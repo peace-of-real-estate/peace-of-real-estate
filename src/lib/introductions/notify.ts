@@ -19,7 +19,7 @@ import {
 } from '@/lib/email.server'
 
 import type { Db } from './db'
-import { agentDisplayName, anonymizeName } from './views'
+import { anonymizeName } from './views'
 
 async function bestEffort(label: string, send: () => Promise<void>) {
 	try {
@@ -36,6 +36,7 @@ async function loadIntroParties(db: Db, introductionIds: string[]) {
 		.select({
 			intro: introductions,
 			agent: agentProfiles,
+			agentUserName: agentUser.name,
 			agentUserEmail: agentUser.email,
 			profile: clientProfiles,
 			clientCity: cities,
@@ -117,7 +118,7 @@ async function deliverLifecycleNotifications(
 		try {
 			if (kind === 'sent' && row.intro.status === 'pending') {
 				await sendIntroSentEmail({
-					to: row.agent.email ?? row.agentUserEmail,
+					to: row.agentUserEmail,
 					clientDisplayName: anonymizeName(row.clientName),
 					role: row.profile.role,
 					city: row.clientCity.name,
@@ -127,7 +128,7 @@ async function deliverLifecycleNotifications(
 			} else if (kind === 'accepted' && row.intro.status === 'accepted') {
 				await sendIntroAcceptedEmail({
 					to: row.clientEmail,
-					agentName: agentDisplayName(row.agent),
+					agentName: row.agentUserName,
 					role: row.profile.role,
 					idempotencyKey: `intro-accepted-${row.intro.id}`,
 				})
@@ -227,8 +228,8 @@ export async function notifyConnected(
 	for (const { job } of jobs) {
 		const row = byIntroductionId.get(job.introductionId)
 		if (!row || row.intro.status !== 'connected') continue
-		const agentName = agentDisplayName(row.agent)
-		const agentEmail = row.agent.email ?? row.agentUserEmail
+		const agentName = row.agentUserName
+		const agentEmail = row.agentUserEmail
 		if (!job.agentSentAt) {
 			try {
 				await sendConnectedAgentEmail({
@@ -251,7 +252,6 @@ export async function notifyConnected(
 					to: row.clientEmail,
 					agentName,
 					agentEmail,
-					agentPhone: row.agent.phone,
 					role: row.profile.role,
 					idempotencyKey: `intro-connected-client-${row.intro.id}`,
 				})

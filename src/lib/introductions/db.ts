@@ -44,7 +44,6 @@ import {
 } from './intro-data'
 import type { IntroAccessWindow } from './types'
 import {
-	agentDisplayName,
 	buildAgentStates,
 	toAgentIntroView,
 	toClientIntroductionsPayload,
@@ -290,6 +289,7 @@ export const Client = {
 			.select({
 				intro: introductions,
 				agent: agentProfiles,
+				agentUserName: user.name,
 				agentUserEmail: user.email,
 			})
 			.from(introductions)
@@ -310,13 +310,11 @@ export const Client = {
 			introductions: rows.map((row) =>
 				toClientIntroView(row.intro, {
 					profileId: row.agent.id,
-					name: agentDisplayName(row.agent),
+					name: row.agentUserName,
 					contact: {
-						email: row.agent.email ?? row.agentUserEmail,
-						phone: row.agent.phone,
+						email: row.agentUserEmail,
 						brokerageName: row.agent.brokerageName,
 						licenseNumberState: row.agent.licenseNumberState,
-						businessAddress: row.agent.businessAddress,
 					},
 				}),
 			),
