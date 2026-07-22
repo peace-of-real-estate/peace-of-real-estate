@@ -18,6 +18,10 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
 import { Route as AuthBetaRouteImport } from './routes/auth/beta'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe-webhook'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminRoleSwitchRouteImport } from './routes/admin/role-switch'
+import { Route as AdminMatchesRouteImport } from './routes/admin/matches'
+import { Route as AdminInvitationsRouteImport } from './routes/admin/invitations'
 import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
 import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
 import { Route as dashboardAgentRouteRouteImport } from './routes/(dashboard)/agent/route'
@@ -95,6 +99,26 @@ const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe-webhook',
   path: '/api/stripe-webhook',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminRoleSwitchRoute = AdminRoleSwitchRouteImport.update({
+  id: '/role-switch',
+  path: '/role-switch',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMatchesRoute = AdminMatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminInvitationsRoute = AdminInvitationsRouteImport.update({
+  id: '/invitations',
+  path: '/invitations',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const dashboardSellerRouteRoute = dashboardSellerRouteRouteImport.update({
   id: '/(dashboard)/seller',
@@ -642,6 +666,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/stripe-webhook'
       preLoaderRoute: typeof ApiStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/role-switch': {
+      id: '/admin/role-switch'
+      path: '/role-switch'
+      fullPath: '/admin/role-switch'
+      preLoaderRoute: typeof AdminRoleSwitchRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/matches': {
+      id: '/admin/matches'
+      path: '/matches'
+      fullPath: '/admin/matches'
+      preLoaderRoute: typeof AdminMatchesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/invitations': {
+      id: '/admin/invitations'
+      path: '/invitations'
+      fullPath: '/admin/invitations'
+      preLoaderRoute: typeof AdminInvitationsRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/(dashboard)/seller': {
       id: '/(dashboard)/seller'

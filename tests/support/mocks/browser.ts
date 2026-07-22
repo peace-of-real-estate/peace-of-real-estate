@@ -110,6 +110,35 @@ vi.mock('@/lib/matching/server', () => ({
 	loadSellerAgentMatches: () => Promise.resolve(mockAgentMatches),
 }))
 
+vi.mock('@/lib/introductions/server', async () => {
+	const [{ mockAgentIntroductions }, { mockClientIntroductions }] =
+		await Promise.all([
+			import('@tests/support/fixtures/data/agent-introductions'),
+			import('@tests/support/fixtures/data/client-introductions'),
+		])
+	return {
+		getClientIntroductions: () => Promise.resolve(mockClientIntroductions),
+		getAgentIntroductions: () => Promise.resolve(mockAgentIntroductions),
+		getPendingIntroCount: () =>
+			Promise.resolve(
+				mockAgentIntroductions.filter((intro) => intro.status === 'pending')
+					.length,
+			),
+		sendIntroductions: () => Promise.resolve({ ok: true, ids: [] }),
+		acceptIntroduction: () => Promise.resolve({ ok: true, status: 'accepted' }),
+		declineIntroduction: () => Promise.resolve({ ok: true }),
+		withdrawIntroduction: () => Promise.resolve({ ok: true }),
+	}
+})
+
+vi.mock('@/lib/payments/server', () => ({
+	createIntroUnlockCheckout: () =>
+		Promise.resolve({
+			url: 'https://checkout.stripe.com/c/pay/cs_test_mock',
+			sessionId: 'cs_test_mock',
+		}),
+}))
+
 vi.mock('@/lib/geography/zip', async () => {
 	const actual = await vi.importActual<typeof import('@/lib/geography/zip')>(
 		'@/lib/geography/zip',
