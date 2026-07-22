@@ -1,0 +1,2 @@
+CREATE TYPE "public"."agent_price_bucket" AS ENUM('under400k', '400kTo750k', '750kTo1_5m', '1_5mPlus');--> statement-breakpoint
+ALTER TABLE "agent_profiles" ALTER COLUMN "typical_price_range" SET DATA TYPE "public"."agent_price_bucket" USING "typical_price_range"::"public"."agent_price_bucket";
