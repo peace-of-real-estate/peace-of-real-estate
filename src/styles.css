@@ -53,6 +53,7 @@
 	/* Success: replaces ad-hoc emerald */
 	--success: oklch(0.55 0.12 155);
 	--success-foreground: oklch(1 0 0);
+	--success-tint: oklch(0.94 0.04 155);
 
 	/* Borders & inputs */
 	--border: oklch(0.88 0.012 240);
@@ -126,6 +127,7 @@
 	--color-amber-foreground: var(--amber-foreground);
 	--color-success: var(--success);
 	--color-success-foreground: var(--success-foreground);
+	--color-success-tint: var(--success-tint);
 	--color-sky: var(--sky);
 	--color-sky-foreground: var(--sky-foreground);
 	--color-sky-tint: var(--sky-tint);

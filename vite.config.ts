@@ -168,6 +168,7 @@ export default defineConfig({
 					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 					setupFiles: ['./tests/support/mocks/styles.ts'],
 					testTimeout: 15_000,
+					sequence: { groupOrder: 1 },
 					browser: {
 						instances: [{ browser: 'chromium' }],
 						provider: playwright(),
