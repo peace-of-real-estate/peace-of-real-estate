@@ -1,2 +1,5 @@
 [env]
 _.file = [".env.compose"]
+
+[tools]
+stripe-cli = "1.43.8"
