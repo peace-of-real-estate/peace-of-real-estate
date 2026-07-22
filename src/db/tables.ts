@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
 	boolean,
 	check,
+	doublePrecision,
 	foreignKey,
 	index,
 	pgTable,
@@ -227,9 +228,9 @@ export const cities = pgTable(
 		id: text().primaryKey().notNull(),
 		city: text().notNull(),
 		state: text().notNull(),
-		centerLat: text().notNull(),
-		centerLng: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		centerLat: doublePrecision().notNull(),
+		centerLng: doublePrecision().notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		uniqueIndex('cities_city_state_index').on(table.city, table.state),
@@ -241,10 +242,11 @@ export const cityZips = pgTable(
 	'city_zips',
 	{
 		id: text().primaryKey().notNull(),
+		cityId: text().notNull(),
 		city: text().notNull(),
 		state: text().notNull(),
 		zip: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		index('city_zips_city_state_index').on(table.city, table.state),
@@ -254,5 +256,11 @@ export const cityZips = pgTable(
 			table.zip,
 		),
 		index('city_zips_zip_index').on(table.zip),
+		index('city_zips_city_id_index').on(table.cityId),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'city_zips_city_id_fk',
+		}).onDelete('cascade'),
 	],
 )
