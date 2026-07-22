@@ -20,6 +20,7 @@ import {
 	scoreLocation,
 	tieBandRotation,
 	TIE_BAND_THRESHOLD,
+	type CityCenter,
 } from './algorithm'
 import { priceOverlapRatio } from './utils'
 
@@ -125,14 +126,18 @@ describe('deriveExpectedClientTypes', () => {
 })
 
 describe('scoreLocation', () => {
-	function baseAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
+	function baseAgent(
+		overrides: Partial<AgentProfile> & { cityCenter?: CityCenter } = {},
+	): AgentProfile & { cityCenter?: CityCenter } {
 		return makeAgent({
 			zipCodes: [],
 			...overrides,
 		})
 	}
 
-	function baseBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
+	function baseBuyer(
+		overrides: Partial<BuyerProfile> & { cityCenter?: CityCenter } = {},
+	): BuyerProfile & { cityCenter?: CityCenter } {
 		return makeBuyer({
 			zipCodes: [],
 			...overrides,
@@ -143,14 +148,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'St. Paul',
 			state: 'MN',
-			cityCenterLatitude: 44.9537,
-			cityCenterLongitude: -93.09,
+			cityCenter: { lat: 44.9537, lng: -93.09 },
 		})
 		const buyer = baseBuyer({
 			city: 'Minneapolis',
 			state: 'MN',
-			cityCenterLatitude: 44.9778,
-			cityCenterLongitude: -93.265,
+			cityCenter: { lat: 44.9778, lng: -93.265 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -161,14 +164,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'Fort Worth',
 			state: 'TX',
-			cityCenterLatitude: 32.7555,
-			cityCenterLongitude: -97.3308,
+			cityCenter: { lat: 32.7555, lng: -97.3308 },
 		})
 		const buyer = baseBuyer({
 			city: 'Dallas',
 			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			cityCenter: { lat: 32.7767, lng: -96.797 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -179,14 +180,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'Austin',
 			state: 'TX',
-			cityCenterLatitude: 30.2672,
-			cityCenterLongitude: -97.7431,
+			cityCenter: { lat: 30.2672, lng: -97.7431 },
 		})
 		const buyer = baseBuyer({
 			city: 'Dallas',
 			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			cityCenter: { lat: 32.7767, lng: -96.797 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBe(0)
@@ -196,14 +195,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'Houston',
 			state: 'TX',
-			cityCenterLatitude: 29.7604,
-			cityCenterLongitude: -95.3698,
+			cityCenter: { lat: 29.7604, lng: -95.3698 },
 		})
 		const buyer = baseBuyer({
 			city: 'Dallas',
 			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			cityCenter: { lat: 32.7767, lng: -96.797 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBe(0)
@@ -213,14 +210,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'Brooklyn',
 			state: 'NY',
-			cityCenterLatitude: 40.6782,
-			cityCenterLongitude: -73.9442,
+			cityCenter: { lat: 40.6782, lng: -73.9442 },
 		})
 		const buyer = baseBuyer({
 			city: 'Manhattan',
 			state: 'NY',
-			cityCenterLatitude: 40.7831,
-			cityCenterLongitude: -73.9712,
+			cityCenter: { lat: 40.7831, lng: -73.9712 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -231,14 +226,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'Hoboken',
 			state: 'NJ',
-			cityCenterLatitude: 40.7433,
-			cityCenterLongitude: -74.0324,
+			cityCenter: { lat: 40.7433, lng: -74.0324 },
 		})
 		const buyer = baseBuyer({
 			city: 'New York',
 			state: 'NY',
-			cityCenterLatitude: 40.7128,
-			cityCenterLongitude: -74.006,
+			cityCenter: { lat: 40.7128, lng: -74.006 },
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -263,15 +256,12 @@ describe('scoreLocation', () => {
 		const agent = baseAgent({
 			city: 'St. Paul',
 			state: 'MN',
-			cityCenterLatitude: 44.9537,
-			cityCenterLongitude: -93.09,
+			cityCenter: { lat: 44.9537, lng: -93.09 },
 		})
 		const buyer = baseBuyer({
 			city: 'Minneapolis',
 			state: 'MN',
 			zipCodes: ['55401'],
-			cityCenterLatitude: null,
-			cityCenterLongitude: null,
 		})
 		const full = calculateFitScore(agent, buyer, 'buying')
 		const geo = full.trace.geo

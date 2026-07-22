@@ -3,17 +3,22 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { buyerProfiles, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
+import {
+	loadAgentProfilesWithCityCenter,
+	loadClientProfileWithCityCenter,
+} from '@/lib/matching/profiles'
 import {
 	calculateFitScore,
 	rankWithTieBandsDetailed,
 	TIE_BAND_THRESHOLD,
+	type ClientProfileForScoring,
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
 import type { PriceRange } from '@/lib/price-range'
-import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
+import type { AgentProfile } from '@/lib/profile/types'
 
 export type DebugClientOption = {
 	id: string
@@ -70,7 +75,7 @@ export type ScoredAgentsResult = {
 
 export type DebugMatchesPayload = {
 	side: 'buying' | 'selling'
-	clientProfile: ClientProfileRow
+	clientProfile: ClientProfileForScoring
 	totalAgents: number
 	qualifiedCount: number
 	scoreDistribution: { range: string; count: number }[]
@@ -85,7 +90,7 @@ const loadDebugMatchesInput = z.object({
 })
 
 export function buildDebugPayload(
-	clientProfile: ClientProfileRow,
+	clientProfile: ClientProfileForScoring,
 	side: 'buying' | 'selling',
 	{
 		qualified,
@@ -209,13 +214,12 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 async function loadProfile(
 	clientId: string,
 	side: 'buying' | 'selling',
-): Promise<ClientProfileRow | null> {
+): Promise<ClientProfileForScoring | null> {
 	const table = side === 'buying' ? buyerProfiles : sellerProfiles
-	const [profile] = await db
-		.select()
-		.from(table)
-		.where(eq(table.id, clientId))
-		.limit(1)
+	const profile = await loadClientProfileWithCityCenter(
+		table,
+		eq(table.id, clientId),
+	)
 	return profile ?? null
 }
 
@@ -224,7 +228,7 @@ async function loadScoreAgentsForProfile({
 }: {
 	data: { clientId: string; side: 'buying' | 'selling' }
 }): Promise<{
-	profile: ClientProfileRow
+	profile: ClientProfileForScoring
 	scored: ScoredAgentsResult
 }> {
 	const profile = await loadProfile(data.clientId, data.side)
@@ -232,10 +236,7 @@ async function loadScoreAgentsForProfile({
 		throw new Error(`Client profile not found: ${data.clientId}`)
 	}
 
-	const results = await db
-		.select({ agent: agentProfiles, user })
-		.from(agentProfiles)
-		.innerJoin(user, eq(agentProfiles.userId, user.id))
+	const results = await loadAgentProfilesWithCityCenter()
 
 	const scored = results.map((row) => ({
 		row: {

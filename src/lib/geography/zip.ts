@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { and, eq, ilike, or, sql } from 'drizzle-orm'
 import type { FeatureCollection } from 'geojson'
+import { z } from 'zod'
 
 import { db } from '@/db/connection'
 import { cities, cityZips } from '@/db/tables'
@@ -24,10 +25,12 @@ const TOP_US_CITIES = [
 	'Jacksonville, FL',
 ]
 
-type CityState = {
-	city: string
-	state: string
-}
+const cityStateSchema = z.object({
+	city: z.string(),
+	state: z.string(),
+})
+
+type CityState = z.infer<typeof cityStateSchema>
 
 export function parseCityState(
 	location: string,
@@ -72,8 +75,12 @@ function buildTopCitiesWhereClause() {
 	return sql`${cities.city} || ', ' || ${cities.state} in (${sql.raw(values)})`
 }
 
+function escapeLikePattern(value: string): string {
+	return value.replace(/[\\%_]/g, '\\$&')
+}
+
 const loadCitySuggestions = createServerFn({ method: 'GET' })
-	.validator((query: string) => query)
+	.validator((query: string) => z.string().parse(query))
 	.handler(async ({ data }) => {
 		const normalizedQuery = data.trim().toLowerCase()
 		if (normalizedQuery.length < 2) {
@@ -89,6 +96,7 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 			return topCities.map((row) => row.label)
 		}
 
+		const escapedQuery = escapeLikePattern(normalizedQuery)
 		const matches = await db
 			.select({
 				label: sql<string>`concat(${cities.city}, ', ', ${cities.state})`,
@@ -96,11 +104,11 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 			.from(cities)
 			.where(
 				or(
-					ilike(cities.city, `%${normalizedQuery}%`),
-					ilike(cities.state, `${normalizedQuery}%`),
+					ilike(cities.city, `%${escapedQuery}%`),
+					ilike(cities.state, `${escapedQuery}%`),
 					ilike(
 						sql`${cities.city} || ', ' || ${cities.state}`,
-						`%${normalizedQuery}%`,
+						`%${escapedQuery}%`,
 					),
 				),
 			)
@@ -110,31 +118,38 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 		return matches.map((row) => row.label)
 	})
 
+// Normalizes the raw, nullable result of a `cities` lookup (no matching city
+// row, or a city with no computed center) into a CityCenter, when possible.
+export type CityCenter = { lat: number; lng: number }
+
+export function toCityCenter(
+	raw: { lat: number | null; lng: number | null } | null | undefined,
+): CityCenter | undefined {
+	if (!raw || raw.lat == null || raw.lng == null) return undefined
+	return { lat: raw.lat, lng: raw.lng }
+}
+
 const loadCityCenter = createServerFn({ method: 'GET' })
-	.validator((data: CityState) => data)
+	.validator((data: CityState) => cityStateSchema.parse(data))
 	.handler(async ({ data }) => {
 		const [row] = await db
-			.select({ centerLat: cities.centerLat, centerLng: cities.centerLng })
+			.select({ lat: cities.centerLat, lng: cities.centerLng })
 			.from(cities)
 			.where(and(eq(cities.city, data.city), eq(cities.state, data.state)))
 			.limit(1)
 
-		if (!row) return undefined
-		const latitude = Number.parseFloat(row.centerLat)
-		const longitude = Number.parseFloat(row.centerLng)
-		if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-			return undefined
-		}
-		return { latitude, longitude }
+		const center = toCityCenter(row)
+		return center && { latitude: center.lat, longitude: center.lng }
 	})
 
 const loadZipCodeBoundaries = createServerFn({ method: 'GET' })
-	.validator((data: CityState) => data)
+	.validator((data: CityState) => cityStateSchema.parse(data))
 	.handler(async ({ data }) => {
 		const zipRows = await db
 			.select({ zip: cityZips.zip })
 			.from(cityZips)
-			.where(and(eq(cityZips.city, data.city), eq(cityZips.state, data.state)))
+			.innerJoin(cities, eq(cityZips.cityId, cities.id))
+			.where(and(eq(cities.city, data.city), eq(cities.state, data.state)))
 			.orderBy(cityZips.zip)
 			.limit(MAX_ZIPS)
 

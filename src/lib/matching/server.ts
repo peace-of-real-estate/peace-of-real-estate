@@ -1,14 +1,20 @@
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
-import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { buyerProfiles, sellerProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
-import { type ClientProfileRow } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 
 import { toAgentMatchData, type AgentMatchData } from './match.view'
-import { calculateFitScore, type MatchSide } from './scoring'
+import {
+	loadAgentProfilesWithCityCenter,
+	loadClientProfileWithCityCenter,
+} from './profiles'
+import {
+	calculateFitScore,
+	type ClientProfileForScoring,
+	type MatchSide,
+} from './scoring'
 
 function toScoringSide(side: MatchSide): 'buying' | 'selling' {
 	return side === 'buyers' ? 'buying' : 'selling'
@@ -31,11 +37,10 @@ export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
 	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(buyerProfiles)
-			.where(eq(buyerProfiles.userId, userId))
-			.limit(1)
+		const profile = await loadClientProfileWithCityCenter(
+			buyerProfiles,
+			eq(buyerProfiles.userId, userId),
+		)
 		return loadAgentMatchesForProfile(profile, 'buyers', data)
 	})
 
@@ -43,23 +48,19 @@ export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
 	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(sellerProfiles)
-			.where(eq(sellerProfiles.userId, userId))
-			.limit(1)
+		const profile = await loadClientProfileWithCityCenter(
+			sellerProfiles,
+			eq(sellerProfiles.userId, userId),
+		)
 		return loadAgentMatchesForProfile(profile, 'sellers', data)
 	})
 
 async function loadAgentMatchesForProfile(
-	profile: ClientProfileRow | undefined,
+	profile: ClientProfileForScoring | undefined,
 	side: MatchSide,
 	pageParam: MatchPageParam = defaultMatchPageParam,
 ): Promise<AgentMatchData[]> {
-	const results = await db
-		.select({ agent: agentProfiles, user })
-		.from(agentProfiles)
-		.innerJoin(user, eq(agentProfiles.userId, user.id))
+	const results = await loadAgentProfilesWithCityCenter()
 	const scored = results.map((row) => ({
 		row,
 		score: calculateFitScore(row.agent, profile, toScoringSide(side)),

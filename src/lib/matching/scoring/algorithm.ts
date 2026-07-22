@@ -1,5 +1,6 @@
 import zipcodes from 'zipcodes'
 
+import type { CityCenter } from '@/lib/geography/zip'
 import {
 	AGENT_PRICE_RANGES,
 	BUCKET_ORDER,
@@ -11,6 +12,16 @@ import type {
 	PropertyTypeSlug,
 } from '@/lib/profile/profile-fields'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
+
+// city center is resolved via a join to `cities` at query time (see
+// src/lib/matching/server.ts, src/lib/matching/debug.ts) rather than stored
+// on the profile row, so it stays in sync with `cities.centerLat/centerLng`.
+export type AgentProfileForScoring = AgentProfile & {
+	cityCenter?: CityCenter | undefined
+}
+export type ClientProfileForScoring = ClientProfileRow & {
+	cityCenter?: CityCenter | undefined
+}
 
 import {
 	baseDimensionWeights,
@@ -103,18 +114,6 @@ function toMatchSide(side: 'buying' | 'selling'): MatchSide {
 	return side === 'buying' ? 'buyers' : 'sellers'
 }
 
-function profileCityCenter(
-	profile: ClientProfileRow | AgentProfile,
-): { lat: number; lng: number } | undefined {
-	if (
-		profile.cityCenterLatitude == null ||
-		profile.cityCenterLongitude == null
-	) {
-		return undefined
-	}
-	return { lat: profile.cityCenterLatitude, lng: profile.cityCenterLongitude }
-}
-
 function haversineMiles(
 	lat1: number,
 	lng1: number,
@@ -170,8 +169,8 @@ function cityFitScore(centroidMiles: number): number {
 }
 
 export function scoreLocation(
-	client: ClientProfileRow,
-	agent: AgentProfile,
+	client: ClientProfileForScoring,
+	agent: AgentProfileForScoring,
 ): DimensionResult {
 	const clientZips = client.zipCodes ?? []
 	const agentZips = agent.zipCodes ?? []
@@ -198,8 +197,8 @@ export function scoreLocation(
 
 	const zipFit = clientZips.length > 0 ? bestFitSum / clientZips.length : 0
 
-	const clientStoredCenter = profileCityCenter(client)
-	const agentStoredCenter = profileCityCenter(agent)
+	const clientStoredCenter = client.cityCenter
+	const agentStoredCenter = agent.cityCenter
 	const clientCenter = clientStoredCenter ?? centroidOfZips(clientZips)
 	const agentCenter = agentStoredCenter ?? centroidOfZips(agentZips)
 
@@ -929,8 +928,8 @@ export interface ScoringVariant {
 }
 
 export function calculateFitScore(
-	agent: AgentProfile,
-	client?: ClientProfileRow,
+	agent: AgentProfileForScoring,
+	client?: ClientProfileForScoring,
 	side: 'buying' | 'selling' = 'buying',
 	variant?: ScoringVariant,
 ): FitScoreResult {

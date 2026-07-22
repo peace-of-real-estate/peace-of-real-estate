@@ -7,8 +7,6 @@ export const mockSellerProfile = {
 	state: 'TX',
 	city: 'Austin',
 	zipCodes: [],
-	cityCenterLatitude: null,
-	cityCenterLongitude: null,
 	timeline: '3months',
 	priceMin: 400_000,
 	priceMax: 750_000,

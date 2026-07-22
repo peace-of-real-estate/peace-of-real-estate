@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import * as zipcodes from 'zipcodes'
 
 import { db } from '../src/db/connection'
@@ -27,6 +28,13 @@ function isNycZip(zip: string): boolean {
 	return NYC_ZIP_RANGES.some(([min, max]) => value >= min && value <= max)
 }
 
+// Encodes a (city, state) pair as a Map key. Using JSON instead of a
+// hand-joined string (e.g. `${city}|${state}`) avoids key collisions if a
+// city or state value ever contains the delimiter.
+function cityKey(city: string, state: string): string {
+	return JSON.stringify([city, state])
+}
+
 async function seedCityData() {
 	const now = new Date()
 
@@ -45,7 +53,7 @@ async function seedCityData() {
 
 	for (const record of Object.values(zipcodes.codes)) {
 		if (record.country !== 'US') continue
-		const key = `${record.city}|${record.state}`
+		const key = cityKey(record.city, record.state)
 		let group = cityGroups.get(key)
 		if (!group) {
 			group = {
@@ -57,10 +65,7 @@ async function seedCityData() {
 			}
 			cityGroups.set(key, group)
 		}
-		if (
-			typeof record.latitude === 'number' &&
-			typeof record.longitude === 'number'
-		) {
+		if (Number.isFinite(record.latitude) && Number.isFinite(record.longitude)) {
 			group.lats.push(record.latitude)
 			group.lngs.push(record.longitude)
 		}
@@ -71,7 +76,7 @@ async function seedCityData() {
 			record.city !== 'New York' &&
 			isNycZip(record.zip)
 		) {
-			const nycKey = 'New York|NY'
+			const nycKey = cityKey('New York', 'NY')
 			let nycGroup = cityGroups.get(nycKey)
 			if (!nycGroup) {
 				nycGroup = {
@@ -84,8 +89,8 @@ async function seedCityData() {
 				cityGroups.set(nycKey, nycGroup)
 			}
 			if (
-				typeof record.latitude === 'number' &&
-				typeof record.longitude === 'number'
+				Number.isFinite(record.latitude) &&
+				Number.isFinite(record.longitude)
 			) {
 				nycGroup.lats.push(record.latitude)
 				nycGroup.lngs.push(record.longitude)
@@ -100,12 +105,12 @@ async function seedCityData() {
 		const id = crypto.randomUUID()
 		const centerLat =
 			group.lats.length > 0
-				? String(group.lats.reduce((a, b) => a + b, 0) / group.lats.length)
-				: '0'
+				? group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+				: null
 		const centerLng =
 			group.lngs.length > 0
-				? String(group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length)
-				: '0'
+				? group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
+				: null
 
 		cityRows.push({
 			id,
@@ -127,13 +132,28 @@ async function seedCityData() {
 		}
 	}
 
+	const cityIdByKey = new Map<string, string>()
+
 	for (let i = 0; i < cityRows.length; i += BATCH_SIZE_CITIES) {
-		await db
+		const batch = cityRows.slice(i, i + BATCH_SIZE_CITIES)
+		// A no-op DO UPDATE (instead of DO NOTHING) makes Postgres run every
+		// conflicting row through the UPDATE arm too, so RETURNING reports the
+		// id for every row in the batch — new or pre-existing — in one query.
+		const upserted = await db
 			.insert(cities)
-			.values(cityRows.slice(i, i + BATCH_SIZE_CITIES))
-			.onConflictDoNothing({
+			.values(batch)
+			.onConflictDoUpdate({
 				target: [cities.city, cities.state],
+				set: {
+					city: sql`excluded.city`,
+					centerLat: sql`excluded.center_lat`,
+					centerLng: sql`excluded.center_lng`,
+				},
 			})
+			.returning({ id: cities.id, city: cities.city, state: cities.state })
+		for (const row of upserted) {
+			cityIdByKey.set(cityKey(row.city, row.state), row.id)
+		}
 		console.log(
 			`  cities ${Math.min(i + BATCH_SIZE_CITIES, cityRows.length)}/${cityRows.length}`,
 		)
@@ -142,9 +162,21 @@ async function seedCityData() {
 	for (let i = 0; i < zipRows.length; i += BATCH_SIZE_ZIPS) {
 		await db
 			.insert(cityZips)
-			.values(zipRows.slice(i, i + BATCH_SIZE_ZIPS))
+			.values(
+				zipRows.slice(i, i + BATCH_SIZE_ZIPS).map((row) => {
+					const key = cityKey(row.city, row.state)
+					const cityId = cityIdByKey.get(key)
+					if (!cityId) throw new Error(`No city row for ${key}`)
+					return {
+						id: row.id,
+						cityId,
+						zip: row.zip,
+						createdAt: row.createdAt,
+					}
+				}),
+			)
 			.onConflictDoNothing({
-				target: [cityZips.city, cityZips.state, cityZips.zip],
+				target: [cityZips.cityId, cityZips.zip],
 			})
 		console.log(
 			`  city_zips ${Math.min(i + BATCH_SIZE_ZIPS, zipRows.length)}/${zipRows.length}`,
