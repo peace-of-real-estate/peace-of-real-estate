@@ -50,10 +50,8 @@ const agentInput: AgentIntroAgentInput = {
 	name: 'Avery Stone',
 	contact: {
 		email: 'avery@example.com',
-		phone: '555-0100',
 		brokerageName: 'Stone Realty',
 		licenseNumberState: 'MD 12345',
-		businessAddress: '100 Main St',
 	},
 }
 
@@ -107,10 +105,8 @@ describe('toClientIntroView', () => {
 		)
 		expect(view.agent.contact).toEqual({
 			email: 'avery@example.com',
-			phone: '555-0100',
 			brokerageName: 'Stone Realty',
 			licenseNumberState: 'MD 12345',
-			businessAddress: '100 Main St',
 		})
 	})
 

@@ -16,10 +16,8 @@ export type ClientIntroView = Pick<
 		name: string
 		contact?: {
 			email: string
-			phone: string | null
 			brokerageName: string
 			licenseNumberState: string
-			businessAddress: string | null
 		}
 	}
 }
@@ -62,10 +60,8 @@ export type AgentIntroAgentInput = {
 	name: string
 	contact: {
 		email: string
-		phone: string | null
 		brokerageName: string
 		licenseNumberState: string
-		businessAddress: string | null
 	}
 }
 
@@ -89,13 +85,6 @@ export function anonymizeName(fullName: string): string {
 	if (!first) return ''
 	if (!last) return first
 	return `${first} ${last.charAt(0)}.`
-}
-
-export function agentDisplayName(agent: {
-	firstName: string
-	lastName: string
-}): string {
-	return `${agent.firstName} ${agent.lastName}`
 }
 
 export function toClientIntroView(

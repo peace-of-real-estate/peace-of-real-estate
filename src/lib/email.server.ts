@@ -199,26 +199,22 @@ export async function sendConnectedClientEmail({
 	to,
 	agentName,
 	agentEmail,
-	agentPhone,
 	role,
 	idempotencyKey,
 }: {
 	to: string
 	agentName: string
 	agentEmail: string
-	agentPhone: string | null
 	role: ClientRole
 	idempotencyKey: string
 }) {
 	const url = appUrl(clientIntroductionsPath(role))
-	const phoneLine = agentPhone ? ` or ${agentPhone}` : ''
-	const htmlPhoneLine = agentPhone ? ` or ${escapeEmailHtml(agentPhone)}` : ''
 	await deliver({
 		to,
 		subject: `You're connected with ${agentName}`,
-		html: `<p>You're now connected with ${escapeEmailHtml(agentName)} on Peace of Real Estate.</p><p>Reach them directly at <a href="mailto:${escapeEmailHtml(agentEmail)}">${escapeEmailHtml(agentEmail)}</a>${htmlPhoneLine}.</p><p>Your introductions: <a href="${url}">${url}</a></p>`,
-		text: `You're now connected with ${agentName} on Peace of Real Estate. Reach them directly at ${agentEmail}${phoneLine}. Your introductions: ${url}`,
-		devSummary: `Connected with ${agentName} <${agentEmail}>${phoneLine}: ${url}`,
+		html: `<p>You're now connected with ${escapeEmailHtml(agentName)} on Peace of Real Estate.</p><p>Reach them directly at <a href="mailto:${escapeEmailHtml(agentEmail)}">${escapeEmailHtml(agentEmail)}</a>.</p><p>Your introductions: <a href="${url}">${url}</a></p>`,
+		text: `You're now connected with ${agentName} on Peace of Real Estate. Reach them directly at ${agentEmail}. Your introductions: ${url}`,
+		devSummary: `Connected with ${agentName} <${agentEmail}>: ${url}`,
 		idempotencyKey,
 	})
 }

@@ -498,11 +498,9 @@ describe('list views', () => {
 
 		const payload = await Client.list(db, client.profile.id)
 		expect(payload.introductions[0]?.agent.contact).toEqual({
-			email: 'avery@example.com',
-			phone: null,
+			email: agent.user.email,
 			brokerageName: 'Harborline Realty',
 			licenseNumberState: 'LIC-123456-MD',
-			businessAddress: null,
 		})
 		expect(payload.agentStates).toEqual([
 			{ agentProfileId: agent.profile.id, state: 'connected', retryAt: null },
