@@ -1,0 +1,15 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "vp build"
+
+[deploy]
+preDeployCommand = "vp run db:migrate && vp run db:init"
+runtime = "V2"
+numReplicas = 1
+startCommand = "vp run start"
+healthcheckPath = "/"
+sleepApplication = true
+useLegacyStacker = false
+ipv6EgressEnabled = false
+restartPolicyType = "ALWAYS"
+healthcheckTimeout = 300

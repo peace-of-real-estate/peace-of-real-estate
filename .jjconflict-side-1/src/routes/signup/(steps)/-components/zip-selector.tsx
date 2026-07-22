@@ -1,0 +1,636 @@
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { MapPinIcon } from '@phosphor-icons/react'
+import { CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import type { Feature, FeatureCollection } from 'geojson'
+import { useEffect, useRef, useState } from 'react'
+import Map, { Layer, Source } from 'react-map-gl/maplibre'
+import type {
+	LayerProps,
+	MapLayerMouseEvent,
+	MapRef,
+} from 'react-map-gl/maplibre'
+import { z } from 'zod'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from '@/components/ui/command'
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@/components/ui/popover'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cartoRasterStyle } from '@/lib/geography/basemap'
+import {
+	isValidZipCode,
+	loadCityCenter,
+	loadCitySuggestions,
+	loadZipCodeBoundaries,
+	parseCityState,
+} from '@/lib/geography/zip'
+import { cn } from '@/lib/utils/ui'
+
+import { StepLabel } from './signup-shell'
+
+export type CityZipSelectorProps = {
+	id?: string
+	value: string
+	onChange: (value: string, zipCodes: string[]) => void
+	zipCodes: string[]
+	label?: React.ReactNode
+	placeholder?: string
+	emptyMessage?: string
+	height?: 'sm' | 'md'
+	children?: React.ReactNode
+}
+
+export function CityZipSelector({
+	id,
+	value,
+	onChange,
+	zipCodes,
+	label = 'City',
+	placeholder = 'Search for your city',
+	emptyMessage = 'No matching cities. Try a nearby market.',
+	height = 'md',
+	children,
+}: CityZipSelectorProps) {
+	const normalizedInitialLocation = (() => {
+		const parsed = parseCityState(value)
+		return parsed ? `${parsed.city}, ${parsed.state}` : value
+	})()
+
+	const [committedLocation, setCommittedLocation] = useState(
+		normalizedInitialLocation,
+	)
+	const [locationQuery, setLocationQuery] = useState(normalizedInitialLocation)
+	const [locationOpen, setLocationOpen] = useState(false)
+	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(zipCodes)
+	const [manualZipCode, setManualZipCode] = useState('')
+	const marketComplete = committedLocation.trim().length >= 2
+	const cityState = parseCityState(committedLocation)
+
+	const { data: locationSuggestions = [] } = useQuery({
+		queryKey: ['city-suggestions', locationQuery],
+		queryFn: () => loadCitySuggestions({ data: locationQuery }),
+		enabled: locationQuery.trim().length >= 0,
+		staleTime: 1000 * 60 * 60,
+	})
+
+	const { data: boundaries } = useQuery({
+		queryKey: ['zip-code-boundaries', committedLocation],
+		queryFn: async () => {
+			if (!cityState) {
+				return {
+					type: 'FeatureCollection',
+					features: [],
+				} satisfies FeatureCollection
+			}
+			return loadZipCodeBoundaries({ data: cityState })
+		},
+		enabled: marketComplete && Boolean(cityState),
+		staleTime: 1000 * 60 * 60,
+	})
+
+	const { data: centerForCity } = useQuery({
+		queryKey: ['city-center', committedLocation],
+		queryFn: async () => {
+			if (!cityState) return undefined
+			return loadCityCenter({ data: cityState })
+		},
+		enabled: marketComplete && Boolean(cityState),
+		staleTime: 1000 * 60 * 60,
+	})
+
+	const selectCity = (city: string) => {
+		const nextZipCodes = city === committedLocation ? selectedZipCodes : []
+		setCommittedLocation(city)
+		setLocationQuery(city)
+		setSelectedZipCodes(nextZipCodes)
+		setLocationOpen(false)
+		onChange(city, nextZipCodes)
+	}
+
+	const toggleZipCode = (zipCode: string) => {
+		const next = selectedZipCodes.includes(zipCode)
+			? selectedZipCodes.filter((item) => item !== zipCode)
+			: [...selectedZipCodes, zipCode]
+		setSelectedZipCodes(next)
+		onChange(committedLocation, next)
+	}
+
+	const addManualZipCode = () => {
+		const zipCode = manualZipCode.trim()
+		if (!marketComplete || !isValidZipCode(zipCode)) return
+		const next = selectedZipCodes.includes(zipCode)
+			? selectedZipCodes
+			: [...selectedZipCodes, zipCode]
+		setSelectedZipCodes(next)
+		onChange(committedLocation, next)
+		setManualZipCode('')
+	}
+
+	const mapHeight = height === 'sm' ? 'h-64' : 'h-80'
+
+	return (
+		<div className="space-y-3">
+			{label ? <StepLabel complete={marketComplete}>{label}</StepLabel> : null}
+			<Popover
+				open={locationOpen}
+				onOpenChange={(open) => {
+					setLocationQuery(open ? '' : committedLocation)
+					setLocationOpen(open)
+				}}
+			>
+				<PopoverTrigger asChild>
+					<Button
+						id={id}
+						variant="outline"
+						aria-expanded={locationOpen}
+						className={cn(
+							'h-12 w-full justify-between rounded-lg px-4 text-left text-base font-semibold transition sm:h-14 sm:text-lg',
+							marketComplete
+								? 'border-primary/60 bg-background text-foreground shadow-sm hover:bg-primary/[0.04]'
+								: 'border-primary/25 bg-background text-foreground shadow-sm hover:border-primary/50 hover:bg-background',
+						)}
+					>
+						<span className="flex min-w-0 flex-1 items-center gap-2.5">
+							{cityState?.state ? (
+								<Badge
+									variant="muted"
+									className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+								>
+									{cityState.state}
+								</Badge>
+							) : null}
+							<span
+								className={cn(
+									'truncate',
+									!committedLocation && 'text-muted-foreground',
+								)}
+							>
+								{cityState ? cityState.city : committedLocation || placeholder}
+							</span>
+						</span>
+						<CaretUpDownIcon className="text-muted-foreground h-4 w-4 shrink-0" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent
+					align="start"
+					className="max-h-(--radix-popover-content-available-height) w-(--radix-popover-trigger-width) min-w-[260px] p-0"
+				>
+					<Command shouldFilter={false}>
+						<CommandInput
+							value={locationQuery}
+							onValueChange={setLocationQuery}
+							placeholder="Search city..."
+						/>
+						<CommandList>
+							<CommandEmpty>{emptyMessage}</CommandEmpty>
+							<CommandGroup
+								heading={
+									locationQuery.trim().length < 2
+										? 'Top US cities'
+										: 'City matches'
+								}
+							>
+								{locationSuggestions.map((suggestion) => {
+									const parsed = parseCityState(suggestion)
+									const isSelected = committedLocation === suggestion
+									return (
+										<CommandItem
+											key={suggestion}
+											value={suggestion}
+											onSelect={selectCity}
+											className="gap-2 rounded-md px-2.5 py-2"
+										>
+											{parsed?.state ? (
+												<Badge
+													variant="muted"
+													className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+												>
+													{parsed.state}
+												</Badge>
+											) : null}
+											<span className="min-w-0 truncate font-medium">
+												{parsed?.city ?? suggestion}
+											</span>
+											<span className="ml-auto flex shrink-0 items-center gap-1.5">
+												<CheckIcon
+													className={cn(
+														'h-4 w-4',
+														isSelected
+															? 'text-primary opacity-100'
+															: 'opacity-0',
+													)}
+												/>
+											</span>
+										</CommandItem>
+									)
+								})}
+							</CommandGroup>
+						</CommandList>
+					</Command>
+				</PopoverContent>
+			</Popover>
+
+			{marketComplete ? (
+				<div className="space-y-3">
+					<div className="flex items-center gap-2">
+						<div className="bg-muted/50 relative flex flex-1 items-center rounded-lg border px-3">
+							<input
+								value={manualZipCode}
+								onChange={(event) => setManualZipCode(event.target.value)}
+								placeholder="Add ZIP code"
+								inputMode="numeric"
+								maxLength={5}
+								className="h-11 w-full bg-transparent text-sm font-semibold outline-none"
+							/>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={addManualZipCode}
+								disabled={!isValidZipCode(manualZipCode.trim())}
+								className="h-8 rounded-md px-3 text-xs"
+							>
+								Add
+							</Button>
+						</div>
+					</div>
+					<div className="flex h-13 flex-wrap content-start items-start gap-1.5 overflow-y-auto">
+						{selectedZipCodes.length > 0 ? (
+							selectedZipCodes.map((zipCode) => (
+								<button
+									key={zipCode}
+									type="button"
+									onClick={() => toggleZipCode(zipCode)}
+									className="border-primary bg-primary text-primary-foreground shrink-0 rounded-md border px-2 py-0.5 text-xs font-semibold transition hover:opacity-80"
+									aria-pressed
+								>
+									{zipCode}
+								</button>
+							))
+						) : (
+							<p className="text-muted-foreground flex h-full items-center text-xs">
+								Click ZIPs on the map or add one above.
+							</p>
+						)}
+					</div>
+					<div className="bg-muted/30 border-border overflow-hidden rounded-lg border p-3">
+						{!centerForCity ? (
+							<Skeleton className={cn('rounded-lg', mapHeight)} />
+						) : (
+							<ZipCodeMap
+								boundaries={
+									boundaries ?? {
+										type: 'FeatureCollection',
+										features: [],
+									}
+								}
+								selectedZipCodes={selectedZipCodes}
+								onToggleZipCode={toggleZipCode}
+								center={centerForCity}
+								className={mapHeight}
+							/>
+						)}
+					</div>
+					{children}
+				</div>
+			) : (
+				<div className="space-y-3">
+					<div className="bg-muted/50 relative flex items-center rounded-lg border px-3 opacity-60">
+						<input
+							placeholder="Add ZIP code"
+							disabled
+							className="h-11 w-full bg-transparent text-sm font-semibold outline-none"
+						/>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							disabled
+							className="h-8 rounded-md px-3 text-xs"
+						>
+							Add
+						</Button>
+					</div>
+					<div className="border-border/70 bg-muted/20 overflow-hidden rounded-lg border p-3">
+						<div
+							className={cn(
+								'flex flex-col items-center justify-center gap-2 text-center',
+								mapHeight,
+							)}
+						>
+							<MapPinIcon className="text-muted-foreground/60 h-6 w-6" />
+							<p className="text-muted-foreground text-sm">
+								Pick a city to unlock the ZIP map.
+							</p>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	)
+}
+
+type ZipCodeMapProps = {
+	boundaries: FeatureCollection
+	selectedZipCodes: string[]
+	onToggleZipCode?: ((zipCode: string) => void) | undefined
+	center?: { latitude: number; longitude: number } | undefined
+	className?: string | undefined
+}
+
+type BBox = {
+	minLng: number
+	minLat: number
+	maxLng: number
+	maxLat: number
+}
+
+const CARTO_STYLE = cartoRasterStyle('light_all')
+
+const LINE_LAYER = {
+	id: 'zip-line',
+	type: 'line',
+	source: 'zip-codes',
+	paint: {
+		'line-color': '#9ca3af',
+		'line-width': 1,
+	},
+} satisfies LayerProps
+
+function expandBoundsFromRing(bounds: BBox, ring: unknown) {
+	if (!Array.isArray(ring)) return
+
+	for (const point of ring) {
+		if (
+			!Array.isArray(point) ||
+			typeof point[0] !== 'number' ||
+			typeof point[1] !== 'number'
+		) {
+			continue
+		}
+
+		const [lng, lat] = point
+		bounds.minLng = Math.min(bounds.minLng, lng)
+		bounds.minLat = Math.min(bounds.minLat, lat)
+		bounds.maxLng = Math.max(bounds.maxLng, lng)
+		bounds.maxLat = Math.max(bounds.maxLat, lat)
+	}
+}
+
+const pointSchema = z.tuple([z.number(), z.number()])
+const ringSchema = z.array(pointSchema)
+const polygonSchema = z.array(ringSchema)
+const multiPolygonSchema = z.array(polygonSchema)
+
+function expandBoundsFromPolygon(
+	bounds: BBox,
+	coordinates: number[][][] | number[][][][],
+) {
+	const polygon = polygonSchema.safeParse(coordinates)
+	if (polygon.success) {
+		for (const ring of polygon.data) {
+			expandBoundsFromRing(bounds, ring)
+		}
+		return
+	}
+
+	const multiPolygon = multiPolygonSchema.safeParse(coordinates)
+	if (multiPolygon.success) {
+		for (const polygon of multiPolygon.data) {
+			for (const ring of polygon) {
+				expandBoundsFromRing(bounds, ring)
+			}
+		}
+	}
+}
+
+function expandBoundsFromFeature(bounds: BBox, feature: Feature) {
+	if (feature.geometry.type === 'Polygon') {
+		expandBoundsFromPolygon(bounds, feature.geometry.coordinates)
+	} else if (feature.geometry.type === 'MultiPolygon') {
+		expandBoundsFromPolygon(bounds, feature.geometry.coordinates)
+	}
+}
+
+function getBounds(features: FeatureCollection['features']): BBox | undefined {
+	const bounds: BBox = {
+		minLng: Infinity,
+		minLat: Infinity,
+		maxLng: -Infinity,
+		maxLat: -Infinity,
+	}
+
+	for (const feature of features) {
+		expandBoundsFromFeature(bounds, feature)
+	}
+
+	if (!Number.isFinite(bounds.minLng)) return undefined
+	return bounds
+}
+
+function ZipCodeMapSkeleton({ className }: { className?: string | undefined }) {
+	return (
+		<div
+			className={cn(
+				'relative min-h-64 overflow-hidden rounded-lg border',
+				className,
+			)}
+		>
+			<Skeleton className="absolute inset-0" />
+		</div>
+	)
+}
+
+function ZipCodeMapImpl({
+	boundaries,
+	selectedZipCodes,
+	onToggleZipCode,
+	center,
+	className,
+}: ZipCodeMapProps) {
+	const mapRef = useRef<MapRef>(null)
+	const [mapLoaded, setMapLoaded] = useState(false)
+	const [hovered, setHovered] = useState<{
+		zipCode: string
+		x: number
+		y: number
+	} | null>(null)
+
+	const bounds = getBounds(boundaries.features)
+	const fitKey = bounds
+		? `${bounds.minLng},${bounds.minLat},${bounds.maxLng},${bounds.maxLat}`
+		: center
+			? `${center.longitude},${center.latitude}`
+			: ''
+	const lastFitKey = useRef('')
+
+	useEffect(() => {
+		const map = mapRef.current
+		if (!map || !mapLoaded) return
+		if (fitKey === '' || lastFitKey.current === fitKey) return
+		lastFitKey.current = fitKey
+
+		if (bounds) {
+			map.fitBounds(
+				[
+					[bounds.minLng, bounds.minLat],
+					[bounds.maxLng, bounds.maxLat],
+				],
+				{ padding: 24, duration: 0 },
+			)
+		} else if (center) {
+			map.flyTo({
+				center: [center.longitude, center.latitude],
+				zoom: 10,
+				duration: 0,
+			})
+		}
+	}, [bounds, center, fitKey, mapLoaded])
+
+	const hoveredZipCode = hovered ? hovered.zipCode : ''
+	const fillLayer = {
+		id: 'zip-fill',
+		type: 'fill',
+		source: 'zip-codes',
+		paint: {
+			'fill-color': [
+				'case',
+				[
+					'boolean',
+					['in', ['get', 'ZCTA5'], ['literal', selectedZipCodes]],
+					false,
+				],
+				'#2563eb',
+				['==', ['get', 'ZCTA5'], hoveredZipCode],
+				'#93c5fd',
+				'#e5e7eb',
+			],
+			'fill-opacity': 0.5,
+		},
+	} satisfies LayerProps
+
+	const selectedLineLayer = {
+		id: 'zip-line-selected',
+		type: 'line',
+		source: 'zip-codes',
+		filter: ['in', ['get', 'ZCTA5'], ['literal', selectedZipCodes]],
+		paint: {
+			'line-color': '#2563eb',
+			'line-width': 2,
+		},
+	} satisfies LayerProps
+
+	function handleClick(event: MapLayerMouseEvent) {
+		if (!onToggleZipCode) return
+		const feature = event.features?.[0]
+		const zipCode = feature?.properties?.ZCTA5
+		if (typeof zipCode !== 'string') return
+		onToggleZipCode(zipCode)
+	}
+
+	function handleMouseEnter() {
+		if (!mapRef.current) return
+		mapRef.current.getCanvas().style.cursor = 'pointer'
+	}
+
+	function handleMouseMove(event: MapLayerMouseEvent) {
+		const feature = event.features?.[0]
+		const zipCode = feature?.properties?.ZCTA5
+		if (typeof zipCode !== 'string') {
+			setHovered(null)
+			return
+		}
+		setHovered({ zipCode, x: event.point.x, y: event.point.y })
+	}
+
+	function handleMouseLeave() {
+		setHovered(null)
+		if (!mapRef.current) return
+		mapRef.current.getCanvas().style.cursor = ''
+	}
+
+	const interactiveLayerIds = ['zip-fill']
+
+	const initialViewState = center
+		? {
+				longitude: center.longitude,
+				latitude: center.latitude,
+				zoom: 10,
+			}
+		: {
+				longitude: -98.5795,
+				latitude: 39.8283,
+				zoom: 3,
+			}
+
+	return (
+		<div className={cn('relative h-80 overflow-hidden rounded-lg', className)}>
+			<Map
+				ref={mapRef}
+				mapStyle={CARTO_STYLE}
+				initialViewState={initialViewState}
+				dragRotate={false}
+				keyboard={false}
+				interactiveLayerIds={interactiveLayerIds}
+				onClick={handleClick}
+				onMouseEnter={handleMouseEnter}
+				onMouseMove={handleMouseMove}
+				onMouseLeave={handleMouseLeave}
+				onLoad={(event) => {
+					event.target.touchZoomRotate.disableRotation()
+					setMapLoaded(true)
+				}}
+				style={{ width: '100%', height: '100%' }}
+			>
+				<Source id="zip-codes" type="geojson" data={boundaries} />
+				<Layer {...fillLayer} />
+				<Layer {...LINE_LAYER} />
+				<Layer {...selectedLineLayer} />
+			</Map>
+			{hovered ? (
+				<div
+					className="bg-foreground text-background pointer-events-none absolute z-10 rounded-md px-2 py-1 text-xs font-semibold shadow-md"
+					style={{ left: hovered.x + 12, top: hovered.y + 12 }}
+				>
+					{hovered.zipCode}
+				</div>
+			) : null}
+		</div>
+	)
+}
+
+function ZipCodeMap(props: ZipCodeMapProps) {
+	const [Inner, setInner] =
+		useState<React.ComponentType<ZipCodeMapProps> | null>(null)
+
+	useEffect(() => {
+		let cancelled = false
+
+		void import('react-map-gl/maplibre').then(() => {
+			if (cancelled) return
+			setInner(() => ZipCodeMapImpl)
+		})
+
+		return () => {
+			cancelled = true
+		}
+	}, [])
+
+	if (!Inner) {
+		return <ZipCodeMapSkeleton className={props.className} />
+	}
+
+	return <Inner {...props} />
+}

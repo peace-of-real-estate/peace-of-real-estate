@@ -1,0 +1,16 @@
+{
+	// scripts/setup.ts is invoked from scripts/bootstrap.sh (invisible to the import graph)
+	"entry": ["scripts/setup.ts"],
+	"ignoreExports": [
+		{
+			"file": "src/components/ui/**",
+			"exports": ["*"],
+		},
+	],
+	"ignorePatterns": ["src/components/ui/**"],
+	"ignoreDependencies": [
+		// planned features not yet wired up
+		"ai",
+		"@ai-sdk/openai-compatible",
+	],
+}

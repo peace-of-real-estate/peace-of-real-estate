@@ -1,0 +1,32 @@
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# env files
+.env*.local
+.env.compose
+.mise.local.toml
+
+# varlock generated types
+env.d.ts
+
+# Build
+.output
+.nitro
+.tanstack
+node_modules
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Testing
+.playwright
+.vitest-attachments
+visual-diffs.html
+**/*-1.png
+e2e/.auth
+
+# Vitest failure screenshots (not baseline snapshots)
+src/**/__screenshots__/*-matches-desktop-screenshot-*.png
+
+.pnpm-store
+.worktrees

@@ -1,0 +1,221 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource-variable/jetbrains-mono';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--app-header-height: 3.5rem;
+	--app-footer-height: 4rem;
+
+	--radius: 0.375rem;
+
+	--background: oklch(0.985 0.003 240);
+	--foreground: oklch(0.21 0.04 240);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.21 0.04 240);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.21 0.04 240);
+
+	/* Primary: ink-depth brand navy (hue 235 held across the family) */
+	--primary: oklch(0.3 0.07 235);
+	--primary-foreground: oklch(0.98 0.005 240);
+
+	/* Brand: #024A70 re-derived — headings on white, links, emphasis.
+	   Never a large fill: light-only UI, navy acts through text and buttons. */
+	--brand: oklch(0.38 0.08 235);
+	--brand-foreground: oklch(0.98 0.005 240);
+
+	/* Secondary: navy-cast neutral */
+	--secondary: oklch(0.945 0.01 240);
+	--secondary-foreground: oklch(0.3 0.05 238);
+
+	/* Muted */
+	--muted: oklch(0.955 0.008 240);
+	--muted-foreground: oklch(0.5 0.025 240);
+
+	/* Accent: shadcn-conventional subtle tint for hover/selected states
+	   (menus, command items, ghost buttons). NOT the brand amber. */
+	--accent: oklch(0.945 0.01 240);
+	--accent-foreground: oklch(0.3 0.05 238);
+
+	/* Amber: brand highlight — match scores, badges, emphasized words.
+	   Never a CTA, never a hover state. */
+	--amber: oklch(0.72 0.13 75);
+	--amber-foreground: oklch(0.25 0.06 70);
+
+	/* Destructive: red-orange, clearly distinct from amber */
+	--destructive: oklch(0.55 0.2 27);
+	--destructive-foreground: oklch(1 0 0);
+
+	/* Success: replaces ad-hoc emerald */
+	--success: oklch(0.55 0.12 155);
+	--success-foreground: oklch(1 0 0);
+
+	/* Borders & inputs */
+	--border: oklch(0.88 0.012 240);
+	--input: oklch(0.9 0.01 240);
+	--ring: oklch(0.3 0.07 235);
+
+	/* Sky: illustration + tint source only; never text, never large fills */
+	--sky: oklch(0.82 0.08 230);
+	--sky-foreground: oklch(0.21 0.04 240);
+	--sky-tint: oklch(0.95 0.02 230);
+
+	/* Sidebar */
+	--sidebar: oklch(0.97 0.005 240);
+	--sidebar-foreground: oklch(0.21 0.04 240);
+	--sidebar-primary: oklch(0.3 0.07 235);
+	--sidebar-primary-foreground: oklch(0.98 0.005 240);
+	--sidebar-accent: oklch(0.945 0.01 240);
+	--sidebar-accent-foreground: oklch(0.3 0.05 238);
+	--sidebar-border: oklch(0.88 0.012 240);
+	--sidebar-ring: oklch(0.3 0.07 235);
+
+	/* Typography: one family — DM Sans for headings and body */
+	--font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: georgia, cambria, 'Times New Roman', times, serif;
+	--font-mono:
+		'JetBrains Mono Variable', ui-monospace, sfmono-regular, menlo, monaco,
+		consolas, monospace;
+	--font-family-sans: var(--font-sans);
+	--font-family-heading: var(--font-sans);
+	--font-family-mono: var(--font-mono);
+	--font-body: var(--font-sans);
+	--font-heading: var(--font-family-heading);
+
+	/* Shadows: cast from deep navy */
+	--shadow-color: oklch(0.2 0.04 255);
+	--shadow-2xs: 0 1px 2px 0 oklch(0.2 0.04 255 / 0.04);
+	--shadow-xs: 0 1px 3px 0 oklch(0.2 0.04 255 / 0.06);
+	--shadow-sm:
+		0 1px 3px 0 oklch(0.2 0.04 255 / 0.07),
+		0 1px 2px -1px oklch(0.2 0.04 255 / 0.06);
+	--shadow: 0 4px 20px -8px oklch(0.2 0.04 255 / 0.14);
+	--shadow-md: 0 10px 36px -14px oklch(0.2 0.04 255 / 0.18);
+	--shadow-lg: 0 18px 52px -20px oklch(0.2 0.04 255 / 0.22);
+	--shadow-xl: 0 26px 76px -24px oklch(0.2 0.04 255 / 0.26);
+	--shadow-2xl: 0 32px 92px -28px oklch(0.2 0.04 255 / 0.3);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-brand: var(--brand);
+	--color-brand-foreground: var(--brand-foreground);
+	--color-amber: var(--amber);
+	--color-amber-foreground: var(--amber-foreground);
+	--color-success: var(--success);
+	--color-success-foreground: var(--success-foreground);
+	--color-sky: var(--sky);
+	--color-sky-foreground: var(--sky-foreground);
+	--color-sky-tint: var(--sky-tint);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+
+	/* Readability floor: smallest text in the app is 13px */
+	--text-xs: 0.8125rem;
+	--text-xs--line-height: 1.4;
+
+	--font-sans: 'DM Sans Variable', sans-serif;
+	--font-heading: var(--font-sans);
+	--font-body: var(--font-sans);
+	--font-serif: georgia, cambria, 'Times New Roman', times, serif;
+	--font-mono:
+		'JetBrains Mono Variable', ui-monospace, sfmono-regular, menlo, monaco,
+		consolas, monospace;
+
+	/* Radius caps at xl — pill and bubble radii don't exist in this theme */
+	--radius-sm: calc(var(--radius) - 2px);
+	--radius-md: var(--radius);
+	--radius-lg: calc(var(--radius) + 2px);
+	--radius-xl: calc(var(--radius) + 6px);
+	--radius-2xl: initial;
+	--radius-3xl: initial;
+	--radius-4xl: initial;
+
+	--shadow-2xs: var(--shadow-2xs);
+	--shadow-xs: var(--shadow-xs);
+	--shadow-sm: var(--shadow-sm);
+	--shadow: var(--shadow);
+	--shadow-md: var(--shadow-md);
+	--shadow-lg: var(--shadow-lg);
+	--shadow-xl: var(--shadow-xl);
+	--shadow-2xl: var(--shadow-2xl);
+
+	--animate-fade-in: fade-in 0.4s ease-out forwards;
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+
+	html {
+		scroll-behavior: smooth;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		@apply font-sans;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--font-family-heading);
+		font-weight: 600;
+		letter-spacing: -0.025em;
+		line-height: 1.15;
+	}
+}
+
+@utility min-h-main-content {
+	min-height: calc(100dvh - var(--app-header-height));
+
+	&:last-child {
+		min-height: calc(
+			100dvh - var(--app-header-height) - var(--app-footer-height)
+		);
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
