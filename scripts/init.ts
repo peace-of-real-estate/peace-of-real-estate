@@ -100,12 +100,12 @@ async function seedCityData() {
 		const id = crypto.randomUUID()
 		const centerLat =
 			group.lats.length > 0
-				? String(group.lats.reduce((a, b) => a + b, 0) / group.lats.length)
-				: '0'
+				? group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+				: 0
 		const centerLng =
 			group.lngs.length > 0
-				? String(group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length)
-				: '0'
+				? group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
+				: 0
 
 		cityRows.push({
 			id,
@@ -119,6 +119,7 @@ async function seedCityData() {
 		for (const zip of group.zips) {
 			zipRows.push({
 				id: crypto.randomUUID(),
+				cityKey: `${group.city}|${group.state}`,
 				city: group.city,
 				state: group.state,
 				zip,
@@ -139,10 +140,30 @@ async function seedCityData() {
 		)
 	}
 
+	const persistedCities = await db
+		.select({ id: cities.id, city: cities.city, state: cities.state })
+		.from(cities)
+	const cityIdByKey = new Map(
+		persistedCities.map((row) => [`${row.city}|${row.state}`, row.id]),
+	)
+
 	for (let i = 0; i < zipRows.length; i += BATCH_SIZE_ZIPS) {
 		await db
 			.insert(cityZips)
-			.values(zipRows.slice(i, i + BATCH_SIZE_ZIPS))
+			.values(
+				zipRows.slice(i, i + BATCH_SIZE_ZIPS).map((row) => {
+					const cityId = cityIdByKey.get(row.cityKey)
+					if (!cityId) throw new Error(`No city row for ${row.cityKey}`)
+					return {
+						id: row.id,
+						cityId,
+						city: row.city,
+						state: row.state,
+						zip: row.zip,
+						createdAt: row.createdAt,
+					}
+				}),
+			)
 			.onConflictDoNothing({
 				target: [cityZips.city, cityZips.state, cityZips.zip],
 			})
