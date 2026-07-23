@@ -36,7 +36,6 @@ const questionIconMap = {
 	homeConnection: HouseIcon,
 	agentSilencePreference: ClockIcon,
 	representationPreference: ShieldIcon,
-	agentDeliveryExpectations: HouseIcon,
 
 	// Agent
 	clientDescription: UserIcon,

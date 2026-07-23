@@ -17,60 +17,6 @@ function responseTimeIndex(slug: string): number {
 	return RESPONSE_TIME_STEPS.findIndex((step) => step === slug)
 }
 
-export const clientDescriptionAffinityMatrix: AffinityMatrix = {
-	strategicDataDriven: {
-		strategicDataDriven: 1.0,
-		calmSteady: 0.4,
-		warmRelational: 0.2,
-		efficientDecisive: 0.7,
-	},
-	calmSteady: {
-		strategicDataDriven: 0.4,
-		calmSteady: 1.0,
-		warmRelational: 0.7,
-		efficientDecisive: 0.2,
-	},
-	warmRelational: {
-		strategicDataDriven: 0.2,
-		calmSteady: 0.7,
-		warmRelational: 1.0,
-		efficientDecisive: 0.3,
-	},
-	efficientDecisive: {
-		strategicDataDriven: 0.7,
-		calmSteady: 0.2,
-		warmRelational: 0.3,
-		efficientDecisive: 1.0,
-	},
-}
-
-export const dealInstinctAffinityMatrix: AffinityMatrix = {
-	factsFast: {
-		factsFast: 1.0,
-		slowItDown: 0.3,
-		takeControl: 0.6,
-		deEscalateFirst: 0.4,
-	},
-	slowItDown: {
-		factsFast: 0.3,
-		slowItDown: 1.0,
-		takeControl: 0.2,
-		deEscalateFirst: 0.7,
-	},
-	takeControl: {
-		factsFast: 0.6,
-		slowItDown: 0.2,
-		takeControl: 1.0,
-		deEscalateFirst: 0.5,
-	},
-	deEscalateFirst: {
-		factsFast: 0.4,
-		slowItDown: 0.7,
-		takeControl: 0.5,
-		deEscalateFirst: 1.0,
-	},
-}
-
 export const buyerDecisionMakingMatrix: AffinityMatrix = {
 	numbersData: {
 		strategicDataDriven: 1.0,
@@ -369,7 +315,6 @@ export const priorityToDimension: Record<string, DimensionId> = {
 	decisionMakingNeed: 'workingStyle',
 	biddingWarResponse: 'workingStyle',
 	homeConnection: 'workingStyle',
-	agentDeliveryExpectations: 'workingStyle',
 	representationPreference: 'businessTerms',
 }
 

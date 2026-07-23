@@ -40,7 +40,6 @@ const step3: SellerDraft = {
 	involvementLevel: 'veryInvolved',
 	quickCommunicationChannel: 'text',
 	updateDeliveryMethod: 'email',
-	agentDeliveryExpectations: ['pricedRight', 'honestStraightforward'],
 	homeConnection: 'goodMemories',
 	agentSilencePreference: 'milestones',
 	representationPreference: 'exclusiveRepresentationOnly',

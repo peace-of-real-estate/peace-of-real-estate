@@ -18,7 +18,6 @@ export const mockSellerProfile = {
 	involvementLevel: 'veryInvolved',
 	saleMotivation: 'lifestyleChange',
 	successfulSaleLooksLike: 'strongPriceSmoothProcess',
-	agentDeliveryExpectations: ['pricedRight', 'honestStraightforward'],
 	homeConnection: 'goodMemories',
 	agentSilencePreference: 'milestones',
 	representationPreference: 'exclusiveRepresentationOnly',

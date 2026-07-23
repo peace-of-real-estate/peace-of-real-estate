@@ -65,7 +65,6 @@ function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
 		commissionComfort: 'payFairRate',
 		saleMotivation: 'relocation',
 		successfulSaleLooksLike: 'strongPriceSmoothProcess',
-		agentDeliveryExpectations: ['pricedRight', 'greatNegotiatedOutcome'],
 		homeConnection: 'asset',
 		agentSilencePreference: 'milestones',
 		representationPreference: 'exclusiveRepresentationOnly',

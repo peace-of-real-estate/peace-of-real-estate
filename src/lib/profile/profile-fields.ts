@@ -1,7 +1,6 @@
 import {
 	defineEnum,
 	freeForm,
-	multi,
 	questionIds,
 	questionRecord,
 	single,
@@ -270,18 +269,6 @@ const sellerQuestionList = [
 	commissionComfortQuestion(
 		'How do you plan to handle listing-agent commission?',
 	),
-	multi('agentDeliveryExpectations', {
-		title: 'What would make you feel your agent delivered? (choose up to 2)',
-		label: 'Delivery expectations',
-		options: defineEnum('seller_agent_delivery_expectations', [
-			['pricedRight', 'Priced right from the start'],
-			['greatMarketing', 'Great marketing and exposure'],
-			['greatNegotiatedOutcome', 'Strong negotiated outcome'],
-			['reachableResponsive', 'Reachable and responsive'],
-			['keptItCalm', 'Kept it calm under stress'],
-			['honestStraightforward', 'Honest and straightforward'],
-		]),
-	}),
 ] as const
 
 export const sellerQuestionIds = questionIds(sellerQuestionList)

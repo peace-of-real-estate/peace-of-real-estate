@@ -18,9 +18,7 @@ import {
 	buyerBiddingWarMatrix,
 	buyerDecisionMakingMatrix,
 	buyerIdealRelationshipMatrix,
-	clientDescriptionAffinityMatrix,
 	commissionMatrix,
-	dealInstinctAffinityMatrix,
 	DIMENSION_IDS,
 	DIMENSION_LABELS,
 	experienceWeightModulation,
@@ -524,74 +522,6 @@ function scoreBuyerWorkingStyle(
 	}
 }
 
-function agentDescriptionScore(
-	agentDescription: string,
-): Record<string, number> {
-	return clientDescriptionAffinityMatrix[agentDescription] ?? {}
-}
-
-function agentDealInstinctScore(agentInstinct: string): Record<string, number> {
-	return dealInstinctAffinityMatrix[agentInstinct] ?? {}
-}
-
-function scoreAgentDeliveryExpectations(
-	expectations: string[],
-	agent: AgentProfile,
-	clientExpectation: string,
-): { score: number; checks: SubCheck[] } {
-	const descriptionScores = agentDescriptionScore(agent.clientDescription)
-	const instinctScores = agentDealInstinctScore(agent.difficultDealInstinct)
-	const responseScore = scoreResponseTime(clientExpectation, agent.responseTime)
-
-	let total = 0
-	const checks: SubCheck[] = []
-	for (const expectation of expectations) {
-		let score = 0.6
-		let explanation = 'neutral'
-		if (
-			expectation === 'pricedRight' ||
-			expectation === 'greatNegotiatedOutcome'
-		) {
-			score = Math.max(
-				descriptionScores.strategicDataDriven ?? 0,
-				descriptionScores.efficientDecisive ?? 0,
-			)
-			explanation = 'strategic / decisive'
-			if (expectation === 'greatNegotiatedOutcome') {
-				score = Math.max(
-					score,
-					instinctScores.takeControl ?? 0,
-					instinctScores.factsFast ?? 0,
-				)
-				explanation = 'strategic / decisive / take-control'
-			}
-		} else if (expectation === 'keptItCalm') {
-			score = Math.max(
-				descriptionScores.calmSteady ?? 0,
-				instinctScores.deEscalateFirst ?? 0,
-			)
-			explanation = 'calm / de-escalate'
-		} else if (expectation === 'reachableResponsive') {
-			score = responseScore
-			explanation = 'response-time match'
-		} else if (expectation === 'honestStraightforward') {
-			score = 0.6
-			explanation = 'not directly observable'
-		}
-		total += score
-		checks.push({
-			label: expectation,
-			client: expectation,
-			agent: agent.clientDescription,
-			passed: score >= 0.7,
-			effect: `${explanation} ${round2(score)}`,
-		})
-	}
-
-	const count = expectations.length || 1
-	return { score: total / count, checks }
-}
-
 function scoreSellerWorkingStyle(
 	client: ClientProfileRow,
 	agent: AgentProfile,
@@ -630,17 +560,10 @@ function scoreSellerWorkingStyle(
 		effect: `affinity ${round2(representation)}`,
 	})
 
-	const delivery = scoreAgentDeliveryExpectations(
-		client.agentDeliveryExpectations ?? [],
-		agent,
-		client.responseTimeExpectation,
-	)
-	checks.push(...delivery.checks)
-
-	const score = (home + representation + delivery.score) / 3
+	const score = (home + representation) / 2
 	return {
 		score: round2(score),
-		explanation: `home ${round2(home)} · representation ${round2(representation)} · delivery ${round2(delivery.score)}`,
+		explanation: `home ${round2(home)} · representation ${round2(representation)}`,
 		checks,
 	}
 }

@@ -78,9 +78,6 @@ export const sellerAgentSilencePreferenceEnum = pgEnumFromDefinition(
 export const sellerRepresentationPreferenceEnum = pgEnumFromDefinition(
 	sellerQuestions.representationPreference.options,
 )
-export const sellerAgentDeliveryExpectationsEnum = pgEnumFromDefinition(
-	sellerQuestions.agentDeliveryExpectations.options,
-)
 export const agentClientDescriptionEnum = pgEnumFromDefinition(
 	agentQuestions.clientDescription.options,
 )
@@ -146,9 +143,6 @@ export const sellerQuizColumns = {
 	homeConnection: sellerHomeConnectionEnum().notNull(),
 	agentSilencePreference: sellerAgentSilencePreferenceEnum().notNull(),
 	representationPreference: sellerRepresentationPreferenceEnum().notNull(),
-	agentDeliveryExpectations: sellerAgentDeliveryExpectationsEnum()
-		.array()
-		.notNull(),
 }
 
 export const agentMatchingColumns = {

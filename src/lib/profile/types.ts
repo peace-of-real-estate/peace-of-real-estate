@@ -7,7 +7,6 @@ import {
 	agentQuestionIds,
 	bestClientType,
 	propertyType,
-	sellerQuestions,
 } from '@/lib/profile/profile-fields'
 import type { PreferencesFor } from '@/lib/profile/question-types'
 
@@ -96,10 +95,6 @@ export const sellerPreviewProfileSchema = sellerCompletedDraftBaseSchema
 	.extend({
 		role: z.literal('seller'),
 		propertyTypes: previewPropertyTypesSchema,
-		agentDeliveryExpectations: z
-			.array(z.enum(sellerQuestions.agentDeliveryExpectations.options.slugs))
-			.min(1)
-			.max(2),
 	})
 	.refine(hasOrderedPriceRange)
 

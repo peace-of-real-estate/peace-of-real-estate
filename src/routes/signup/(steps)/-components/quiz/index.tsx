@@ -121,7 +121,7 @@ function QuestionFlow({
 					animate={{ opacity: 1, x: 0 }}
 					exit={{ opacity: 0, x: direction * -24 }}
 					transition={{ duration: 0.2, ease: 'easeInOut' }}
-					className="min-h-[280px] space-y-4"
+					className={`min-h-[280px] space-y-4 ${isTransitioning ? 'pointer-events-none' : ''}`}
 				>
 					{children}
 				</motion.div>
