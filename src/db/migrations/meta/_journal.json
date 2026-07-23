@@ -8,6 +8,20 @@
       "when": 1784609198129,
       "tag": "0000_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784777785943,
+      "tag": "0001_price_bucket",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784782242493,
+      "tag": "0002_windy_omega_flight",
+      "breakpoints": true
     }
   ]
 }

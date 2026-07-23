@@ -1,36 +1,42 @@
-import { createFileRoute, ClientOnly } from '@tanstack/react-router'
+import { createFileRoute, ClientOnly, Navigate } from '@tanstack/react-router'
 
 import { createSellerProfileFromDraft } from '@/lib/profile'
-import type { ClientProfile } from '@/lib/profile'
-import { sellerInsertSchema } from '@/lib/profile/types'
+import type { SellerPreviewProfile } from '@/lib/profile'
+import {
+	sellerCompletedDraftSchema,
+	sellerPreviewProfileSchema,
+} from '@/lib/profile/types'
 
 import { sellerDraftStorage } from '../(steps)/seller/route'
 import {
 	ClientMatchesPreview,
 	ClientPreviewHeader,
 	ClientProfilePreviewCard,
-	draftToClientPreviewProfile,
 } from './-components/client-preview'
 import { SignupPreviewShell } from './-components/signup-preview-shell'
 
 export const Route = createFileRoute('/signup/preview/seller')({
+	ssr: false,
 	component: SellerPreviewRoute,
 })
 
 function SellerPreviewRoute() {
-	const profile = draftToClientPreviewProfile(
-		'seller',
-		sellerDraftStorage.load(),
-	)
+	const parsed = sellerPreviewProfileSchema.safeParse({
+		...sellerDraftStorage.load(),
+		role: 'seller',
+	})
+	if (!parsed.success) {
+		return <Navigate to="/signup/seller/location" replace />
+	}
 
 	return (
 		<ClientOnly fallback={null}>
-			<SellerPreview profile={profile} />
+			<SellerPreview profile={parsed.data} />
 		</ClientOnly>
 	)
 }
 
-function SellerPreview({ profile }: { profile: ClientProfile }) {
+function SellerPreview({ profile }: { profile: SellerPreviewProfile }) {
 	return (
 		<SignupPreviewShell
 			redirect="/seller/matches"
@@ -39,7 +45,7 @@ function SellerPreview({ profile }: { profile: ClientProfile }) {
 			createProfile={createSellerProfileFromDraft}
 			loadDraft={sellerDraftStorage.load}
 			validateDraft={(draft) =>
-				sellerInsertSchema.omit({ status: true }).safeParse(draft).success
+				sellerCompletedDraftSchema.safeParse(draft).success
 			}
 			clearDraft={sellerDraftStorage.clear}
 			panelTitle={

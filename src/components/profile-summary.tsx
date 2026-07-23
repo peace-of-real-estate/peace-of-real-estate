@@ -8,7 +8,11 @@ import {
 } from '@phosphor-icons/react'
 import type { ElementType } from 'react'
 
-import { formatPriceRange, parsePriceRange } from '@/lib/price-range'
+import {
+	AGENT_PRICE_BUCKET_LABELS,
+	formatPriceRange,
+	type AgentPriceBucket,
+} from '@/lib/price-range'
 import {
 	averageTransactions,
 	bestClientType,
@@ -20,24 +24,30 @@ import {
 	sellerQuestionIds,
 	sellerQuestions,
 	yearsLicensed,
+	type AverageTransactions,
+	type BestClientTypeSlug,
+	type PropertyTypeSlug,
+	type RepresentationSide,
+	type YearsLicensed,
 } from '@/lib/profile'
 
 export interface ClientSummaryProfile {
-	city?: string | null | undefined
-	state?: string | null | undefined
-	priceRange?: string | null | undefined
-	propertyTypes?: string[] | undefined
+	city: string
+	state: string
+	priceMin: number
+	priceMax: number
+	propertyTypes: PropertyTypeSlug[]
 	[key: string]: unknown
 }
 
 export interface AgentSummaryProfile {
-	typicalPriceRange?: string | null | undefined
-	representationSide?: string | null | undefined
-	zipCodes?: string[] | undefined
-	bestClientTypes?: string[] | undefined
-	yearsLicensed?: string | null | undefined
-	averageTransactions?: string | null | undefined
-	eoInsuranceStatus?: string | null | undefined
+	typicalPriceRange: AgentPriceBucket
+	representationSide: RepresentationSide
+	zipCodes: string[]
+	bestClientTypes: BestClientTypeSlug[]
+	yearsLicensed?: YearsLicensed | null | undefined
+	averageTransactions?: AverageTransactions | null | undefined
+	eoInsuranceStatus: string
 }
 
 export type SummaryItem = {
@@ -54,13 +64,12 @@ function getEnumLabel(
 }
 
 export type ProfileSummaryInput =
-	| { role: 'buyer'; profile: ClientSummaryProfile | null | undefined }
-	| { role: 'seller'; profile: ClientSummaryProfile | null | undefined }
-	| { role: 'agent'; profile: AgentSummaryProfile | null | undefined }
+	| { role: 'buyer'; profile: ClientSummaryProfile }
+	| { role: 'seller'; profile: ClientSummaryProfile }
+	| { role: 'agent'; profile: AgentSummaryProfile }
 
 export function getProfileSummary(input: ProfileSummaryInput): SummaryItem[] {
 	const { role, profile } = input
-	if (!profile) return []
 
 	switch (role) {
 		case 'agent':
@@ -76,14 +85,15 @@ function getClientSummaryItems(
 	profile: ClientSummaryProfile,
 ): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
-		profile.priceRange
-			? {
-					label: 'Budget',
-					value: formatPriceRange(parsePriceRange(profile.priceRange)),
-					icon: MoneyIcon,
-				}
-			: null,
-		profile.propertyTypes?.length
+		{
+			label: 'Budget',
+			value: formatPriceRange({
+				min: profile.priceMin,
+				max: profile.priceMax,
+			}),
+			icon: MoneyIcon,
+		},
+		profile.propertyTypes.length
 			? {
 					label: 'Home Type',
 					value: profile.propertyTypes
@@ -205,31 +215,27 @@ function formatQuestionSummary(
 
 function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
-		profile.typicalPriceRange
-			? {
-					label: 'Typical price range',
-					value: formatPriceRange(parsePriceRange(profile.typicalPriceRange)),
-					icon: MoneyIcon,
-				}
-			: null,
-		profile.representationSide
-			? {
-					label: 'Representation',
-					value: getEnumLabel(
-						representationSide.labels,
-						profile.representationSide,
-					),
-					icon: BriefcaseIcon,
-				}
-			: null,
-		profile.zipCodes?.length
+		{
+			label: 'Typical price range',
+			value: AGENT_PRICE_BUCKET_LABELS[profile.typicalPriceRange],
+			icon: MoneyIcon,
+		},
+		{
+			label: 'Representation',
+			value: getEnumLabel(
+				representationSide.labels,
+				profile.representationSide,
+			),
+			icon: BriefcaseIcon,
+		},
+		profile.zipCodes.length
 			? {
 					label: 'Service areas',
 					value: profile.zipCodes.slice(0, 3).join(', '),
 					icon: BriefcaseIcon,
 				}
 			: null,
-		profile.bestClientTypes?.length
+		profile.bestClientTypes.length
 			? {
 					label: 'Best clients',
 					value: profile.bestClientTypes
@@ -255,13 +261,11 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 					icon: HouseIcon,
 				}
 			: null,
-		profile.eoInsuranceStatus
-			? {
-					label: 'E&O insurance',
-					value: profile.eoInsuranceStatus,
-					icon: ShieldIcon,
-				}
-			: null,
+		{
+			label: 'E&O insurance',
+			value: profile.eoInsuranceStatus,
+			icon: ShieldIcon,
+		},
 	]
 
 	const result: SummaryItem[] = []

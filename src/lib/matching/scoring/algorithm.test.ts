@@ -34,7 +34,8 @@ function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 		state: 'MD',
 		city: 'Baltimore',
 		zipCodes: ['21201', '21205'],
-		priceRange: '400000-600000',
+		priceMin: 400_000,
+		priceMax: 600_000,
 		involvementLevel: 'veryInvolved',
 		commissionComfort: 'dontUnderstand',
 		idealAgentRelationship: 'thinkingPartner',
@@ -56,14 +57,14 @@ function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
 		state: 'MD',
 		city: 'Baltimore',
 		zipCodes: ['21201'],
-		priceRange: '400000-600000',
+		priceMin: 400_000,
+		priceMax: 600_000,
 		involvementLevel: 'keyDetails',
 		quickCommunicationChannel: 'phone',
 		updateDeliveryMethod: 'phoneThenEmailRecap',
 		commissionComfort: 'payFairRate',
 		saleMotivation: 'relocation',
 		successfulSaleLooksLike: 'strongPriceSmoothProcess',
-		agentDeliveryExpectations: ['pricedRight', 'greatNegotiatedOutcome'],
 		homeConnection: 'asset',
 		agentSilencePreference: 'milestones',
 		representationPreference: 'exclusiveRepresentationOnly',
@@ -118,7 +119,7 @@ describe('deriveExpectedClientTypes', () => {
 	})
 
 	test('luxury buyer', () => {
-		const buyer = makeBuyer({ priceRange: '1200000-1500000' })
+		const buyer = makeBuyer({ priceMin: 1_200_000, priceMax: 1_500_000 })
 		expect(deriveExpectedClientTypes(buyer, 'buying')).toContain('luxury')
 	})
 })
@@ -285,21 +286,9 @@ describe('scoreLocation', () => {
 })
 
 describe('calculateFitScore', () => {
-	test('accepts min-max stored format for both client and agent', () => {
-		const agent = makeAgent({ typicalPriceRange: '400000-750000' })
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
-		const result = calculateFitScore(agent, buyer, 'buying')
-
-		expect(result.disqualified).toBe(false)
-		expect(
-			result.trace.dimensions.find((d) => d.id === 'priceFit')?.score,
-		).toBe(1)
-		expect(result.fitScore).toBeGreaterThan(0)
-	})
-
 	test('accepts slug stored format for agent typicalPriceRange', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
+		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
 		const result = calculateFitScore(agent, buyer, 'buying')
 
 		expect(result.disqualified).toBe(false)
@@ -314,7 +303,7 @@ describe('calculateFitScore', () => {
 			id: 'agent-fixture-realistic',
 			typicalPriceRange: '400kTo750k',
 		})
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
+		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
 		const result = calculateFitScore(agent, buyer, 'buying')
 
 		expect(result.disqualified).toBe(false)
@@ -323,17 +312,6 @@ describe('calculateFitScore', () => {
 		expect(priceFit?.score).toBeGreaterThan(0)
 		expect(priceFit?.explanation).toContain('bucket overlap')
 		expect(result.fitScore).toBeGreaterThan(0)
-	})
-
-	test('returns zero price fit when agent range is unparseable', () => {
-		const agent = makeAgent({ typicalPriceRange: 'legacy $250k - $500k' })
-		const buyer = makeBuyer({ priceRange: '400000-750000' })
-		const result = calculateFitScore(agent, buyer, 'buying')
-
-		expect(result.disqualified).toBe(true)
-		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
-		expect(priceFit?.score).toBe(0)
-		expect(result.fitScore).toBe(0)
 	})
 
 	test('perfect buyer match scores 100', () => {
@@ -381,14 +359,14 @@ describe('calculateFitScore', () => {
 
 	test('disqualified for price contact', () => {
 		const agent = makeAgent({ typicalPriceRange: '1_5mPlus' })
-		const buyer = makeBuyer({ priceRange: '200000-300000' })
+		const buyer = makeBuyer({ priceMin: 200_000, priceMax: 300_000 })
 		const result = calculateFitScore(agent, buyer, 'buying')
 		expect(result.disqualified).toBe(true)
 	})
 
 	test('adjacent bucket passes price gate', () => {
 		const agent = makeAgent({ typicalPriceRange: '750kTo1_5m' })
-		const buyer = makeBuyer({ priceRange: '400000-600000' })
+		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 600_000 })
 		const result = calculateFitScore(agent, buyer, 'buying')
 		expect(result.disqualified).toBe(false)
 	})
@@ -398,12 +376,6 @@ describe('calculateFitScore', () => {
 		const result = calculateFitScore(agent)
 		expect(result.fitScore).toBe(100)
 		expect(result.trace.mode).toBe('fallback')
-	})
-
-	test('fallback penalizes invalid price bucket', () => {
-		const agent = makeAgent({ typicalPriceRange: 'legacy $250k - $500k' })
-		const result = calculateFitScore(agent)
-		expect(result.fitScore).toBeLessThan(100)
 	})
 
 	test('priority boost raises priceFit weight', () => {
@@ -688,5 +660,14 @@ describe('rankWithTieBandsDetailed', () => {
 		const first = rankWithTieBandsDetailed(input, 'client-a')
 		const second = rankWithTieBandsDetailed(input, 'client-a')
 		expect(first).toEqual(second)
+	})
+
+	test('slug agent earns adjacent-bucket credit', () => {
+		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
+		const buyer = makeBuyer({ priceMin: 750_000, priceMax: 900_000 })
+		const result = calculateFitScore(agent, buyer, 'buying')
+		expect(result.disqualified).toBe(false)
+		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
+		expect(priceFit?.score).toBe(0.4)
 	})
 })

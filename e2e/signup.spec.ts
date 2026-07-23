@@ -121,6 +121,7 @@ test.describe('with beta access', () => {
 			page.getByRole('heading', { name: 'Market', exact: true }),
 		).toBeVisible()
 		await selectCity(page, 'Search for your city')
+		await page.getByRole('button', { name: /Under \$400k/ }).click()
 		await page.getByRole('button', { name: 'Buyers', exact: true }).click()
 		await page.getByRole('button', { name: 'First-time buyers' }).click()
 		await page.getByRole('button', { name: 'Continue' }).click()

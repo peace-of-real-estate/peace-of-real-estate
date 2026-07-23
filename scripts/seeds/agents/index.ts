@@ -9,7 +9,7 @@ import {
 	userEntitlements,
 } from '../../../src/db/tables'
 import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
-import { AGENT_PRICE_RANGES } from '../../../src/lib/price-range'
+import { BUCKET_ORDER } from '../../../src/lib/price-range'
 import {
 	agentQuestions,
 	averageTransactions,
@@ -64,7 +64,7 @@ function pickAnswer<K extends keyof AgentWorkStyle>(
 // option sets, so the cast is safe.
 type AgentPersona = {
 	representationSide: AgentProfile['representationSide']
-	typicalPriceRange: string
+	typicalPriceRange: AgentProfile['typicalPriceRange']
 	bestClientTypes: AgentProfile['bestClientTypes']
 	notFitFor: AgentProfile['notFitFor']
 	yearsLicensed: YearsLicensed
@@ -96,7 +96,7 @@ function generatePersona(): AgentPersona {
 
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
-		typicalPriceRange: pick(Object.keys(AGENT_PRICE_RANGES)),
+		typicalPriceRange: pick(BUCKET_ORDER),
 		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
 		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),

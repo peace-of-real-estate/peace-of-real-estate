@@ -76,7 +76,11 @@ function SellerWizardRoute() {
 							case 'location':
 								return Boolean(draft.city && draft.state)
 							case 'home':
-								return Boolean(draft.priceRange && draft.propertyTypes?.length)
+								return Boolean(
+									draft.priceMin !== undefined &&
+									draft.priceMax !== undefined &&
+									draft.propertyTypes?.length,
+								)
 							case 'preferences':
 								return isSellerPreferencesComplete(draft)
 						}

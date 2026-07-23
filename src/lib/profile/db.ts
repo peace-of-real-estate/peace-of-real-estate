@@ -1,6 +1,14 @@
 import { sql } from 'drizzle-orm'
-import { boolean, pgEnum, real, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	integer,
+	pgEnum,
+	real,
+	text,
+	timestamp,
+} from 'drizzle-orm/pg-core'
 
+import { BUCKET_ORDER } from '@/lib/price-range'
 import {
 	agentQuestions,
 	averageTransactions,
@@ -70,9 +78,6 @@ export const sellerAgentSilencePreferenceEnum = pgEnumFromDefinition(
 export const sellerRepresentationPreferenceEnum = pgEnumFromDefinition(
 	sellerQuestions.representationPreference.options,
 )
-export const sellerAgentDeliveryExpectationsEnum = pgEnumFromDefinition(
-	sellerQuestions.agentDeliveryExpectations.options,
-)
 export const agentClientDescriptionEnum = pgEnumFromDefinition(
 	agentQuestions.clientDescription.options,
 )
@@ -91,6 +96,10 @@ export const agentCommissionApproachEnum = pgEnumFromDefinition(
 export const agentUnrepresentedBuyerApproachEnum = pgEnumFromDefinition(
 	agentQuestions.unrepresentedBuyerApproach.options,
 )
+export const agentPriceBucketEnum = pgEnumFromDefinition({
+	dbName: 'agent_price_bucket',
+	slugs: BUCKET_ORDER,
+})
 
 export const clientLifecycleColumns = {
 	status: profileStatusEnum().default('draft').notNull(),
@@ -103,7 +112,8 @@ export const clientMatchingColumns = {
 	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
 	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
 	timeline: timelineEnum().notNull(),
-	priceRange: text().notNull(),
+	priceMin: integer().notNull(),
+	priceMax: integer().notNull(),
 	propertyTypes: propertyTypeEnum().array().notNull(),
 }
 
@@ -133,16 +143,13 @@ export const sellerQuizColumns = {
 	homeConnection: sellerHomeConnectionEnum().notNull(),
 	agentSilencePreference: sellerAgentSilencePreferenceEnum().notNull(),
 	representationPreference: sellerRepresentationPreferenceEnum().notNull(),
-	agentDeliveryExpectations: sellerAgentDeliveryExpectationsEnum()
-		.array()
-		.notNull(),
 }
 
 export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	typicalPriceRange: text().notNull(),
+	typicalPriceRange: agentPriceBucketEnum().notNull(),
 	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
 	notFitFor: text().array().notNull().default([]),
 }

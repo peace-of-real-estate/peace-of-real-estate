@@ -1,6 +1,5 @@
 import { UserIcon } from '@phosphor-icons/react'
-import { createFileRoute, ClientOnly } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute, ClientOnly, Navigate } from '@tanstack/react-router'
 
 import {
 	getProfileSummary,
@@ -8,12 +7,11 @@ import {
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import {
-	agentDraftSchema,
-	agentInsertSchema,
+	agentCompletedDraftSchema,
+	agentPreviewProfileSchema,
 	completeAgentSignup,
 } from '@/lib/profile'
-import type { AgentDraft } from '@/lib/profile'
-import { bestClientType } from '@/lib/profile'
+import type { AgentPreviewProfile } from '@/lib/profile'
 import {
 	AgentPreviewCard,
 	type MatchDetails,
@@ -86,30 +84,21 @@ const agentPreviewMatches: MatchDetails[] = [
 ]
 
 export const Route = createFileRoute('/signup/preview/agent')({
+	ssr: false,
 	component: AgentPreviewRoute,
 })
 
 function AgentPreviewRoute() {
-	const state = agentDraftStorage.load() ?? {}
-	const parsed = agentInsertSchema.safeParse(state)
-	const profile = draftToPreviewProfile(parsed.success ? parsed.data : state)
+	const parsed = agentPreviewProfileSchema.safeParse(agentDraftStorage.load())
+	if (!parsed.success) {
+		return <Navigate to="/signup/agent/identity" replace />
+	}
 
 	return (
 		<ClientOnly fallback={null}>
-			<AgentPreview profile={profile} />
+			<AgentPreview profile={parsed.data} />
 		</ClientOnly>
 	)
-}
-
-const agentPreviewProfileSchema = agentDraftSchema.extend({
-	zipCodes: z.array(z.string()).default([]),
-	bestClientTypes: z.array(z.enum(bestClientType.slugs)).default([]),
-})
-
-type AgentPreviewProfile = z.infer<typeof agentPreviewProfileSchema>
-
-function draftToPreviewProfile(draft: AgentDraft): AgentPreviewProfile {
-	return agentPreviewProfileSchema.parse(draft)
 }
 
 function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
@@ -120,7 +109,9 @@ function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 			quizPath="/signup/agent/identity"
 			createProfile={completeAgentSignup}
 			loadDraft={agentDraftStorage.load}
-			validateDraft={(draft) => agentInsertSchema.safeParse(draft).success}
+			validateDraft={(draft) =>
+				agentCompletedDraftSchema.safeParse(draft).success
+			}
 			clearDraft={agentDraftStorage.clear}
 			submitLabel="Activate profile"
 			showTerms={false}

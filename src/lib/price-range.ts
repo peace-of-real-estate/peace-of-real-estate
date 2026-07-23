@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export type PriceRange = {
 	min: number
 	max: number
@@ -6,14 +8,6 @@ export type PriceRange = {
 export const PRICE_MIN = 0
 export const PRICE_MAX = 2_000_000
 export const PRICE_STEP = 50_000
-export const DEFAULT_PRICE_RANGE: PriceRange = { min: 400_000, max: 600_000 }
-
-export const AGENT_PRICE_RANGES: Record<string, PriceRange> = {
-	under400k: { min: 0, max: 400_000 },
-	'400kTo750k': { min: 400_000, max: 750_000 },
-	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
-	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
-}
 
 export const BUCKET_ORDER = [
 	'under400k',
@@ -24,32 +18,30 @@ export const BUCKET_ORDER = [
 
 export type AgentPriceBucket = (typeof BUCKET_ORDER)[number]
 
-export function parseMinMaxRange(
-	value: string | undefined | null,
-): PriceRange | undefined {
-	const [, minRaw, maxRaw] = value?.trim().match(/^(\d+)-(\d+)$/) ?? []
-	if (!minRaw || !maxRaw) return undefined
-	const min = Number.parseInt(minRaw, 10)
-	const max = Number.parseInt(maxRaw, 10)
-	return {
-		min: Math.min(min, max),
-		max: Math.max(min, max),
-	}
+export const AGENT_PRICE_RANGES: Record<AgentPriceBucket, PriceRange> = {
+	under400k: { min: 0, max: 400_000 },
+	'400kTo750k': { min: 400_000, max: 750_000 },
+	'750kTo1_5m': { min: 750_000, max: 1_500_000 },
+	'1_5mPlus': { min: 1_500_000, max: PRICE_MAX },
 }
 
-export function parsePriceRange(value: string | undefined | null): PriceRange {
-	const sanitized = value?.replace(/[^\d-]/g, '').replace(/-{2,}/g, '-')
-	const parsed = parseMinMaxRange(sanitized)
-	if (!parsed) return { ...DEFAULT_PRICE_RANGE }
-	return {
-		min: Math.max(PRICE_MIN, Math.min(parsed.min, parsed.max)),
-		max: Math.min(PRICE_MAX, Math.max(parsed.min, parsed.max)),
-	}
+export const agentPriceBucketSchema = z.enum(BUCKET_ORDER)
+
+export const AGENT_PRICE_BUCKET_LABELS: Record<AgentPriceBucket, string> = {
+	under400k: 'Under $400k',
+	'400kTo750k': '$400k – $750k',
+	'750kTo1_5m': '$750k – $1.5M',
+	'1_5mPlus': '$1.5M+',
 }
 
-export function serializePriceRange(range: PriceRange): string {
-	return `${range.min}-${range.max}`
+export function toAgentPriceBucket(
+	value: string | null | undefined,
+): AgentPriceBucket | undefined {
+	const parsed = agentPriceBucketSchema.safeParse(value)
+	return parsed.success ? parsed.data : undefined
 }
+
+export const priceBoundSchema = z.number().int().min(PRICE_MIN).max(PRICE_MAX)
 
 export function formatPriceRange(range: PriceRange): string {
 	return `${formatPriceCompact(range.min)} - ${formatPriceCompact(range.max)}`
