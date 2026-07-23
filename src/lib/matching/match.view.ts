@@ -1,10 +1,6 @@
-import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
+import type { AgentProfile } from '@/lib/profile/types'
 
-import type {
-	FitScoreResult,
-	MatchDebugInfo,
-	ScoreBucket,
-} from './scoring/types'
+import type { FitScoreResult, ScoreBucket } from './scoring/types'
 
 const DIMENSIONS: ScoreBucket[] = [
 	'Location',
@@ -14,15 +10,6 @@ const DIMENSIONS: ScoreBucket[] = [
 	'Communication',
 	'Business Terms',
 ]
-
-/** Placeholder display data — not real agent metrics yet. */
-const PLACEHOLDER_AGENT_DISPLAY = {
-	about: 'Experienced real estate professional serving the local community.',
-	avgDays: 14,
-	satisfactionSigned: 4.9,
-	satisfactionUnsigned: 4.7,
-	fallbackTransactions: 50,
-}
 
 export interface AgentMatchData {
 	id: string
@@ -36,31 +23,18 @@ export interface AgentMatchData {
 	experience?: string
 	agency?: string
 	specialties: string[]
-	about: string
 	scores: Record<string, number>
-	contact?: {
-		phone?: string
-		email?: string
-	}
 	stats?: {
-		transactions: number
-		avgDays: number
-		satisfaction: number
+		transactions: string
 	}
 	isTopMatch?: boolean
 	avatar?: string
-	debug?: MatchDebugInfo
 }
 
 interface ToAgentMatchDataInput {
 	agent: AgentProfile
 	user: { name: string; email: string }
 	score: FitScoreResult
-	profile: ClientProfileRow | undefined
-	rank: number
-	totalAgents: number
-	qualifiedCount: number
-	scoreDistribution: { range: string; count: number }[]
 	avatar?: string | undefined
 }
 
@@ -68,11 +42,6 @@ export function toAgentMatchData({
 	agent,
 	user,
 	score,
-	profile,
-	rank,
-	totalAgents,
-	qualifiedCount,
-	scoreDistribution,
 	avatar,
 }: ToAgentMatchDataInput): AgentMatchData {
 	return {
@@ -87,31 +56,12 @@ export function toAgentMatchData({
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
 		specialties: agent.bestClientTypes,
-		about: PLACEHOLDER_AGENT_DISPLAY.about,
 		scores: Object.fromEntries(
 			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
 		),
-		contact: {
-			email: user.email,
-		},
-		stats: {
-			transactions:
-				Number(agent.averageTransactions) ||
-				PLACEHOLDER_AGENT_DISPLAY.fallbackTransactions,
-			avgDays: PLACEHOLDER_AGENT_DISPLAY.avgDays,
-			satisfaction: agent.peacePactSigned
-				? PLACEHOLDER_AGENT_DISPLAY.satisfactionSigned
-				: PLACEHOLDER_AGENT_DISPLAY.satisfactionUnsigned,
-		},
-		debug: {
-			rank,
-			totalAgents,
-			qualifiedCount,
-			scoreDistribution,
-			trace: score.trace,
-			agentProfile: agent,
-			clientProfile: profile ?? null,
-		},
+		...(agent.averageTransactions
+			? { stats: { transactions: agent.averageTransactions } }
+			: {}),
 		...(avatar ? { avatar } : {}),
 	}
 }

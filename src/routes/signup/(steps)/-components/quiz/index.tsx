@@ -10,6 +10,7 @@ import type {
 	QuestionRecord,
 	SingleQuestion,
 } from '@/lib/profile'
+import { cn } from '@/lib/utils/ui'
 
 import {
 	AnimatedStepCard,
@@ -121,7 +122,10 @@ function QuestionFlow({
 					animate={{ opacity: 1, x: 0 }}
 					exit={{ opacity: 0, x: direction * -24 }}
 					transition={{ duration: 0.2, ease: 'easeInOut' }}
-					className={`min-h-[280px] space-y-4 ${isTransitioning ? 'pointer-events-none' : ''}`}
+					className={cn(
+						'min-h-70 space-y-4',
+						isTransitioning && 'pointer-events-none',
+					)}
 				>
 					{children}
 				</motion.div>
