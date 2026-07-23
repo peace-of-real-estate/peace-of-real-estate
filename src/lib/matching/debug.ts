@@ -14,6 +14,7 @@ import {
 	calculateFitScore,
 	rankWithTieBandsDetailed,
 	TIE_BAND_THRESHOLD,
+	type AgentProfileForScoring,
 	type ClientProfileForScoring,
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
@@ -42,12 +43,12 @@ export type DebugMatch = {
 	bandSize: number
 	bandOffset: number
 	trace: ScoreTrace
-	agentProfile: AgentProfile
+	agentProfile: AgentProfileForScoring
 }
 
 export type ScoredAgent = {
 	row: {
-		agent: AgentProfile
+		agent: AgentProfileForScoring
 		user: {
 			id: string
 			name: string | null
