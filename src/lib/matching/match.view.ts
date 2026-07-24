@@ -1,5 +1,4 @@
-import type { AgentProfile } from '@/lib/profile/types'
-
+import type { AgentProfileForScoring } from './scoring'
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
 
 const DIMENSIONS: ScoreBucket[] = [
@@ -31,7 +30,7 @@ export interface AgentMatchData {
 }
 
 interface ToAgentMatchDataInput {
-	agent: AgentProfile
+	agent: AgentProfileForScoring
 	user: { name: string; email: string }
 	score: FitScoreResult
 	avatar?: string | undefined

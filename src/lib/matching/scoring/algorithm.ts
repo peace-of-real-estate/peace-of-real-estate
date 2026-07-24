@@ -13,13 +13,17 @@ import type {
 } from '@/lib/profile/profile-fields'
 import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
 
-// city center is resolved via a join to `cities` at query time (see
-// src/lib/matching/server.ts, src/lib/matching/debug.ts) rather than stored
-// on the profile row, so it stays in sync with `cities.centerLat/centerLng`.
+// city/state and city center are resolved via a join to `cities` at query
+// time (see src/lib/matching/profiles.ts) rather than stored as free text on
+// the profile row, so a profile's `cityId` is always a valid `cities` row.
 export type AgentProfileForScoring = AgentProfile & {
+	city: string
+	state: string
 	cityCenter?: CityCenter | undefined
 }
 export type ClientProfileForScoring = ClientProfileRow & {
+	city: string
+	state: string
 	cityCenter?: CityCenter | undefined
 }
 
@@ -832,8 +836,8 @@ function resolveDimensionWeights(
 }
 
 function evaluateDisqualifiers(
-	client: ClientProfileRow,
-	agent: AgentProfile,
+	client: ClientProfileForScoring,
+	agent: AgentProfileForScoring,
 	side: 'buying' | 'selling',
 	locationResult: DimensionResult,
 	priceResult: DimensionResult,

@@ -6,7 +6,7 @@ import { buildDebugPayload } from '@/lib/matching/debug'
 import type { ScoredAgent } from '@/lib/matching/debug'
 import { TIE_BAND_THRESHOLD } from '@/lib/matching/scoring'
 
-const buyer = mockBuyerProfile
+const buyer = { ...mockBuyerProfile, city: 'Austin', state: 'TX' }
 
 function makeScoredAgent(
 	id: string,

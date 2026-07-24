@@ -5,11 +5,7 @@ import { describe, expect, test } from 'vitest'
 
 import { AGENT_PRICE_RANGES } from '@/lib/price-range'
 import type { AgentPriceBucket } from '@/lib/price-range'
-import type {
-	AgentProfile,
-	BuyerProfile,
-	SellerProfile,
-} from '@/lib/profile/types'
+import type { BuyerProfile, SellerProfile } from '@/lib/profile/types'
 
 import {
 	buildTieBands,
@@ -20,20 +16,25 @@ import {
 	scoreLocation,
 	tieBandRotation,
 	TIE_BAND_THRESHOLD,
-	type CityCenter,
+	type AgentProfileForScoring,
+	type ClientProfileForScoring,
 } from './algorithm'
 import { priceOverlapRatio } from './utils'
 
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
-function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
+type BuyerForScoring = ClientProfileForScoring & BuyerProfile
+type SellerForScoring = ClientProfileForScoring & SellerProfile
+
+function makeBuyer(overrides: Partial<BuyerForScoring> = {}): BuyerForScoring {
 	return {
 		...mockBuyerProfile,
 		id: 'buyer-fixture-1',
 		userId: 'user-buyer-fixture-1',
 		status: 'active',
-		state: 'MD',
+		cityId: 'city-fixture-baltimore-md',
 		city: 'Baltimore',
+		state: 'MD',
 		zipCodes: ['21201', '21205'],
 		priceMin: 400_000,
 		priceMax: 600_000,
@@ -49,14 +50,17 @@ function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 	}
 }
 
-function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
+function makeSeller(
+	overrides: Partial<SellerForScoring> = {},
+): SellerForScoring {
 	return {
 		...mockSellerProfile,
 		id: 'seller-fixture-1',
 		userId: 'user-seller-fixture-1',
 		status: 'active',
-		state: 'MD',
+		cityId: 'city-fixture-baltimore-md',
 		city: 'Baltimore',
+		state: 'MD',
 		zipCodes: ['21201'],
 		priceMin: 400_000,
 		priceMax: 600_000,
@@ -127,8 +131,8 @@ describe('deriveExpectedClientTypes', () => {
 
 describe('scoreLocation', () => {
 	function baseAgent(
-		overrides: Partial<AgentProfile> & { cityCenter?: CityCenter } = {},
-	): AgentProfile & { cityCenter?: CityCenter } {
+		overrides: Partial<AgentProfileForScoring> = {},
+	): AgentProfileForScoring {
 		return makeAgent({
 			zipCodes: [],
 			...overrides,
@@ -136,8 +140,8 @@ describe('scoreLocation', () => {
 	}
 
 	function baseBuyer(
-		overrides: Partial<BuyerProfile> & { cityCenter?: CityCenter } = {},
-	): BuyerProfile & { cityCenter?: CityCenter } {
+		overrides: Partial<BuyerForScoring> = {},
+	): BuyerForScoring {
 		return makeBuyer({
 			zipCodes: [],
 			...overrides,

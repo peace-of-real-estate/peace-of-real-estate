@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { parseCityState } from '@/lib/geography/zip'
 import type { BuyerDraft } from '@/lib/profile'
 
 import {
@@ -26,18 +25,12 @@ function BuyerLocationRoute() {
 		ClientSignupStep
 	>()
 
-	const rawInitialLocation = state.city
-		? state.state
-			? `${state.city}, ${state.state}`
-			: state.city
-		: ''
-	const [committedLocation, setCommittedLocation] = useState(rawInitialLocation)
+	const [selectedCityId, setSelectedCityId] = useState(state.cityId)
 	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(
 		state.zipCodes ?? [],
 	)
 	const [hasTriedContinue, setHasTriedContinue] = useState(false)
-	const canContinue = committedLocation.trim().length >= 2
-	const cityState = parseCityState(committedLocation)
+	const canContinue = Boolean(selectedCityId)
 
 	return (
 		<AnimatedStepCard stepKey="location">
@@ -47,9 +40,9 @@ function BuyerLocationRoute() {
 					<div className="space-y-4">
 						<CityZipSelector
 							id="client-location"
-							value={rawInitialLocation}
-							onChange={(location, zipCodes) => {
-								setCommittedLocation(location)
+							value={state.cityId}
+							onChange={(cityId, zipCodes) => {
+								setSelectedCityId(cityId)
 								setSelectedZipCodes(zipCodes)
 							}}
 							zipCodes={selectedZipCodes}
@@ -62,13 +55,12 @@ function BuyerLocationRoute() {
 					<ContinueButton
 						disabled={!canContinue}
 						onClick={() => {
-							if (!canContinue) {
+							if (!selectedCityId) {
 								setHasTriedContinue(true)
 								return
 							}
 							updateState({
-								city: cityState?.city ?? committedLocation.trim(),
-								...(cityState?.state ? { state: cityState.state } : {}),
+								cityId: selectedCityId,
 								zipCodes: selectedZipCodes,
 							})
 							goToStep('home')

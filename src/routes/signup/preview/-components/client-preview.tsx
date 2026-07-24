@@ -1,10 +1,12 @@
 import { MapPinIcon, UserIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 
 import {
 	getProfileSummary,
 	ProfileSummaryGrid,
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
+import { loadCityLabel } from '@/lib/geography/zip'
 import type { ClientPreviewProfile } from '@/lib/profile'
 import {
 	AgentPreviewCard,
@@ -95,13 +97,19 @@ export function ClientProfilePreviewCard({
 }: {
 	profile: ClientPreviewProfile
 }) {
-	const stateSvgPath = profile.state
-		? `/states/${profile.state}.svg`
+	const { data: cityLabel } = useQuery({
+		queryKey: ['city-label', profile.cityId],
+		queryFn: () => loadCityLabel({ data: profile.cityId }),
+		staleTime: 1000 * 60 * 60,
+	})
+
+	const stateSvgPath = cityLabel?.state
+		? `/states/${cityLabel.state}.svg`
 		: undefined
 	const summaryItems = getProfileSummary({ role: profile.role, profile })
 	const profileTitle =
-		profile.city ??
-		profile.state ??
+		cityLabel?.city ??
+		cityLabel?.state ??
 		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
@@ -111,10 +119,10 @@ export function ClientProfilePreviewCard({
 					{stateSvgPath ? (
 						<img
 							src={stateSvgPath}
-							alt={`${profile.state} state icon`}
+							alt={`${cityLabel?.state} state icon`}
 							className="h-8 w-8 object-contain opacity-85"
 						/>
-					) : profile.city ? (
+					) : cityLabel?.city ? (
 						<MapPinIcon className="h-5 w-5" />
 					) : (
 						<UserIcon className="h-5 w-5" />

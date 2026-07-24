@@ -98,8 +98,7 @@ export const clientLifecycleColumns = {
 }
 
 export const clientMatchingColumns = {
-	state: text().notNull(),
-	city: text().notNull(),
+	cityId: text().notNull(),
 	zipCodes: text().array().notNull().default([]),
 	timeline: timelineEnum().notNull(),
 	priceMin: integer().notNull(),
@@ -137,8 +136,7 @@ export const sellerQuizColumns = {
 
 export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
-	city: text().notNull(),
-	state: text().notNull(),
+	cityId: text().notNull(),
 	typicalPriceRange: agentPriceBucketEnum().notNull(),
 	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
 	notFitFor: text().array().notNull().default([]),

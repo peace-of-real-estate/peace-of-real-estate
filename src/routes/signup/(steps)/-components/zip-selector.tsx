@@ -32,9 +32,10 @@ import { cartoRasterStyle } from '@/lib/geography/basemap'
 import {
 	isValidZipCode,
 	loadCityCenter,
+	loadCityLabel,
 	loadCitySuggestions,
 	loadZipCodeBoundaries,
-	parseCityState,
+	type CitySuggestion,
 } from '@/lib/geography/zip'
 import { cn } from '@/lib/utils/ui'
 
@@ -42,8 +43,8 @@ import { StepLabel } from './signup-shell'
 
 export type CityZipSelectorProps = {
 	id?: string
-	value: string
-	onChange: (value: string, zipCodes: string[]) => void
+	value: string | undefined
+	onChange: (cityId: string, zipCodes: string[]) => void
 	zipCodes: string[]
 	label?: React.ReactNode
 	placeholder?: string
@@ -63,20 +64,15 @@ export function CityZipSelector({
 	height = 'md',
 	children,
 }: CityZipSelectorProps) {
-	const normalizedInitialLocation = (() => {
-		const parsed = parseCityState(value)
-		return parsed ? `${parsed.city}, ${parsed.state}` : value
-	})()
-
-	const [committedLocation, setCommittedLocation] = useState(
-		normalizedInitialLocation,
+	const [selectedCityId, setSelectedCityId] = useState(value)
+	const [selectedCity, setSelectedCity] = useState<CitySuggestion | undefined>(
+		undefined,
 	)
-	const [locationQuery, setLocationQuery] = useState(normalizedInitialLocation)
+	const [locationQuery, setLocationQuery] = useState('')
 	const [locationOpen, setLocationOpen] = useState(false)
 	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(zipCodes)
 	const [manualZipCode, setManualZipCode] = useState('')
-	const marketComplete = committedLocation.trim().length >= 2
-	const cityState = parseCityState(committedLocation)
+	const marketComplete = Boolean(selectedCityId)
 
 	const { data: locationSuggestions = [] } = useQuery({
 		queryKey: ['city-suggestions', locationQuery],
@@ -85,56 +81,58 @@ export function CityZipSelector({
 		staleTime: 1000 * 60 * 60,
 	})
 
+	const { data: resolvedInitialCity } = useQuery({
+		queryKey: ['city-label', value],
+		queryFn: () => loadCityLabel({ data: value! }),
+		enabled: Boolean(value) && !selectedCity,
+		staleTime: 1000 * 60 * 60,
+	})
+
+	if (resolvedInitialCity && !selectedCity) {
+		setSelectedCity(resolvedInitialCity)
+	}
+
 	const { data: boundaries } = useQuery({
-		queryKey: ['zip-code-boundaries', committedLocation],
-		queryFn: async () => {
-			if (!cityState) {
-				return {
-					type: 'FeatureCollection',
-					features: [],
-				} satisfies FeatureCollection
-			}
-			return loadZipCodeBoundaries({ data: cityState })
-		},
-		enabled: marketComplete && Boolean(cityState),
+		queryKey: ['zip-code-boundaries', selectedCityId],
+		queryFn: () => loadZipCodeBoundaries({ data: selectedCityId! }),
+		enabled: Boolean(selectedCityId),
 		staleTime: 1000 * 60 * 60,
 	})
 
 	const { data: centerForCity } = useQuery({
-		queryKey: ['city-center', committedLocation],
-		queryFn: async () => {
-			if (!cityState) return undefined
-			return loadCityCenter({ data: cityState })
-		},
-		enabled: marketComplete && Boolean(cityState),
+		queryKey: ['city-center', selectedCityId],
+		queryFn: () => loadCityCenter({ data: selectedCityId! }),
+		enabled: Boolean(selectedCityId),
 		staleTime: 1000 * 60 * 60,
 	})
 
-	const selectCity = (city: string) => {
-		const nextZipCodes = city === committedLocation ? selectedZipCodes : []
-		setCommittedLocation(city)
-		setLocationQuery(city)
+	const selectCity = (city: CitySuggestion) => {
+		const nextZipCodes = city.id === selectedCityId ? selectedZipCodes : []
+		setSelectedCityId(city.id)
+		setSelectedCity(city)
+		setLocationQuery(`${city.city}, ${city.state}`)
 		setSelectedZipCodes(nextZipCodes)
 		setLocationOpen(false)
-		onChange(city, nextZipCodes)
+		onChange(city.id, nextZipCodes)
 	}
 
 	const toggleZipCode = (zipCode: string) => {
+		if (!selectedCityId) return
 		const next = selectedZipCodes.includes(zipCode)
 			? selectedZipCodes.filter((item) => item !== zipCode)
 			: [...selectedZipCodes, zipCode]
 		setSelectedZipCodes(next)
-		onChange(committedLocation, next)
+		onChange(selectedCityId, next)
 	}
 
 	const addManualZipCode = () => {
 		const zipCode = manualZipCode.trim()
-		if (!marketComplete || !isValidZipCode(zipCode)) return
+		if (!selectedCityId || !isValidZipCode(zipCode)) return
 		const next = selectedZipCodes.includes(zipCode)
 			? selectedZipCodes
 			: [...selectedZipCodes, zipCode]
 		setSelectedZipCodes(next)
-		onChange(committedLocation, next)
+		onChange(selectedCityId, next)
 		setManualZipCode('')
 	}
 
@@ -146,7 +144,7 @@ export function CityZipSelector({
 			<Popover
 				open={locationOpen}
 				onOpenChange={(open) => {
-					setLocationQuery(open ? '' : committedLocation)
+					setLocationQuery(open ? '' : (selectedCity?.city ?? ''))
 					setLocationOpen(open)
 				}}
 			>
@@ -163,21 +161,21 @@ export function CityZipSelector({
 						)}
 					>
 						<span className="flex min-w-0 flex-1 items-center gap-2.5">
-							{cityState?.state ? (
+							{selectedCity?.state ? (
 								<Badge
 									variant="muted"
 									className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
 								>
-									{cityState.state}
+									{selectedCity.state}
 								</Badge>
 							) : null}
 							<span
 								className={cn(
 									'truncate',
-									!committedLocation && 'text-muted-foreground',
+									!selectedCity && 'text-muted-foreground',
 								)}
 							>
-								{cityState ? cityState.city : committedLocation || placeholder}
+								{selectedCity?.city ?? placeholder}
 							</span>
 						</span>
 						<CaretUpDownIcon className="text-muted-foreground h-4 w-4 shrink-0" />
@@ -203,25 +201,22 @@ export function CityZipSelector({
 								}
 							>
 								{locationSuggestions.map((suggestion) => {
-									const parsed = parseCityState(suggestion)
-									const isSelected = committedLocation === suggestion
+									const isSelected = suggestion.id === selectedCityId
 									return (
 										<CommandItem
-											key={suggestion}
-											value={suggestion}
-											onSelect={selectCity}
+											key={suggestion.id}
+											value={suggestion.id}
+											onSelect={() => selectCity(suggestion)}
 											className="gap-2 rounded-md px-2.5 py-2"
 										>
-											{parsed?.state ? (
-												<Badge
-													variant="muted"
-													className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
-												>
-													{parsed.state}
-												</Badge>
-											) : null}
+											<Badge
+												variant="muted"
+												className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+											>
+												{suggestion.state}
+											</Badge>
 											<span className="min-w-0 truncate font-medium">
-												{parsed?.city ?? suggestion}
+												{suggestion.city}
 											</span>
 											<span className="ml-auto flex shrink-0 items-center gap-1.5">
 												<CheckIcon

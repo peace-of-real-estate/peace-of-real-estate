@@ -1,12 +1,15 @@
-import type { AgentProfile } from '@/lib/profile/types'
+import type { AgentProfileForScoring } from '@/lib/matching/scoring'
 
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
-export function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
+export function makeAgent(
+	overrides: Partial<AgentProfileForScoring> = {},
+): AgentProfileForScoring {
 	return {
 		id: 'agent-fixture-1',
 		userId: 'user-agent-fixture-1',
 		representationSide: 'buyers',
+		cityId: 'city-fixture-baltimore-md',
 		city: 'Baltimore',
 		state: 'MD',
 		typicalPriceRange: '400kTo750k',

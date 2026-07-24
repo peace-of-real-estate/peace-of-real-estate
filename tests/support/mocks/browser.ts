@@ -62,13 +62,29 @@ vi.mock('@/routes/__root', async () => {
 	}
 })
 
+const mockCitySuggestion = {
+	id: 'city-fixture-austin-tx',
+	city: 'Austin',
+	state: 'TX',
+}
+
 vi.mock('@/lib/profile', async () => {
 	const actual =
 		await vi.importActual<typeof import('@/lib/profile')>('@/lib/profile')
 	return {
 		...actual,
-		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
-		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
+		loadBuyerProfile: () =>
+			Promise.resolve({
+				...mockBuyerProfile,
+				city: mockCitySuggestion.city,
+				state: mockCitySuggestion.state,
+			}),
+		loadSellerProfile: () =>
+			Promise.resolve({
+				...mockSellerProfile,
+				city: mockCitySuggestion.city,
+				state: mockCitySuggestion.state,
+			}),
 		loadAgentProfile: () => Promise.resolve(profileState.agentProfile),
 		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
 		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
@@ -88,7 +104,8 @@ vi.mock('@/lib/geography/zip', async () => {
 	)
 	return {
 		...actual,
-		loadCitySuggestions: async () => ['Austin, TX'],
+		loadCitySuggestions: async () => [mockCitySuggestion],
+		loadCityLabel: async () => mockCitySuggestion,
 		loadCityCenter: async () => ({ latitude: 30.2672, longitude: -97.7431 }),
 		loadZipCodeBoundaries: async () => ({
 			type: 'FeatureCollection',

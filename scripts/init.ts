@@ -3,6 +3,7 @@ import * as zipcodes from 'zipcodes'
 
 import { db } from '../src/db/connection'
 import { cities, cityZips } from '../src/db/tables'
+import { cityKey } from './lib/city-key'
 
 const BATCH_SIZE_CITIES = 1000
 const BATCH_SIZE_ZIPS = 2000
@@ -26,13 +27,6 @@ function isNycZip(zip: string): boolean {
 	const value = Number.parseInt(zip, 10)
 	if (!Number.isFinite(value)) return false
 	return NYC_ZIP_RANGES.some(([min, max]) => value >= min && value <= max)
-}
-
-// Encodes a (city, state) pair as a Map key. Using JSON instead of a
-// hand-joined string (e.g. `${city}|${state}`) avoids key collisions if a
-// city or state value ever contains the delimiter.
-function cityKey(city: string, state: string): string {
-	return JSON.stringify([city, state])
 }
 
 async function seedCityData() {

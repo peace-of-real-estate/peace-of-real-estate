@@ -110,7 +110,7 @@ function AgentWizardRoute() {
 			getStepPath={stepPath}
 			getHasDraft={(draft) =>
 				draft.firstName !== undefined ||
-				draft.city !== undefined ||
+				draft.cityId !== undefined ||
 				draft.representationSide !== undefined
 			}
 			getCompletedStepIds={(draft) =>
@@ -121,7 +121,7 @@ function AgentWizardRoute() {
 								return Boolean(draft.firstName && draft.lastName)
 							case 'market':
 								return Boolean(
-									draft.city &&
+									draft.cityId &&
 									draft.typicalPriceRange &&
 									draft.representationSide,
 								)

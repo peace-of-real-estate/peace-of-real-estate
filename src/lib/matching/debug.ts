@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { buyerProfiles, sellerProfiles, user } from '@/db/tables'
+import { buyerProfiles, cities, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
 import {
@@ -18,7 +18,6 @@ import {
 	type ScoreTrace,
 } from '@/lib/matching/scoring'
 import type { PriceRange } from '@/lib/price-range'
-import type { AgentProfile } from '@/lib/profile/types'
 
 export type DebugClientOption = {
 	id: string
@@ -176,16 +175,22 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 				.select({
 					buyer: buyerProfiles,
 					user,
+					city: cities.city,
+					state: cities.state,
 				})
 				.from(buyerProfiles)
-				.innerJoin(user, eq(buyerProfiles.userId, user.id)),
+				.innerJoin(user, eq(buyerProfiles.userId, user.id))
+				.innerJoin(cities, eq(buyerProfiles.cityId, cities.id)),
 			db
 				.select({
 					seller: sellerProfiles,
 					user,
+					city: cities.city,
+					state: cities.state,
 				})
 				.from(sellerProfiles)
-				.innerJoin(user, eq(sellerProfiles.userId, user.id)),
+				.innerJoin(user, eq(sellerProfiles.userId, user.id))
+				.innerJoin(cities, eq(sellerProfiles.cityId, cities.id)),
 		])
 
 		return [
@@ -194,8 +199,8 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 				side: 'buying' as const,
 				name: row.user.name,
 				email: row.user.email,
-				city: row.buyer.city,
-				state: row.buyer.state,
+				city: row.city,
+				state: row.state,
 				priceRange: { min: row.buyer.priceMin, max: row.buyer.priceMax },
 			})),
 			...sellers.map((row) => ({
@@ -203,8 +208,8 @@ export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 				side: 'selling' as const,
 				name: row.user.name,
 				email: row.user.email,
-				city: row.seller.city,
-				state: row.seller.state,
+				city: row.city,
+				state: row.state,
 				priceRange: { min: row.seller.priceMin, max: row.seller.priceMax },
 			})),
 		]

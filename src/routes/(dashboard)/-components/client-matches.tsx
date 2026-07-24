@@ -18,12 +18,12 @@ import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth/client'
 import { resolveStateCode } from '@/lib/geography/states'
 import type { AgentMatchData } from '@/lib/matching/match.view'
+import type { ClientProfileForScoring } from '@/lib/matching/scoring'
 import {
 	loadBuyerAgentMatches,
 	loadSellerAgentMatches,
 } from '@/lib/matching/server'
 import { loadBuyerProfile, loadSellerProfile } from '@/lib/profile'
-import type { BuyerProfile, SellerProfile } from '@/lib/profile'
 import {
 	DashboardPage,
 	DashboardPageMobileNav,
@@ -32,7 +32,7 @@ import { MatchList } from '@/routes/(dashboard)/-components/match-list'
 
 type ClientRole = 'buyer' | 'seller'
 
-type ClientMatchesProfile = BuyerProfile | SellerProfile
+type ClientMatchesProfile = ClientProfileForScoring
 
 type RoleConfig = {
 	loadProfile: () => Promise<ClientMatchesProfile | null>

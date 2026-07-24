@@ -32,8 +32,6 @@ import {
 } from '@/lib/profile'
 
 export interface ClientSummaryProfile {
-	city: string
-	state: string
 	priceMin: number
 	priceMax: number
 	propertyTypes: PropertyTypeSlug[]

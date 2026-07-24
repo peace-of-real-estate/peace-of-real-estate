@@ -13,34 +13,19 @@ const BATCH_SIZE = 50
 const MAX_ZIPS = 500
 
 const TOP_US_CITIES = [
-	'New York, NY',
-	'Los Angeles, CA',
-	'Chicago, IL',
-	'Houston, TX',
-	'Phoenix, AZ',
-	'Philadelphia, PA',
-	'San Antonio, TX',
-	'San Diego, CA',
-	'Dallas, TX',
-	'Jacksonville, FL',
-]
+	['New York', 'NY'],
+	['Los Angeles', 'CA'],
+	['Chicago', 'IL'],
+	['Houston', 'TX'],
+	['Phoenix', 'AZ'],
+	['Philadelphia', 'PA'],
+	['San Antonio', 'TX'],
+	['San Diego', 'CA'],
+	['Dallas', 'TX'],
+	['Jacksonville', 'FL'],
+] as const
 
-const cityStateSchema = z.object({
-	city: z.string(),
-	state: z.string(),
-})
-
-type CityState = z.infer<typeof cityStateSchema>
-
-export function parseCityState(
-	location: string,
-): { city: string; state: string } | undefined {
-	const [cityName, rest] = location.split(',').map((part) => part.trim())
-	if (!cityName || !rest) return undefined
-	const state = rest.split(/\s+/)[0]
-	if (!state || state.length !== 2) return undefined
-	return { city: cityName, state: state.toUpperCase() }
-}
+export type CitySuggestion = { id: string; city: string; state: string }
 
 export function isValidZipCode(zipCode: string) {
 	return /^\d{5}$/.test(zipCode)
@@ -71,36 +56,39 @@ async function fetchZipBoundaryBatch(
 }
 
 function buildTopCitiesWhereClause() {
-	const values = TOP_US_CITIES.map((city) => `'${city}'`).join(', ')
-	return sql`${cities.city} || ', ' || ${cities.state} in (${sql.raw(values)})`
+	return or(
+		...TOP_US_CITIES.map(([city, state]) =>
+			and(eq(cities.city, city), eq(cities.state, state)),
+		),
+	)
 }
 
 function escapeLikePattern(value: string): string {
 	return value.replace(/[\\%_]/g, '\\$&')
 }
 
+const citySuggestionColumns = {
+	id: cities.id,
+	city: cities.city,
+	state: cities.state,
+}
+
 const loadCitySuggestions = createServerFn({ method: 'GET' })
 	.validator((query: string) => z.string().parse(query))
-	.handler(async ({ data }) => {
+	.handler(async ({ data }): Promise<CitySuggestion[]> => {
 		const normalizedQuery = data.trim().toLowerCase()
 		if (normalizedQuery.length < 2) {
-			const topCities = await db
-				.select({
-					label: sql<string>`concat(${cities.city}, ', ', ${cities.state})`,
-				})
+			return db
+				.select(citySuggestionColumns)
 				.from(cities)
 				.where(buildTopCitiesWhereClause())
 				.orderBy(cities.city)
 				.limit(10)
-
-			return topCities.map((row) => row.label)
 		}
 
 		const escapedQuery = escapeLikePattern(normalizedQuery)
-		const matches = await db
-			.select({
-				label: sql<string>`concat(${cities.city}, ', ', ${cities.state})`,
-			})
+		return db
+			.select(citySuggestionColumns)
 			.from(cities)
 			.where(
 				or(
@@ -114,8 +102,17 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 			)
 			.orderBy(cities.city)
 			.limit(10)
+	})
 
-		return matches.map((row) => row.label)
+const loadCityLabel = createServerFn({ method: 'GET' })
+	.validator((cityId: string) => z.string().parse(cityId))
+	.handler(async ({ data }): Promise<CitySuggestion | undefined> => {
+		const [row] = await db
+			.select(citySuggestionColumns)
+			.from(cities)
+			.where(eq(cities.id, data))
+			.limit(1)
+		return row
 	})
 
 // Normalizes the raw, nullable result of a `cities` lookup (no matching city
@@ -130,12 +127,12 @@ export function toCityCenter(
 }
 
 const loadCityCenter = createServerFn({ method: 'GET' })
-	.validator((data: CityState) => cityStateSchema.parse(data))
+	.validator((cityId: string) => z.string().parse(cityId))
 	.handler(async ({ data }) => {
 		const [row] = await db
 			.select({ lat: cities.centerLat, lng: cities.centerLng })
 			.from(cities)
-			.where(and(eq(cities.city, data.city), eq(cities.state, data.state)))
+			.where(eq(cities.id, data))
 			.limit(1)
 
 		const center = toCityCenter(row)
@@ -143,13 +140,12 @@ const loadCityCenter = createServerFn({ method: 'GET' })
 	})
 
 const loadZipCodeBoundaries = createServerFn({ method: 'GET' })
-	.validator((data: CityState) => cityStateSchema.parse(data))
+	.validator((cityId: string) => z.string().parse(cityId))
 	.handler(async ({ data }) => {
 		const zipRows = await db
 			.select({ zip: cityZips.zip })
 			.from(cityZips)
-			.innerJoin(cities, eq(cityZips.cityId, cities.id))
-			.where(and(eq(cities.city, data.city), eq(cities.state, data.state)))
+			.where(eq(cityZips.cityId, data))
 			.orderBy(cityZips.zip)
 			.limit(MAX_ZIPS)
 
@@ -175,4 +171,9 @@ const loadZipCodeBoundaries = createServerFn({ method: 'GET' })
 		} satisfies FeatureCollection
 	})
 
-export { loadCitySuggestions, loadCityCenter, loadZipCodeBoundaries }
+export {
+	loadCitySuggestions,
+	loadCityLabel,
+	loadCityCenter,
+	loadZipCodeBoundaries,
+}

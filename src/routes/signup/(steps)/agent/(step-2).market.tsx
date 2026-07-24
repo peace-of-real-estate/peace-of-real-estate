@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { parseCityState } from '@/lib/geography/zip'
 import {
 	AGENT_PRICE_BUCKET_LABELS,
 	AGENT_PRICE_RANGES,
@@ -58,12 +57,7 @@ function AgentMarket({
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
-	const rawInitialLocation = state.city
-		? state.state
-			? `${state.city}, ${state.state}`
-			: state.city
-		: ''
-	const [committedLocation, setCommittedLocation] = useState(rawInitialLocation)
+	const [selectedCityId, setSelectedCityId] = useState(state.cityId)
 	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(
 		state.zipCodes ?? [],
 	)
@@ -79,17 +73,16 @@ function AgentMarket({
 		state.bestClientTypes ?? [],
 	)
 
-	const marketComplete = committedLocation.trim().length >= 2
+	const marketComplete = Boolean(selectedCityId)
 	const priceComplete = priceBucket !== ''
 	const sideComplete = representationSide.length > 0
 	const clientsComplete = bestClientTypes.length > 0
 	const canContinue =
 		marketComplete && priceComplete && sideComplete && clientsComplete
 	const showMarketError = hasTriedContinue && !marketComplete
-	const cityState = parseCityState(committedLocation)
 
-	const handleLocationChange = (location: string, zipCodes: string[]) => {
-		setCommittedLocation(location)
+	const handleLocationChange = (cityId: string, zipCodes: string[]) => {
+		setSelectedCityId(cityId)
 		setSelectedZipCodes(zipCodes)
 	}
 
@@ -108,12 +101,10 @@ function AgentMarket({
 		}
 		if (!representationSide) return
 		if (!priceBucket) return
+		if (!selectedCityId) return
 
-		const locationUpdate = cityState
-			? { city: cityState.city, state: cityState.state }
-			: { city: committedLocation }
 		onUpdate({
-			...locationUpdate,
+			cityId: selectedCityId,
 			zipCodes: selectedZipCodes,
 			typicalPriceRange: priceBucket,
 			representationSide,
@@ -130,7 +121,7 @@ function AgentMarket({
 
 					<CityZipSelector
 						id="agent-market"
-						value={rawInitialLocation}
+						value={state.cityId}
 						onChange={handleLocationChange}
 						zipCodes={selectedZipCodes}
 						label={

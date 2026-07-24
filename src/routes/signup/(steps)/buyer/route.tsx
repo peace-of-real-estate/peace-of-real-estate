@@ -66,7 +66,7 @@ function BuyerWizardRoute() {
 				step === 'preview' ? '/signup/preview/buyer' : step
 			}
 			getHasDraft={(draft) =>
-				draft.city !== undefined ||
+				draft.cityId !== undefined ||
 				draft.quickCommunicationChannel !== undefined
 			}
 			getCompletedStepIds={(draft) =>
@@ -74,7 +74,7 @@ function BuyerWizardRoute() {
 					.filter((step) => {
 						switch (step.id) {
 							case 'location':
-								return Boolean(draft.city && draft.state)
+								return Boolean(draft.cityId)
 							case 'home':
 								return Boolean(
 									draft.priceMin !== undefined &&

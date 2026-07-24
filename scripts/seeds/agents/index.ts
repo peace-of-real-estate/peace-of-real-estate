@@ -1,8 +1,11 @@
+import { and, eq, or } from 'drizzle-orm'
+
 import { db } from '../../../src/db/connection'
 import {
 	account,
 	agentProfiles,
 	buyerProfiles,
+	cities,
 	sellerProfiles,
 	session,
 	user,
@@ -19,6 +22,7 @@ import {
 	type AverageTransactions,
 	type YearsLicensed,
 } from '../../../src/lib/profile'
+import { cityKey } from '../../lib/city-key'
 import { ensureAvatarPool, getAvatarFallbackUrls } from '../avatars'
 import {
 	BROKERAGE_POOLS,
@@ -144,7 +148,33 @@ function generateEmail(firstName: string, lastName: string): string {
 	return `${firstName.toLowerCase()}.${lastName.toLowerCase()}${randInt(1, 999)}@example.com`
 }
 
-async function insertAgent(location: City, now: Date, imageKey: string) {
+async function loadCityIdsByKey(
+	locations: readonly City[],
+): Promise<Map<string, string>> {
+	const rows = await db
+		.select({ id: cities.id, city: cities.city, state: cities.state })
+		.from(cities)
+		.where(
+			or(
+				...locations.map((location) =>
+					and(eq(cities.city, location.city), eq(cities.state, location.state)),
+				),
+			),
+		)
+
+	const byKey = new Map<string, string>()
+	for (const row of rows) {
+		byKey.set(cityKey(row.city, row.state), row.id)
+	}
+	return byKey
+}
+
+async function insertAgent(
+	location: City,
+	cityId: string,
+	now: Date,
+	imageKey: string,
+) {
 	const persona = generatePersona()
 	const { firstName, lastName, fullName } = generateName()
 	const email = generateEmail(firstName, lastName)
@@ -164,8 +194,7 @@ async function insertAgent(location: City, now: Date, imageKey: string) {
 	await db.insert(agentProfiles).values({
 		id: agentId,
 		userId,
-		city: location.city,
-		state: location.state,
+		cityId,
 		representationSide: persona.representationSide,
 		typicalPriceRange: persona.typicalPriceRange,
 		bestClientTypes: persona.bestClientTypes,
@@ -238,6 +267,8 @@ export async function seedAgents(count: number) {
 
 	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
 
+	const cityIdByKey = await loadCityIdsByKey(CITIES)
+
 	const poolKeys = await ensureAvatarPool(count)
 	const sources =
 		poolKeys.length >= count
@@ -246,7 +277,14 @@ export async function seedAgents(count: number) {
 	const imageFor = (index: number) => sources[index % sources.length]!
 
 	for (let i = 0; i < count; i++) {
-		await insertAgent(pickCity(), now, imageFor(i))
+		const location = pickCity()
+		const cityId = cityIdByKey.get(cityKey(location.city, location.state))
+		if (!cityId) {
+			throw new Error(
+				`No city row for ${location.city}, ${location.state} — run db:init first.`,
+			)
+		}
+		await insertAgent(location, cityId, now, imageFor(i))
 
 		if ((i + 1) % 50 === 0 || i === count - 1) {
 			console.log(`  ${i + 1}/${count} agents seeded`)

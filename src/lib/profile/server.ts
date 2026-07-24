@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm'
 import { db } from '@/db/connection'
 import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
+import { loadClientProfileWithCityCenter } from '@/lib/matching/profiles'
 
 import {
 	agentInsertSchema,
@@ -44,13 +45,11 @@ async function insertProfileOnce(
 export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(buyerProfiles)
-				.where(eq(buyerProfiles.userId, userId))
-				.limit(1),
+		const profile = await loadClientProfileWithCityCenter(
+			buyerProfiles,
+			eq(buyerProfiles.userId, userId),
 		)
+		return profile ?? null
 	},
 )
 
@@ -88,13 +87,11 @@ export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 export const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(sellerProfiles)
-				.where(eq(sellerProfiles.userId, userId))
-				.limit(1),
+		const profile = await loadClientProfileWithCityCenter(
+			sellerProfiles,
+			eq(sellerProfiles.userId, userId),
 		)
+		return profile ?? null
 	},
 )
 

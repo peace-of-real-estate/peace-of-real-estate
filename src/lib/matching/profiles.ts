@@ -1,4 +1,4 @@
-import { and, eq, type SQL } from 'drizzle-orm'
+import { eq, type SQL } from 'drizzle-orm'
 
 import { db } from '@/db/connection'
 import {
@@ -17,10 +17,9 @@ import {
 
 type User = typeof user.$inferSelect
 
-// Both loaders join `cities` on (city, state) to resolve each profile's city
-// center and normalize the join's nullable result via toCityCenter, so every
-// caller gets an already-clean ClientProfileForScoring/AgentProfileForScoring
-// — nobody downstream has to remember to do that conversion themselves.
+// Every profile's `cityId` is a required FK to `cities`, so both loaders can
+// innerJoin it to resolve city/state and city center in one query — nobody
+// downstream has to remember to do that lookup or normalization themselves.
 const cityJoinColumns = {
 	city: cities.city,
 	state: cities.state,
@@ -32,40 +31,36 @@ export async function loadClientProfileWithCityCenter(
 	where: SQL,
 ): Promise<ClientProfileForScoring | undefined> {
 	const [row] = await db
-		.select({
-			profile: table,
-			cityCenter: { lat: cities.centerLat, lng: cities.centerLng },
-		})
+		.select({ profile: table, ...cityJoinColumns })
 		.from(table)
-		.leftJoin(
-			cities,
-			and(eq(table.city, cities.city), eq(table.state, cities.state)),
-		)
+		.innerJoin(cities, eq(table.cityId, cities.id))
 		.where(where)
 		.limit(1)
-	return row && { ...row.profile, cityCenter: toCityCenter(row.cityCenter) }
+	return (
+		row && {
+			...row.profile,
+			city: row.city,
+			state: row.state,
+			cityCenter: toCityCenter(row.cityCenter),
+		}
+	)
 }
 
 export async function loadAgentProfilesWithCityCenter(): Promise<
 	{ agent: AgentProfileForScoring; user: User }[]
 > {
 	const results = await db
-		.select({
-			agent: agentProfiles,
-			user,
-			cityCenter: { lat: cities.centerLat, lng: cities.centerLng },
-		})
+		.select({ agent: agentProfiles, user, ...cityJoinColumns })
 		.from(agentProfiles)
 		.innerJoin(user, eq(agentProfiles.userId, user.id))
-		.leftJoin(
-			cities,
-			and(
-				eq(agentProfiles.city, cities.city),
-				eq(agentProfiles.state, cities.state),
-			),
-		)
+		.innerJoin(cities, eq(agentProfiles.cityId, cities.id))
 	return results.map((row) => ({
-		agent: { ...row.agent, cityCenter: toCityCenter(row.cityCenter) },
+		agent: {
+			...row.agent,
+			city: row.city,
+			state: row.state,
+			cityCenter: toCityCenter(row.cityCenter),
+		},
 		user: row.user,
 	}))
 }

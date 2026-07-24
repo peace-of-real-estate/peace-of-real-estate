@@ -141,82 +141,6 @@ export const verification = pgTable(
 	],
 )
 
-export const buyerProfiles = pgTable(
-	'buyer_profiles',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...clientLifecycleColumns,
-		...clientMatchingColumns,
-		...clientWorkStyleColumns,
-		...clientMatchTuningColumns,
-		...buyerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'buyer_profiles_user_id_fk',
-		}),
-		check(
-			'buyer_profiles_price_range_check',
-			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
-		),
-	],
-)
-
-export const sellerProfiles = pgTable(
-	'seller_profiles',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...clientLifecycleColumns,
-		...clientMatchingColumns,
-		...clientWorkStyleColumns,
-		...clientMatchTuningColumns,
-		...sellerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'seller_profiles_user_id_fk',
-		}),
-		check(
-			'seller_profiles_price_range_check',
-			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
-		),
-	],
-)
-
-export const agentProfiles = pgTable(
-	'agent_profiles',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...agentMatchingColumns,
-		...agentIdentityColumns,
-		...agentQuizColumns,
-		...agentComplianceColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		uniqueIndex('agent_profiles_user_id_index').on(table.userId),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'agent_profiles_user_id_fk',
-		}),
-	],
-)
-
 export const cities = pgTable(
 	'cities',
 	{
@@ -249,5 +173,96 @@ export const cityZips = pgTable(
 			foreignColumns: [cities.id],
 			name: 'city_zips_city_id_fk',
 		}).onDelete('cascade'),
+	],
+)
+
+export const buyerProfiles = pgTable(
+	'buyer_profiles',
+	{
+		id: text().primaryKey().notNull(),
+		userId: text().notNull(),
+		...clientLifecycleColumns,
+		...clientMatchingColumns,
+		...clientWorkStyleColumns,
+		...clientMatchTuningColumns,
+		...buyerQuizColumns,
+		createdAt: timestamp({ withTimezone: true }).notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: 'buyer_profiles_user_id_fk',
+		}),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'buyer_profiles_city_id_fk',
+		}),
+		check(
+			'buyer_profiles_price_range_check',
+			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+		),
+	],
+)
+
+export const sellerProfiles = pgTable(
+	'seller_profiles',
+	{
+		id: text().primaryKey().notNull(),
+		userId: text().notNull(),
+		...clientLifecycleColumns,
+		...clientMatchingColumns,
+		...clientWorkStyleColumns,
+		...clientMatchTuningColumns,
+		...sellerQuizColumns,
+		createdAt: timestamp({ withTimezone: true }).notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: 'seller_profiles_user_id_fk',
+		}),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'seller_profiles_city_id_fk',
+		}),
+		check(
+			'seller_profiles_price_range_check',
+			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+		),
+	],
+)
+
+export const agentProfiles = pgTable(
+	'agent_profiles',
+	{
+		id: text().primaryKey().notNull(),
+		userId: text().notNull(),
+		...agentMatchingColumns,
+		...agentIdentityColumns,
+		...agentQuizColumns,
+		...agentComplianceColumns,
+		createdAt: timestamp({ withTimezone: true }).notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		uniqueIndex('agent_profiles_user_id_index').on(table.userId),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: 'agent_profiles_user_id_fk',
+		}),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'agent_profiles_city_id_fk',
+		}),
 	],
 )
