@@ -117,11 +117,6 @@ export const account = pgTable(
 			table.providerId,
 			table.accountId,
 		),
-		index('account_provider_index').using(
-			'btree',
-			table.providerId,
-			table.accountId,
-		),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
