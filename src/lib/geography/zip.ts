@@ -79,36 +79,41 @@ const cityColumns = {
 	state: cities.state,
 }
 
-const loadCitySuggestions = createServerFn({ method: 'GET' })
-	.validator((query: string) => z.string().trim().parse(query))
-	.handler(async ({ data }): Promise<City[]> => {
-		const normalizedQuery = data.toLowerCase()
-		if (normalizedQuery.length < 2) {
-			return db
-				.select(cityColumns)
-				.from(cities)
-				.where(buildTopCitiesWhereClause())
-				.orderBy(cities.name)
-				.limit(10)
-		}
-
-		const escapedQuery = escapeLikePattern(normalizedQuery)
-		return db
+export async function searchCities(
+	database: typeof db,
+	query: string,
+): Promise<City[]> {
+	const normalizedQuery = query.toLowerCase()
+	if (normalizedQuery.length < 2) {
+		return database
 			.select(cityColumns)
 			.from(cities)
-			.where(
-				or(
-					ilike(cities.name, `%${escapedQuery}%`),
-					ilike(cities.state, `${escapedQuery}%`),
-					ilike(
-						sql`${cities.name} || ', ' || ${cities.state}`,
-						`%${escapedQuery}%`,
-					),
-				),
-			)
+			.where(buildTopCitiesWhereClause())
 			.orderBy(cities.name)
 			.limit(10)
-	})
+	}
+
+	const escapedQuery = escapeLikePattern(normalizedQuery)
+	return database
+		.select(cityColumns)
+		.from(cities)
+		.where(
+			or(
+				ilike(cities.name, `%${escapedQuery}%`),
+				ilike(sql`${cities.state}::text`, `${escapedQuery}%`),
+				ilike(
+					sql`${cities.name} || ', ' || ${cities.state}::text`,
+					`%${escapedQuery}%`,
+				),
+			),
+		)
+		.orderBy(cities.name)
+		.limit(10)
+}
+
+const loadCitySuggestions = createServerFn({ method: 'GET' })
+	.validator((query: string) => z.string().trim().parse(query))
+	.handler(async ({ data }): Promise<City[]> => searchCities(db, data))
 
 const loadCityById = createServerFn({ method: 'GET' })
 	.validator((cityId: string) => z.uuid().parse(cityId))
