@@ -148,7 +148,17 @@ async function seedCityData() {
 					}
 				}),
 			)
-			.onConflictDoNothing()
+			.onConflictDoUpdate({
+				target: cityZips.zip,
+				// lat/lng track the pinned dataset like city centers do. cityId is
+				// deliberately excluded: the composite FK from profile zip rows
+				// makes a reassigned city fail loudly instead of silently moving a
+				// zip out from under existing profiles.
+				set: {
+					lat: sql`excluded."lat"`,
+					lng: sql`excluded."lng"`,
+				},
+			})
 		console.log(
 			`  city_zips ${Math.min(i + BATCH_SIZE_ZIPS, zipRows.length)}/${zipRows.length}`,
 		)
