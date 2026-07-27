@@ -1,6 +1,6 @@
 import type { SellerProfile } from '@/lib/profile/types'
 
-import { geoOf } from '../geography'
+import { austinCity, geoOf } from '../geography'
 
 export function makeSellerProfile(
 	overrides: Partial<SellerProfile> = {},
@@ -10,12 +10,7 @@ export function makeSellerProfile(
 		userId: 'user-1',
 		role: 'seller',
 		status: 'draft',
-		city: {
-			id: 'city-fixture-austin-tx',
-			name: 'Austin',
-			state: 'TX',
-			center: { lat: 30.2672, lng: -97.7431 },
-		},
+		city: austinCity,
 		geography: geoOf({}),
 		timeline: '3months',
 		priceMin: 400_000,

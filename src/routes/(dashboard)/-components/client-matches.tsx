@@ -22,14 +22,12 @@ import {
 	loadSellerAgentMatches,
 } from '@/lib/matching/server'
 import { buyer, seller } from '@/lib/profile'
-import type { ClientProfile } from '@/lib/profile/types'
+import type { ClientProfile, ClientRole } from '@/lib/profile/types'
 import {
 	DashboardPage,
 	DashboardPageMobileNav,
 } from '@/routes/(dashboard)/-components/dashboard'
 import { MatchList } from '@/routes/(dashboard)/-components/match-list'
-
-type ClientRole = 'buyer' | 'seller'
 
 type ClientMatchesProfile = ClientProfile
 

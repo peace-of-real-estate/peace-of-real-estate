@@ -30,13 +30,6 @@ type CityRow = typeof cities.$inferSelect
 
 type ZipTable = typeof clientProfileZips | typeof agentProfileZips
 
-type UserRow = typeof user.$inferSelect
-
-type AgentUserSummary = Pick<
-	UserRow,
-	'id' | 'name' | 'email' | 'emailVerified' | 'image'
->
-
 type ClientProfileBaseRow = typeof clientProfiles.$inferSelect
 type BuyerDetailsRow = typeof buyerDetails.$inferSelect
 type SellerDetailsRow = typeof sellerDetails.$inferSelect
@@ -167,22 +160,10 @@ function buildClientProfile(
 	}
 	if (pair.role === 'buyer') {
 		const { clientProfileId: _id, role: _role, ...quiz } = pair.details
-		const profile: BuyerProfile = {
-			...shared,
-			...quiz,
-			role: pair.role,
-			...resolved,
-		}
-		return profile
+		return { ...shared, ...quiz, role: pair.role, ...resolved }
 	}
 	const { clientProfileId: _id, role: _role, ...quiz } = pair.details
-	const profile: SellerProfile = {
-		...shared,
-		...quiz,
-		role: pair.role,
-		...resolved,
-	}
-	return profile
+	return { ...shared, ...quiz, role: pair.role, ...resolved }
 }
 
 function groupByProfile(geographyRows: GeographyRows) {
@@ -433,9 +414,7 @@ export const Agent = {
 		return toAgentProfile(row.agent, row.city, geographyRows)
 	},
 
-	async listWithUsers(): Promise<
-		{ agent: AgentProfile; user: AgentUserSummary }[]
-	> {
+	async listWithUsers() {
 		const rows = await db
 			.select({
 				agent: agentProfiles,
