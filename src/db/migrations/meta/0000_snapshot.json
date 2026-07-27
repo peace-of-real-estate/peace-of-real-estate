@@ -1,5 +1,5 @@
 {
-  "id": "62a5a02b-cae1-4dfc-9a2c-28dd1e23b61b",
+  "id": "88f4b3c6-a25a-4af5-ba04-7f2714a0fe1b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -136,7 +136,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -159,6 +159,12 @@
         "city_zip_id": {
           "name": "city_zip_id",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -215,28 +221,32 @@
         }
       },
       "foreignKeys": {
-        "agent_profile_zips_profile_id_fk": {
-          "name": "agent_profile_zips_profile_id_fk",
+        "agent_profile_zips_profile_city_fk": {
+          "name": "agent_profile_zips_profile_city_fk",
           "tableFrom": "agent_profile_zips",
           "tableTo": "agent_profiles",
           "columnsFrom": [
-            "profile_id"
+            "profile_id",
+            "city_id"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "city_id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "agent_profile_zips_city_zip_id_fk": {
-          "name": "agent_profile_zips_city_zip_id_fk",
+        "agent_profile_zips_city_zip_city_fk": {
+          "name": "agent_profile_zips_city_zip_city_fk",
           "tableFrom": "agent_profile_zips",
           "tableTo": "city_zips",
           "columnsFrom": [
-            "city_zip_id"
+            "city_zip_id",
+            "city_id"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "city_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -273,7 +283,7 @@
         },
         "city_id": {
           "name": "city_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -491,6 +501,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "agent_profiles_city_id_index": {
+          "name": "agent_profiles_city_id_index",
+          "columns": [
+            {
+              "expression": "city_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -522,7 +547,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "agent_profiles_id_city_id_unique": {
+          "name": "agent_profiles_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -609,13 +643,13 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true
         },
         "name": {
           "name": "name",
-          "type": "text",
+          "type": "citext",
           "primaryKey": false,
           "notNull": true
         },
@@ -703,7 +737,7 @@
         },
         "city_id": {
           "name": "city_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -748,6 +782,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "city_zips_city_id_index": {
+          "name": "city_zips_city_id_index",
+          "columns": [
+            {
+              "expression": "city_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -766,7 +815,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "city_zips_id_city_id_unique": {
+          "name": "city_zips_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -784,6 +842,12 @@
         "city_zip_id": {
           "name": "city_zip_id",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -840,28 +904,32 @@
         }
       },
       "foreignKeys": {
-        "client_profile_zips_profile_id_fk": {
-          "name": "client_profile_zips_profile_id_fk",
+        "client_profile_zips_profile_city_fk": {
+          "name": "client_profile_zips_profile_city_fk",
           "tableFrom": "client_profile_zips",
           "tableTo": "client_profiles",
           "columnsFrom": [
-            "profile_id"
+            "profile_id",
+            "city_id"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "city_id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "client_profile_zips_city_zip_id_fk": {
-          "name": "client_profile_zips_city_zip_id_fk",
+        "client_profile_zips_city_zip_city_fk": {
+          "name": "client_profile_zips_city_zip_city_fk",
           "tableFrom": "client_profile_zips",
           "tableTo": "city_zips",
           "columnsFrom": [
-            "city_zip_id"
+            "city_zip_id",
+            "city_id"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "city_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -906,7 +974,7 @@
         },
         "city_id": {
           "name": "city_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -1056,6 +1124,14 @@
           "columns": [
             "id",
             "role"
+          ]
+        },
+        "client_profiles_id_city_id_unique": {
+          "name": "client_profiles_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
           ]
         }
       },
@@ -1247,7 +1323,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1451,7 +1527,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
