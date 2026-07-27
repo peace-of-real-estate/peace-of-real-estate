@@ -105,11 +105,11 @@ export type ClientRole = (typeof clientRole.enumValues)[number]
 
 export type ProfileRole = ClientRole | 'agent'
 
-export const dashboardPaths: Record<ProfileRole, string> = {
+export const dashboardPaths = {
 	agent: '/agent/introductions',
 	buyer: '/buyer/matches',
 	seller: '/seller/matches',
-}
+} as const satisfies Record<ProfileRole, string>
 
 type ClientProfileBase = Omit<
 	typeof clientProfiles.$inferSelect,
