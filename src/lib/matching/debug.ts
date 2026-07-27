@@ -209,7 +209,7 @@ async function loadScoreAgentsForProfile({
 
 	const scored = results.map((row) => ({
 		row,
-		score: calculateFitScore(row.agent, profile, data.side),
+		score: calculateFitScore(row.agent, profile),
 	}))
 
 	const qualified = scored.filter((item) => !item.score.disqualified)

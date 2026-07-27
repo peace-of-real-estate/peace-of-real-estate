@@ -123,20 +123,17 @@ describe('priceOverlapRatio', () => {
 describe('deriveExpectedClientTypes', () => {
 	test('buyer single-family', () => {
 		const buyer = makeBuyer({ propertyTypes: ['singleFamily'] })
-		expect(deriveExpectedClientTypes(buyer, 'buyer')).toEqual([
-			'firstTime',
-			'moveUp',
-		])
+		expect(deriveExpectedClientTypes(buyer)).toEqual(['firstTime', 'moveUp'])
 	})
 
 	test('seller', () => {
 		const seller = makeSeller()
-		expect(deriveExpectedClientTypes(seller, 'seller')).toEqual(['seller'])
+		expect(deriveExpectedClientTypes(seller)).toEqual(['seller'])
 	})
 
 	test('luxury buyer', () => {
 		const buyer = makeBuyer({ priceMin: 1_200_000, priceMax: 1_500_000 })
-		expect(deriveExpectedClientTypes(buyer, 'buyer')).toContain('luxury')
+		expect(deriveExpectedClientTypes(buyer)).toContain('luxury')
 	})
 })
 
@@ -222,7 +219,7 @@ describe('scoreLocation', () => {
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
-		const full = calculateFitScore(agent, buyer, 'buyer')
+		const full = calculateFitScore(agent, buyer)
 		expect(full.disqualified).toBe(true)
 		expect(
 			full.trace.disqualifiers.some((d) => d.id === 'state' && d.disqualified),
@@ -237,7 +234,7 @@ describe('scoreLocation', () => {
 			city: cityOf('Minneapolis', 'MN', { lat: 44.9778, lng: -93.265 }),
 			geography: geoOf({ '55401': { lat: 44.9834, lng: -93.2666 } }),
 		})
-		const full = calculateFitScore(agent, buyer, 'buyer')
+		const full = calculateFitScore(agent, buyer)
 		const geo = full.trace.geo
 		expect(geo?.client.lat).toBeCloseTo(44.9778, 4)
 		expect(geo?.agent.lat).toBeCloseTo(44.9537, 4)
@@ -252,7 +249,7 @@ describe('calculateFitScore', () => {
 	test('accepts slug stored format for agent typicalPriceRange', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 
 		expect(result.disqualified).toBe(false)
 		expect(
@@ -267,7 +264,7 @@ describe('calculateFitScore', () => {
 			typicalPriceRange: '400kTo750k',
 		})
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 
 		expect(result.disqualified).toBe(false)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
@@ -286,7 +283,7 @@ describe('calculateFitScore', () => {
 			propertyTypes: [],
 			experienceLevel: 'firstTime',
 		})
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.fitScore).toBe(100)
 		expect(result.disqualified).toBe(false)
 	})
@@ -294,7 +291,7 @@ describe('calculateFitScore', () => {
 	test('disqualified for side mismatch', () => {
 		const agent = makeAgent({ representationSide: 'seller' })
 		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 		expect(result.fitScore).toBe(0)
 	})
@@ -304,7 +301,7 @@ describe('calculateFitScore', () => {
 			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
 		})
 		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 		expect(result.fitScore).toBe(0)
 	})
@@ -314,7 +311,7 @@ describe('calculateFitScore', () => {
 			city: cityOf('Towson', 'MD', { lat: 39.4015, lng: -76.6019 }),
 		})
 		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		const stateGate = result.trace.disqualifiers.find((d) => d.id === 'state')
 		expect(stateGate?.disqualified).toBe(false)
 		expect(stateGate?.detail).toBe('client in MD, agent in MD')
@@ -326,7 +323,7 @@ describe('calculateFitScore', () => {
 			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
 		})
 		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		const stateGate = result.trace.disqualifiers.find((d) => d.id === 'state')
 		expect(stateGate?.disqualified).toBe(true)
 		expect(stateGate?.detail).toBe('client in MD, agent in VA')
@@ -341,21 +338,21 @@ describe('calculateFitScore', () => {
 			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
 			city: cityOf('Baltimore', 'MD', { lat: 39.2904, lng: -76.6122 }),
 		})
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 	})
 
 	test('disqualified for price contact', () => {
 		const agent = makeAgent({ typicalPriceRange: '1_5mPlus' })
 		const buyer = makeBuyer({ priceMin: 200_000, priceMax: 300_000 })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 	})
 
 	test('adjacent bucket passes price gate', () => {
 		const agent = makeAgent({ typicalPriceRange: '750kTo1_5m' })
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 600_000 })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(false)
 	})
 
@@ -369,7 +366,7 @@ describe('calculateFitScore', () => {
 	test('priority boost raises priceFit weight', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		const priceDimension = result.trace.dimensions.find(
 			(d) => d.id === 'priceFit',
 		)
@@ -380,7 +377,7 @@ describe('calculateFitScore', () => {
 	test('seller match uses seller matrices', () => {
 		const agent = makeAgent({ representationSide: 'seller' })
 		const seller = makeSeller()
-		const result = calculateFitScore(agent, seller, 'seller')
+		const result = calculateFitScore(agent, seller)
 		expect(result.disqualified).toBe(false)
 		expect(result.fitScore).toBeGreaterThan(0)
 		const workingStyle = result.trace.dimensions.find(
@@ -398,8 +395,8 @@ describe('calculateFitScore', () => {
 			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
 		})
 		const buyer = makeBuyer()
-		const qualifiedResult = calculateFitScore(qualified, buyer, 'buyer')
-		const disqualifiedResult = calculateFitScore(disqualified, buyer, 'buyer')
+		const qualifiedResult = calculateFitScore(qualified, buyer)
+		const disqualifiedResult = calculateFitScore(disqualified, buyer)
 		expect(qualifiedResult.fitScore).toBeGreaterThan(
 			disqualifiedResult.fitScore,
 		)
@@ -424,7 +421,7 @@ describe('calculateFitScore trace', () => {
 	test('stage2 values are internally consistent', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		const stage2 = result.trace.stage2
 		expect(stage2).toBeDefined()
 		expect(stage2!.linear).toBeGreaterThan(0)
@@ -438,7 +435,7 @@ describe('calculateFitScore trace', () => {
 	test('reciprocalBlend equals harmonic mean of consumerScore and agentFit floor', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		const { stage2, agentFit, reciprocalBlend } = result.trace
 		expect(reciprocalBlend).toBeDefined()
 		const expected =
@@ -450,7 +447,7 @@ describe('calculateFitScore trace', () => {
 	test('notFitPenalty is populated exactly when penalized', () => {
 		const agent = makeAgent({ notFitFor: ['entryLevel'] })
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeDefined()
 		expect(result.trace.notFitPenalty!.scoreAfter).toBeCloseTo(
 			result.trace.notFitPenalty!.scoreBefore * 0.3,
@@ -461,7 +458,7 @@ describe('calculateFitScore trace', () => {
 	test('notFitPenalty is omitted when not penalized', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeUndefined()
 	})
 })
@@ -653,7 +650,7 @@ describe('rankWithTieBandsDetailed', () => {
 	test('slug agent earns adjacent-bucket credit', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer({ priceMin: 750_000, priceMax: 900_000 })
-		const result = calculateFitScore(agent, buyer, 'buyer')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(false)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
 		expect(priceFit?.score).toBe(0.4)

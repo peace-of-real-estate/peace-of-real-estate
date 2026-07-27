@@ -297,27 +297,18 @@ function bucketCentrality(
 	return priceOverlapRatio(clientRange, agentBucket)
 }
 
-// `side` and `client.role` always agree by the time scoring runs; pairing
-// them here proves that once so the dimension scorers below never re-narrow
-// the client union.
+// The discriminated ClientProfile union already carries its side in
+// `role`; pairing them here narrows the union once so the dimension
+// scorers below never re-narrow.
 type ClientSideProfile =
 	| { side: 'buyer'; client: BuyerProfile }
 	| { side: 'seller'; client: SellerProfile }
 
-function toClientSideProfile(
-	client: ClientProfile,
-	side: ClientRole,
-): ClientSideProfile {
-	if (side === 'buyer') {
-		if (client.role !== 'buyer') {
-			throw new Error(`side is 'buyer' but client role is '${client.role}'`)
-		}
-		return { side, client }
+function toClientSideProfile(client: ClientProfile): ClientSideProfile {
+	if (client.role === 'buyer') {
+		return { side: 'buyer', client }
 	}
-	if (client.role !== 'seller') {
-		throw new Error(`side is 'seller' but client role is '${client.role}'`)
-	}
-	return { side, client }
+	return { side: 'seller', client }
 }
 
 function expectedClientTypeSources(
@@ -353,11 +344,8 @@ function expectedClientTypeSources(
 
 export function deriveExpectedClientTypes(
 	client: ClientProfile,
-	side: ClientRole,
 ): BestClientTypeSlug[] {
-	return [
-		...expectedClientTypeSources(toClientSideProfile(client, side)).keys(),
-	]
+	return [...expectedClientTypeSources(toClientSideProfile(client)).keys()]
 }
 
 function scoreSpecialization(
@@ -845,11 +833,11 @@ function harmonicMean(a: number, b: number): number {
 export function calculateFitScore(
 	agent: AgentProfile,
 	client?: ClientProfile,
-	side: ClientRole = 'buyer',
+	fallbackSide: ClientRole = 'buyer',
 ): FitScoreResult {
-	if (!client) return calculateFallbackScore(agent, side)
+	if (!client) return calculateFallbackScore(agent, fallbackSide)
 
-	const scored = toClientSideProfile(client, side)
+	const scored = toClientSideProfile(client)
 	const { weights, boosted } = resolveDimensionWeights(scored)
 
 	const results: Record<DimensionId, DimensionResult> = {
@@ -919,7 +907,7 @@ export function calculateFitScore(
 	const disqualifiers = evaluateDisqualifiers(
 		client,
 		agent,
-		side,
+		scored.side,
 		results.location,
 		results.priceFit,
 	)
@@ -949,7 +937,7 @@ export function calculateFitScore(
 		disqualified,
 		trace: {
 			mode: 'client-scored',
-			side,
+			side: scored.side,
 			matchPriorities: client.matchPriorities ?? [],
 			disqualifiers,
 			disqualified,
