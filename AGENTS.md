@@ -32,6 +32,17 @@ for information about a specific command.
 Docs are local at `node_modules/vite-plus/docs` or online at
 <https://viteplus.dev/guide/>.
 
+## Comments
+
+Never write comments that restate what the code already says — if a comment
+explains _what_ the code does, delete it and rename or restructure the code
+instead. Comments must add information the code cannot express. Allowed:
+
+- **Critical context** — why a non-obvious decision was made, constraints
+  imposed by external systems, or links to reference material.
+- **Section markers** — short labels (often one word) like `// Shared`, or the
+  banner style `// ===== Section =====`, to annotate blocks of code.
+
 ## Review Checklist
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
