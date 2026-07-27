@@ -69,6 +69,10 @@ function buildTopCitiesWhereClause() {
 	)
 }
 
+function escapeLikePattern(value: string): string {
+	return value.replace(/[\\%_]/g, '\\$&')
+}
+
 const cityColumns = {
 	id: cities.id,
 	name: cities.name,
@@ -88,16 +92,17 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 				.limit(10)
 		}
 
+		const escapedQuery = escapeLikePattern(normalizedQuery)
 		return db
 			.select(cityColumns)
 			.from(cities)
 			.where(
 				or(
-					ilike(cities.name, `%${normalizedQuery}%`),
-					ilike(cities.state, `${normalizedQuery}%`),
+					ilike(cities.name, `%${escapedQuery}%`),
+					ilike(cities.state, `${escapedQuery}%`),
 					ilike(
 						sql`${cities.name} || ', ' || ${cities.state}`,
-						`%${normalizedQuery}%`,
+						`%${escapedQuery}%`,
 					),
 				),
 			)
