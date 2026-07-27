@@ -82,7 +82,7 @@ export const userEntitlements = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'user_entitlements_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -105,7 +105,7 @@ export const session = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'session_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -140,7 +140,7 @@ export const account = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'account_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
