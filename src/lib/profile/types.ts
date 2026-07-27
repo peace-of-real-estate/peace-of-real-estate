@@ -61,12 +61,12 @@ export const sellerDetailsInsertSchema = createInsertSchema(sellerDetails).omit(
 	},
 )
 
-export const buyerInsertSchema = clientProfileInsertSchema.merge(
-	buyerDetailsInsertSchema,
+export const buyerInsertSchema = clientProfileInsertSchema.extend(
+	buyerDetailsInsertSchema.shape,
 )
 
-export const sellerInsertSchema = clientProfileInsertSchema.merge(
-	sellerDetailsInsertSchema,
+export const sellerInsertSchema = clientProfileInsertSchema.extend(
+	sellerDetailsInsertSchema.shape,
 )
 
 export const buyerDraftSchema = buyerInsertSchema.partial()

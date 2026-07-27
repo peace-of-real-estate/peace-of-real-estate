@@ -287,6 +287,7 @@ export const agentProfiles = pgTable(
 	},
 	(table) => [
 		uniqueIndex('agent_profiles_user_id_index').on(table.userId),
+		index('agent_profiles_city_id_index').on(table.cityId),
 		unique('agent_profiles_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.userId],

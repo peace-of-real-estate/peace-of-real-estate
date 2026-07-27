@@ -95,15 +95,15 @@ function haversineMiles(
 }
 
 function distanceBetweenZips(
-	clientCenters: ReadonlyMap<string, CityCenter>,
-	agentCenters: ReadonlyMap<string, CityCenter>,
-	zip1: string,
-	zip2: string,
-): number | undefined {
-	const c1 = clientCenters.get(zip1)
-	const c2 = agentCenters.get(zip2)
-	if (!c1 || !c2) return undefined
-	return haversineMiles(c1.lat, c1.lng, c2.lat, c2.lng)
+	clientCenter: CityCenter,
+	agentCenter: CityCenter,
+): number {
+	return haversineMiles(
+		clientCenter.lat,
+		clientCenter.lng,
+		agentCenter.lat,
+		agentCenter.lng,
+	)
 }
 
 function distanceScore(miles: number): number {
@@ -135,22 +135,15 @@ export function scoreLocation(
 	const checks: SubCheck[] = []
 	let bestFitSum = 0
 
-	if (clientZips.length > 0 && agentZips.length > 0) {
-		for (const clientZip of clientZips) {
+	if (clientCenters.size > 0 && agentCenters.size > 0) {
+		for (const [clientZip, clientCenter] of clientCenters) {
 			let best = 0
-			for (const agentZip of agentZips) {
+			for (const [agentZip, agentCenter] of agentCenters) {
 				if (clientZip === agentZip) {
 					best = Math.max(best, 1.0)
 				} else {
-					const miles = distanceBetweenZips(
-						clientCenters,
-						agentCenters,
-						clientZip,
-						agentZip,
-					)
-					if (miles !== undefined) {
-						best = Math.max(best, distanceScore(miles))
-					}
+					const miles = distanceBetweenZips(clientCenter, agentCenter)
+					best = Math.max(best, distanceScore(miles))
 				}
 			}
 			bestFitSum += best
@@ -312,7 +305,7 @@ function toClientSideProfile(client: ClientProfile): ClientSideProfile {
 }
 
 function expectedClientTypeSources(
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 ): Map<BestClientTypeSlug, string[]> {
 	const sources = new Map<BestClientTypeSlug, string[]>()
 	const add = (slug: BestClientTypeSlug, source: string) => {
@@ -321,21 +314,21 @@ function expectedClientTypeSources(
 		else sources.set(slug, [source])
 	}
 
-	if (scored.side === 'seller') add('seller', 'seller side')
-	if (scored.side === 'buyer') {
-		for (const propertyType of scored.client.propertyTypes ?? []) {
+	if (clientBySide.side === 'seller') add('seller', 'seller side')
+	if (clientBySide.side === 'buyer') {
+		for (const propertyType of clientBySide.client.propertyTypes ?? []) {
 			for (const slug of propertyTypeToClientTypes[propertyType] ?? []) {
 				add(slug, propertyType)
 			}
 		}
 	}
-	const clientRange = clientPriceRange(scored.client)
+	const clientRange = clientPriceRange(clientBySide.client)
 	if (clientRange.min >= LUXURY_PRICE_FLOOR) {
 		add('luxury', 'budget ≥ $1M')
 	}
 	if (
-		scored.side === 'buyer' &&
-		scored.client.experienceLevel === 'firstTime'
+		clientBySide.side === 'buyer' &&
+		clientBySide.client.experienceLevel === 'firstTime'
 	) {
 		add('firstTime', 'first-time buyer')
 	}
@@ -349,10 +342,10 @@ export function deriveExpectedClientTypes(
 }
 
 function scoreSpecialization(
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 	agent: AgentProfile,
 ): DimensionResult {
-	const sources = expectedClientTypeSources(scored)
+	const sources = expectedClientTypeSources(clientBySide)
 	const expected = [...sources.keys()]
 	const agentTypes = agent.bestClientTypes ?? []
 	const primary = agentTypes[0]
@@ -406,13 +399,13 @@ function scoreSpecialization(
 }
 
 function scoreWorkingStyle(
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 	agent: AgentProfile,
 ): DimensionResult {
-	if (scored.side === 'buyer') {
-		return scoreBuyerWorkingStyle(scored.client, agent)
+	if (clientBySide.side === 'buyer') {
+		return scoreBuyerWorkingStyle(clientBySide.client, agent)
 	}
-	return scoreSellerWorkingStyle(scored.client, agent)
+	return scoreSellerWorkingStyle(clientBySide.client, agent)
 }
 
 function scoreBuyerWorkingStyle(
@@ -514,10 +507,10 @@ function scoreSellerWorkingStyle(
 }
 
 function scoreCommunication(
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 	agent: AgentProfile,
 ): DimensionResult {
-	const client = scored.client
+	const client = clientBySide.client
 	const checks: SubCheck[] = []
 
 	const channel = scoreChannel(
@@ -545,11 +538,11 @@ function scoreCommunication(
 	})
 
 	const clientFrequency =
-		scored.side === 'buyer'
-			? scored.client.involvementLevel
-			: scored.client.agentSilencePreference
+		clientBySide.side === 'buyer'
+			? clientBySide.client.involvementLevel
+			: clientBySide.client.agentSilencePreference
 	const frequency =
-		scored.side === 'buyer'
+		clientBySide.side === 'buyer'
 			? scoreFrequency(clientFrequency, agent.communicationFrequency)
 			: scoreSellerFrequency(clientFrequency, agent.communicationFrequency)
 	checks.push({
@@ -668,7 +661,7 @@ function addModulations(
 
 function applyModulation(
 	weights: Record<DimensionId, number>,
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 ): {
 	weights: Record<DimensionId, number>
 	modulators: { dimension: DimensionId; source: string; delta: number }[]
@@ -680,8 +673,8 @@ function applyModulation(
 		delta: number
 	}[] = []
 
-	if (scored.side === 'buyer') {
-		const { experienceLevel } = scored.client
+	if (clientBySide.side === 'buyer') {
+		const { experienceLevel } = clientBySide.client
 		const modulation = experienceWeightModulation[experienceLevel]
 		if (modulation) {
 			addModulations(
@@ -692,7 +685,7 @@ function applyModulation(
 			)
 		}
 	} else {
-		const { saleMotivation, successfulSaleLooksLike } = scored.client
+		const { saleMotivation, successfulSaleLooksLike } = clientBySide.client
 		if (saleMotivation === 'financialPressure') {
 			addModulations(
 				adjusted,
@@ -715,14 +708,14 @@ function applyModulation(
 	return { weights: adjusted, modulators }
 }
 
-function resolveDimensionWeights(scored: ClientSideProfile): {
+function resolveDimensionWeights(clientBySide: ClientSideProfile): {
 	weights: Record<DimensionId, number>
 	boosted: Set<DimensionId>
 } {
 	const baseRanks = baseRank()
 	const priorityRanks = applyPriorityRanking(
 		baseRanks,
-		scored.client.matchPriorities,
+		clientBySide.client.matchPriorities,
 	)
 	const rocWeights = rankOrderCentroidWeights(priorityRanks)
 
@@ -732,7 +725,7 @@ function resolveDimensionWeights(scored: ClientSideProfile): {
 			(baseDimensionWeights[dimension] + rocWeights[dimension]) / 2
 	}
 
-	const { weights: modulated } = applyModulation(raw, scored)
+	const { weights: modulated } = applyModulation(raw, clientBySide)
 
 	const total = Object.values(modulated).reduce(
 		(sum, weight) => sum + weight,
@@ -762,10 +755,8 @@ function evaluateDisqualifiers(
 	locationResult: DimensionResult,
 	priceResult: DimensionResult,
 ): DisqualifierTrace[] {
-	const expectedSide = side
 	const sideMismatch =
-		agent.representationSide !== 'both' &&
-		agent.representationSide !== expectedSide
+		agent.representationSide !== 'both' && agent.representationSide !== side
 	const stateMismatch = client.city.state !== agent.city.state
 
 	const locationDisqualified = locationResult.score <= 0
@@ -804,14 +795,14 @@ function evaluateDisqualifiers(
 }
 
 function applyNotFitPenalty(
-	scored: ClientSideProfile,
+	clientBySide: ClientSideProfile,
 	agent: AgentProfile,
 	score: number,
 ): { score: number; penalized: boolean; reason: string } {
 	const notFitFor = agent.notFitFor ?? []
 	if (notFitFor.length === 0) return { score, penalized: false, reason: '' }
 
-	const expected = [...expectedClientTypeSources(scored).keys()]
+	const expected = [...expectedClientTypeSources(clientBySide).keys()]
 	for (const slug of notFitFor) {
 		const hits = notFitForClientTypeHits[slug]
 		if (hits && expected.some((type) => hits.includes(type))) {
@@ -834,15 +825,15 @@ export function calculateFitScore(
 	agent: AgentProfile,
 	client: ClientProfile,
 ): FitScoreResult {
-	const scored = toClientSideProfile(client)
-	const { weights, boosted } = resolveDimensionWeights(scored)
+	const clientBySide = toClientSideProfile(client)
+	const { weights, boosted } = resolveDimensionWeights(clientBySide)
 
 	const results: Record<DimensionId, DimensionResult> = {
 		location: scoreLocation(client, agent),
 		priceFit: scorePriceFit(client, agent),
-		specialization: scoreSpecialization(scored, agent),
-		workingStyle: scoreWorkingStyle(scored, agent),
-		communication: scoreCommunication(scored, agent),
+		specialization: scoreSpecialization(clientBySide, agent),
+		workingStyle: scoreWorkingStyle(clientBySide, agent),
+		communication: scoreCommunication(clientBySide, agent),
 		businessTerms: scoreBusinessTerms(client, agent),
 	}
 
@@ -880,7 +871,11 @@ export function calculateFitScore(
 
 	const baseFinalScore = Math.round(reciprocalBlend * 100)
 
-	const notFitPenalty = applyNotFitPenalty(scored, agent, baseFinalScore / 100)
+	const notFitPenalty = applyNotFitPenalty(
+		clientBySide,
+		agent,
+		baseFinalScore / 100,
+	)
 	const finalScore = notFitPenalty.penalized
 		? Math.round(notFitPenalty.score * 100)
 		: baseFinalScore
@@ -904,7 +899,7 @@ export function calculateFitScore(
 	const disqualifiers = evaluateDisqualifiers(
 		client,
 		agent,
-		scored.side,
+		clientBySide.side,
 		results.location,
 		results.priceFit,
 	)
@@ -934,7 +929,7 @@ export function calculateFitScore(
 		disqualified,
 		trace: {
 			mode: 'client-scored',
-			side: scored.side,
+			side: clientBySide.side,
 			matchPriorities: client.matchPriorities ?? [],
 			disqualifiers,
 			disqualified,

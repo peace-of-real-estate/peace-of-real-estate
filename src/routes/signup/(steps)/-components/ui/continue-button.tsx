@@ -3,10 +3,10 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 
 export function ContinueButton({
-	disabled,
+	disabled = false,
 	onClick,
 }: {
-	disabled: boolean
+	disabled?: boolean
 	onClick: () => void
 }) {
 	return (

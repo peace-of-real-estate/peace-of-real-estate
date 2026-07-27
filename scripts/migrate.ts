@@ -1,6 +1,8 @@
+import { sql } from 'drizzle-orm'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 
 import { closeDb, db } from '../src/db/connection'
+import { REQUIRED_EXTENSIONS } from '../src/db/extensions'
 
 // Wraps drizzle-orm's migrator instead of `drizzle-kit migrate` because the
 // CLI swallows the underlying Postgres error (just exits 1), which makes
@@ -8,6 +10,9 @@ import { closeDb, db } from '../src/db/connection'
 async function main() {
 	console.log('Running migrations...')
 	try {
+		for (const ext of REQUIRED_EXTENSIONS) {
+			await db.execute(sql`CREATE EXTENSION IF NOT EXISTS ${sql.raw(ext)}`)
+		}
 		await migrate(db, { migrationsFolder: 'src/db/migrations' })
 		console.log('Migrations complete.')
 	} catch (error) {

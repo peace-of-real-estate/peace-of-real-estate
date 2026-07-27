@@ -40,7 +40,6 @@ export function LocationStep() {
 						) : null}
 					</div>
 					<ContinueButton
-						disabled={!canContinue}
 						onClick={() => {
 							if (!state.cityId) {
 								setHasTriedContinue(true)

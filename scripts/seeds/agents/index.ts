@@ -170,6 +170,18 @@ async function loadCityDataByKey(
 			),
 		)
 
+	const foundKeys = new Set(rows.map((row) => cityKey(row.name, row.state)))
+	const missing = locations.filter(
+		(location) => !foundKeys.has(cityKey(location.city, location.state)),
+	)
+	if (missing.length > 0) {
+		throw new Error(
+			`No city row for: ${missing
+				.map((location) => `${location.city}, ${location.state}`)
+				.join('; ')} — run db:init first.`,
+		)
+	}
+
 	const zipRows = await db
 		.select({ id: cityZips.id, cityId: cityZips.cityId, zip: cityZips.zip })
 		.from(cityZips)
@@ -302,16 +314,6 @@ export async function seedAgents(count: number) {
 	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
 
 	const cityDataByKey = await loadCityDataByKey(CITIES)
-	const missingCities = CITIES.filter(
-		(location) => !cityDataByKey.has(cityKey(location.city, location.state)),
-	)
-	if (missingCities.length > 0) {
-		throw new Error(
-			`No city row for: ${missingCities
-				.map((location) => `${location.city}, ${location.state}`)
-				.join('; ')} — run db:init first.`,
-		)
-	}
 
 	await clearFakeData()
 

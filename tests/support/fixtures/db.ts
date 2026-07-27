@@ -4,13 +4,14 @@ import { dirname, resolve } from 'node:path'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
 
+import { REQUIRED_EXTENSIONS } from '@/db/extensions'
 import type * as schema from '@/db/tables'
 
 import { test as baseTest } from './server'
 
 const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
 const DEFAULT_IMAGE = 'postgres:17'
-const DEFAULT_EXTENSIONS = ['pg_trgm']
+const DEFAULT_EXTENSIONS = REQUIRED_EXTENSIONS
 const ROOT_MARKERS = [
 	'vite.config.ts',
 	'vite.config.mts',
@@ -113,7 +114,7 @@ export function initDb(
 export interface SeedDatabaseOptions {
 	schemaPath: string
 	seedFunction?: (db: Database) => Promise<void> | void
-	extensions?: string[]
+	extensions?: readonly string[]
 }
 
 export async function seedDatabase(

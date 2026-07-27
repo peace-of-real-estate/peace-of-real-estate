@@ -92,7 +92,6 @@ function AgentMarket({
 		}
 		if (!representationSide) return
 		if (!priceBucket) return
-		if (!state.cityId) return
 
 		onUpdate({
 			typicalPriceRange: priceBucket,

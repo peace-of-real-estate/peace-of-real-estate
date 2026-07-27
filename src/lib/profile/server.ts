@@ -159,19 +159,21 @@ export const agent = {
 async function findExistingProfileRoles(
 	userId: string,
 ): Promise<ProfileRole[]> {
+	const [agentRows, clientRoles] = await Promise.all([
+		db
+			.select({ id: agentProfiles.id })
+			.from(agentProfiles)
+			.where(eq(agentProfiles.userId, userId))
+			.limit(1),
+		db
+			.select({ role: clientProfiles.role })
+			.from(clientProfiles)
+			.where(eq(clientProfiles.userId, userId)),
+	])
 	const roles: ProfileRole[] = []
-	const [agentRow] = await db
-		.select({ id: agentProfiles.id })
-		.from(agentProfiles)
-		.where(eq(agentProfiles.userId, userId))
-		.limit(1)
-	if (agentRow) {
+	if (agentRows.length > 0) {
 		roles.push('agent')
 	}
-	const clientRoles = await db
-		.select({ role: clientProfiles.role })
-		.from(clientProfiles)
-		.where(eq(clientProfiles.userId, userId))
 	for (const row of clientRoles) {
 		roles.push(row.role)
 	}

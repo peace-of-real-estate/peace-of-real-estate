@@ -20,7 +20,6 @@ export type ScoreBucket =
 export interface LocationGeoTrace {
 	client: CityCenter
 	agent: CityCenter
-	/** Haversine miles between the two city centers. */
 	centroidMiles: number
 	zipFit: number
 	cityFit: number
