@@ -12,6 +12,7 @@ import {
 	sellerDetails,
 	user,
 } from '@/db/tables'
+import type { UsPostalCode } from '@/lib/geography/states'
 import { toZipGeography, type ResolvedCity } from '@/lib/geography/zip'
 
 import type {
@@ -414,7 +415,10 @@ export const Agent = {
 		return toAgentProfile(row.agent, row.city, geographyRows)
 	},
 
-	async listWithUsers() {
+	// `filter.state` pushes the matching algorithm's state disqualifier into
+	// SQL for callers that only serve qualified matches; debug tooling calls
+	// this without a filter precisely because it displays the disqualified.
+	async listWithUsers(filter: { state?: UsPostalCode | undefined } = {}) {
 		const rows = await db
 			.select({
 				agent: agentProfiles,
@@ -430,6 +434,7 @@ export const Agent = {
 			.from(agentProfiles)
 			.innerJoin(user, eq(agentProfiles.userId, user.id))
 			.innerJoin(cities, eq(agentProfiles.cityId, cities.id))
+			.where(filter.state ? eq(cities.state, filter.state) : undefined)
 		const rowsByProfile = groupByProfile(
 			await loadGeographyRows(
 				agentProfileZips,

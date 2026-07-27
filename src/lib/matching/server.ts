@@ -41,7 +41,7 @@ async function loadAgentMatchesForProfile(
 	side: ClientRole,
 	pageParam: MatchPageParam = defaultMatchPageParam,
 ): Promise<AgentMatchData[]> {
-	const results = await Agent.listWithUsers()
+	const results = await Agent.listWithUsers({ state: profile?.city.state })
 	const scored = results.map((row) => ({
 		row,
 		score: calculateFitScore(row.agent, profile, side),
