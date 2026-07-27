@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 
 import { requireUserId } from '@/lib/auth/session'
 import { Agent, Buyer, Seller } from '@/lib/profile/repository'
@@ -8,21 +9,19 @@ import { getAvatarUrl } from '@/lib/s3'
 import { toAgentMatchData, type AgentMatchData } from './match.view'
 import { calculateFitScore } from './scoring'
 
-type MatchPageParam = { offset: number; limit: number }
+const MAX_MATCH_PAGE_SIZE = 100
 
-const defaultMatchPageParam: MatchPageParam = { offset: 0, limit: 10 }
+const matchPageParamSchema = z.object({
+	offset: z.number().int().min(0).default(0),
+	limit: z.number().int().min(1).max(MAX_MATCH_PAGE_SIZE).default(10),
+})
 
-function resolveMatchPageParam(
-	data: MatchPageParam | undefined,
-): MatchPageParam {
-	return {
-		offset: data?.offset ?? defaultMatchPageParam.offset,
-		limit: data?.limit ?? defaultMatchPageParam.limit,
-	}
-}
+type MatchPageParam = z.infer<typeof matchPageParamSchema>
+
+const defaultMatchPageParam: MatchPageParam = matchPageParamSchema.parse({})
 
 export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
-	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.validator((data: unknown) => matchPageParamSchema.parse(data ?? {}))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 		const profile = await Buyer.loadByUserId(userId)
@@ -30,7 +29,7 @@ export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
 	})
 
 export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
-	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.validator((data: unknown) => matchPageParamSchema.parse(data ?? {}))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 		const profile = await Seller.loadByUserId(userId)
