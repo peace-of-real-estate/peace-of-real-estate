@@ -59,6 +59,13 @@ export type ClientDetailsTable = typeof buyerDetails | typeof sellerDetails
 
 // ===== Shared ================================================================
 
+// Thrown for profile writes that fail validation the zod schemas can't
+// express (cross-row checks). server.ts maps it to a 400; anything else
+// escaping a create fn is a genuine server fault and stays a 500.
+export class ProfileValidationError extends Error {
+	override name = 'ProfileValidationError'
+}
+
 // Every profile's `cityId` is a required FK to `cities`, so an inner join
 // always resolves.
 export function resolveCity(row: CityRow): ResolvedCity {
@@ -104,7 +111,9 @@ export async function resolveCityZipIds(
 		.from(cityZips)
 		.where(and(eq(cityZips.cityId, cityId), inArray(cityZips.zip, uniqueZips)))
 	if (rows.length !== uniqueZips.length) {
-		throw new Error('zipCodes must belong to the selected city')
+		throw new ProfileValidationError(
+			'zipCodes must belong to the selected city',
+		)
 	}
 	return rows.map((row) => row.id)
 }

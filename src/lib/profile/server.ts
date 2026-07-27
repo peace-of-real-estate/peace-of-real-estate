@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { setResponseStatus } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import type { z } from 'zod'
 
@@ -6,7 +7,7 @@ import { db } from '@/db/connection'
 import { agentProfiles, clientProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 
-import { Agent, Buyer, Seller } from './repository'
+import { Agent, Buyer, ProfileValidationError, Seller } from './repository'
 import {
 	agentInsertSchema,
 	buyerCompletedDraftSchema,
@@ -24,8 +25,13 @@ async function insertProfileOnce(
 	roleName: string,
 	insert: () => Promise<boolean>,
 ) {
-	const inserted = await insert()
-	if (!inserted) throw new Error(`${roleName} profile already exists`)
+	try {
+		const inserted = await insert()
+		if (!inserted) throw new Error(`${roleName} profile already exists`)
+	} catch (error) {
+		if (error instanceof ProfileValidationError) setResponseStatus(400)
+		throw error
+	}
 }
 
 // One create-from-draft flow for both client roles: parse the completed
