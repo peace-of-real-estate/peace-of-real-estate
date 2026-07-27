@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { cities, clientProfiles, user } from '@/db/tables'
+import { cities, clientProfiles, clientRole, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { formatCityName } from '@/lib/geography/zip'
@@ -74,7 +74,7 @@ export type DebugMatchesPayload = {
 
 const loadDebugMatchesInput = z.object({
 	clientId: z.string(),
-	side: z.enum(['buyer', 'seller']),
+	side: z.enum(clientRole.enumValues),
 })
 
 export function buildDebugPayload(

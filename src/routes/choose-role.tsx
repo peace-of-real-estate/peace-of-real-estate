@@ -4,6 +4,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
 import { loadExistingProfileRoles } from '@/lib/profile'
+import { dashboardPaths, type ProfileRole } from '@/lib/profile/types'
 
 export const Route = createFileRoute('/choose-role')({
 	beforeLoad: async () => {
@@ -14,42 +15,38 @@ export const Route = createFileRoute('/choose-role')({
 			throw redirect({ to: '/buyer/matches' })
 		}
 		if (roles.length === 1) {
-			throw redirect({ to: dashboardPathFor(first) })
+			throw redirect({ to: dashboardPaths[first] })
 		}
 		return { roles }
 	},
 	component: ChooseRolePage,
 })
 
-const roleOptions = [
+const roleOptions: readonly {
+	role: ProfileRole
+	label: string
+	description: string
+	icon: typeof BriefcaseIcon
+}[] = [
 	{
 		role: 'agent',
-		to: '/agent/introductions',
 		label: 'Agent',
 		description: 'See your client introductions',
 		icon: BriefcaseIcon,
 	},
 	{
 		role: 'buyer',
-		to: '/buyer/matches',
 		label: 'Buying',
 		description: 'See your matched agents',
 		icon: HouseIcon,
 	},
 	{
 		role: 'seller',
-		to: '/seller/matches',
 		label: 'Selling',
 		description: 'See your matched agents',
 		icon: TagIcon,
 	},
-] as const
-
-function dashboardPathFor(role: (typeof roleOptions)[number]['role']) {
-	const option = roleOptions.find((o) => o.role === role)
-	if (!option) throw new Error(`no dashboard path for role '${role}'`)
-	return option.to
-}
+]
 
 function ChooseRolePage() {
 	const { roles } = Route.useRouteContext()
@@ -66,10 +63,10 @@ function ChooseRolePage() {
 						</p>
 					</div>
 					<div className="flex flex-col gap-3">
-						{options.map(({ role, to, label, description, icon: Icon }) => (
+						{options.map(({ role, label, description, icon: Icon }) => (
 							<Link
 								key={role}
-								to={to}
+								to={dashboardPaths[role]}
 								className="hover:border-primary/50 hover:bg-muted/50 flex items-center gap-3 rounded-md border px-4 py-3 transition-colors"
 							>
 								<Icon className="text-brand size-5 shrink-0" weight="duotone" />

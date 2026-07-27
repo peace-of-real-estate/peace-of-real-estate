@@ -10,7 +10,7 @@ import {
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { loadCityById } from '@/lib/geography/zip'
-import type { ClientPreviewProfile } from '@/lib/profile'
+import type { ClientPreviewProfile, ClientRole } from '@/lib/profile'
 import {
 	AgentPreviewCard,
 	type MatchDetails,
@@ -88,7 +88,7 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 	draftStorage,
 	createProfile,
 }: {
-	clientRole: 'buyer' | 'seller'
+	clientRole: ClientRole
 	previewSchema: z.ZodType<P>
 	completedDraftSchema: z.ZodType
 	draftStorage: { load: () => D | null; clear: () => void }
