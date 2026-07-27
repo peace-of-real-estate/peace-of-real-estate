@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { db } from '@/db/connection'
 import { cities, clientProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
+import type { UsPostalCode } from '@/lib/geography/states'
 import { formatCityName } from '@/lib/geography/zip'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
 import {
@@ -28,7 +29,7 @@ export type DebugClientOption = {
 	name: string | null
 	email: string | null
 	cityName: string
-	state: string
+	state: UsPostalCode
 	priceRange: PriceRange
 }
 

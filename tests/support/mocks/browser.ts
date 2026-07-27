@@ -1,6 +1,7 @@
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
 import { makeBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { makeSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { austinCity } from '@tests/support/fixtures/geography'
 import { vi } from 'vite-plus/test'
 
 type MockSession = unknown
@@ -62,11 +63,7 @@ vi.mock('@/routes/__root', async () => {
 	}
 })
 
-const mockCitySuggestion = {
-	id: 'city-fixture-austin-tx',
-	name: 'Austin',
-	state: 'TX',
-}
+const mockCitySuggestion = austinCity
 
 vi.mock('@/lib/profile', async () => {
 	const actual =
@@ -88,6 +85,7 @@ vi.mock('@/lib/profile', async () => {
 			loadProfile: () => Promise.resolve(profileState.agentProfile),
 			createProfile: () => Promise.resolve({ success: true }),
 		},
+		loadExistingProfileRoles: () => Promise.resolve([]),
 	}
 })
 
@@ -104,7 +102,7 @@ vi.mock('@/lib/geography/zip', async () => {
 		...actual,
 		loadCitySuggestions: async () => [mockCitySuggestion],
 		loadCityById: async () => mockCitySuggestion,
-		loadCityCenter: async () => ({ lat: 30.2672, lng: -97.7431 }),
+		loadCityCenter: async () => austinCity.center,
 		loadZipCodeBoundaries: async () => ({
 			type: 'FeatureCollection',
 			features: [],
