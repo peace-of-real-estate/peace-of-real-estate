@@ -187,6 +187,7 @@ export const cityZips = pgTable(
 		// (New York, NY lost ~200 zips when the old NYC_ZIP_RANGES aliasing was
 		// removed). Revisit with metro aliasing if a zip ever needs two cities.
 		uniqueIndex('city_zips_zip_unique').on(table.zip),
+		unique('city_zips_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.cityId],
 			foreignColumns: [cities.id],
@@ -213,6 +214,7 @@ export const clientProfiles = pgTable(
 	(table) => [
 		uniqueIndex('client_profiles_user_role_index').on(table.userId, table.role),
 		unique('client_profiles_id_role_index').on(table.id, table.role),
+		unique('client_profiles_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
@@ -278,6 +280,7 @@ export const agentProfiles = pgTable(
 	},
 	(table) => [
 		uniqueIndex('agent_profiles_user_id_index').on(table.userId),
+		unique('agent_profiles_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
@@ -294,13 +297,15 @@ export const agentProfiles = pgTable(
 const profileZipColumns = {
 	id: text().primaryKey().notNull(),
 	cityZipId: text().notNull(),
+	cityId: text().notNull(),
 	createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 }
 
-// Each profile's service zips are rows referencing `city_zips` directly, so
-// membership in the profile's city is enforced by foreign key rather than by
-// application-level checks on an unverifiable string array. Buyer and seller
-// profiles share `client_profiles`, so their zips share one join table.
+// Zip↔profile membership is enforced at the database level: the join row's
+// `cityId` is pinned to BOTH the profile's `(id, cityId)` and the zip's
+// `(id, cityId)` by composite foreign keys, so a row can only commit when
+// the zip belongs to the profile's city. Buyer and seller profiles share
+// `client_profiles`, so their zips share one join table.
 export const clientProfileZips = pgTable(
 	'client_profile_zips',
 	{
@@ -314,14 +319,14 @@ export const clientProfileZips = pgTable(
 		),
 		index('client_profile_zips_profile_id_index').on(table.profileId),
 		foreignKey({
-			columns: [table.profileId],
-			foreignColumns: [clientProfiles.id],
-			name: 'client_profile_zips_profile_id_fk',
+			columns: [table.profileId, table.cityId],
+			foreignColumns: [clientProfiles.id, clientProfiles.cityId],
+			name: 'client_profile_zips_profile_city_fk',
 		}).onDelete('cascade'),
 		foreignKey({
-			columns: [table.cityZipId],
-			foreignColumns: [cityZips.id],
-			name: 'client_profile_zips_city_zip_id_fk',
+			columns: [table.cityZipId, table.cityId],
+			foreignColumns: [cityZips.id, cityZips.cityId],
+			name: 'client_profile_zips_city_zip_city_fk',
 		}),
 	],
 )
@@ -339,14 +344,14 @@ export const agentProfileZips = pgTable(
 		),
 		index('agent_profile_zips_profile_id_index').on(table.profileId),
 		foreignKey({
-			columns: [table.profileId],
-			foreignColumns: [agentProfiles.id],
-			name: 'agent_profile_zips_profile_id_fk',
+			columns: [table.profileId, table.cityId],
+			foreignColumns: [agentProfiles.id, agentProfiles.cityId],
+			name: 'agent_profile_zips_profile_city_fk',
 		}).onDelete('cascade'),
 		foreignKey({
-			columns: [table.cityZipId],
-			foreignColumns: [cityZips.id],
-			name: 'agent_profile_zips_city_zip_id_fk',
+			columns: [table.cityZipId, table.cityId],
+			foreignColumns: [cityZips.id, cityZips.cityId],
+			name: 'agent_profile_zips_city_zip_city_fk',
 		}),
 	],
 )

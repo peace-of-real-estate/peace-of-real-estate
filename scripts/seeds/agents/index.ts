@@ -267,6 +267,7 @@ async function insertAgent(
 			id: crypto.randomUUID(),
 			profileId: agentId,
 			cityZipId: row.id,
+			cityId,
 			createdAt: now,
 		})),
 	)
