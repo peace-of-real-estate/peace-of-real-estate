@@ -6,12 +6,10 @@ import { z } from 'zod'
 import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentSession } from '@/lib/auth/session'
 import {
-	completeAgentSignup,
-	createBuyerProfileFromDraft,
-	createSellerProfileFromDraft,
-	loadAgentProfile,
-	loadBuyerProfile,
-	loadSellerProfile,
+	agent,
+	buyer,
+	loadExistingProfileRoles,
+	seller,
 	type AgentDraft,
 	type BuyerDraft,
 	type SellerDraft,
@@ -35,15 +33,17 @@ export const Route = createFileRoute('/auth/complete')({
 			})
 		}
 
-		if (search.role === 'agent' && (await loadAgentProfile())) {
+		const existingRoles = await loadExistingProfileRoles()
+
+		if (search.role === 'agent' && existingRoles.includes('agent')) {
 			throw redirect({ to: '/agent/introductions' })
 		}
 
-		if (search.role === 'buyer' && (await loadBuyerProfile())) {
+		if (search.role === 'buyer' && existingRoles.includes('buyer')) {
 			throw redirect({ to: '/buyer/matches' })
 		}
 
-		if (search.role === 'seller' && (await loadSellerProfile())) {
+		if (search.role === 'seller' && existingRoles.includes('seller')) {
 			throw redirect({ to: '/seller/matches' })
 		}
 	},
@@ -74,7 +74,8 @@ function SignupCompleteRoute() {
 				return
 			}
 
-			void completeAgentSignup({ data: draft })
+			void agent
+				.createProfile({ data: draft })
 				.then(() => {
 					agentDraftStorage.clear()
 					void navigate({ to: '/agent/introductions' })
@@ -101,7 +102,8 @@ function SignupCompleteRoute() {
 				return
 			}
 
-			void createBuyerProfileFromDraft({ data: draft })
+			void buyer
+				.createProfileFromDraft({ data: draft })
 				.then(() => {
 					buyerDraftStorage.clear()
 					void navigate({ to: '/buyer/matches' })
@@ -127,7 +129,8 @@ function SignupCompleteRoute() {
 			return
 		}
 
-		void createSellerProfileFromDraft({ data: draft })
+		void seller
+			.createProfileFromDraft({ data: draft })
 			.then(() => {
 				sellerDraftStorage.clear()
 				void navigate({ to: '/seller/matches' })

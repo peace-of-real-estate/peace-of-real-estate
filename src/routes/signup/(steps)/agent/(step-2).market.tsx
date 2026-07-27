@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { parseCityState } from '@/lib/geography/zip'
 import {
 	AGENT_PRICE_BUCKET_LABELS,
 	AGENT_PRICE_RANGES,
@@ -58,15 +57,6 @@ function AgentMarket({
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
-	const rawInitialLocation = state.city
-		? state.state
-			? `${state.city}, ${state.state}`
-			: state.city
-		: ''
-	const [committedLocation, setCommittedLocation] = useState(rawInitialLocation)
-	const [selectedZipCodes, setSelectedZipCodes] = useState<string[]>(
-		state.zipCodes ?? [],
-	)
 	const [hasTriedContinue, setHasTriedContinue] = useState(false)
 
 	const [priceBucket, setPriceBucket] = useState<AgentPriceBucket | ''>(
@@ -79,19 +69,13 @@ function AgentMarket({
 		state.bestClientTypes ?? [],
 	)
 
-	const marketComplete = committedLocation.trim().length >= 2
+	const marketComplete = Boolean(state.cityId)
 	const priceComplete = priceBucket !== ''
 	const sideComplete = representationSide.length > 0
 	const clientsComplete = bestClientTypes.length > 0
 	const canContinue =
 		marketComplete && priceComplete && sideComplete && clientsComplete
 	const showMarketError = hasTriedContinue && !marketComplete
-	const cityState = parseCityState(committedLocation)
-
-	const handleLocationChange = (location: string, zipCodes: string[]) => {
-		setCommittedLocation(location)
-		setSelectedZipCodes(zipCodes)
-	}
 
 	const toggleClientType = (option: BestClientTypeSlug) => {
 		setBestClientTypes((current) =>
@@ -108,13 +92,9 @@ function AgentMarket({
 		}
 		if (!representationSide) return
 		if (!priceBucket) return
+		if (!state.cityId) return
 
-		const locationUpdate = cityState
-			? { city: cityState.city, state: cityState.state }
-			: { city: committedLocation }
 		onUpdate({
-			...locationUpdate,
-			zipCodes: selectedZipCodes,
 			typicalPriceRange: priceBucket,
 			representationSide,
 			bestClientTypes,
@@ -130,9 +110,11 @@ function AgentMarket({
 
 					<CityZipSelector
 						id="agent-market"
-						value={rawInitialLocation}
-						onChange={handleLocationChange}
-						zipCodes={selectedZipCodes}
+						value={{
+							cityId: state.cityId,
+							zipCodes: state.zipCodes ?? [],
+						}}
+						onChange={onUpdate}
 						label={
 							<span
 								className={showMarketError ? 'text-destructive' : undefined}

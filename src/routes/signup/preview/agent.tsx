@@ -7,9 +7,9 @@ import {
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import {
+	agent,
 	agentCompletedDraftSchema,
 	agentPreviewProfileSchema,
-	completeAgentSignup,
 } from '@/lib/profile'
 import type { AgentPreviewProfile } from '@/lib/profile'
 import {
@@ -107,7 +107,7 @@ function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 			redirect="/agent/introductions"
 			oauthRedirect="/auth/complete?role=agent"
 			quizPath="/signup/agent/identity"
-			createProfile={completeAgentSignup}
+			createProfile={agent.createProfile}
 			loadDraft={agentDraftStorage.load}
 			validateDraft={(draft) =>
 				agentCompletedDraftSchema.safeParse(draft).success

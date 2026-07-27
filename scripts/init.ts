@@ -1,7 +1,13 @@
+import { sql } from 'drizzle-orm'
 import * as zipcodes from 'zipcodes'
 
 import { db } from '../src/db/connection'
 import { cities, cityZips } from '../src/db/tables'
+import {
+	usPostalCodeSchema,
+	type UsPostalCode,
+} from '../src/lib/geography/states'
+import { cityKey } from './city-key'
 
 const BATCH_SIZE_CITIES = 1000
 const BATCH_SIZE_ZIPS = 2000
@@ -36,42 +42,56 @@ async function seedCityData() {
 		string,
 		{
 			city: string
-			state: string
+			state: UsPostalCode
 			lats: number[]
 			lngs: number[]
 			zips: string[]
 		}
 	>()
 
+	// Per-zip centroids, captured alongside the city groups so scoring can
+	// resolve zip distances from `city_zips` alone at runtime.
+	const zipCoords = new Map<string, { lat: number; lng: number }>()
+
 	for (const record of Object.values(zipcodes.codes)) {
 		if (record.country !== 'US') continue
-		const key = `${record.city}|${record.state}`
+		// Throws on a code outside US_POSTAL_CODES: if the dataset ever adds
+		// one, seeding fails loudly here rather than silently writing
+		// non-canonical state values that scoring compares with `!==`.
+		const state = usPostalCodeSchema.parse(record.state)
+		// Zips without coordinates are excluded entirely: they can't
+		// participate in distance scoring, and city_zips.lat/lng are NOT NULL.
+		const hasCoords =
+			Number.isFinite(record.latitude) && Number.isFinite(record.longitude)
+		const key = cityKey(record.city, state)
 		let group = cityGroups.get(key)
 		if (!group) {
 			group = {
 				city: record.city,
-				state: record.state,
+				state,
 				lats: [],
 				lngs: [],
 				zips: [],
 			}
 			cityGroups.set(key, group)
 		}
-		if (
-			typeof record.latitude === 'number' &&
-			typeof record.longitude === 'number'
-		) {
+		if (hasCoords) {
 			group.lats.push(record.latitude)
 			group.lngs.push(record.longitude)
+			zipCoords.set(record.zip, {
+				lat: record.latitude,
+				lng: record.longitude,
+			})
+			group.zips.push(record.zip)
 		}
-		group.zips.push(record.zip)
 
 		if (
-			record.state === 'NY' &&
+			hasCoords &&
+			state === 'NY' &&
 			record.city !== 'New York' &&
 			isNycZip(record.zip)
 		) {
-			const nycKey = 'New York|NY'
+			const nycKey = cityKey('New York', 'NY')
 			let nycGroup = cityGroups.get(nycKey)
 			if (!nycGroup) {
 				nycGroup = {
@@ -83,13 +103,8 @@ async function seedCityData() {
 				}
 				cityGroups.set(nycKey, nycGroup)
 			}
-			if (
-				typeof record.latitude === 'number' &&
-				typeof record.longitude === 'number'
-			) {
-				nycGroup.lats.push(record.latitude)
-				nycGroup.lngs.push(record.longitude)
-			}
+			nycGroup.lats.push(record.latitude)
+			nycGroup.lngs.push(record.longitude)
 			nycGroup.zips.push(record.zip)
 		}
 	}
@@ -97,19 +112,18 @@ async function seedCityData() {
 	const cityRows = []
 	const zipRows = []
 	for (const group of cityGroups.values()) {
+		if (group.lats.length === 0) {
+			throw new Error(
+				`No coordinates for any zip in ${group.city}, ${group.state} — a city center is required`,
+			)
+		}
 		const id = crypto.randomUUID()
-		const centerLat =
-			group.lats.length > 0
-				? String(group.lats.reduce((a, b) => a + b, 0) / group.lats.length)
-				: '0'
-		const centerLng =
-			group.lngs.length > 0
-				? String(group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length)
-				: '0'
+		const centerLat = group.lats.reduce((a, b) => a + b, 0) / group.lats.length
+		const centerLng = group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
 
 		cityRows.push({
 			id,
-			city: group.city,
+			name: group.city,
 			state: group.state,
 			centerLat,
 			centerLng,
@@ -117,23 +131,44 @@ async function seedCityData() {
 		})
 
 		for (const zip of group.zips) {
+			const coords = zipCoords.get(zip)
+			if (!coords) throw new Error(`No coordinates for ${zip}`)
 			zipRows.push({
 				id: crypto.randomUUID(),
 				city: group.city,
 				state: group.state,
 				zip,
+				lat: coords.lat,
+				lng: coords.lng,
 				createdAt: now,
 			})
 		}
 	}
 
+	const cityIdByKey = new Map<string, string>()
+
 	for (let i = 0; i < cityRows.length; i += BATCH_SIZE_CITIES) {
-		await db
+		const batch = cityRows.slice(i, i + BATCH_SIZE_CITIES)
+		// Centers are derived from the version-pinned zipcodes dataset, so a
+		// re-seed should track the source: always overwrite with the freshly
+		// computed center. DO UPDATE (not DO NOTHING) also makes Postgres run
+		// every conflicting row through the UPDATE arm, so RETURNING reports
+		// the id for every row in the batch — new or pre-existing — in one
+		// query.
+		const upserted = await db
 			.insert(cities)
-			.values(cityRows.slice(i, i + BATCH_SIZE_CITIES))
-			.onConflictDoNothing({
-				target: [cities.city, cities.state],
+			.values(batch)
+			.onConflictDoUpdate({
+				target: [cities.name, cities.state],
+				set: {
+					centerLat: sql`excluded."center_lat"`,
+					centerLng: sql`excluded."center_lng"`,
+				},
 			})
+			.returning({ id: cities.id, name: cities.name, state: cities.state })
+		for (const row of upserted) {
+			cityIdByKey.set(cityKey(row.name, row.state), row.id)
+		}
 		console.log(
 			`  cities ${Math.min(i + BATCH_SIZE_CITIES, cityRows.length)}/${cityRows.length}`,
 		)
@@ -142,10 +177,22 @@ async function seedCityData() {
 	for (let i = 0; i < zipRows.length; i += BATCH_SIZE_ZIPS) {
 		await db
 			.insert(cityZips)
-			.values(zipRows.slice(i, i + BATCH_SIZE_ZIPS))
-			.onConflictDoNothing({
-				target: [cityZips.city, cityZips.state, cityZips.zip],
-			})
+			.values(
+				zipRows.slice(i, i + BATCH_SIZE_ZIPS).map((row) => {
+					const key = cityKey(row.city, row.state)
+					const cityId = cityIdByKey.get(key)
+					if (!cityId) throw new Error(`No city row for ${key}`)
+					return {
+						id: row.id,
+						cityId,
+						zip: row.zip,
+						lat: row.lat,
+						lng: row.lng,
+						createdAt: row.createdAt,
+					}
+				}),
+			)
+			.onConflictDoNothing()
 		console.log(
 			`  city_zips ${Math.min(i + BATCH_SIZE_ZIPS, zipRows.length)}/${zipRows.length}`,
 		)

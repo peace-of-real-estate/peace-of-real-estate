@@ -1,14 +1,20 @@
 import type { AgentProfile } from '@/lib/profile/types'
 
+import { geoOf } from '../geography'
+
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
 export function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 	return {
 		id: 'agent-fixture-1',
 		userId: 'user-agent-fixture-1',
-		representationSide: 'buyers',
-		city: 'Baltimore',
-		state: 'MD',
+		representationSide: 'buyer',
+		city: {
+			id: 'city-fixture-baltimore-md',
+			name: 'Baltimore',
+			state: 'MD',
+			center: { lat: 39.2904, lng: -76.6122 },
+		},
 		typicalPriceRange: '400kTo750k',
 		bestClientTypes: ['firstTime', 'moveUp'],
 		notFitFor: [] satisfies string[],
@@ -18,11 +24,11 @@ export function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		email: 'avery@example.com',
 		phone: null,
 		businessAddress: null,
-		billingAddress: null,
 		licenseNumberState: 'LIC-123456-MD',
-		zipCodes: ['21201', '21202'],
-		cityCenterLatitude: null,
-		cityCenterLongitude: null,
+		geography: geoOf({
+			'21201': { lat: 39.2946, lng: -76.6239 },
+			'21202': { lat: 39.3051, lng: -76.6056 },
+		}),
 		yearsLicensed: '6-10',
 		averageTransactions: '6-15',
 		employmentStatus: 'Realtor',

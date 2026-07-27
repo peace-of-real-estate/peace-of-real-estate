@@ -26,14 +26,13 @@ import {
 	yearsLicensed,
 	type AverageTransactions,
 	type BestClientTypeSlug,
+	type ClientRole,
 	type PropertyTypeSlug,
 	type RepresentationSide,
 	type YearsLicensed,
 } from '@/lib/profile'
 
 export interface ClientSummaryProfile {
-	city: string
-	state: string
 	priceMin: number
 	priceMax: number
 	propertyTypes: PropertyTypeSlug[]
@@ -81,7 +80,7 @@ export function getProfileSummary(input: ProfileSummaryInput): SummaryItem[] {
 }
 
 function getClientSummaryItems(
-	role: 'buyer' | 'seller',
+	role: ClientRole,
 	profile: ClientSummaryProfile,
 ): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [

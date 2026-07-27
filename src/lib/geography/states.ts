@@ -1,4 +1,9 @@
-const STATE_ABBREVIATIONS = new Set([
+import { z } from 'zod'
+
+// Every code in the seed dataset (zipcodes package, country === 'US'): the
+// 50 states, DC, territories, and military postal codes. The DB enum derives
+// from this list, so it is the single source of truth for valid state codes.
+export const US_POSTAL_CODES = [
 	'AL',
 	'AK',
 	'AZ',
@@ -50,7 +55,24 @@ const STATE_ABBREVIATIONS = new Set([
 	'WV',
 	'WI',
 	'WY',
-])
+	'AS',
+	'FM',
+	'GU',
+	'MH',
+	'MP',
+	'PR',
+	'PW',
+	'VI',
+	'AA',
+	'AE',
+	'AP',
+] as const
+
+export const usPostalCodeSchema = z.enum(US_POSTAL_CODES)
+
+export type UsPostalCode = z.infer<typeof usPostalCodeSchema>
+
+const STATE_ABBREVIATIONS: ReadonlySet<string> = new Set(US_POSTAL_CODES)
 
 export function resolveStateCode(...values: Array<string | undefined>) {
 	for (const value of values) {

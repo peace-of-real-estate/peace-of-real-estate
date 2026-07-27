@@ -1,7 +1,14 @@
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
-import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
+import {
+	agentProfiles,
+	buyerDetails,
+	clientProfiles,
+	clientRole,
+	sellerDetails,
+} from '@/db/tables'
+import type { ResolvedCity, ZipGeography } from '@/lib/geography/zip'
 import { agentPriceBucketSchema, priceBoundSchema } from '@/lib/price-range'
 import {
 	agentQuestionIds,
@@ -12,32 +19,55 @@ import type { PreferencesFor } from '@/lib/profile/question-types'
 
 export const agentInsertSchema = createInsertSchema(agentProfiles, {
 	typicalPriceRange: agentPriceBucketSchema,
-}).omit({
-	id: true,
-	userId: true,
-	createdAt: true,
-	updatedAt: true,
 })
+	.omit({
+		id: true,
+		userId: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		// Not a column — carried through signup and persisted as
+		// `agent_profile_zips` join rows instead.
+		zipCodes: z.array(z.string()).default([]),
+	})
 
-export const buyerInsertSchema = createInsertSchema(buyerProfiles, {
+export const clientProfileInsertSchema = createInsertSchema(clientProfiles, {
 	priceMin: priceBoundSchema,
 	priceMax: priceBoundSchema,
-}).omit({
-	id: true,
-	userId: true,
-	createdAt: true,
-	updatedAt: true,
+})
+	.omit({
+		id: true,
+		userId: true,
+		role: true,
+		createdAt: true,
+		updatedAt: true,
+	})
+	.extend({
+		// Not a column — carried through signup and persisted as
+		// `client_profile_zips` join rows instead.
+		zipCodes: z.array(z.string()).default([]),
+	})
+
+export const buyerDetailsInsertSchema = createInsertSchema(buyerDetails).omit({
+	clientProfileId: true,
+	role: true,
 })
 
-export const sellerInsertSchema = createInsertSchema(sellerProfiles, {
-	priceMin: priceBoundSchema,
-	priceMax: priceBoundSchema,
-}).omit({
-	id: true,
-	userId: true,
-	createdAt: true,
-	updatedAt: true,
-})
+export const sellerDetailsInsertSchema = createInsertSchema(sellerDetails).omit(
+	{
+		clientProfileId: true,
+		role: true,
+	},
+)
+
+export const buyerInsertSchema = clientProfileInsertSchema.merge(
+	buyerDetailsInsertSchema,
+)
+
+export const sellerInsertSchema = clientProfileInsertSchema.merge(
+	sellerDetailsInsertSchema,
+)
 
 export const buyerDraftSchema = buyerInsertSchema.partial()
 export const sellerDraftSchema = sellerInsertSchema.partial()
@@ -66,13 +96,30 @@ export const sellerCompletedDraftSchema =
 	sellerCompletedDraftBaseSchema.refine(hasOrderedPriceRange)
 export const agentCompletedDraftSchema = agentInsertSchema
 
-export type BuyerProfile = typeof buyerProfiles.$inferSelect
+type ResolvedGeography = {
+	city: ResolvedCity
+	geography: ZipGeography
+}
 
-export type SellerProfile = typeof sellerProfiles.$inferSelect
+export type ClientRole = (typeof clientRole.enumValues)[number]
 
-export type AgentProfile = typeof agentProfiles.$inferSelect
+type ClientProfileBase = Omit<
+	typeof clientProfiles.$inferSelect,
+	'role' | 'cityId'
+>
 
-export type ClientProfileRow = BuyerProfile | SellerProfile
+export type BuyerProfile = ClientProfileBase &
+	Omit<typeof buyerDetails.$inferSelect, 'clientProfileId' | 'role'> &
+	ResolvedGeography & { role: 'buyer' }
+
+export type SellerProfile = ClientProfileBase &
+	Omit<typeof sellerDetails.$inferSelect, 'clientProfileId' | 'role'> &
+	ResolvedGeography & { role: 'seller' }
+
+export type AgentProfile = Omit<typeof agentProfiles.$inferSelect, 'cityId'> &
+	ResolvedGeography
+
+export type ClientProfile = BuyerProfile | SellerProfile
 
 export type BuyerDraft = z.infer<typeof buyerDraftSchema>
 

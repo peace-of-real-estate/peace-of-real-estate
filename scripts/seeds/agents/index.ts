@@ -1,9 +1,15 @@
+import { and, eq, inArray, or } from 'drizzle-orm'
+
 import { db } from '../../../src/db/connection'
 import {
 	account,
 	agentProfiles,
-	buyerProfiles,
-	sellerProfiles,
+	agentProfileZips,
+	buyerDetails,
+	cities,
+	cityZips,
+	clientProfiles,
+	sellerDetails,
 	session,
 	user,
 	userEntitlements,
@@ -19,6 +25,7 @@ import {
 	type AverageTransactions,
 	type YearsLicensed,
 } from '../../../src/lib/profile'
+import { cityKey } from '../../city-key'
 import { ensureAvatarPool, getAvatarFallbackUrls } from '../avatars'
 import {
 	BROKERAGE_POOLS,
@@ -119,8 +126,9 @@ function generatePersona(): AgentPersona {
 async function clearFakeData() {
 	console.log('Clearing existing seed data...')
 
-	await db.delete(sellerProfiles)
-	await db.delete(buyerProfiles)
+	await db.delete(buyerDetails)
+	await db.delete(sellerDetails)
+	await db.delete(clientProfiles)
 	await db.delete(agentProfiles)
 	await db.delete(session)
 	await db.delete(account)
@@ -144,12 +152,63 @@ function generateEmail(firstName: string, lastName: string): string {
 	return `${firstName.toLowerCase()}.${lastName.toLowerCase()}${randInt(1, 999)}@example.com`
 }
 
-async function insertAgent(location: City, now: Date, imageKey: string) {
+type CityZipRow = { id: string; zip: string }
+
+type CityData = { cityId: string; zips: CityZipRow[] }
+
+async function loadCityDataByKey(
+	locations: readonly City[],
+): Promise<Map<string, CityData>> {
+	const rows = await db
+		.select({ id: cities.id, name: cities.name, state: cities.state })
+		.from(cities)
+		.where(
+			or(
+				...locations.map((location) =>
+					and(eq(cities.name, location.city), eq(cities.state, location.state)),
+				),
+			),
+		)
+
+	const zipRows = await db
+		.select({ id: cityZips.id, cityId: cityZips.cityId, zip: cityZips.zip })
+		.from(cityZips)
+		.where(
+			inArray(
+				cityZips.cityId,
+				rows.map((row) => row.id),
+			),
+		)
+	const zipsByCityId = new Map<string, CityZipRow[]>()
+	for (const row of zipRows) {
+		const existing = zipsByCityId.get(row.cityId)
+		if (existing) existing.push({ id: row.id, zip: row.zip })
+		else zipsByCityId.set(row.cityId, [{ id: row.id, zip: row.zip }])
+	}
+
+	const cityDataByKey = new Map<string, CityData>()
+	for (const row of rows) {
+		cityDataByKey.set(cityKey(row.name, row.state), {
+			cityId: row.id,
+			zips: zipsByCityId.get(row.id) ?? [],
+		})
+	}
+	return cityDataByKey
+}
+
+async function insertAgent(
+	location: City,
+	cityId: string,
+	cityZipRows: CityZipRow[],
+	now: Date,
+	imageKey: string,
+) {
 	const persona = generatePersona()
 	const { firstName, lastName, fullName } = generateName()
 	const email = generateEmail(firstName, lastName)
 	const userId = crypto.randomUUID()
 	const agentId = crypto.randomUUID()
+	const addressZip = pick(cityZipRows).zip
 
 	await db.insert(user).values({
 		id: userId,
@@ -164,8 +223,7 @@ async function insertAgent(location: City, now: Date, imageKey: string) {
 	await db.insert(agentProfiles).values({
 		id: agentId,
 		userId,
-		city: location.city,
-		state: location.state,
+		cityId,
 		representationSide: persona.representationSide,
 		typicalPriceRange: persona.typicalPriceRange,
 		bestClientTypes: persona.bestClientTypes,
@@ -175,10 +233,8 @@ async function insertAgent(location: City, now: Date, imageKey: string) {
 		brokerageName: pick(BROKERAGE_POOLS),
 		email,
 		phone: buildPhone(),
-		businessAddress: buildAddress(location),
-		billingAddress: buildAddress(location),
+		businessAddress: buildAddress(location, addressZip),
 		licenseNumberState: `LIC-${randInt(100000, 999999)}-${location.state}`,
-		zipCodes: pickZipCodes(location),
 		yearsLicensed: persona.yearsLicensed,
 		averageTransactions: persona.averageTransactions,
 		employmentStatus: persona.employmentStatus,
@@ -201,6 +257,19 @@ async function insertAgent(location: City, now: Date, imageKey: string) {
 		createdAt: now,
 		updatedAt: now,
 	})
+
+	const picked = sample(
+		cityZipRows,
+		Math.min(randInt(3, 5), cityZipRows.length),
+	)
+	await db.insert(agentProfileZips).values(
+		picked.map((row) => ({
+			id: crypto.randomUUID(),
+			profileId: agentId,
+			cityZipId: row.id,
+			createdAt: now,
+		})),
+	)
 }
 
 const PRIORITY_CITIES = new Set([
@@ -226,17 +295,24 @@ function pickCity(): City {
 	return pickWeighted(CITY_WEIGHTS)
 }
 
-function pickZipCodes(location: City): string[] {
-	const count = Math.min(randInt(3, 5), location.zips.length)
-	return sample(location.zips, count)
-}
-
 export async function seedAgents(count: number) {
 	const now = new Date()
 
-	await clearFakeData()
-
 	console.log(`Seeding ${count} agents across ${CITIES.length} cities...`)
+
+	const cityDataByKey = await loadCityDataByKey(CITIES)
+	const missingCities = CITIES.filter(
+		(location) => !cityDataByKey.has(cityKey(location.city, location.state)),
+	)
+	if (missingCities.length > 0) {
+		throw new Error(
+			`No city row for: ${missingCities
+				.map((location) => `${location.city}, ${location.state}`)
+				.join('; ')} — run db:init first.`,
+		)
+	}
+
+	await clearFakeData()
 
 	const poolKeys = await ensureAvatarPool(count)
 	const sources =
@@ -246,7 +322,16 @@ export async function seedAgents(count: number) {
 	const imageFor = (index: number) => sources[index % sources.length]!
 
 	for (let i = 0; i < count; i++) {
-		await insertAgent(pickCity(), now, imageFor(i))
+		const location = pickCity()
+		const { cityId, zips: cityZipRows } = cityDataByKey.get(
+			cityKey(location.city, location.state),
+		)!
+		if (cityZipRows.length === 0) {
+			throw new Error(
+				`No city_zips rows for ${location.city}, ${location.state} — run db:init first.`,
+			)
+		}
+		await insertAgent(location, cityId, cityZipRows, now, imageFor(i))
 
 		if ((i + 1) % 50 === 0 || i === count - 1) {
 			console.log(`  ${i + 1}/${count} agents seeded`)

@@ -3,13 +3,13 @@
 ## Overview
 
 Peace of Real Estate (PRE) is a bilateral matching platform built to connect
-real estate consumers with agents based on working style, communication
+real estate clients with agents based on working style, communication
 expectations, transparency, and overall fit.
 
 Core idea:
 
-- Consumers get matched with agents who fit how they want to buy or sell.
-- Agents get introduced to consumers who align with how they work.
+- Clients get matched with agents who fit how they want to buy or sell.
+- Agents get introduced to clients who align with how they work.
 - Matching is based on responses from both sides, not a one-sided lead form.
 
 ## Tech
