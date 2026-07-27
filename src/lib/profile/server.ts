@@ -1,191 +1,193 @@
 import { createServerFn } from '@tanstack/react-start'
+import { setResponseStatus } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
+import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles } from '@/db/tables'
+import { agentProfiles, clientProfiles } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
 
+import { Agent, Buyer, ProfileValidationError, Seller } from './repository'
 import {
 	agentInsertSchema,
 	buyerCompletedDraftSchema,
+	buyerDetailsInsertSchema,
 	buyerInsertSchema,
+	clientProfileInsertSchema,
 	sellerCompletedDraftSchema,
+	sellerDetailsInsertSchema,
 	sellerInsertSchema,
+	resolveDashboardTarget,
+	type ProfileRole,
 } from './types'
 
-const roleTables = {
-	buyer: buyerProfiles,
-	seller: sellerProfiles,
-	agent: agentProfiles,
-} as const
-
-async function loadOwnProfile<T>(load: () => Promise<T[]>): Promise<T | null> {
-	const [profile] = await load()
-	return profile ?? null
+class ProfileConflictError extends Error {
+	override name = 'ProfileConflictError'
 }
 
 async function insertProfileOnce(
-	userId: string,
 	roleName: string,
-	findExisting: () => Promise<{ id: string }[]>,
-	insert: (values: {
+	insert: () => Promise<boolean>,
+) {
+	try {
+		const inserted = await insert()
+		if (!inserted) {
+			throw new ProfileConflictError(`${roleName} profile already exists`)
+		}
+	} catch (error) {
+		if (error instanceof z.ZodError) setResponseStatus(400)
+		if (error instanceof ProfileValidationError) setResponseStatus(400)
+		if (error instanceof ProfileConflictError) setResponseStatus(409)
+		throw error
+	}
+}
+
+// One create-from-draft flow for both client roles: parse the completed
+// draft, then re-parse it with each table's own schema to split base from
+// details — zod strips unknown keys, so each table's columns (and only
+// those) land in its insert. Adding a quiz field touches the table and the
+// UI — never this function.
+function makeClientProfileCreator<
+	S extends z.ZodType,
+	B extends z.ZodType<{ zipCodes: string[] }>,
+	D extends z.ZodType,
+>(config: {
+	insertSchema: S
+	baseSchema: B
+	detailsSchema: D
+	label: string
+	insert: (input: {
 		id: string
 		userId: string
 		now: Date
-	}) => Promise<unknown>,
-) {
-	const [existing] = await findExisting()
-	if (existing) throw new Error(`${roleName} profile already exists`)
-
-	const now = new Date()
-	await insert({ id: crypto.randomUUID(), userId, now })
+		base: Omit<z.output<B>, 'zipCodes'>
+		details: z.output<D>
+		zipCodes: string[]
+	}) => Promise<boolean>
+}) {
+	return async (userId: string, data: object) => {
+		const parsed = config.insertSchema.parse({ ...data, status: 'active' })
+		const { zipCodes, ...base } = config.baseSchema.parse(parsed)
+		const details = config.detailsSchema.parse(parsed)
+		await insertProfileOnce(config.label, () =>
+			config.insert({
+				id: crypto.randomUUID(),
+				userId,
+				now: new Date(),
+				base,
+				details,
+				zipCodes,
+			}),
+		)
+		return { success: true }
+	}
 }
 
-export const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(
-	async () => {
-		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(buyerProfiles)
-				.where(eq(buyerProfiles.userId, userId))
-				.limit(1),
-		)
-	},
-)
+const createBuyerProfile = makeClientProfileCreator({
+	insertSchema: buyerInsertSchema,
+	baseSchema: clientProfileInsertSchema,
+	detailsSchema: buyerDetailsInsertSchema,
+	label: 'Buyer',
+	insert: (input) => Buyer.insert(input),
+})
 
-export const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
+const createSellerProfile = makeClientProfileCreator({
+	insertSchema: sellerInsertSchema,
+	baseSchema: clientProfileInsertSchema,
+	detailsSchema: sellerDetailsInsertSchema,
+	label: 'Seller',
+	insert: (input) => Seller.insert(input),
+})
+
+const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(async () => {
+	const userId = await requireUserId()
+	return (await Buyer.loadByUserId(userId)) ?? null
+})
+
+const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
 	.validator((data: unknown) => buyerCompletedDraftSchema.parse(data))
-	.handler(async ({ data }) => {
-		const userId = await requireUserId()
-		const insert = buyerInsertSchema.parse({
-			...data,
-			status: 'active',
-		})
+	.handler(async ({ data }) => createBuyerProfile(await requireUserId(), data))
 
-		await insertProfileOnce(
-			userId,
-			'Buyer',
-			() =>
-				db
-					.select({ id: buyerProfiles.id })
-					.from(buyerProfiles)
-					.where(eq(buyerProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(buyerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
-		)
-
-		return { success: true }
-	})
-
-export const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
+const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(sellerProfiles)
-				.where(eq(sellerProfiles.userId, userId))
-				.limit(1),
-		)
+		return (await Seller.loadByUserId(userId)) ?? null
 	},
 )
 
-export const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
+const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
 	.validator((data: unknown) => sellerCompletedDraftSchema.parse(data))
-	.handler(async ({ data }) => {
-		const userId = await requireUserId()
-		const insert = sellerInsertSchema.parse({
-			...data,
-			status: 'active',
-		})
+	.handler(async ({ data }) => createSellerProfile(await requireUserId(), data))
 
-		await insertProfileOnce(
-			userId,
-			'Seller',
-			() =>
-				db
-					.select({ id: sellerProfiles.id })
-					.from(sellerProfiles)
-					.where(eq(sellerProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(sellerProfiles).values({
-					id,
-					userId,
-					...insert,
-					createdAt: now,
-					updatedAt: now,
-				}),
-		)
+const loadAgentProfile = createServerFn({ method: 'GET' }).handler(async () => {
+	const userId = await requireUserId()
+	return (await Agent.loadByUserId(userId)) ?? null
+})
 
-		return { success: true }
-	})
-
-export const completeAgentSignup = createServerFn({ method: 'POST' })
+const createAgentProfile = createServerFn({ method: 'POST' })
 	.validator((data: unknown) => agentInsertSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
-		await insertProfileOnce(
-			userId,
-			'Agent',
-			() =>
-				db
-					.select({ id: agentProfiles.id })
-					.from(agentProfiles)
-					.where(eq(agentProfiles.userId, userId))
-					.limit(1),
-			({ id, userId, now }) =>
-				db.insert(agentProfiles).values({
-					id,
-					userId,
-					...data,
-					createdAt: now,
-					updatedAt: now,
-				}),
+		const { zipCodes, ...values } = data
+		await insertProfileOnce('Agent', () =>
+			Agent.insert({
+				id: crypto.randomUUID(),
+				userId,
+				now: new Date(),
+				values,
+				zipCodes,
+			}),
 		)
 		return { success: true }
 	})
 
-export const loadAgentProfile = createServerFn({ method: 'GET' }).handler(
-	async () => {
-		const userId = await requireUserId()
-		return loadOwnProfile(() =>
-			db
-				.select()
-				.from(agentProfiles)
-				.where(eq(agentProfiles.userId, userId))
-				.limit(1),
-		)
-	},
-)
+export const buyer = {
+	loadProfile: loadBuyerProfile,
+	createProfileFromDraft: createBuyerProfileFromDraft,
+}
+
+export const seller = {
+	loadProfile: loadSellerProfile,
+	createProfileFromDraft: createSellerProfileFromDraft,
+}
+
+export const agent = {
+	loadProfile: loadAgentProfile,
+	createProfile: createAgentProfile,
+}
+
+async function findExistingProfileRoles(
+	userId: string,
+): Promise<ProfileRole[]> {
+	const [agentRows, clientRoles] = await Promise.all([
+		db
+			.select({ id: agentProfiles.id })
+			.from(agentProfiles)
+			.where(eq(agentProfiles.userId, userId))
+			.limit(1),
+		db
+			.select({ role: clientProfiles.role })
+			.from(clientProfiles)
+			.where(eq(clientProfiles.userId, userId)),
+	])
+	const roles: ProfileRole[] = []
+	if (agentRows.length > 0) {
+		roles.push('agent')
+	}
+	for (const row of clientRoles) {
+		roles.push(row.role)
+	}
+	return roles
+}
+
+export const loadExistingProfileRoles = createServerFn({
+	method: 'GET',
+}).handler(async () => findExistingProfileRoles(await requireUserId()))
 
 export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-
-		for (const [role, table] of [
-			['agent', roleTables.agent],
-			['buyer', roleTables.buyer],
-			['seller', roleTables.seller],
-		] as const) {
-			const [profile] = await db
-				.select({ id: table.id })
-				.from(table)
-				.where(eq(table.userId, userId))
-				.limit(1)
-			if (profile) {
-				return role === 'agent' ? '/agent/introductions' : `/${role}/matches`
-			}
-		}
-
-		return '/buyer/matches'
+		const roles = await findExistingProfileRoles(userId)
+		return resolveDashboardTarget(roles)
 	},
 )

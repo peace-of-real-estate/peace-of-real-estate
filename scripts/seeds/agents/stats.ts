@@ -26,10 +26,9 @@ export function sample<T>(arr: readonly T[], count: number): T[] {
 	return shuffled.slice(0, count)
 }
 
-export function buildAddress(location: City): string {
+export function buildAddress(location: City, zip: string): string {
 	const streetNum = randInt(100, 9999)
 	const street = pick(STREETS)
-	const zip = pick(location.zips)
 	return `${streetNum} ${street}, ${location.city}, ${location.state} ${zip}`
 }
 

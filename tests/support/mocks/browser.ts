@@ -1,6 +1,7 @@
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
-import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
-import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { makeBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
+import { makeSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { austinCity } from '@tests/support/fixtures/geography'
 import { vi } from 'vite-plus/test'
 
 type MockSession = unknown
@@ -62,18 +63,29 @@ vi.mock('@/routes/__root', async () => {
 	}
 })
 
+const mockCitySuggestion = austinCity
+
 vi.mock('@/lib/profile', async () => {
 	const actual =
 		await vi.importActual<typeof import('@/lib/profile')>('@/lib/profile')
 	return {
 		...actual,
-		loadBuyerProfile: () => Promise.resolve(mockBuyerProfile),
-		loadSellerProfile: () => Promise.resolve(mockSellerProfile),
-		loadAgentProfile: () => Promise.resolve(profileState.agentProfile),
-		createBuyerProfileFromDraft: () => Promise.resolve({ success: true }),
-		createSellerProfileFromDraft: () => Promise.resolve({ success: true }),
-		completeAgentSignup: () => Promise.resolve({ success: true }),
-		updateAgentProfile: () => Promise.resolve(),
+		buyer: {
+			...actual.buyer,
+			loadProfile: () => Promise.resolve(makeBuyerProfile()),
+			createProfileFromDraft: () => Promise.resolve({ success: true }),
+		},
+		seller: {
+			...actual.seller,
+			loadProfile: () => Promise.resolve(makeSellerProfile()),
+			createProfileFromDraft: () => Promise.resolve({ success: true }),
+		},
+		agent: {
+			...actual.agent,
+			loadProfile: () => Promise.resolve(profileState.agentProfile),
+			createProfile: () => Promise.resolve({ success: true }),
+		},
+		loadExistingProfileRoles: () => Promise.resolve([]),
 	}
 })
 
@@ -88,8 +100,9 @@ vi.mock('@/lib/geography/zip', async () => {
 	)
 	return {
 		...actual,
-		loadCitySuggestions: async () => ['Austin, TX'],
-		loadCityCenter: async () => ({ latitude: 30.2672, longitude: -97.7431 }),
+		loadCitySuggestions: async () => [mockCitySuggestion],
+		loadCityById: async () => mockCitySuggestion,
+		loadCityCenter: async () => austinCity.center,
 		loadZipCodeBoundaries: async () => ({
 			type: 'FeatureCollection',
 			features: [],

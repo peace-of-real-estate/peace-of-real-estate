@@ -17,9 +17,11 @@ export const profileStatus = defineEnum('profile_status', [
 	['enriched', 'Enriched'],
 ])
 
+export type ProfileStatus = SlugOf<typeof profileStatus>
+
 export const representationSide = defineEnum('representation_side', [
-	['buyers', 'Buyers'],
-	['sellers', 'Sellers'],
+	['buyer', 'Buyers'],
+	['seller', 'Sellers'],
 	['both', 'Both'],
 ])
 

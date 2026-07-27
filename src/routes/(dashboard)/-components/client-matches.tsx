@@ -16,23 +16,20 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth/client'
-import { resolveStateCode } from '@/lib/geography/states'
 import type { AgentMatchData } from '@/lib/matching/match.view'
 import {
 	loadBuyerAgentMatches,
 	loadSellerAgentMatches,
 } from '@/lib/matching/server'
-import { loadBuyerProfile, loadSellerProfile } from '@/lib/profile'
-import type { BuyerProfile, SellerProfile } from '@/lib/profile'
+import { buyer, seller } from '@/lib/profile'
+import type { ClientProfile, ClientRole } from '@/lib/profile/types'
 import {
 	DashboardPage,
 	DashboardPageMobileNav,
 } from '@/routes/(dashboard)/-components/dashboard'
 import { MatchList } from '@/routes/(dashboard)/-components/match-list'
 
-type ClientRole = 'buyer' | 'seller'
-
-type ClientMatchesProfile = BuyerProfile | SellerProfile
+type ClientMatchesProfile = ClientProfile
 
 type RoleConfig = {
 	loadProfile: () => Promise<ClientMatchesProfile | null>
@@ -44,12 +41,12 @@ type RoleConfig = {
 
 const roleConfig: Record<ClientRole, RoleConfig> = {
 	buyer: {
-		loadProfile: loadBuyerProfile,
+		loadProfile: buyer.loadProfile,
 		loadMatches: loadBuyerAgentMatches,
 		searchPreferencesPath: '/buyer/search-preferences',
 	},
 	seller: {
-		loadProfile: loadSellerProfile,
+		loadProfile: seller.loadProfile,
 		loadMatches: loadSellerAgentMatches,
 		searchPreferencesPath: '/seller/search-preferences',
 	},
@@ -74,7 +71,7 @@ export function ClientMatches({
 		queryKey: ['client-profile', role],
 		queryFn: () => loadProfileFn(),
 	})
-	const stateCode = resolveStateCode(profile?.state ?? undefined)
+	const stateCode = profile?.city.state
 
 	return (
 		<DashboardPage>
@@ -134,10 +131,11 @@ function PreferencesSummaryCard({
 }) {
 	const locationItems: SummaryItem[] = []
 	if (profile?.city) {
-		locationItems.push({ label: 'City', value: profile.city, icon: MapPin })
-	}
-	if (profile?.state) {
-		locationItems.push({ label: 'State', value: profile.state, icon: MapPin })
+		locationItems.push({
+			label: 'Location',
+			value: `${profile.city.name}, ${profile.city.state}`,
+			icon: MapPin,
+		})
 	}
 	const summaryItems = profile ? getProfileSummary({ role, profile }) : []
 	const items = [...locationItems, ...summaryItems]

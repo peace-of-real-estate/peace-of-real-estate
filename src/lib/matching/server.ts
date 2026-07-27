@@ -1,68 +1,52 @@
+import { redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { z } from 'zod'
 
-import { db } from '@/db/connection'
-import { agentProfiles, buyerProfiles, sellerProfiles, user } from '@/db/tables'
 import { requireUserId } from '@/lib/auth/session'
-import { type ClientProfileRow } from '@/lib/profile/types'
+import { Agent, Buyer, Seller } from '@/lib/profile/repository'
+import type { ClientProfile } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 
 import { toAgentMatchData, type AgentMatchData } from './match.view'
-import { calculateFitScore, type MatchSide } from './scoring'
+import { calculateFitScore } from './scoring'
 
-function toScoringSide(side: MatchSide): 'buying' | 'selling' {
-	return side === 'buyers' ? 'buying' : 'selling'
-}
+const MAX_MATCH_PAGE_SIZE = 100
 
-type MatchPageParam = { offset: number; limit: number }
+const matchPageParamSchema = z.object({
+	offset: z.number().int().min(0).default(0),
+	limit: z.number().int().min(1).max(MAX_MATCH_PAGE_SIZE).default(10),
+})
 
-const defaultMatchPageParam: MatchPageParam = { offset: 0, limit: 10 }
+type MatchPageParam = z.infer<typeof matchPageParamSchema>
 
-function resolveMatchPageParam(
-	data: MatchPageParam | undefined,
-): MatchPageParam {
-	return {
-		offset: data?.offset ?? defaultMatchPageParam.offset,
-		limit: data?.limit ?? defaultMatchPageParam.limit,
-	}
-}
+const defaultMatchPageParam: MatchPageParam = matchPageParamSchema.parse({})
 
 export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
-	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.validator((data: unknown) => matchPageParamSchema.parse(data ?? {}))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(buyerProfiles)
-			.where(eq(buyerProfiles.userId, userId))
-			.limit(1)
-		return loadAgentMatchesForProfile(profile, 'buyers', data)
+		const profile = await Buyer.loadByUserId(userId)
+		if (!profile) throw redirect({ to: '/signup/buyer' })
+		return loadAgentMatchesForProfile(profile, data)
 	})
 
 export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
-	.validator((data: MatchPageParam | undefined) => resolveMatchPageParam(data))
+	.validator((data: unknown) => matchPageParamSchema.parse(data ?? {}))
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
-		const [profile] = await db
-			.select()
-			.from(sellerProfiles)
-			.where(eq(sellerProfiles.userId, userId))
-			.limit(1)
-		return loadAgentMatchesForProfile(profile, 'sellers', data)
+		const profile = await Seller.loadByUserId(userId)
+		if (!profile) throw redirect({ to: '/signup/seller' })
+		return loadAgentMatchesForProfile(profile, data)
 	})
 
 async function loadAgentMatchesForProfile(
-	profile: ClientProfileRow | undefined,
-	side: MatchSide,
+	profile: ClientProfile,
 	pageParam: MatchPageParam = defaultMatchPageParam,
 ): Promise<AgentMatchData[]> {
-	const results = await db
-		.select({ agent: agentProfiles, user })
-		.from(agentProfiles)
-		.innerJoin(user, eq(agentProfiles.userId, user.id))
+	const results = await Agent.listWithUsers({ state: profile.city.state })
 	const scored = results.map((row) => ({
 		row,
-		score: calculateFitScore(row.agent, profile, toScoringSide(side)),
+		score: calculateFitScore(row.agent, profile),
 	}))
 	const byComputedScore = (
 		a: (typeof scored)[number],

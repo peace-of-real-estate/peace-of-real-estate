@@ -4,11 +4,14 @@ import { dirname, resolve } from 'node:path'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
 
+import { REQUIRED_EXTENSIONS } from '@/db/extensions'
+import type * as schema from '@/db/tables'
+
 import { test as baseTest } from './server'
 
 const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
 const DEFAULT_IMAGE = 'postgres:17'
-const DEFAULT_EXTENSIONS = ['pg_trgm']
+const DEFAULT_EXTENSIONS = REQUIRED_EXTENSIONS
 const ROOT_MARKERS = [
 	'vite.config.ts',
 	'vite.config.mts',
@@ -26,7 +29,7 @@ export interface DbConfig {
 	postgresImage?: string
 }
 
-export type Database = NodePgDatabase & {
+export type Database = NodePgDatabase<typeof schema> & {
 	$client: Pool
 }
 
@@ -78,7 +81,13 @@ export const test = baseTest.extend<DbFixture>({
 			const client = new Pool({
 				connectionString: container.getConnectionUri(),
 			})
-			const db = Object.assign(drizzle({ client }), { $client: client })
+			const schema = await import('@/db/tables')
+			const db = Object.assign(
+				drizzle({ client, casing: 'snake_case', schema }),
+				{
+					$client: client,
+				},
+			)
 
 			try {
 				await seedDatabase(db, { schemaPath, seedFunction })
@@ -105,7 +114,7 @@ export function initDb(
 export interface SeedDatabaseOptions {
 	schemaPath: string
 	seedFunction?: (db: Database) => Promise<void> | void
-	extensions?: string[]
+	extensions?: readonly string[]
 }
 
 export async function seedDatabase(
@@ -116,14 +125,16 @@ export async function seedDatabase(
 		extensions = DEFAULT_EXTENSIONS,
 	}: SeedDatabaseOptions,
 ) {
-	const { pushSchema } = await import('drizzle-kit/api')
+	const { migrate } = await import('drizzle-orm/node-postgres/migrator')
 	const { reset } = await import('drizzle-seed')
 	const schema = await import(/* @vite-ignore */ schemaPath)
 
 	for (const ext of extensions) {
 		await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
 	}
-	await (await pushSchema(schema, db)).apply()
+	await migrate(db, {
+		migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
+	})
 	await reset(db, schema)
 	if (seedFunction) await seedFunction(db)
 }

@@ -3,13 +3,13 @@
 ## Overview
 
 Peace of Real Estate (PRE) is a bilateral matching platform built to connect
-real estate consumers with agents based on working style, communication
+real estate clients with agents based on working style, communication
 expectations, transparency, and overall fit.
 
 Core idea:
 
-- Consumers get matched with agents who fit how they want to buy or sell.
-- Agents get introduced to consumers who align with how they work.
+- Clients get matched with agents who fit how they want to buy or sell.
+- Agents get introduced to clients who align with how they work.
 - Matching is based on responses from both sides, not a one-sided lead form.
 
 ## Tech
@@ -31,6 +31,29 @@ for information about a specific command.
 
 Docs are local at `node_modules/vite-plus/docs` or online at
 <https://viteplus.dev/guide/>.
+
+## React
+
+This project uses the React Compiler (`reactCompilerPreset()` in
+`vite.config.ts`). Memoization is automatic:
+
+- Never write `useMemo` or `useCallback` — compute values inline; the compiler
+  memoizes for you.
+- Never write `useEffect` without explicit permission from the user, and only in
+  extreme circumstances. Fetch data with TanStack Query, derive state during
+  render, and respond to events in event handlers. If you think an effect is
+  unavoidable, stop and ask first.
+
+## Comments
+
+Never write comments that restate what the code already says — if a comment
+explains _what_ the code does, delete it and rename or restructure the code
+instead. Comments must add information the code cannot express. Allowed:
+
+- **Critical context** — why a non-obvious decision was made, constraints
+  imposed by external systems, or links to reference material.
+- **Section markers** — short labels (often one word) like `// Shared`, or the
+  banner style `// ===== Section =====`, to annotate blocks of code.
 
 ## Review Checklist
 

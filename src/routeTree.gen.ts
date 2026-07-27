@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ChooseRoleRouteImport } from './routes/choose-role'
 import { Route as dashboardAgentRouteRouteImport } from './routes/(dashboard)/agent/route'
 import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
 import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
@@ -51,6 +52,11 @@ import { Route as SignupstepsSellerstep3PreferencesRouteImport } from './routes/
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChooseRoleRoute = ChooseRoleRouteImport.update({
+  id: '/choose-role',
+  path: '/choose-role',
   getParentRoute: () => rootRouteImport,
 } as any)
 const dashboardAgentRouteRoute = dashboardAgentRouteRouteImport.update({
@@ -259,6 +265,7 @@ const SignupstepsSellerstep3PreferencesRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/choose-role': typeof ChooseRoleRoute
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/choose-role': typeof ChooseRoleRoute
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -340,6 +348,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/choose-role': typeof ChooseRoleRoute
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
@@ -382,6 +391,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/choose-role'
     | '/agent'
     | '/buyer'
     | '/seller'
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/choose-role'
     | '/agent'
     | '/buyer'
     | '/seller'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/choose-role'
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
@@ -503,6 +515,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChooseRoleRoute: typeof ChooseRoleRoute
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/choose-role': {
+      id: '/choose-role'
+      path: '/choose-role'
+      fullPath: '/choose-role'
+      preLoaderRoute: typeof ChooseRoleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(dashboard)/agent': {
@@ -899,6 +919,7 @@ const SignupstepsSellerRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChooseRoleRoute: ChooseRoleRoute,
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,

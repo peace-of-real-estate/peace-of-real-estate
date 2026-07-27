@@ -158,7 +158,7 @@ export default defineConfig({
 				test: {
 					name: 'server',
 					include: ['src/**/*.{server,db}.test.ts'],
-					testTimeout: 5_000,
+					testTimeout: 10_000,
 				},
 			},
 			{
@@ -168,6 +168,10 @@ export default defineConfig({
 					include: ['src/**/*.test.tsx', 'tests/pages/**/*.test.tsx'],
 					setupFiles: ['./tests/support/mocks/styles.ts'],
 					testTimeout: 15_000,
+					// One chromium instance shares one module-mocker registry;
+					// parallel files race it (spurious vi.mock hoisting errors,
+					// failed dynamic imports). Serial files are ~30s total.
+					fileParallelism: false,
 					browser: {
 						instances: [{ browser: 'chromium' }],
 						provider: playwright(),

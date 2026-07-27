@@ -1,3 +1,4 @@
+import { formatCityName } from '@/lib/geography/zip'
 import type { AgentProfile } from '@/lib/profile/types'
 
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
@@ -47,8 +48,8 @@ export function toAgentMatchData({
 		id: agent.id,
 		name: user.name,
 		role: 'agent',
-		location: `${agent.city}, ${agent.state}`,
-		zipCodes: agent.zipCodes,
+		location: formatCityName(agent.city),
+		zipCodes: agent.geography.map(({ zip }) => zip),
 		fitScore: score.fitScore,
 		status: 'new',
 		date: new Date(agent.updatedAt).toLocaleDateString(),

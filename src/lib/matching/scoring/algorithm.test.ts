@@ -1,8 +1,10 @@
 import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
-import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
-import { mockSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { makeBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
+import { makeSellerProfile } from '@tests/support/fixtures/data/seller-profile'
+import { geoOf } from '@tests/support/fixtures/geography'
 import { describe, expect, test } from 'vitest'
 
+import type { UsPostalCode } from '@/lib/geography/states'
 import { AGENT_PRICE_RANGES } from '@/lib/price-range'
 import type { AgentPriceBucket } from '@/lib/price-range'
 import type {
@@ -25,15 +27,29 @@ import { priceOverlapRatio } from './utils'
 
 const FIXED_DATE = new Date('2026-01-01T00:00:00Z')
 
-function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
+function cityOf(
+	name: string,
+	state: UsPostalCode,
+	center: { lat: number; lng: number },
+) {
 	return {
-		...mockBuyerProfile,
+		id: `city-fixture-${name.toLowerCase().replace(/[^a-z]+/g, '-')}-${state.toLowerCase()}`,
+		name,
+		state,
+		center,
+	}
+}
+
+function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
+	return makeBuyerProfile({
 		id: 'buyer-fixture-1',
 		userId: 'user-buyer-fixture-1',
 		status: 'active',
-		state: 'MD',
-		city: 'Baltimore',
-		zipCodes: ['21201', '21205'],
+		city: cityOf('Baltimore', 'MD', { lat: 39.2904, lng: -76.6122 }),
+		geography: geoOf({
+			'21201': { lat: 39.2946, lng: -76.6239 },
+			'21205': { lat: 39.303, lng: -76.5822 },
+		}),
 		priceMin: 400_000,
 		priceMax: 600_000,
 		involvementLevel: 'veryInvolved',
@@ -45,18 +61,18 @@ function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
-	}
+	})
 }
 
 function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
-	return {
-		...mockSellerProfile,
+	return makeSellerProfile({
 		id: 'seller-fixture-1',
 		userId: 'user-seller-fixture-1',
 		status: 'active',
-		state: 'MD',
-		city: 'Baltimore',
-		zipCodes: ['21201'],
+		city: cityOf('Baltimore', 'MD', { lat: 39.2904, lng: -76.6122 }),
+		geography: geoOf({
+			'21201': { lat: 39.2946, lng: -76.6239 },
+		}),
 		priceMin: 400_000,
 		priceMax: 600_000,
 		involvementLevel: 'keyDetails',
@@ -72,7 +88,7 @@ function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
-	}
+	})
 }
 
 describe('priceOverlapRatio', () => {
@@ -107,50 +123,41 @@ describe('priceOverlapRatio', () => {
 describe('deriveExpectedClientTypes', () => {
 	test('buyer single-family', () => {
 		const buyer = makeBuyer({ propertyTypes: ['singleFamily'] })
-		expect(deriveExpectedClientTypes(buyer, 'buying')).toEqual([
-			'firstTime',
-			'moveUp',
-		])
+		expect(deriveExpectedClientTypes(buyer)).toEqual(['firstTime', 'moveUp'])
 	})
 
 	test('seller', () => {
 		const seller = makeSeller()
-		expect(deriveExpectedClientTypes(seller, 'selling')).toEqual(['seller'])
+		expect(deriveExpectedClientTypes(seller)).toEqual(['seller'])
 	})
 
 	test('luxury buyer', () => {
 		const buyer = makeBuyer({ priceMin: 1_200_000, priceMax: 1_500_000 })
-		expect(deriveExpectedClientTypes(buyer, 'buying')).toContain('luxury')
+		expect(deriveExpectedClientTypes(buyer)).toContain('luxury')
 	})
 })
 
 describe('scoreLocation', () => {
 	function baseAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		return makeAgent({
-			zipCodes: [],
+			geography: geoOf({}),
 			...overrides,
 		})
 	}
 
 	function baseBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 		return makeBuyer({
-			zipCodes: [],
+			geography: geoOf({}),
 			...overrides,
 		})
 	}
 
 	test('twin cities: Minneapolis client passes with St. Paul agent', () => {
 		const agent = baseAgent({
-			city: 'St. Paul',
-			state: 'MN',
-			cityCenterLatitude: 44.9537,
-			cityCenterLongitude: -93.09,
+			city: cityOf('St. Paul', 'MN', { lat: 44.9537, lng: -93.09 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Minneapolis',
-			state: 'MN',
-			cityCenterLatitude: 44.9778,
-			cityCenterLongitude: -93.265,
+			city: cityOf('Minneapolis', 'MN', { lat: 44.9778, lng: -93.265 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -159,16 +166,10 @@ describe('scoreLocation', () => {
 
 	test('metroplex: Fort Worth agent is low-but-qualified for Dallas client', () => {
 		const agent = baseAgent({
-			city: 'Fort Worth',
-			state: 'TX',
-			cityCenterLatitude: 32.7555,
-			cityCenterLongitude: -97.3308,
+			city: cityOf('Fort Worth', 'TX', { lat: 32.7555, lng: -97.3308 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Dallas',
-			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			city: cityOf('Dallas', 'TX', { lat: 32.7767, lng: -96.797 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -177,16 +178,10 @@ describe('scoreLocation', () => {
 
 	test('Dallas client disqualified from Austin agent', () => {
 		const agent = baseAgent({
-			city: 'Austin',
-			state: 'TX',
-			cityCenterLatitude: 30.2672,
-			cityCenterLongitude: -97.7431,
+			city: cityOf('Austin', 'TX', { lat: 30.2672, lng: -97.7431 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Dallas',
-			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			city: cityOf('Dallas', 'TX', { lat: 32.7767, lng: -96.797 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBe(0)
@@ -194,16 +189,10 @@ describe('scoreLocation', () => {
 
 	test('Dallas client disqualified from Houston agent', () => {
 		const agent = baseAgent({
-			city: 'Houston',
-			state: 'TX',
-			cityCenterLatitude: 29.7604,
-			cityCenterLongitude: -95.3698,
+			city: cityOf('Houston', 'TX', { lat: 29.7604, lng: -95.3698 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Dallas',
-			state: 'TX',
-			cityCenterLatitude: 32.7767,
-			cityCenterLongitude: -96.797,
+			city: cityOf('Dallas', 'TX', { lat: 32.7767, lng: -96.797 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBe(0)
@@ -211,16 +200,10 @@ describe('scoreLocation', () => {
 
 	test('boroughs: Manhattan and Brooklyn both signal', () => {
 		const agent = baseAgent({
-			city: 'Brooklyn',
-			state: 'NY',
-			cityCenterLatitude: 40.6782,
-			cityCenterLongitude: -73.9442,
+			city: cityOf('Brooklyn', 'NY', { lat: 40.6782, lng: -73.9442 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Manhattan',
-			state: 'NY',
-			cityCenterLatitude: 40.7831,
-			cityCenterLongitude: -73.9712,
+			city: cityOf('Manhattan', 'NY', { lat: 40.7831, lng: -73.9712 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
@@ -229,56 +212,33 @@ describe('scoreLocation', () => {
 
 	test('cross-state metro is blocked by state gate, not distance', () => {
 		const agent = baseAgent({
-			city: 'Hoboken',
-			state: 'NJ',
-			cityCenterLatitude: 40.7433,
-			cityCenterLongitude: -74.0324,
+			city: cityOf('Hoboken', 'NJ', { lat: 40.7433, lng: -74.0324 }),
 		})
 		const buyer = baseBuyer({
-			city: 'New York',
-			state: 'NY',
-			cityCenterLatitude: 40.7128,
-			cityCenterLongitude: -74.006,
+			city: cityOf('New York', 'NY', { lat: 40.7128, lng: -74.006 }),
 		})
 		const result = scoreLocation(buyer, agent)
 		expect(result.score).toBeGreaterThan(0)
-		const full = calculateFitScore(agent, buyer, 'buying')
+		const full = calculateFitScore(agent, buyer)
 		expect(full.disqualified).toBe(true)
 		expect(
 			full.trace.disqualifiers.some((d) => d.id === 'state' && d.disqualified),
 		).toBe(true)
 	})
 
-	test('no city centers and no zips gives zero location score', () => {
-		const agent = baseAgent()
-		const buyer = baseBuyer()
-		const result = scoreLocation(buyer, agent)
-		expect(result.score).toBe(0)
-		expect(result.geo?.client).toBeUndefined()
-		expect(result.geo?.agent).toBeUndefined()
-		expect(result.geo?.centroidMiles).toBeUndefined()
-	})
-
-	test('geo trace carries centers, source, and centroid miles', () => {
+	test('geo trace carries centers and centroid miles', () => {
 		const agent = baseAgent({
-			city: 'St. Paul',
-			state: 'MN',
-			cityCenterLatitude: 44.9537,
-			cityCenterLongitude: -93.09,
+			city: cityOf('St. Paul', 'MN', { lat: 44.9537, lng: -93.09 }),
 		})
 		const buyer = baseBuyer({
-			city: 'Minneapolis',
-			state: 'MN',
-			zipCodes: ['55401'],
-			cityCenterLatitude: null,
-			cityCenterLongitude: null,
+			city: cityOf('Minneapolis', 'MN', { lat: 44.9778, lng: -93.265 }),
+			geography: geoOf({ '55401': { lat: 44.9834, lng: -93.2666 } }),
 		})
-		const full = calculateFitScore(agent, buyer, 'buying')
+		const full = calculateFitScore(agent, buyer)
 		const geo = full.trace.geo
-		expect(geo?.client?.source).toBe('zipCentroid')
-		expect(geo?.agent?.source).toBe('cityCenter')
-		expect(geo?.agent?.lat).toBeCloseTo(44.9537, 4)
-		// Minneapolis 55401 to the St. Paul city center is ~9 miles
+		expect(geo?.client.lat).toBeCloseTo(44.9778, 4)
+		expect(geo?.agent.lat).toBeCloseTo(44.9537, 4)
+		// Minneapolis to the St. Paul city center is ~9 miles
 		expect(geo?.centroidMiles).toBeGreaterThan(5)
 		expect(geo?.centroidMiles).toBeLessThan(15)
 		expect(geo?.cityFit).toBeGreaterThan(0)
@@ -289,7 +249,7 @@ describe('calculateFitScore', () => {
 	test('accepts slug stored format for agent typicalPriceRange', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 
 		expect(result.disqualified).toBe(false)
 		expect(
@@ -304,7 +264,7 @@ describe('calculateFitScore', () => {
 			typicalPriceRange: '400kTo750k',
 		})
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 750_000 })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 
 		expect(result.disqualified).toBe(false)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
@@ -315,73 +275,91 @@ describe('calculateFitScore', () => {
 	})
 
 	test('perfect buyer match scores 100', () => {
-		const agent = makeAgent({ zipCodes: ['21201'] })
+		const agent = makeAgent({
+			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
+		})
 		const buyer = makeBuyer({
-			zipCodes: ['21201'],
+			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
 			propertyTypes: [],
 			experienceLevel: 'firstTime',
 		})
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.fitScore).toBe(100)
 		expect(result.disqualified).toBe(false)
 	})
 
 	test('disqualified for side mismatch', () => {
-		const agent = makeAgent({ representationSide: 'sellers' })
+		const agent = makeAgent({ representationSide: 'seller' })
 		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 		expect(result.fitScore).toBe(0)
 	})
 
 	test('disqualified for state mismatch', () => {
-		const agent = makeAgent({ state: 'VA' })
-		const buyer = makeBuyer({ state: 'MD' })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const agent = makeAgent({
+			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
+		})
+		const buyer = makeBuyer()
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 		expect(result.fitScore).toBe(0)
 	})
 
+	test('state gate: same state is not disqualified', () => {
+		const agent = makeAgent({
+			city: cityOf('Towson', 'MD', { lat: 39.4015, lng: -76.6019 }),
+		})
+		const buyer = makeBuyer()
+		const result = calculateFitScore(agent, buyer)
+		const stateGate = result.trace.disqualifiers.find((d) => d.id === 'state')
+		expect(stateGate?.disqualified).toBe(false)
+		expect(stateGate?.detail).toBe('client in MD, agent in MD')
+		expect(result.disqualified).toBe(false)
+	})
+
+	test('state gate: mismatch is exact and always enforced', () => {
+		const agent = makeAgent({
+			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
+		})
+		const buyer = makeBuyer()
+		const result = calculateFitScore(agent, buyer)
+		const stateGate = result.trace.disqualifiers.find((d) => d.id === 'state')
+		expect(stateGate?.disqualified).toBe(true)
+		expect(stateGate?.detail).toBe('client in MD, agent in VA')
+	})
+
 	test('disqualified for location floor', () => {
 		const agent = makeAgent({
-			zipCodes: ['94101'],
-			city: 'San Francisco',
-			state: 'CA',
+			geography: geoOf({ '94101': { lat: 37.7749, lng: -122.4194 } }),
+			city: cityOf('San Francisco', 'CA', { lat: 37.7749, lng: -122.4194 }),
 		})
 		const buyer = makeBuyer({
-			zipCodes: ['21201'],
-			city: 'Baltimore',
-			state: 'MD',
+			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
+			city: cityOf('Baltimore', 'MD', { lat: 39.2904, lng: -76.6122 }),
 		})
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 	})
 
 	test('disqualified for price contact', () => {
 		const agent = makeAgent({ typicalPriceRange: '1_5mPlus' })
 		const buyer = makeBuyer({ priceMin: 200_000, priceMax: 300_000 })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(true)
 	})
 
 	test('adjacent bucket passes price gate', () => {
 		const agent = makeAgent({ typicalPriceRange: '750kTo1_5m' })
 		const buyer = makeBuyer({ priceMin: 400_000, priceMax: 600_000 })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(false)
-	})
-
-	test('fallback score when no client', () => {
-		const agent = makeAgent()
-		const result = calculateFitScore(agent)
-		expect(result.fitScore).toBe(100)
-		expect(result.trace.mode).toBe('fallback')
 	})
 
 	test('priority boost raises priceFit weight', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		const priceDimension = result.trace.dimensions.find(
 			(d) => d.id === 'priceFit',
 		)
@@ -390,9 +368,9 @@ describe('calculateFitScore', () => {
 	})
 
 	test('seller match uses seller matrices', () => {
-		const agent = makeAgent({ representationSide: 'sellers' })
+		const agent = makeAgent({ representationSide: 'seller' })
 		const seller = makeSeller()
-		const result = calculateFitScore(agent, seller, 'selling')
+		const result = calculateFitScore(agent, seller)
 		expect(result.disqualified).toBe(false)
 		expect(result.fitScore).toBeGreaterThan(0)
 		const workingStyle = result.trace.dimensions.find(
@@ -407,11 +385,11 @@ describe('calculateFitScore', () => {
 		const qualified = makeAgent()
 		const disqualified = makeAgent({
 			id: 'agent-disqualified',
-			state: 'VA',
+			city: cityOf('Arlington', 'VA', { lat: 38.8816, lng: -77.091 }),
 		})
 		const buyer = makeBuyer()
-		const qualifiedResult = calculateFitScore(qualified, buyer, 'buying')
-		const disqualifiedResult = calculateFitScore(disqualified, buyer, 'buying')
+		const qualifiedResult = calculateFitScore(qualified, buyer)
+		const disqualifiedResult = calculateFitScore(disqualified, buyer)
 		expect(qualifiedResult.fitScore).toBeGreaterThan(
 			disqualifiedResult.fitScore,
 		)
@@ -436,7 +414,7 @@ describe('calculateFitScore trace', () => {
 	test('stage2 values are internally consistent', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		const stage2 = result.trace.stage2
 		expect(stage2).toBeDefined()
 		expect(stage2!.linear).toBeGreaterThan(0)
@@ -450,7 +428,7 @@ describe('calculateFitScore trace', () => {
 	test('reciprocalBlend equals harmonic mean of consumerScore and agentFit floor', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		const { stage2, agentFit, reciprocalBlend } = result.trace
 		expect(reciprocalBlend).toBeDefined()
 		const expected =
@@ -462,7 +440,7 @@ describe('calculateFitScore trace', () => {
 	test('notFitPenalty is populated exactly when penalized', () => {
 		const agent = makeAgent({ notFitFor: ['entryLevel'] })
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeDefined()
 		expect(result.trace.notFitPenalty!.scoreAfter).toBeCloseTo(
 			result.trace.notFitPenalty!.scoreBefore * 0.3,
@@ -473,7 +451,7 @@ describe('calculateFitScore trace', () => {
 	test('notFitPenalty is omitted when not penalized', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeUndefined()
 	})
 })
@@ -665,7 +643,7 @@ describe('rankWithTieBandsDetailed', () => {
 	test('slug agent earns adjacent-bucket credit', () => {
 		const agent = makeAgent({ typicalPriceRange: '400kTo750k' })
 		const buyer = makeBuyer({ priceMin: 750_000, priceMax: 900_000 })
-		const result = calculateFitScore(agent, buyer, 'buying')
+		const result = calculateFitScore(agent, buyer)
 		expect(result.disqualified).toBe(false)
 		const priceFit = result.trace.dimensions.find((d) => d.id === 'priceFit')
 		expect(priceFit?.score).toBe(0.4)

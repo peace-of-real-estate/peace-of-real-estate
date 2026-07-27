@@ -19,7 +19,7 @@ import {
 	agentDraftSchema,
 	agentQuestionIds,
 	bestClientType,
-	loadAgentProfile,
+	loadExistingProfileRoles,
 	representationSide,
 	type BestClientTypeSlug,
 	type RepresentationSide,
@@ -74,7 +74,7 @@ export const Route = createFileRoute('/signup/(steps)/agent')({
 	ssr: false,
 	beforeLoad: async ({ location }) => {
 		const session = await getCurrentSession()
-		if (session && (await loadAgentProfile())) {
+		if (session && (await loadExistingProfileRoles()).includes('agent')) {
 			throw redirect({ to: '/agent/introductions' })
 		}
 		if (location.pathname === '/signup/agent') {
@@ -110,7 +110,7 @@ function AgentWizardRoute() {
 			getStepPath={stepPath}
 			getHasDraft={(draft) =>
 				draft.firstName !== undefined ||
-				draft.city !== undefined ||
+				draft.cityId !== undefined ||
 				draft.representationSide !== undefined
 			}
 			getCompletedStepIds={(draft) =>
@@ -121,7 +121,7 @@ function AgentWizardRoute() {
 								return Boolean(draft.firstName && draft.lastName)
 							case 'market':
 								return Boolean(
-									draft.city &&
+									draft.cityId &&
 									draft.typicalPriceRange &&
 									draft.representationSide,
 								)
@@ -149,7 +149,7 @@ function stepPath(step: AgentFlowStep) {
 }
 
 export function getRepresentationIcon(side: RepresentationSide): Icon {
-	if (side === 'buyers') return UsersIcon
-	if (side === 'sellers') return ChartLineIcon
+	if (side === 'buyer') return UsersIcon
+	if (side === 'seller') return ChartLineIcon
 	return BriefcaseIcon
 }

@@ -1,9 +1,12 @@
+import type { CityCenter } from '@/lib/geography/zip'
 import type { PriceRange } from '@/lib/price-range'
-import type { AgentProfile, ClientProfileRow } from '@/lib/profile/types'
+import type {
+	AgentProfile,
+	ClientProfile,
+	ClientRole,
+} from '@/lib/profile/types'
 
 import type { DimensionId } from '../affinities'
-
-export type MatchSide = 'buyers' | 'sellers'
 
 export type ScoreBucket =
 	| 'Location'
@@ -13,19 +16,11 @@ export type ScoreBucket =
 	| 'Communication'
 	| 'Business Terms'
 
-/** A resolved coordinate and where it came from. */
-export interface GeoPoint {
-	lat: number
-	lng: number
-	source: 'cityCenter' | 'zipCentroid'
-}
-
 /** Geographic inputs the location dimension actually scored with. */
 export interface LocationGeoTrace {
-	client?: GeoPoint | undefined
-	agent?: GeoPoint | undefined
-	/** Haversine miles between the two centers, when both resolve. */
-	centroidMiles?: number | undefined
+	client: CityCenter
+	agent: CityCenter
+	centroidMiles: number
 	zipFit: number
 	cityFit: number
 }
@@ -67,8 +62,8 @@ export interface DisqualifierTrace {
 }
 
 export interface ScoreTrace {
-	mode: 'client-scored' | 'fallback'
-	side: MatchSide
+	mode: 'client-scored'
+	side: ClientRole
 	matchPriorities: string[]
 	disqualifiers: DisqualifierTrace[]
 	disqualified: boolean
@@ -86,10 +81,6 @@ export interface ScoreTrace {
 	notFitPenalty?:
 		| { reason: string; scoreBefore: number; scoreAfter: number }
 		| undefined
-	fallback?: {
-		present: string[]
-		missing: string[]
-	}
 	/** Location-dimension geography, hoisted for map visualizations. */
 	geo?: LocationGeoTrace | undefined
 }
@@ -101,7 +92,7 @@ export interface MatchDebugInfo {
 	scoreDistribution: { range: string; count: number }[]
 	trace: ScoreTrace
 	agentProfile: AgentProfile
-	clientProfile: ClientProfileRow | null
+	clientProfile: ClientProfile | null
 }
 
 export interface FitScoreResult {

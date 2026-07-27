@@ -1,11 +1,10 @@
-import { sql } from 'drizzle-orm'
 import {
 	boolean,
 	integer,
 	pgEnum,
-	real,
 	text,
 	timestamp,
+	uuid,
 } from 'drizzle-orm/pg-core'
 
 import { BUCKET_ORDER } from '@/lib/price-range'
@@ -106,11 +105,7 @@ export const clientLifecycleColumns = {
 }
 
 export const clientMatchingColumns = {
-	state: text().notNull(),
-	city: text().notNull(),
-	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
+	cityId: uuid().notNull(),
 	timeline: timelineEnum().notNull(),
 	priceMin: integer().notNull(),
 	priceMax: integer().notNull(),
@@ -147,8 +142,7 @@ export const sellerQuizColumns = {
 
 export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
-	city: text().notNull(),
-	state: text().notNull(),
+	cityId: uuid().notNull(),
 	typicalPriceRange: agentPriceBucketEnum().notNull(),
 	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
 	notFitFor: text().array().notNull().default([]),
@@ -161,11 +155,7 @@ export const agentIdentityColumns = {
 	email: text(),
 	phone: text(),
 	businessAddress: text(),
-	billingAddress: text(),
 	licenseNumberState: text().notNull(),
-	zipCodes: text().array().notNull().default([]),
-	cityCenterLatitude: real('city_center_latitude').default(sql`NULL`),
-	cityCenterLongitude: real('city_center_longitude').default(sql`NULL`),
 	yearsLicensed: yearsLicensedEnum(),
 	averageTransactions: averageTransactionsEnum(),
 	employmentStatus: text(),

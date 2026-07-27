@@ -1,5 +1,5 @@
 {
-  "id": "67762839-2a11-494e-905b-248605d5aa31",
+  "id": "88f4b3c6-a25a-4af5-ba04-7f2714a0fe1b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -123,27 +123,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "account_provider_index": {
-          "name": "account_provider_index",
-          "columns": [
-            {
-              "expression": "provider_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "account_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -156,6 +135,118 @@
           ],
           "columnsTo": [
             "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.agent_profile_zips": {
+      "name": "agent_profile_zips",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "city_zip_id": {
+          "name": "city_zip_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "profile_id": {
+          "name": "profile_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "agent_profile_zips_profile_id_city_zip_id_index": {
+          "name": "agent_profile_zips_profile_id_city_zip_id_index",
+          "columns": [
+            {
+              "expression": "profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "city_zip_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "agent_profile_zips_profile_id_index": {
+          "name": "agent_profile_zips_profile_id_index",
+          "columns": [
+            {
+              "expression": "profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "agent_profile_zips_profile_city_fk": {
+          "name": "agent_profile_zips_profile_city_fk",
+          "tableFrom": "agent_profile_zips",
+          "tableTo": "agent_profiles",
+          "columnsFrom": [
+            "profile_id",
+            "city_id"
+          ],
+          "columnsTo": [
+            "id",
+            "city_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "agent_profile_zips_city_zip_city_fk": {
+          "name": "agent_profile_zips_city_zip_city_fk",
+          "tableFrom": "agent_profile_zips",
+          "tableTo": "city_zips",
+          "columnsFrom": [
+            "city_zip_id",
+            "city_id"
+          ],
+          "columnsTo": [
+            "id",
+            "city_id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -190,21 +281,16 @@
           "primaryKey": false,
           "notNull": true
         },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "state": {
-          "name": "state",
-          "type": "text",
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "typical_price_range": {
           "name": "typical_price_range",
-          "type": "text",
+          "type": "agent_price_bucket",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -259,38 +345,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "billing_address": {
-          "name": "billing_address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "license_number_state": {
           "name": "license_number_state",
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "zip_codes": {
-          "name": "zip_codes",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
-        "city_center_latitude": {
-          "name": "city_center_latitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
-        },
-        "city_center_longitude": {
-          "name": "city_center_longitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
         },
         "years_licensed": {
           "name": "years_licensed",
@@ -417,7 +476,8 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
@@ -441,6 +501,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "agent_profiles_city_id_index": {
+          "name": "agent_profiles_city_id_index",
+          "columns": [
+            {
+              "expression": "city_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -454,139 +529,55 @@
           "columnsTo": [
             "id"
           ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "agent_profiles_city_id_fk": {
+          "name": "agent_profiles_city_id_fk",
+          "tableFrom": "agent_profiles",
+          "tableTo": "cities",
+          "columnsFrom": [
+            "city_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "agent_profiles_id_city_id_unique": {
+          "name": "agent_profiles_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.buyer_profiles": {
-      "name": "buyer_profiles",
+    "public.buyer_details": {
+      "name": "buyer_details",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
+        "client_profile_id": {
+          "name": "client_profile_id",
           "type": "text",
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "profile_status",
+        "role": {
+          "name": "role",
+          "type": "client_role",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'draft'"
-        },
-        "state": {
-          "name": "state",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "zip_codes": {
-          "name": "zip_codes",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
-        "city_center_latitude": {
-          "name": "city_center_latitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
-        },
-        "city_center_longitude": {
-          "name": "city_center_longitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
-        },
-        "timeline": {
-          "name": "timeline",
-          "type": "timeline",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "price_range": {
-          "name": "price_range",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "property_types": {
-          "name": "property_types",
-          "type": "property_type[]",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quick_communication_channel": {
-          "name": "quick_communication_channel",
-          "type": "quick_communication_channel",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "update_delivery_method": {
-          "name": "update_delivery_method",
-          "type": "update_delivery_method",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "response_time_expectation": {
-          "name": "response_time_expectation",
-          "type": "response_time_expectation",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "involvement_level": {
-          "name": "involvement_level",
-          "type": "involvement_level",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "commission_comfort": {
-          "name": "commission_comfort",
-          "type": "commission_comfort",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "match_priorities": {
-          "name": "match_priorities",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "match_details": {
-          "name": "match_details",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "default": "'buyer'"
         },
         "experience_level": {
           "name": "experience_level",
@@ -615,56 +606,35 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
         }
       },
-      "indexes": {
-        "buyer_profiles_user_id_index": {
-          "name": "buyer_profiles_user_id_index",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "buyer_profiles_user_id_fk": {
-          "name": "buyer_profiles_user_id_fk",
-          "tableFrom": "buyer_profiles",
-          "tableTo": "user",
+        "buyer_details_profile_role_fk": {
+          "name": "buyer_details_profile_role_fk",
+          "tableFrom": "buyer_details",
+          "tableTo": "client_profiles",
           "columnsFrom": [
-            "user_id"
+            "client_profile_id",
+            "role"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "role"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "buyer_details_role_check": {
+          "name": "buyer_details_role_check",
+          "value": "\"buyer_details\".\"role\" = 'buyer'"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.cities": {
@@ -673,31 +643,32 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true
         },
-        "city": {
-          "name": "city",
-          "type": "text",
+        "name": {
+          "name": "name",
+          "type": "citext",
           "primaryKey": false,
           "notNull": true
         },
         "state": {
           "name": "state",
-          "type": "text",
+          "type": "us_postal_code",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "center_lat": {
           "name": "center_lat",
-          "type": "text",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": true
         },
         "center_lng": {
           "name": "center_lng",
-          "type": "text",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": true
         },
@@ -705,15 +676,16 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "cities_city_state_index": {
-          "name": "cities_city_state_index",
+        "cities_name_state_index": {
+          "name": "cities_name_state_index",
           "columns": [
             {
-              "expression": "city",
+              "expression": "name",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -763,15 +735,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "state": {
-          "name": "state",
-          "type": "text",
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -781,50 +747,30 @@
           "primaryKey": false,
           "notNull": true
         },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lng": {
+          "name": "lng",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "city_zips_city_state_index": {
-          "name": "city_zips_city_state_index",
+        "city_zips_zip_unique": {
+          "name": "city_zips_zip_unique",
           "columns": [
-            {
-              "expression": "city",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "state",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "city_zips_city_state_zip_index": {
-          "name": "city_zips_city_state_zip_index",
-          "columns": [
-            {
-              "expression": "city",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "state",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "zip",
               "isExpression": false,
@@ -837,11 +783,11 @@
           "method": "btree",
           "with": {}
         },
-        "city_zips_zip_index": {
-          "name": "city_zips_zip_index",
+        "city_zips_city_id_index": {
+          "name": "city_zips_city_id_index",
           "columns": [
             {
-              "expression": "zip",
+              "expression": "city_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -853,15 +799,150 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "city_zips_city_id_fk": {
+          "name": "city_zips_city_id_fk",
+          "tableFrom": "city_zips",
+          "tableTo": "cities",
+          "columnsFrom": [
+            "city_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "city_zips_id_city_id_unique": {
+          "name": "city_zips_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.client_profile_zips": {
+      "name": "client_profile_zips",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "city_zip_id": {
+          "name": "city_zip_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "profile_id": {
+          "name": "profile_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "client_profile_zips_profile_id_city_zip_id_index": {
+          "name": "client_profile_zips_profile_id_city_zip_id_index",
+          "columns": [
+            {
+              "expression": "profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "city_zip_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "client_profile_zips_profile_id_index": {
+          "name": "client_profile_zips_profile_id_index",
+          "columns": [
+            {
+              "expression": "profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "client_profile_zips_profile_city_fk": {
+          "name": "client_profile_zips_profile_city_fk",
+          "tableFrom": "client_profile_zips",
+          "tableTo": "client_profiles",
+          "columnsFrom": [
+            "profile_id",
+            "city_id"
+          ],
+          "columnsTo": [
+            "id",
+            "city_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "client_profile_zips_city_zip_city_fk": {
+          "name": "client_profile_zips_city_zip_city_fk",
+          "tableFrom": "client_profile_zips",
+          "tableTo": "city_zips",
+          "columnsFrom": [
+            "city_zip_id",
+            "city_id"
+          ],
+          "columnsTo": [
+            "id",
+            "city_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.seller_profiles": {
-      "name": "seller_profiles",
+    "public.client_profiles": {
+      "name": "client_profiles",
       "schema": "",
       "columns": {
         "id": {
@@ -876,6 +957,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "role": {
+          "name": "role",
+          "type": "client_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
         "status": {
           "name": "status",
           "type": "profile_status",
@@ -884,38 +972,11 @@
           "notNull": true,
           "default": "'draft'"
         },
-        "state": {
-          "name": "state",
-          "type": "text",
+        "city_id": {
+          "name": "city_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "zip_codes": {
-          "name": "zip_codes",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'"
-        },
-        "city_center_latitude": {
-          "name": "city_center_latitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
-        },
-        "city_center_longitude": {
-          "name": "city_center_longitude",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "NULL"
         },
         "timeline": {
           "name": "timeline",
@@ -924,9 +985,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "price_range": {
-          "name": "price_range",
-          "type": "text",
+        "price_min": {
+          "name": "price_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_max": {
+          "name": "price_max",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -984,6 +1051,117 @@
           "primaryKey": false,
           "notNull": false
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "client_profiles_user_role_index": {
+          "name": "client_profiles_user_role_index",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "client_profiles_user_id_fk": {
+          "name": "client_profiles_user_id_fk",
+          "tableFrom": "client_profiles",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "client_profiles_city_id_fk": {
+          "name": "client_profiles_city_id_fk",
+          "tableFrom": "client_profiles",
+          "tableTo": "cities",
+          "columnsFrom": [
+            "city_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "client_profiles_id_role_index": {
+          "name": "client_profiles_id_role_index",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "role"
+          ]
+        },
+        "client_profiles_id_city_id_unique": {
+          "name": "client_profiles_id_city_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id",
+            "city_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "client_profiles_price_range_check": {
+          "name": "client_profiles_price_range_check",
+          "value": "\"price_min\" >= 0 AND \"price_max\" <= 2000000 AND \"price_min\" <= \"price_max\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.seller_details": {
+      "name": "seller_details",
+      "schema": "",
+      "columns": {
+        "client_profile_id": {
+          "name": "client_profile_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "client_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'seller'"
+        },
         "sale_motivation": {
           "name": "sale_motivation",
           "type": "seller_sale_motivation",
@@ -1018,63 +1196,35 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
-        },
-        "agent_delivery_expectations": {
-          "name": "agent_delivery_expectations",
-          "type": "seller_agent_delivery_expectations[]",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
         }
       },
-      "indexes": {
-        "seller_profiles_user_id_index": {
-          "name": "seller_profiles_user_id_index",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "seller_profiles_user_id_fk": {
-          "name": "seller_profiles_user_id_fk",
-          "tableFrom": "seller_profiles",
-          "tableTo": "user",
+        "seller_details_profile_role_fk": {
+          "name": "seller_details_profile_role_fk",
+          "tableFrom": "seller_details",
+          "tableTo": "client_profiles",
           "columnsFrom": [
-            "user_id"
+            "client_profile_id",
+            "role"
           ],
           "columnsTo": [
-            "id"
+            "id",
+            "role"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "seller_details_role_check": {
+          "name": "seller_details_role_check",
+          "value": "\"seller_details\".\"role\" = 'seller'"
+        }
+      },
       "isRLSEnabled": false
     },
     "public.session": {
@@ -1173,7 +1323,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1273,13 +1423,15 @@
         },
         "key": {
           "name": "key",
-          "type": "text",
+          "type": "entitlement_key",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "source": {
           "name": "source",
-          "type": "text",
+          "type": "entitlement_source",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -1375,7 +1527,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1452,6 +1604,99 @@
     }
   },
   "enums": {
+    "public.client_role": {
+      "name": "client_role",
+      "schema": "public",
+      "values": [
+        "buyer",
+        "seller"
+      ]
+    },
+    "public.entitlement_key": {
+      "name": "entitlement_key",
+      "schema": "public",
+      "values": [
+        "client_lifetime_premium",
+        "agent_subscription"
+      ]
+    },
+    "public.entitlement_source": {
+      "name": "entitlement_source",
+      "schema": "public",
+      "values": [
+        "manual",
+        "stripe_checkout",
+        "stripe_subscription"
+      ]
+    },
+    "public.us_postal_code": {
+      "name": "us_postal_code",
+      "schema": "public",
+      "values": [
+        "AL",
+        "AK",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DE",
+        "DC",
+        "FL",
+        "GA",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY",
+        "AS",
+        "FM",
+        "GU",
+        "MH",
+        "MP",
+        "PR",
+        "PW",
+        "VI",
+        "AA",
+        "AE",
+        "AP"
+      ]
+    },
     "public.agent_client_description": {
       "name": "agent_client_description",
       "schema": "public",
@@ -1489,6 +1734,16 @@
         "slowItDown",
         "takeControl",
         "deEscalateFirst"
+      ]
+    },
+    "public.agent_price_bucket": {
+      "name": "agent_price_bucket",
+      "schema": "public",
+      "values": [
+        "under400k",
+        "400kTo750k",
+        "750kTo1_5m",
+        "1_5mPlus"
       ]
     },
     "public.agent_response_time": {
@@ -1625,8 +1880,8 @@
       "name": "representation_side",
       "schema": "public",
       "values": [
-        "buyers",
-        "sellers",
+        "buyer",
+        "seller",
         "both"
       ]
     },
@@ -1638,18 +1893,6 @@
         "within30Min",
         "fewHours",
         "within24Hours"
-      ]
-    },
-    "public.seller_agent_delivery_expectations": {
-      "name": "seller_agent_delivery_expectations",
-      "schema": "public",
-      "values": [
-        "pricedRight",
-        "greatMarketing",
-        "greatNegotiatedOutcome",
-        "reachableResponsive",
-        "keptItCalm",
-        "honestStraightforward"
       ]
     },
     "public.seller_agent_silence_preference": {

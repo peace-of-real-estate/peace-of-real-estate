@@ -1,12 +1,12 @@
 import { makeAgent } from '@tests/support/fixtures/data/agent-profile'
-import { mockBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
+import { makeBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { describe, expect, test } from 'vitest'
 
 import { buildDebugPayload } from '@/lib/matching/debug'
 import type { ScoredAgent } from '@/lib/matching/debug'
 import { TIE_BAND_THRESHOLD } from '@/lib/matching/scoring'
 
-const buyer = mockBuyerProfile
+const buyer = makeBuyerProfile()
 
 function makeScoredAgent(
 	id: string,
@@ -37,7 +37,7 @@ function makeScoredAgent(
 			disqualified,
 			trace: {
 				mode: 'client-scored',
-				side: 'buyers',
+				side: 'buyer',
 				matchPriorities: [],
 				disqualifiers: [],
 				disqualified,
@@ -57,9 +57,8 @@ describe('buildDebugPayload', () => {
 		const c = makeScoredAgent('c', 80, false)
 		const d = makeScoredAgent('d', 75, false)
 
-		const payload = buildDebugPayload(buyer, 'buying', {
+		const payload = buildDebugPayload(buyer, 'buyer', {
 			qualified: [a, b, c, d],
-			ranked: [a, b, c, d],
 			disqualified: [],
 			scoreDistribution: [],
 			totalAgents: 4,
@@ -89,9 +88,8 @@ describe('buildDebugPayload', () => {
 		const b = makeScoredAgent('b', 88, false)
 		const c = makeScoredAgent('c', 80, false)
 
-		const payload = buildDebugPayload(buyer, 'buying', {
+		const payload = buildDebugPayload(buyer, 'buyer', {
 			qualified: [a, b, c],
-			ranked: [a, b, c],
 			disqualified: [],
 			scoreDistribution: [],
 			totalAgents: 3,
@@ -115,9 +113,8 @@ describe('buildDebugPayload', () => {
 		const a = makeScoredAgent('a', 90, false)
 		const b = makeScoredAgent('b', 70, true)
 
-		const payload = buildDebugPayload(buyer, 'buying', {
+		const payload = buildDebugPayload(buyer, 'buyer', {
 			qualified: [a],
-			ranked: [a],
 			disqualified: [b],
 			scoreDistribution: [],
 			totalAgents: 2,

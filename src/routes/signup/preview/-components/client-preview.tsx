@@ -1,15 +1,22 @@
 import { MapPinIcon, UserIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { ClientOnly, Navigate } from '@tanstack/react-router'
+import type { z } from 'zod'
 
 import {
 	getProfileSummary,
 	ProfileSummaryGrid,
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
-import type { ClientPreviewProfile } from '@/lib/profile'
+import { Skeleton } from '@/components/ui/skeleton'
+import { loadCityById } from '@/lib/geography/zip'
+import type { ClientPreviewProfile, ClientRole } from '@/lib/profile'
 import {
 	AgentPreviewCard,
 	type MatchDetails,
 } from '@/routes/(dashboard)/-components/agent-preview-card'
+
+import { SignupPreviewShell } from './signup-preview-shell'
 
 const clientPreviewMatches: MatchDetails[] = [
 	{
@@ -74,6 +81,61 @@ const clientPreviewMatches: MatchDetails[] = [
 	},
 ]
 
+export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
+	clientRole,
+	previewSchema,
+	completedDraftSchema,
+	draftStorage,
+	createProfile,
+}: {
+	clientRole: ClientRole
+	previewSchema: z.ZodType<P>
+	completedDraftSchema: z.ZodType
+	draftStorage: { load: () => D | null; clear: () => void }
+	createProfile: (payload: { data: D }) => Promise<unknown>
+}) {
+	const parsed = previewSchema.safeParse({
+		...draftStorage.load(),
+		role: clientRole,
+	})
+	const quizPath =
+		clientRole === 'buyer'
+			? '/signup/buyer/location'
+			: '/signup/seller/location'
+	if (!parsed.success) {
+		return <Navigate to={quizPath} replace />
+	}
+
+	return (
+		<ClientOnly fallback={null}>
+			<SignupPreviewShell
+				redirect={`/${clientRole}/matches`}
+				oauthRedirect={`/auth/complete?role=${clientRole}`}
+				quizPath={quizPath}
+				createProfile={createProfile}
+				loadDraft={draftStorage.load}
+				validateDraft={(draft) => completedDraftSchema.safeParse(draft).success}
+				clearDraft={draftStorage.clear}
+				panelTitle={
+					<>
+						Create your profile to <span className="text-brand">unlock</span>{' '}
+						your matches
+					</>
+				}
+				panelDescription={`Save your personalized ${clientRole} profile, view ranked agent matches, and connect with agents who fit your style.`}
+				mobileTitle="Unlock your matches"
+				mobileSubtitle="Create your profile to view full agent matches."
+			>
+				<div className="mx-auto w-full max-w-2xl space-y-6">
+					<ClientPreviewHeader title="Your Profile" />
+					<ClientProfilePreviewCard profile={parsed.data} />
+					<ClientMatchesPreview />
+				</div>
+			</SignupPreviewShell>
+		</ClientOnly>
+	)
+}
+
 export function ClientPreviewHeader({ title }: { title: string }) {
 	return (
 		<div>
@@ -95,35 +157,43 @@ export function ClientProfilePreviewCard({
 }: {
 	profile: ClientPreviewProfile
 }) {
-	const stateSvgPath = profile.state
-		? `/states/${profile.state}.svg`
-		: undefined
+	const { data: city, isPending } = useQuery({
+		queryKey: ['city', profile.cityId],
+		queryFn: () => loadCityById({ data: profile.cityId }),
+		staleTime: 1000 * 60 * 60,
+	})
+
+	const stateSvgPath = city?.state ? `/states/${city.state}.svg` : undefined
 	const summaryItems = getProfileSummary({ role: profile.role, profile })
 	const profileTitle =
-		profile.city ??
-		profile.state ??
-		(profile.role === 'buyer' ? 'Buyer' : 'Seller')
+		city?.name ?? city?.state ?? (profile.role === 'buyer' ? 'Buyer' : 'Seller')
 
 	return (
 		<Card className="border-border bg-card gap-0 rounded-lg p-0 shadow-sm">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
 				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
-					{stateSvgPath ? (
+					{isPending ? (
+						<Skeleton className="h-8 w-8 rounded" />
+					) : stateSvgPath ? (
 						<img
 							src={stateSvgPath}
-							alt={`${profile.state} state icon`}
+							alt={`${city?.state} state icon`}
 							className="h-8 w-8 object-contain opacity-85"
 						/>
-					) : profile.city ? (
+					) : city?.name ? (
 						<MapPinIcon className="h-5 w-5" />
 					) : (
 						<UserIcon className="h-5 w-5" />
 					)}
 				</div>
 				<div className="min-w-0 flex-1">
-					<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">
-						{profileTitle}
-					</h3>
+					{isPending ? (
+						<Skeleton className="h-6 w-32" />
+					) : (
+						<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">
+							{profileTitle}
+						</h3>
+					)}
 				</div>
 			</div>
 			{summaryItems.length > 0 ? (

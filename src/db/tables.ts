@@ -2,14 +2,20 @@ import { sql } from 'drizzle-orm'
 import {
 	boolean,
 	check,
+	customType,
+	doublePrecision,
 	foreignKey,
 	index,
+	pgEnum,
 	pgTable,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex,
+	uuid,
 } from 'drizzle-orm/pg-core'
 
+import { US_POSTAL_CODES } from '@/lib/geography/states'
 import {
 	agentComplianceColumns,
 	agentIdentityColumns,
@@ -23,9 +29,22 @@ import {
 	sellerQuizColumns,
 } from '@/lib/profile/db'
 
-type EntitlementKey = 'client_lifetime_premium' | 'agent_subscription'
+export const entitlementKey = pgEnum('entitlement_key', [
+	'client_lifetime_premium',
+	'agent_subscription',
+])
 
-type EntitlementSource = 'manual' | 'stripe_checkout' | 'stripe_subscription'
+export const entitlementSource = pgEnum('entitlement_source', [
+	'manual',
+	'stripe_checkout',
+	'stripe_subscription',
+])
+
+export const usPostalCode = pgEnum('us_postal_code', US_POSTAL_CODES)
+
+const citext = customType<{ data: string }>({
+	dataType: () => 'citext',
+})
 
 export const user = pgTable(
 	'user',
@@ -46,8 +65,8 @@ export const userEntitlements = pgTable(
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
-		key: text().$type<EntitlementKey>().notNull(),
-		source: text().$type<EntitlementSource>().notNull(),
+		key: entitlementKey().notNull(),
+		source: entitlementSource().notNull(),
 		stripeCustomerId: text(),
 		stripePaymentIntentId: text(),
 		stripeSubscriptionId: text(),
@@ -63,7 +82,7 @@ export const userEntitlements = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'user_entitlements_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -81,12 +100,12 @@ export const session = pgTable(
 	},
 	(table) => [
 		uniqueIndex('session_token_index').on(table.token),
-		index('session_user_id_index').using('btree', table.userId),
+		index('session_user_id_index').on(table.userId),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'session_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -121,7 +140,7 @@ export const account = pgTable(
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'account_user_id_fk',
-		}),
+		}).onDelete('cascade'),
 	],
 )
 
@@ -135,62 +154,122 @@ export const verification = pgTable(
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
+	(table) => [index('verification_identifier_index').on(table.identifier)],
+)
+
+export const cities = pgTable(
+	'cities',
+	{
+		id: uuid().primaryKey().notNull(),
+		name: citext().notNull(),
+		state: usPostalCode().notNull(),
+		centerLat: doublePrecision().notNull(),
+		centerLng: doublePrecision().notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
 	(table) => [
-		index('verification_identifier_index').using('btree', table.identifier),
+		uniqueIndex('cities_name_state_index').on(table.name, table.state),
+		index('cities_state_index').on(table.state),
 	],
 )
 
-export const buyerProfiles = pgTable(
-	'buyer_profiles',
+export const cityZips = pgTable(
+	'city_zips',
+	{
+		id: text().primaryKey().notNull(),
+		cityId: uuid().notNull(),
+		zip: text().notNull(),
+		// Per-zip centroid from the seed dataset; scoring resolves zip
+		// distances from these so the `zipcodes` package is only needed at
+		// seed time. Zips without coordinates are excluded at seed time.
+		lat: doublePrecision().notNull(),
+		lng: doublePrecision().notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		// One zip belongs to exactly one city (the seed dataset has one record
+		// per zip). Accepted limitation: zips labeled with a borough/neighborhood
+		// city (e.g. Brooklyn, Flushing) no longer roll up to their metro city
+		// (New York, NY lost ~200 zips when the old NYC_ZIP_RANGES aliasing was
+		// removed). Revisit with metro aliasing if a zip ever needs two cities.
+		uniqueIndex('city_zips_zip_unique').on(table.zip),
+		index('city_zips_city_id_index').on(table.cityId),
+		unique('city_zips_id_city_id_unique').on(table.id, table.cityId),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'city_zips_city_id_fk',
+		}),
+	],
+)
+
+export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
+
+export const clientProfiles = pgTable(
+	'client_profiles',
 	{
 		id: text().primaryKey().notNull(),
 		userId: text().notNull(),
+		role: clientRole().notNull(),
 		...clientLifecycleColumns,
 		...clientMatchingColumns,
 		...clientWorkStyleColumns,
 		...clientMatchTuningColumns,
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		uniqueIndex('client_profiles_user_role_index').on(table.userId, table.role),
+		unique('client_profiles_id_role_index').on(table.id, table.role),
+		unique('client_profiles_id_city_id_unique').on(table.id, table.cityId),
+		foreignKey({
+			columns: [table.userId],
+			foreignColumns: [user.id],
+			name: 'client_profiles_user_id_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'client_profiles_city_id_fk',
+		}),
+		check(
+			'client_profiles_price_range_check',
+			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+		),
+	],
+)
+
+export const buyerDetails = pgTable(
+	'buyer_details',
+	{
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('buyer'),
 		...buyerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
-		uniqueIndex('buyer_profiles_user_id_index').on(table.userId),
+		check('buyer_details_role_check', sql`${table.role} = 'buyer'`),
 		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'buyer_profiles_user_id_fk',
-		}),
-		check(
-			'buyer_profiles_price_range_check',
-			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
-		),
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'buyer_details_profile_role_fk',
+		}).onDelete('cascade'),
 	],
 )
 
-export const sellerProfiles = pgTable(
-	'seller_profiles',
+export const sellerDetails = pgTable(
+	'seller_details',
 	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		...clientLifecycleColumns,
-		...clientMatchingColumns,
-		...clientWorkStyleColumns,
-		...clientMatchTuningColumns,
+		clientProfileId: text().primaryKey().notNull(),
+		role: clientRole().notNull().default('seller'),
 		...sellerQuizColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
-		uniqueIndex('seller_profiles_user_id_index').on(table.userId),
+		check('seller_details_role_check', sql`${table.role} = 'seller'`),
 		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'seller_profiles_user_id_fk',
-		}),
-		check(
-			'seller_profiles_price_range_check',
-			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
-		),
+			columns: [table.clientProfileId, table.role],
+			foreignColumns: [clientProfiles.id, clientProfiles.role],
+			name: 'seller_details_profile_role_fk',
+		}).onDelete('cascade'),
 	],
 )
 
@@ -203,51 +282,84 @@ export const agentProfiles = pgTable(
 		...agentIdentityColumns,
 		...agentQuizColumns,
 		...agentComplianceColumns,
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
 	(table) => [
 		uniqueIndex('agent_profiles_user_id_index').on(table.userId),
+		index('agent_profiles_city_id_index').on(table.cityId),
+		unique('agent_profiles_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.userId],
 			foreignColumns: [user.id],
 			name: 'agent_profiles_user_id_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.cityId],
+			foreignColumns: [cities.id],
+			name: 'agent_profiles_city_id_fk',
 		}),
 	],
 )
 
-export const cities = pgTable(
-	'cities',
+const profileZipColumns = {
+	id: text().primaryKey().notNull(),
+	cityZipId: text().notNull(),
+	cityId: uuid().notNull(),
+	createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+}
+
+// Zip↔profile membership is enforced at the database level: the join row's
+// `cityId` is pinned to BOTH the profile's `(id, cityId)` and the zip's
+// `(id, cityId)` by composite foreign keys, so a row can only commit when
+// the zip belongs to the profile's city. Buyer and seller profiles share
+// `client_profiles`, so their zips share one join table.
+export const clientProfileZips = pgTable(
+	'client_profile_zips',
 	{
-		id: text().primaryKey().notNull(),
-		city: text().notNull(),
-		state: text().notNull(),
-		centerLat: text().notNull(),
-		centerLng: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		...profileZipColumns,
+		profileId: text().notNull(),
 	},
 	(table) => [
-		uniqueIndex('cities_city_state_index').on(table.city, table.state),
-		index('cities_state_index').on(table.state),
+		uniqueIndex('client_profile_zips_profile_id_city_zip_id_index').on(
+			table.profileId,
+			table.cityZipId,
+		),
+		index('client_profile_zips_profile_id_index').on(table.profileId),
+		foreignKey({
+			columns: [table.profileId, table.cityId],
+			foreignColumns: [clientProfiles.id, clientProfiles.cityId],
+			name: 'client_profile_zips_profile_city_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.cityZipId, table.cityId],
+			foreignColumns: [cityZips.id, cityZips.cityId],
+			name: 'client_profile_zips_city_zip_city_fk',
+		}),
 	],
 )
 
-export const cityZips = pgTable(
-	'city_zips',
+export const agentProfileZips = pgTable(
+	'agent_profile_zips',
 	{
-		id: text().primaryKey().notNull(),
-		city: text().notNull(),
-		state: text().notNull(),
-		zip: text().notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
+		...profileZipColumns,
+		profileId: text().notNull(),
 	},
 	(table) => [
-		index('city_zips_city_state_index').on(table.city, table.state),
-		uniqueIndex('city_zips_city_state_zip_index').on(
-			table.city,
-			table.state,
-			table.zip,
+		uniqueIndex('agent_profile_zips_profile_id_city_zip_id_index').on(
+			table.profileId,
+			table.cityZipId,
 		),
-		index('city_zips_zip_index').on(table.zip),
+		index('agent_profile_zips_profile_id_index').on(table.profileId),
+		foreignKey({
+			columns: [table.profileId, table.cityId],
+			foreignColumns: [agentProfiles.id, agentProfiles.cityId],
+			name: 'agent_profile_zips_profile_city_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.cityZipId, table.cityId],
+			foreignColumns: [cityZips.id, cityZips.cityId],
+			name: 'agent_profile_zips_city_zip_city_fk',
+		}),
 	],
 )

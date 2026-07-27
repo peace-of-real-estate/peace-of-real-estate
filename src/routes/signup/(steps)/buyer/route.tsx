@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-router'
 
 import { getCurrentSession } from '@/lib/auth/session'
-import { buyerDraftSchema, loadBuyerProfile } from '@/lib/profile'
+import { buyerDraftSchema, loadExistingProfileRoles } from '@/lib/profile'
 import type { BuyerDraft } from '@/lib/profile'
 import { buyerQuestionIds } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/signup/(steps)/buyer')({
 	ssr: false,
 	beforeLoad: async () => {
 		const session = await getCurrentSession()
-		if (session && (await loadBuyerProfile())) {
+		if (session && (await loadExistingProfileRoles()).includes('buyer')) {
 			throw redirect({ to: '/buyer/matches' })
 		}
 	},
@@ -66,7 +66,7 @@ function BuyerWizardRoute() {
 				step === 'preview' ? '/signup/preview/buyer' : step
 			}
 			getHasDraft={(draft) =>
-				draft.city !== undefined ||
+				draft.cityId !== undefined ||
 				draft.quickCommunicationChannel !== undefined
 			}
 			getCompletedStepIds={(draft) =>
@@ -74,7 +74,7 @@ function BuyerWizardRoute() {
 					.filter((step) => {
 						switch (step.id) {
 							case 'location':
-								return Boolean(draft.city && draft.state)
+								return Boolean(draft.cityId)
 							case 'home':
 								return Boolean(
 									draft.priceMin !== undefined &&
