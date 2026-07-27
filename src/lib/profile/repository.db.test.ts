@@ -7,7 +7,13 @@ import {
 } from '@tests/support/fixtures/db'
 import { eq } from 'drizzle-orm'
 
-import { cities, clientProfiles, user } from '@/db/tables'
+import {
+	cities,
+	cityZips,
+	clientProfiles,
+	clientProfileZips,
+	user,
+} from '@/db/tables'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { Buyer, Seller } from '@/lib/profile/repository'
 
@@ -183,5 +189,60 @@ describe('zip scoping', () => {
 			.from(clientProfiles)
 			.where(eq(clientProfiles.userId, account.id))
 		expect(rows).toHaveLength(0)
+	})
+
+	test('the database rejects a zip row pointing at another city', async ({
+		db,
+	}) => {
+		const profileCity = uniqueCity()
+		const otherCity = uniqueCity()
+		await seedCity(db, profileCity)
+		await seedCity(db, otherCity)
+		const foreignZip = {
+			id: crypto.randomUUID(),
+			cityId: otherCity.id,
+			zip: '00501',
+			lat: 40.81,
+			lng: -73.04,
+		}
+		const localZip = {
+			...foreignZip,
+			id: crypto.randomUUID(),
+			zip: '00502',
+			cityId: profileCity.id,
+		}
+		await db.insert(cityZips).values([foreignZip, localZip])
+		const account = makeIntroUser()
+		await db.insert(user).values(account)
+		await Buyer.insert(
+			{
+				id: crypto.randomUUID(),
+				userId: account.id,
+				now: new Date(),
+				...buyerInsert(profileCity.id),
+			},
+			db,
+		)
+		const [profile] = await db
+			.select({ id: clientProfiles.id })
+			.from(clientProfiles)
+			.where(eq(clientProfiles.userId, account.id))
+		if (!profile) throw new Error('expected a client profile row')
+
+		await expect(
+			db.insert(clientProfileZips).values({
+				id: crypto.randomUUID(),
+				profileId: profile.id,
+				cityZipId: foreignZip.id,
+				cityId: profileCity.id,
+			}),
+		).rejects.toThrow()
+
+		await db.insert(clientProfileZips).values({
+			id: crypto.randomUUID(),
+			profileId: profile.id,
+			cityZipId: localZip.id,
+			cityId: profileCity.id,
+		})
 	})
 })

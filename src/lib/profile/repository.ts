@@ -215,6 +215,7 @@ async function insertZipRows(
 			id: crypto.randomUUID(),
 			profileId,
 			cityZipId,
+			cityId,
 		})),
 	)
 }
