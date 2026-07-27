@@ -4,6 +4,8 @@ import { dirname, resolve } from 'node:path'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
 
+import type * as schema from '@/db/tables'
+
 import { test as baseTest } from './server'
 
 const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
@@ -26,7 +28,7 @@ export interface DbConfig {
 	postgresImage?: string
 }
 
-export type Database = NodePgDatabase & {
+export type Database = NodePgDatabase<typeof schema> & {
 	$client: Pool
 }
 
@@ -78,9 +80,13 @@ export const test = baseTest.extend<DbFixture>({
 			const client = new Pool({
 				connectionString: container.getConnectionUri(),
 			})
-			const db = Object.assign(drizzle({ client, casing: 'snake_case' }), {
-				$client: client,
-			})
+			const schema = await import('@/db/tables')
+			const db = Object.assign(
+				drizzle({ client, casing: 'snake_case', schema }),
+				{
+					$client: client,
+				},
+			)
 
 			try {
 				await seedDatabase(db, { schemaPath, seedFunction })
