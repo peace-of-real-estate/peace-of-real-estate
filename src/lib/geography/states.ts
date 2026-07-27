@@ -71,20 +71,3 @@ export const US_POSTAL_CODES = [
 export const usPostalCodeSchema = z.enum(US_POSTAL_CODES)
 
 export type UsPostalCode = z.infer<typeof usPostalCodeSchema>
-
-const STATE_ABBREVIATIONS: ReadonlySet<string> = new Set(US_POSTAL_CODES)
-
-export function resolveStateCode(...values: Array<string | undefined>) {
-	for (const value of values) {
-		if (!value) continue
-		const normalized = value.trim().toUpperCase()
-		if (STATE_ABBREVIATIONS.has(normalized)) return normalized
-
-		const stateMatch = normalized.match(/\b[A-Z]{2}\b(?=\s*$|\s*,|\s+\d{5})/)
-		if (stateMatch && STATE_ABBREVIATIONS.has(stateMatch[0])) {
-			return stateMatch[0]
-		}
-	}
-
-	return undefined
-}
