@@ -21,15 +21,22 @@ import {
 	type ProfileRole,
 } from './types'
 
+class ProfileConflictError extends Error {
+	override name = 'ProfileConflictError'
+}
+
 async function insertProfileOnce(
 	roleName: string,
 	insert: () => Promise<boolean>,
 ) {
 	try {
 		const inserted = await insert()
-		if (!inserted) throw new Error(`${roleName} profile already exists`)
+		if (!inserted) {
+			throw new ProfileConflictError(`${roleName} profile already exists`)
+		}
 	} catch (error) {
 		if (error instanceof ProfileValidationError) setResponseStatus(400)
+		if (error instanceof ProfileConflictError) setResponseStatus(409)
 		throw error
 	}
 }
