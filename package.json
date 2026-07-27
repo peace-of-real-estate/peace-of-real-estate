@@ -86,7 +86,7 @@
 		"@tanstack/devtools-vite": "^0.8.0",
 		"@testcontainers/postgresql": "^12.0.3",
 		"@types/geojson": "^7946.0.16",
-		"@types/node": "^26.0.0",
+		"@types/node": "^26.1.1",
 		"@types/pg": "^8.20.0",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",

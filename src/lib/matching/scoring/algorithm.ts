@@ -832,11 +832,8 @@ function harmonicMean(a: number, b: number): number {
 
 export function calculateFitScore(
 	agent: AgentProfile,
-	client?: ClientProfile,
-	fallbackSide: ClientRole = 'buyer',
+	client: ClientProfile,
 ): FitScoreResult {
-	if (!client) return calculateFallbackScore(agent, fallbackSide)
-
 	const scored = toClientSideProfile(client)
 	const { weights, boosted } = resolveDimensionWeights(scored)
 
@@ -965,64 +962,6 @@ export function calculateFitScore(
 					}
 				: undefined,
 			geo: results.location.geo,
-		},
-	}
-}
-
-function calculateFallbackScore(
-	agent: AgentProfile,
-	side: ClientRole,
-): FitScoreResult {
-	const checks = [
-		{
-			label: 'representationSide set',
-			present: Boolean(agent.representationSide),
-		},
-		{
-			label: 'typicalPriceRange is valid bucket',
-			present: toAgentPriceBucket(agent.typicalPriceRange) !== undefined,
-		},
-		{
-			label: 'bestClientTypes ranked',
-			present: agent.bestClientTypes.length >= 2,
-		},
-		{
-			label: 'zipCodes non-empty',
-			present: agent.geography.length > 0,
-		},
-	]
-	const present = checks.filter((check) => check.present)
-	const completeness = present.length / checks.length
-	const fitScore = Math.round(completeness * 100)
-	const stars = toStars(completeness)
-
-	return {
-		fitScore,
-		scores: {
-			Location: stars,
-			'Price Fit': stars,
-			Specialization: stars,
-			'Working Style': stars,
-			Communication: stars,
-			'Business Terms': stars,
-		},
-		disqualified: false,
-		trace: {
-			mode: 'fallback',
-			side,
-			matchPriorities: [],
-			disqualifiers: [],
-			disqualified: false,
-			dimensions: [],
-			computedScore: fitScore,
-			fitScore,
-			formula: `no client profile — completeness fallback: round(${present.length} / ${checks.length} × 100) = ${fitScore}`,
-			fallback: {
-				present: present.map((check) => check.label),
-				missing: checks
-					.filter((check) => !check.present)
-					.map((check) => check.label),
-			},
 		},
 	}
 }

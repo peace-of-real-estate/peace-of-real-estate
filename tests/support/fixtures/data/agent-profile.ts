@@ -10,7 +10,7 @@ export function makeAgent(overrides: Partial<AgentProfile> = {}): AgentProfile {
 		userId: 'user-agent-fixture-1',
 		representationSide: 'buyer',
 		city: {
-			id: 'city-fixture-baltimore-md',
+			id: '01936f00-0000-7000-8000-000000000ba1',
 			name: 'Baltimore',
 			state: 'MD',
 			center: { lat: 39.2904, lng: -76.6122 },

@@ -22,7 +22,7 @@ beforeEach(() => {
 })
 
 const step1: SellerDraft = {
-	cityId: 'city-fixture-austin-tx',
+	cityId: '01936f00-0000-7000-8000-000000000aa1',
 	zipCodes: [],
 }
 

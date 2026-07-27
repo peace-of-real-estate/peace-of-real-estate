@@ -1,4 +1,11 @@
-import { boolean, integer, pgEnum, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	integer,
+	pgEnum,
+	text,
+	timestamp,
+	uuid,
+} from 'drizzle-orm/pg-core'
 
 import { BUCKET_ORDER } from '@/lib/price-range'
 import {
@@ -98,7 +105,7 @@ export const clientLifecycleColumns = {
 }
 
 export const clientMatchingColumns = {
-	cityId: text().notNull(),
+	cityId: uuid().notNull(),
 	timeline: timelineEnum().notNull(),
 	priceMin: integer().notNull(),
 	priceMax: integer().notNull(),
@@ -135,7 +142,7 @@ export const sellerQuizColumns = {
 
 export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
-	cityId: text().notNull(),
+	cityId: uuid().notNull(),
 	typicalPriceRange: agentPriceBucketEnum().notNull(),
 	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
 	notFitFor: text().array().notNull().default([]),

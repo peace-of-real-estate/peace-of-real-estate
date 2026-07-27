@@ -73,7 +73,7 @@ export class ProfileValidationError extends Error {
 
 // Every profile's `cityId` is a required FK to `cities`, so an inner join
 // always resolves.
-export function resolveCity(row: CityRow): ResolvedCity {
+function resolveCity(row: CityRow): ResolvedCity {
 	return {
 		id: row.id,
 		name: row.name,
@@ -82,7 +82,7 @@ export function resolveCity(row: CityRow): ResolvedCity {
 	}
 }
 
-export async function loadGeographyRows(
+async function loadGeographyRows(
 	zipTable: ZipTable,
 	profileIds: string[],
 	executor: DbOrTx = db,
@@ -104,11 +104,7 @@ export async function loadGeographyRows(
 // not the UI: resolve submitted zips to `city_zips` rows scoped to the chosen
 // city and reject any that don't belong, so a profile can never claim one
 // city while scoring against another city's zips.
-export async function resolveCityZipIds(
-	tx: Tx,
-	cityId: string,
-	zipCodes: string[],
-) {
+async function resolveCityZipIds(tx: Tx, cityId: string, zipCodes: string[]) {
 	const uniqueZips = [...new Set(zipCodes)]
 	if (uniqueZips.length === 0) return []
 	const rows = await tx
@@ -170,12 +166,15 @@ function buildClientProfile(
 		city: resolveCity(city),
 		geography: toZipGeography(geographyRows),
 	}
-	if (pair.role === 'buyer') {
-		const { clientProfileId: _id, role: _role, ...quiz } = pair.details
-		return { ...shared, ...quiz, role: pair.role, ...resolved }
+	const assemble = <R extends ClientRole>(
+		role: R,
+		details: DetailsRowFor<R>,
+	) => {
+		const { clientProfileId: _id, role: _role, ...quiz } = details
+		return { ...shared, ...quiz, role, ...resolved }
 	}
-	const { clientProfileId: _id, role: _role, ...quiz } = pair.details
-	return { ...shared, ...quiz, role: pair.role, ...resolved }
+	if (pair.role === 'buyer') return assemble(pair.role, pair.details)
+	return assemble(pair.role, pair.details)
 }
 
 function groupByProfile(geographyRows: GeographyRows) {

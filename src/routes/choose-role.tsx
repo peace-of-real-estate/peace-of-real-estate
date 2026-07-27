@@ -4,18 +4,19 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
 import { loadExistingProfileRoles } from '@/lib/profile'
-import { dashboardPaths, type ProfileRole } from '@/lib/profile/types'
+import {
+	dashboardPaths,
+	resolveDashboardTarget,
+	type ProfileRole,
+} from '@/lib/profile/types'
 
 export const Route = createFileRoute('/choose-role')({
 	beforeLoad: async () => {
 		await redirectUnauthenticatedUsers({ redirectTo: '/choose-role' })
 		const roles = await loadExistingProfileRoles()
-		const [first] = roles
-		if (!first) {
-			throw redirect({ to: '/buyer/matches' })
-		}
-		if (roles.length === 1) {
-			throw redirect({ to: dashboardPaths[first] })
+		const target = resolveDashboardTarget(roles)
+		if (target !== '/choose-role') {
+			throw redirect({ to: target })
 		}
 		return { roles }
 	},

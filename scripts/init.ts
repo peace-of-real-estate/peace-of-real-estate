@@ -1,3 +1,5 @@
+import { randomUUIDv7 } from 'node:crypto'
+
 import { sql } from 'drizzle-orm'
 import * as zipcodes from 'zipcodes'
 
@@ -73,7 +75,7 @@ async function seedCityData() {
 				`No coordinates for any zip in ${group.city}, ${group.state} — a city center is required`,
 			)
 		}
-		const id = crypto.randomUUID()
+		const id = randomUUIDv7()
 		const centerLat = group.lats.reduce((a, b) => a + b, 0) / group.lats.length
 		const centerLng = group.lngs.reduce((a, b) => a + b, 0) / group.lngs.length
 
@@ -90,7 +92,7 @@ async function seedCityData() {
 			const coords = zipCoords.get(zip)
 			if (!coords) throw new Error(`No coordinates for ${zip}`)
 			zipRows.push({
-				id: crypto.randomUUID(),
+				id: randomUUIDv7(),
 				city: group.city,
 				state: group.state,
 				zip,
@@ -148,7 +150,17 @@ async function seedCityData() {
 					}
 				}),
 			)
-			.onConflictDoNothing()
+			.onConflictDoUpdate({
+				target: cityZips.zip,
+				// lat/lng track the pinned dataset like city centers do. cityId is
+				// deliberately excluded: the composite FK from profile zip rows
+				// makes a reassigned city fail loudly instead of silently moving a
+				// zip out from under existing profiles.
+				set: {
+					lat: sql`excluded."lat"`,
+					lng: sql`excluded."lng"`,
+				},
+			})
 		console.log(
 			`  city_zips ${Math.min(i + BATCH_SIZE_ZIPS, zipRows.length)}/${zipRows.length}`,
 		)

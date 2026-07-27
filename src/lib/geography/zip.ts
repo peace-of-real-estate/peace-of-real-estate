@@ -83,8 +83,7 @@ export async function searchCities(
 	database: typeof db,
 	query: string,
 ): Promise<City[]> {
-	const normalizedQuery = query.toLowerCase()
-	if (normalizedQuery.length < 2) {
+	if (query.length < 2) {
 		return database
 			.select(cityColumns)
 			.from(cities)
@@ -93,13 +92,12 @@ export async function searchCities(
 			.limit(10)
 	}
 
-	const escapedQuery = escapeLikePattern(normalizedQuery)
+	const escapedQuery = escapeLikePattern(query)
 	return database
 		.select(cityColumns)
 		.from(cities)
 		.where(
 			or(
-				ilike(cities.name, `%${escapedQuery}%`),
 				ilike(sql`${cities.state}::text`, `${escapedQuery}%`),
 				ilike(
 					sql`${cities.name} || ', ' || ${cities.state}::text`,

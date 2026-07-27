@@ -1,44 +1,10 @@
 import { makeIntroUser } from '@tests/support/fixtures/data/user'
-import {
-	describe,
-	expect,
-	test,
-	type Database,
-} from '@tests/support/fixtures/db'
+import { describe, expect, test } from '@tests/support/fixtures/db'
+import { seedCities, uniqueCity } from '@tests/support/fixtures/geography'
 import { eq } from 'drizzle-orm'
 
-import {
-	cities,
-	cityZips,
-	clientProfiles,
-	clientProfileZips,
-	user,
-} from '@/db/tables'
-import type { UsPostalCode } from '@/lib/geography/states'
+import { cityZips, clientProfiles, clientProfileZips, user } from '@/db/tables'
 import { Buyer, Seller } from '@/lib/profile/repository'
-
-type TestCity = {
-	id: string
-	name: string
-	state: UsPostalCode
-	centerLat: number
-	centerLng: number
-}
-
-function uniqueCity(overrides: Partial<TestCity> = {}): TestCity {
-	return {
-		id: crypto.randomUUID(),
-		name: `City-${crypto.randomUUID()}`,
-		state: 'TX',
-		centerLat: 30.2672,
-		centerLng: -97.7431,
-		...overrides,
-	}
-}
-
-async function seedCity(db: Database, testCity: TestCity) {
-	await db.insert(cities).values(testCity)
-}
 
 function buyerInsert(cityId: string) {
 	return {
@@ -88,7 +54,7 @@ function sellerInsert(cityId: string) {
 describe('client profile loading', () => {
 	test('resolves city and center for a buyer profile', async ({ db }) => {
 		const testCity = uniqueCity()
-		await seedCity(db, testCity)
+		await seedCities(db, [testCity])
 		const account = makeIntroUser()
 		await db.insert(user).values(account)
 
@@ -111,7 +77,7 @@ describe('client profile loading', () => {
 
 	test('resolves city and center for a seller profile', async ({ db }) => {
 		const testCity = uniqueCity()
-		await seedCity(db, testCity)
+		await seedCities(db, [testCity])
 		const account = makeIntroUser()
 		await db.insert(user).values(account)
 
@@ -136,7 +102,7 @@ describe('profile insert conflicts', () => {
 		db,
 	}) => {
 		const testCity = uniqueCity()
-		await seedCity(db, testCity)
+		await seedCities(db, [testCity])
 		const account = makeIntroUser()
 		await db.insert(user).values(account)
 
@@ -163,11 +129,44 @@ describe('profile insert conflicts', () => {
 })
 
 describe('zip scoping', () => {
+	test('resolves geography for zips belonging to the selected city', async ({
+		db,
+	}) => {
+		const testCity = uniqueCity()
+		await seedCities(db, [testCity])
+		const localZip = {
+			id: crypto.randomUUID(),
+			cityId: testCity.id,
+			zip: '00510',
+			lat: 40.81,
+			lng: -73.04,
+		}
+		await db.insert(cityZips).values(localZip)
+		const account = makeIntroUser()
+		await db.insert(user).values(account)
+
+		await Buyer.insert(
+			{
+				id: crypto.randomUUID(),
+				userId: account.id,
+				now: new Date(),
+				...buyerInsert(testCity.id),
+				zipCodes: ['00510'],
+			},
+			db,
+		)
+
+		const profile = await Buyer.loadByUserId(account.id, db)
+		expect(profile?.geography).toEqual([
+			{ zip: '00510', center: { lat: 40.81, lng: -73.04 } },
+		])
+	})
+
 	test('rejects zips that do not belong to the selected city', async ({
 		db,
 	}) => {
 		const testCity = uniqueCity()
-		await seedCity(db, testCity)
+		await seedCities(db, [testCity])
 		const account = makeIntroUser()
 		await db.insert(user).values(account)
 
@@ -196,8 +195,8 @@ describe('zip scoping', () => {
 	}) => {
 		const profileCity = uniqueCity()
 		const otherCity = uniqueCity()
-		await seedCity(db, profileCity)
-		await seedCity(db, otherCity)
+		await seedCities(db, [profileCity])
+		await seedCities(db, [otherCity])
 		const foreignZip = {
 			id: crypto.randomUUID(),
 			cityId: otherCity.id,

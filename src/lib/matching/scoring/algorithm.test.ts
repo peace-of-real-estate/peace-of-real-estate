@@ -356,13 +356,6 @@ describe('calculateFitScore', () => {
 		expect(result.disqualified).toBe(false)
 	})
 
-	test('fallback score when no client', () => {
-		const agent = makeAgent()
-		const result = calculateFitScore(agent)
-		expect(result.fitScore).toBe(100)
-		expect(result.trace.mode).toBe('fallback')
-	})
-
 	test('priority boost raises priceFit weight', () => {
 		const agent = makeAgent()
 		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })

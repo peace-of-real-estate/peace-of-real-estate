@@ -99,6 +99,14 @@ export function CityZipSelector({
 		staleTime: 1000 * 60 * 60,
 	})
 
+	const cityZipCodes = boundaries
+		? new Set(
+				boundaries.features
+					.map((f) => f.properties?.ZCTA5)
+					.filter((z) => typeof z === 'string'),
+			)
+		: undefined
+
 	const { data: centerForCity } = useQuery({
 		queryKey: ['city-center', selectedCityId],
 		queryFn: selectedCityId
@@ -126,9 +134,13 @@ export function CityZipSelector({
 		onChange({ cityId: selectedCityId, zipCodes: next })
 	}
 
+	const isAddableZipCode = (zipCode: string) =>
+		isValidZipCode(zipCode) &&
+		(cityZipCodes === undefined || cityZipCodes.has(zipCode))
+
 	const addManualZipCode = () => {
 		const zipCode = manualZipCode.trim()
-		if (!selectedCityId || !isValidZipCode(zipCode)) return
+		if (!selectedCityId || !isAddableZipCode(zipCode)) return
 		const next = selectedZipCodes.includes(zipCode)
 			? selectedZipCodes
 			: [...selectedZipCodes, zipCode]
@@ -256,7 +268,7 @@ export function CityZipSelector({
 								variant="ghost"
 								size="sm"
 								onClick={addManualZipCode}
-								disabled={!isValidZipCode(manualZipCode.trim())}
+								disabled={!isAddableZipCode(manualZipCode.trim())}
 								className="h-8 rounded-md px-3 text-xs"
 							>
 								Add

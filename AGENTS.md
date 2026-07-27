@@ -32,6 +32,18 @@ for information about a specific command.
 Docs are local at `node_modules/vite-plus/docs` or online at
 <https://viteplus.dev/guide/>.
 
+## React
+
+This project uses the React Compiler (`reactCompilerPreset()` in
+`vite.config.ts`). Memoization is automatic:
+
+- Never write `useMemo` or `useCallback` — compute values inline; the compiler
+  memoizes for you.
+- Never write `useEffect` without explicit permission from the user, and only in
+  extreme circumstances. Fetch data with TanStack Query, derive state during
+  render, and respond to events in event handlers. If you think an effect is
+  unavoidable, stop and ask first.
+
 ## Comments
 
 Never write comments that restate what the code already says — if a comment

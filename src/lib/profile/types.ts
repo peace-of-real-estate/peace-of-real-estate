@@ -111,6 +111,13 @@ export const dashboardPaths = {
 	seller: '/seller/matches',
 } as const satisfies Record<ProfileRole, string>
 
+export function resolveDashboardTarget(roles: ProfileRole[]): string {
+	const [first] = roles
+	if (!first) return '/signup/buyer'
+	if (roles.length > 1) return '/choose-role'
+	return dashboardPaths[first]
+}
+
 type ClientProfileBase = Omit<
 	typeof clientProfiles.$inferSelect,
 	'role' | 'cityId'

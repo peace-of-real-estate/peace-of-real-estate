@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
 	boolean,
 	check,
+	customType,
 	doublePrecision,
 	foreignKey,
 	index,
@@ -11,6 +12,7 @@ import {
 	timestamp,
 	unique,
 	uniqueIndex,
+	uuid,
 } from 'drizzle-orm/pg-core'
 
 import { US_POSTAL_CODES } from '@/lib/geography/states'
@@ -39,6 +41,10 @@ export const entitlementSource = pgEnum('entitlement_source', [
 ])
 
 export const usPostalCode = pgEnum('us_postal_code', US_POSTAL_CODES)
+
+const citext = customType<{ data: string }>({
+	dataType: () => 'citext',
+})
 
 export const user = pgTable(
 	'user',
@@ -154,8 +160,8 @@ export const verification = pgTable(
 export const cities = pgTable(
 	'cities',
 	{
-		id: text().primaryKey().notNull(),
-		name: text().notNull(),
+		id: uuid().primaryKey().notNull(),
+		name: citext().notNull(),
 		state: usPostalCode().notNull(),
 		centerLat: doublePrecision().notNull(),
 		centerLng: doublePrecision().notNull(),
@@ -171,7 +177,7 @@ export const cityZips = pgTable(
 	'city_zips',
 	{
 		id: text().primaryKey().notNull(),
-		cityId: text().notNull(),
+		cityId: uuid().notNull(),
 		zip: text().notNull(),
 		// Per-zip centroid from the seed dataset; scoring resolves zip
 		// distances from these so the `zipcodes` package is only needed at
@@ -187,6 +193,7 @@ export const cityZips = pgTable(
 		// (New York, NY lost ~200 zips when the old NYC_ZIP_RANGES aliasing was
 		// removed). Revisit with metro aliasing if a zip ever needs two cities.
 		uniqueIndex('city_zips_zip_unique').on(table.zip),
+		index('city_zips_city_id_index').on(table.cityId),
 		unique('city_zips_id_city_id_unique').on(table.id, table.cityId),
 		foreignKey({
 			columns: [table.cityId],
@@ -297,7 +304,7 @@ export const agentProfiles = pgTable(
 const profileZipColumns = {
 	id: text().primaryKey().notNull(),
 	cityZipId: text().notNull(),
-	cityId: text().notNull(),
+	cityId: uuid().notNull(),
 	createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 }
 

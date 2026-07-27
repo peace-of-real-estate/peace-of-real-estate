@@ -1,34 +1,7 @@
-import {
-	describe,
-	expect,
-	test,
-	type Database,
-} from '@tests/support/fixtures/db'
+import { describe, expect, test } from '@tests/support/fixtures/db'
+import { seedCities, uniqueCity } from '@tests/support/fixtures/geography'
 
-import { cities } from '@/db/tables'
-import type { UsPostalCode } from '@/lib/geography/states'
 import { searchCities } from '@/lib/geography/zip'
-
-type TestCity = {
-	id: string
-	name: string
-	state: UsPostalCode
-	centerLat: number
-	centerLng: number
-}
-
-function uniqueCity(overrides: Pick<TestCity, 'name' | 'state'>): TestCity {
-	return {
-		id: crypto.randomUUID(),
-		centerLat: 30.2672,
-		centerLng: -97.7431,
-		...overrides,
-	}
-}
-
-async function seedCities(db: Database, rows: TestCity[]) {
-	await db.insert(cities).values(rows)
-}
 
 describe('searchCities', () => {
 	test('matches by city name', async ({ db }) => {

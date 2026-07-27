@@ -1,9 +1,10 @@
+import { redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
 import { requireUserId } from '@/lib/auth/session'
 import { Agent, Buyer, Seller } from '@/lib/profile/repository'
-import type { ClientProfile, ClientRole } from '@/lib/profile/types'
+import type { ClientProfile } from '@/lib/profile/types'
 import { getAvatarUrl } from '@/lib/s3'
 
 import { toAgentMatchData, type AgentMatchData } from './match.view'
@@ -25,7 +26,8 @@ export const loadBuyerAgentMatches = createServerFn({ method: 'GET' })
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 		const profile = await Buyer.loadByUserId(userId)
-		return loadAgentMatchesForProfile(profile, 'buyer', data)
+		if (!profile) throw redirect({ to: '/signup/buyer' })
+		return loadAgentMatchesForProfile(profile, data)
 	})
 
 export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
@@ -33,18 +35,18 @@ export const loadSellerAgentMatches = createServerFn({ method: 'GET' })
 	.handler(async ({ data }): Promise<AgentMatchData[]> => {
 		const userId = await requireUserId()
 		const profile = await Seller.loadByUserId(userId)
-		return loadAgentMatchesForProfile(profile, 'seller', data)
+		if (!profile) throw redirect({ to: '/signup/seller' })
+		return loadAgentMatchesForProfile(profile, data)
 	})
 
 async function loadAgentMatchesForProfile(
-	profile: ClientProfile | undefined,
-	side: ClientRole,
+	profile: ClientProfile,
 	pageParam: MatchPageParam = defaultMatchPageParam,
 ): Promise<AgentMatchData[]> {
-	const results = await Agent.listWithUsers({ state: profile?.city.state })
+	const results = await Agent.listWithUsers({ state: profile.city.state })
 	const scored = results.map((row) => ({
 		row,
-		score: calculateFitScore(row.agent, profile, side),
+		score: calculateFitScore(row.agent, profile),
 	}))
 	const byComputedScore = (
 		a: (typeof scored)[number],

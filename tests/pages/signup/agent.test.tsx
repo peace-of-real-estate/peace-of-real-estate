@@ -36,7 +36,7 @@ const identity: AgentDraft = {
 }
 
 const market: AgentDraft = {
-	cityId: 'city-fixture-austin-tx',
+	cityId: '01936f00-0000-7000-8000-000000000aa1',
 	zipCodes: ['78701', '78704'],
 	typicalPriceRange: '400kTo750k',
 	representationSide: 'both',

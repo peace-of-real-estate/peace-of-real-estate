@@ -63,7 +63,7 @@ export interface DisqualifierTrace {
 }
 
 export interface ScoreTrace {
-	mode: 'client-scored' | 'fallback'
+	mode: 'client-scored'
 	side: ClientRole
 	matchPriorities: string[]
 	disqualifiers: DisqualifierTrace[]
@@ -82,10 +82,6 @@ export interface ScoreTrace {
 	notFitPenalty?:
 		| { reason: string; scoreBefore: number; scoreAfter: number }
 		| undefined
-	fallback?: {
-		present: string[]
-		missing: string[]
-	}
 	/** Location-dimension geography, hoisted for map visualizations. */
 	geo?: LocationGeoTrace | undefined
 }

@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { setResponseStatus } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import { db } from '@/db/connection'
 import { agentProfiles, clientProfiles } from '@/db/tables'
@@ -17,7 +17,7 @@ import {
 	sellerCompletedDraftSchema,
 	sellerDetailsInsertSchema,
 	sellerInsertSchema,
-	dashboardPaths,
+	resolveDashboardTarget,
 	type ProfileRole,
 } from './types'
 
@@ -35,6 +35,7 @@ async function insertProfileOnce(
 			throw new ProfileConflictError(`${roleName} profile already exists`)
 		}
 	} catch (error) {
+		if (error instanceof z.ZodError) setResponseStatus(400)
 		if (error instanceof ProfileValidationError) setResponseStatus(400)
 		if (error instanceof ProfileConflictError) setResponseStatus(409)
 		throw error
@@ -185,13 +186,6 @@ export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
 		const roles = await findExistingProfileRoles(userId)
-		const [first] = roles
-		if (!first) {
-			return '/buyer/matches'
-		}
-		if (roles.length > 1) {
-			return '/choose-role'
-		}
-		return dashboardPaths[first]
+		return resolveDashboardTarget(roles)
 	},
 )
