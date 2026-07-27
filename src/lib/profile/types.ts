@@ -103,6 +103,14 @@ type ResolvedGeography = {
 
 export type ClientRole = (typeof clientRole.enumValues)[number]
 
+export type ProfileRole = ClientRole | 'agent'
+
+export const dashboardPaths: Record<ProfileRole, string> = {
+	agent: '/agent/introductions',
+	buyer: '/buyer/matches',
+	seller: '/seller/matches',
+}
+
 type ClientProfileBase = Omit<
 	typeof clientProfiles.$inferSelect,
 	'role' | 'cityId'

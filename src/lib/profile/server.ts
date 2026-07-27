@@ -16,6 +16,8 @@ import {
 	sellerCompletedDraftSchema,
 	sellerDetailsInsertSchema,
 	sellerInsertSchema,
+	dashboardPaths,
+	type ProfileRole,
 } from './types'
 
 async function insertProfileOnce(
@@ -140,8 +142,6 @@ export const agent = {
 	createProfile: createAgentProfile,
 }
 
-export type ProfileRole = 'buyer' | 'seller' | 'agent'
-
 async function findExistingProfileRoles(
 	userId: string,
 ): Promise<ProfileRole[]> {
@@ -171,10 +171,14 @@ export const loadExistingProfileRoles = createServerFn({
 export const getUserDashboardPath = createServerFn({ method: 'GET' }).handler(
 	async () => {
 		const userId = await requireUserId()
-		const [role] = await findExistingProfileRoles(userId)
-		if (role) {
-			return role === 'agent' ? '/agent/introductions' : `/${role}/matches`
+		const roles = await findExistingProfileRoles(userId)
+		const [first] = roles
+		if (!first) {
+			return '/buyer/matches'
 		}
-		return '/buyer/matches'
+		if (roles.length > 1) {
+			return '/choose-role'
+		}
+		return dashboardPaths[first]
 	},
 )
