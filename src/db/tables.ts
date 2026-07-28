@@ -7,7 +7,7 @@ import {
 	foreignKey,
 	index,
 	pgEnum,
-	pgTable,
+	snakeCase,
 	text,
 	timestamp,
 	unique,
@@ -46,7 +46,7 @@ const citext = customType<{ data: string }>({
 	dataType: () => 'citext',
 })
 
-export const user = pgTable(
+export const user = snakeCase.table(
 	'user',
 	{
 		id: text().primaryKey().notNull(),
@@ -60,7 +60,7 @@ export const user = pgTable(
 	(table) => [uniqueIndex('user_email_index').on(table.email)],
 )
 
-export const userEntitlements = pgTable(
+export const userEntitlements = snakeCase.table(
 	'user_entitlements',
 	{
 		id: text().primaryKey().notNull(),
@@ -86,7 +86,7 @@ export const userEntitlements = pgTable(
 	],
 )
 
-export const session = pgTable(
+export const session = snakeCase.table(
 	'session',
 	{
 		id: text().primaryKey().notNull(),
@@ -109,7 +109,7 @@ export const session = pgTable(
 	],
 )
 
-export const account = pgTable(
+export const account = snakeCase.table(
 	'account',
 	{
 		id: text().primaryKey().notNull(),
@@ -144,7 +144,7 @@ export const account = pgTable(
 	],
 )
 
-export const verification = pgTable(
+export const verification = snakeCase.table(
 	'verification',
 	{
 		id: text().primaryKey().notNull(),
@@ -157,7 +157,7 @@ export const verification = pgTable(
 	(table) => [index('verification_identifier_index').on(table.identifier)],
 )
 
-export const cities = pgTable(
+export const cities = snakeCase.table(
 	'cities',
 	{
 		id: uuid().primaryKey().notNull(),
@@ -173,7 +173,7 @@ export const cities = pgTable(
 	],
 )
 
-export const cityZips = pgTable(
+export const cityZips = snakeCase.table(
 	'city_zips',
 	{
 		id: text().primaryKey().notNull(),
@@ -205,7 +205,7 @@ export const cityZips = pgTable(
 
 export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
 
-export const clientProfiles = pgTable(
+export const clientProfiles = snakeCase.table(
 	'client_profiles',
 	{
 		id: text().primaryKey().notNull(),
@@ -239,7 +239,7 @@ export const clientProfiles = pgTable(
 	],
 )
 
-export const buyerDetails = pgTable(
+export const buyerDetails = snakeCase.table(
 	'buyer_details',
 	{
 		clientProfileId: text().primaryKey().notNull(),
@@ -256,7 +256,7 @@ export const buyerDetails = pgTable(
 	],
 )
 
-export const sellerDetails = pgTable(
+export const sellerDetails = snakeCase.table(
 	'seller_details',
 	{
 		clientProfileId: text().primaryKey().notNull(),
@@ -273,7 +273,7 @@ export const sellerDetails = pgTable(
 	],
 )
 
-export const agentProfiles = pgTable(
+export const agentProfiles = snakeCase.table(
 	'agent_profiles',
 	{
 		id: text().primaryKey().notNull(),
@@ -314,7 +314,7 @@ const profileZipColumns = {
 // `(id, cityId)` by composite foreign keys, so a row can only commit when
 // the zip belongs to the profile's city. Buyer and seller profiles share
 // `client_profiles`, so their zips share one join table.
-export const clientProfileZips = pgTable(
+export const clientProfileZips = snakeCase.table(
 	'client_profile_zips',
 	{
 		...profileZipColumns,
@@ -339,7 +339,7 @@ export const clientProfileZips = pgTable(
 	],
 )
 
-export const agentProfileZips = pgTable(
+export const agentProfileZips = snakeCase.table(
 	'agent_profile_zips',
 	{
 		...profileZipColumns,
