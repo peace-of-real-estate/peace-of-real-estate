@@ -9,7 +9,7 @@ import { requireUserId } from '@/lib/auth/session'
 
 import { Agent, Buyer, ProfileValidationError, Seller } from './repository'
 import {
-	agentInsertSchema,
+	agentCompletedDraftSchema,
 	buyerCompletedDraftSchema,
 	buyerDetailsInsertSchema,
 	buyerInsertSchema,
@@ -125,7 +125,7 @@ const loadAgentProfile = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 const createAgentProfile = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => agentInsertSchema.parse(data))
+	.validator((data: unknown) => agentCompletedDraftSchema.parse(data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const { zipCodes, ...values } = data

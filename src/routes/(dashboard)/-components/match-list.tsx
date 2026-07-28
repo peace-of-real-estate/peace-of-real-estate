@@ -1,4 +1,4 @@
-import { ClockIcon, MapPinIcon, UsersIcon } from '@phosphor-icons/react'
+import { ClockIcon, MapPinIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -61,12 +61,6 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 							<span className="flex items-center gap-1">
 								<ClockIcon className="h-3 w-3" />
 								{match.experience}
-							</span>
-						)}
-						{match.stats && (
-							<span className="flex items-center gap-1">
-								<UsersIcon className="h-3 w-3" />
-								{match.stats.transactions} deals
 							</span>
 						)}
 					</div>

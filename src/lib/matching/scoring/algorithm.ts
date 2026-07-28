@@ -347,9 +347,7 @@ function scoreSpecialization(
 ): DimensionResult {
 	const sources = expectedClientTypeSources(clientBySide)
 	const expected = [...sources.keys()]
-	const agentTypes = agent.bestClientTypes ?? []
-	const primary = agentTypes[0]
-	const secondary = agentTypes[1]
+	const primary = agent.bestClientType
 
 	const checks: SubCheck[] = []
 
@@ -357,7 +355,7 @@ function scoreSpecialization(
 		checks.push({
 			label: 'client signals',
 			client: '(none)',
-			agent: formatList(agentTypes),
+			agent: formatList([primary]),
 			passed: null,
 			effect: 'neutral 0.5',
 		})
@@ -373,11 +371,9 @@ function scoreSpecialization(
 	let creditedMatches = 0
 	for (const slug of expected) {
 		let match = 0
-		if (primary && slug === primary) match = 1.0
-		else if (secondary && slug === secondary) match = 0.6
+		if (slug === primary) match = 1.0
 		let source = sources.get(slug) ?? []
-		if (primary && slug === primary) source = [...source, 'primary']
-		else if (secondary && slug === secondary) source = [...source, 'secondary']
+		if (slug === primary) source = [...source, 'primary']
 		sum += match
 		if (match > 0) creditedMatches++
 		checks.push({
@@ -755,8 +751,7 @@ function evaluateDisqualifiers(
 	locationResult: DimensionResult,
 	priceResult: DimensionResult,
 ): DisqualifierTrace[] {
-	const sideMismatch =
-		agent.representationSide !== 'both' && agent.representationSide !== side
+	const sideMismatch = agent.representationSide !== side
 	const stateMismatch = client.city.state !== agent.city.state
 
 	const locationDisqualified = locationResult.score <= 0
