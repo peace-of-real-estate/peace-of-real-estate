@@ -1,4 +1,5 @@
 import {
+	BriefcaseIcon,
 	ChatIcon,
 	ClockIcon,
 	EnvelopeIcon,
@@ -38,6 +39,7 @@ const questionIconMap = {
 	representationPreference: ShieldIcon,
 
 	// Agent
+	bestClientType: BriefcaseIcon,
 	clientDescription: UserIcon,
 	communicationFrequency: ChatIcon,
 	difficultDealInstinct: ScalesIcon,
