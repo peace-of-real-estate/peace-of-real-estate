@@ -25,9 +25,6 @@ export interface AgentMatchData {
 	agency?: string
 	specialties: string[]
 	scores: Record<string, number>
-	stats?: {
-		transactions: string
-	}
 	avatar?: string
 }
 
@@ -55,13 +52,10 @@ export function toAgentMatchData({
 		date: new Date(agent.updatedAt).toLocaleDateString(),
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
-		specialties: agent.bestClientTypes,
+		specialties: [agent.bestClientType],
 		scores: Object.fromEntries(
 			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
 		),
-		...(agent.averageTransactions
-			? { stats: { transactions: agent.averageTransactions } }
-			: {}),
 		...(avatar ? { avatar } : {}),
 	}
 }

@@ -1,16 +1,8 @@
-import {
-	boolean,
-	integer,
-	pgEnum,
-	text,
-	timestamp,
-	uuid,
-} from 'drizzle-orm/pg-core'
+import { integer, pgEnum, text, uuid } from 'drizzle-orm/pg-core'
 
 import { BUCKET_ORDER } from '@/lib/price-range'
 import {
 	agentQuestions,
-	averageTransactions,
 	bestClientType,
 	buyerQuestions,
 	profileStatus,
@@ -31,7 +23,6 @@ function pgEnumFromDefinition<TSlug extends string>(definition: {
 export const profileStatusEnum = pgEnumFromDefinition(profileStatus)
 export const representationSideEnum = pgEnumFromDefinition(representationSide)
 export const yearsLicensedEnum = pgEnumFromDefinition(yearsLicensed)
-export const averageTransactionsEnum = pgEnumFromDefinition(averageTransactions)
 export const propertyTypeEnum = pgEnumFromDefinition(propertyType)
 export const bestClientTypeEnum = pgEnumFromDefinition(bestClientType)
 export const timelineEnum = pgEnumFromDefinition(timeline)
@@ -144,22 +135,14 @@ export const agentMatchingColumns = {
 	representationSide: representationSideEnum().notNull(),
 	cityId: uuid().notNull(),
 	typicalPriceRange: agentPriceBucketEnum().notNull(),
-	bestClientTypes: bestClientTypeEnum().array().notNull().default([]),
+	bestClientType: bestClientTypeEnum().notNull(),
 	notFitFor: text().array().notNull().default([]),
 }
 
 export const agentIdentityColumns = {
-	firstName: text().notNull(),
-	lastName: text().notNull(),
 	brokerageName: text().notNull(),
-	email: text(),
-	phone: text(),
-	businessAddress: text(),
 	licenseNumberState: text().notNull(),
 	yearsLicensed: yearsLicensedEnum(),
-	averageTransactions: averageTransactionsEnum(),
-	employmentStatus: text(),
-	licenseProof: text(),
 }
 
 export const agentQuizColumns = {
@@ -171,15 +154,4 @@ export const agentQuizColumns = {
 	responseTime: agentResponseTimeEnum().notNull(),
 	commissionApproach: agentCommissionApproachEnum().notNull(),
 	unrepresentedBuyerApproach: agentUnrepresentedBuyerApproachEnum().notNull(),
-}
-
-export const agentComplianceColumns = {
-	usePaxWriter: boolean().default(true).notNull(),
-	licenseAttested: boolean().default(false).notNull(),
-	eoInsuranceStatus: text().notNull(),
-	peacePactSigned: boolean().default(false).notNull(),
-	peacePactSignature: text().notNull(),
-	peacePactSignedAt: timestamp({
-		withTimezone: true,
-	}),
 }

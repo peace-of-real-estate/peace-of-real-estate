@@ -17,7 +17,6 @@ import {
 
 import { US_POSTAL_CODES } from '@/lib/geography/states'
 import {
-	agentComplianceColumns,
 	agentIdentityColumns,
 	agentMatchingColumns,
 	agentQuizColumns,
@@ -281,7 +280,6 @@ export const agentProfiles = snakeCase.table(
 		...agentMatchingColumns,
 		...agentIdentityColumns,
 		...agentQuizColumns,
-		...agentComplianceColumns,
 		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},

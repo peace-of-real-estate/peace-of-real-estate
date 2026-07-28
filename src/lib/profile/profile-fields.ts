@@ -22,7 +22,6 @@ export type ProfileStatus = SlugOf<typeof profileStatus>
 export const representationSide = defineEnum('representation_side', [
 	['buyer', 'Buyers'],
 	['seller', 'Sellers'],
-	['both', 'Both'],
 ])
 
 export type RepresentationSide = SlugOf<typeof representationSide>
@@ -35,15 +34,6 @@ export const yearsLicensed = defineEnum('years_licensed', [
 ])
 
 export type YearsLicensed = SlugOf<typeof yearsLicensed>
-
-export const averageTransactions = defineEnum('average_transactions', [
-	['0-5', '0-5 per year'],
-	['6-15', '6-15 per year'],
-	['16-30', '16-30 per year'],
-	['30+', '30+ per year'],
-])
-
-export type AverageTransactions = SlugOf<typeof averageTransactions>
 
 export const propertyType = defineEnum('property_type', [
 	['singleFamily', 'Single-Family'],
@@ -279,6 +269,11 @@ export type SellerQuestionId = (typeof sellerQuestionIds)[number]
 export const sellerQuestions = questionRecord(sellerQuestionList)
 
 const agentQuestionList = [
+	single('bestClientType', {
+		title: 'Where do you do your best work?',
+		label: 'Best work',
+		options: bestClientType,
+	}),
 	single('clientDescription', {
 		title: 'How would clients describe working with you?',
 		label: 'Client description',
