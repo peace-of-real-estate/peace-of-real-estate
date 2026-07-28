@@ -1,13 +1,4 @@
-import {
-	BriefcaseIcon,
-	ChartLineIcon,
-	MapPinIcon,
-	ScrollIcon,
-	ShieldCheckIcon,
-	UserIcon,
-	UsersIcon,
-	type Icon,
-} from '@phosphor-icons/react'
+import { ChartLineIcon, MapPinIcon, UserIcon } from '@phosphor-icons/react'
 import {
 	createFileRoute,
 	redirect,
@@ -18,11 +9,7 @@ import { getCurrentSession } from '@/lib/auth/session'
 import {
 	agentDraftSchema,
 	agentQuestionIds,
-	bestClientType,
 	loadExistingProfileRoles,
-	representationSide,
-	type BestClientTypeSlug,
-	type RepresentationSide,
 } from '@/lib/profile'
 import type { AgentDraft } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
@@ -33,13 +20,7 @@ import {
 	type SignupWizardStep,
 } from '../-components/signup-shell'
 
-export type AgentFlowStep =
-	| 'identity'
-	| 'market'
-	| 'preferences'
-	| 'compliance'
-	| 'peacePact'
-	| 'preview'
+export type AgentFlowStep = 'identity' | 'market' | 'preferences' | 'preview'
 
 export const agentDraftStorage = createLocalStorage<AgentDraft>(
 	'pre-agent-draft',
@@ -47,28 +28,10 @@ export const agentDraftStorage = createLocalStorage<AgentDraft>(
 )
 
 const agentFlowSteps = [
-	{ id: 'identity', label: 'Identity', icon: UserIcon },
+	{ id: 'identity', label: 'Practice', icon: UserIcon },
 	{ id: 'market', label: 'Market', icon: MapPinIcon },
 	{ id: 'preferences', label: 'Preferences', icon: ChartLineIcon },
-	{ id: 'compliance', label: 'Compliance', icon: ShieldCheckIcon },
-	{ id: 'peacePact', label: 'Peace Pact', icon: ScrollIcon },
 ] satisfies SignupWizardStep<Exclude<AgentFlowStep, 'preview'>>[]
-
-const representationSides: RepresentationSide[] = [...representationSide.slugs]
-
-export const agentConfig = {
-	basePath: '/signup/agent',
-	label: 'Agent',
-	intentOptions: representationSides,
-	clientOptions: [...bestClientType.slugs],
-	accent: 'amber',
-} satisfies {
-	basePath: '/signup/agent'
-	label: string
-	intentOptions: RepresentationSide[]
-	clientOptions: BestClientTypeSlug[]
-	accent: 'amber'
-}
 
 export const Route = createFileRoute('/signup/(steps)/agent')({
 	ssr: false,
@@ -94,11 +57,7 @@ function AgentWizardRoute() {
 			? 'market'
 			: pathname.endsWith('/preferences')
 				? 'preferences'
-				: pathname.endsWith('/compliance')
-					? 'compliance'
-					: pathname.endsWith('/peace-pact')
-						? 'peacePact'
-						: 'identity'
+				: 'identity'
 
 	return (
 		<SignupWizardShell
@@ -109,7 +68,7 @@ function AgentWizardRoute() {
 			basePath="/signup/agent"
 			getStepPath={stepPath}
 			getHasDraft={(draft) =>
-				draft.firstName !== undefined ||
+				draft.brokerageName !== undefined ||
 				draft.cityId !== undefined ||
 				draft.representationSide !== undefined
 			}
@@ -118,22 +77,18 @@ function AgentWizardRoute() {
 					.filter((step) => {
 						switch (step.id) {
 							case 'identity':
-								return Boolean(draft.firstName && draft.lastName)
-							case 'market':
 								return Boolean(
-									draft.cityId &&
-									draft.typicalPriceRange &&
+									draft.brokerageName &&
+									draft.licenseNumberState &&
+									draft.yearsLicensed &&
 									draft.representationSide,
 								)
+							case 'market':
+								return Boolean(draft.cityId && draft.typicalPriceRange)
 							case 'preferences':
 								return agentQuestionIds.every(
 									(id) => id in draft && isAnswered(draft[id]),
 								)
-
-							case 'compliance':
-								return Boolean(draft.licenseAttested && draft.eoInsuranceStatus)
-							case 'peacePact':
-								return Boolean(draft.peacePactSigned)
 						}
 					})
 					.map((step) => step.id)
@@ -144,12 +99,5 @@ function AgentWizardRoute() {
 
 function stepPath(step: AgentFlowStep) {
 	if (step === 'preview') return '/signup/preview/agent'
-	if (step === 'preferences') return 'preferences'
-	return step === 'peacePact' ? 'peace-pact' : step
-}
-
-export function getRepresentationIcon(side: RepresentationSide): Icon {
-	if (side === 'buyer') return UsersIcon
-	if (side === 'seller') return ChartLineIcon
-	return BriefcaseIcon
+	return step
 }

@@ -40,8 +40,6 @@ import { Route as ApiIngestStaticSplatRouteImport } from './routes/api/ingest.st
 import { Route as SignupstepsAgentstep1IdentityRouteImport } from './routes/signup/(steps)/agent/(step-1).identity'
 import { Route as SignupstepsAgentstep2MarketRouteImport } from './routes/signup/(steps)/agent/(step-2).market'
 import { Route as SignupstepsAgentstep3PreferencesRouteImport } from './routes/signup/(steps)/agent/(step-3).preferences'
-import { Route as SignupstepsAgentstep4ComplianceRouteImport } from './routes/signup/(steps)/agent/(step-4).compliance'
-import { Route as SignupstepsAgentstep5PeacePactRouteImport } from './routes/signup/(steps)/agent/(step-5).peace-pact'
 import { Route as SignupstepsBuyerstep1HomeRouteImport } from './routes/signup/(steps)/buyer/(step-1).home'
 import { Route as SignupstepsBuyerstep2LocationRouteImport } from './routes/signup/(steps)/buyer/(step-2).location'
 import { Route as SignupstepsBuyerstep3PreferencesRouteImport } from './routes/signup/(steps)/buyer/(step-3).preferences'
@@ -214,18 +212,6 @@ const SignupstepsAgentstep3PreferencesRoute =
     path: '/preferences',
     getParentRoute: () => SignupstepsAgentRouteRoute,
   } as any)
-const SignupstepsAgentstep4ComplianceRoute =
-  SignupstepsAgentstep4ComplianceRouteImport.update({
-    id: '/(step-4)/compliance',
-    path: '/compliance',
-    getParentRoute: () => SignupstepsAgentRouteRoute,
-  } as any)
-const SignupstepsAgentstep5PeacePactRoute =
-  SignupstepsAgentstep5PeacePactRouteImport.update({
-    id: '/(step-5)/peace-pact',
-    path: '/peace-pact',
-    getParentRoute: () => SignupstepsAgentRouteRoute,
-  } as any)
 const SignupstepsBuyerstep1HomeRoute =
   SignupstepsBuyerstep1HomeRouteImport.update({
     id: '/(step-1)/home',
@@ -295,8 +281,6 @@ export interface FileRoutesByFullPath {
   '/signup/agent/identity': typeof SignupstepsAgentstep1IdentityRoute
   '/signup/agent/market': typeof SignupstepsAgentstep2MarketRoute
   '/signup/agent/preferences': typeof SignupstepsAgentstep3PreferencesRoute
-  '/signup/agent/compliance': typeof SignupstepsAgentstep4ComplianceRoute
-  '/signup/agent/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
   '/signup/buyer/home': typeof SignupstepsBuyerstep1HomeRoute
   '/signup/buyer/location': typeof SignupstepsBuyerstep2LocationRoute
   '/signup/buyer/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
@@ -336,8 +320,6 @@ export interface FileRoutesByTo {
   '/signup/agent/identity': typeof SignupstepsAgentstep1IdentityRoute
   '/signup/agent/market': typeof SignupstepsAgentstep2MarketRoute
   '/signup/agent/preferences': typeof SignupstepsAgentstep3PreferencesRoute
-  '/signup/agent/compliance': typeof SignupstepsAgentstep4ComplianceRoute
-  '/signup/agent/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
   '/signup/buyer/home': typeof SignupstepsBuyerstep1HomeRoute
   '/signup/buyer/location': typeof SignupstepsBuyerstep2LocationRoute
   '/signup/buyer/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
@@ -378,8 +360,6 @@ export interface FileRoutesById {
   '/signup/(steps)/agent/(step-1)/identity': typeof SignupstepsAgentstep1IdentityRoute
   '/signup/(steps)/agent/(step-2)/market': typeof SignupstepsAgentstep2MarketRoute
   '/signup/(steps)/agent/(step-3)/preferences': typeof SignupstepsAgentstep3PreferencesRoute
-  '/signup/(steps)/agent/(step-4)/compliance': typeof SignupstepsAgentstep4ComplianceRoute
-  '/signup/(steps)/agent/(step-5)/peace-pact': typeof SignupstepsAgentstep5PeacePactRoute
   '/signup/(steps)/buyer/(step-1)/home': typeof SignupstepsBuyerstep1HomeRoute
   '/signup/(steps)/buyer/(step-2)/location': typeof SignupstepsBuyerstep2LocationRoute
   '/signup/(steps)/buyer/(step-3)/preferences': typeof SignupstepsBuyerstep3PreferencesRoute
@@ -421,8 +401,6 @@ export interface FileRouteTypes {
     | '/signup/agent/identity'
     | '/signup/agent/market'
     | '/signup/agent/preferences'
-    | '/signup/agent/compliance'
-    | '/signup/agent/peace-pact'
     | '/signup/buyer/home'
     | '/signup/buyer/location'
     | '/signup/buyer/preferences'
@@ -462,8 +440,6 @@ export interface FileRouteTypes {
     | '/signup/agent/identity'
     | '/signup/agent/market'
     | '/signup/agent/preferences'
-    | '/signup/agent/compliance'
-    | '/signup/agent/peace-pact'
     | '/signup/buyer/home'
     | '/signup/buyer/location'
     | '/signup/buyer/preferences'
@@ -503,8 +479,6 @@ export interface FileRouteTypes {
     | '/signup/(steps)/agent/(step-1)/identity'
     | '/signup/(steps)/agent/(step-2)/market'
     | '/signup/(steps)/agent/(step-3)/preferences'
-    | '/signup/(steps)/agent/(step-4)/compliance'
-    | '/signup/(steps)/agent/(step-5)/peace-pact'
     | '/signup/(steps)/buyer/(step-1)/home'
     | '/signup/(steps)/buyer/(step-2)/location'
     | '/signup/(steps)/buyer/(step-3)/preferences'
@@ -754,20 +728,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupstepsAgentstep3PreferencesRouteImport
       parentRoute: typeof SignupstepsAgentRouteRoute
     }
-    '/signup/(steps)/agent/(step-4)/compliance': {
-      id: '/signup/(steps)/agent/(step-4)/compliance'
-      path: '/compliance'
-      fullPath: '/signup/agent/compliance'
-      preLoaderRoute: typeof SignupstepsAgentstep4ComplianceRouteImport
-      parentRoute: typeof SignupstepsAgentRouteRoute
-    }
-    '/signup/(steps)/agent/(step-5)/peace-pact': {
-      id: '/signup/(steps)/agent/(step-5)/peace-pact'
-      path: '/peace-pact'
-      fullPath: '/signup/agent/peace-pact'
-      preLoaderRoute: typeof SignupstepsAgentstep5PeacePactRouteImport
-      parentRoute: typeof SignupstepsAgentRouteRoute
-    }
     '/signup/(steps)/buyer/(step-1)/home': {
       id: '/signup/(steps)/buyer/(step-1)/home'
       path: '/home'
@@ -864,16 +824,12 @@ interface SignupstepsAgentRouteRouteChildren {
   SignupstepsAgentstep1IdentityRoute: typeof SignupstepsAgentstep1IdentityRoute
   SignupstepsAgentstep2MarketRoute: typeof SignupstepsAgentstep2MarketRoute
   SignupstepsAgentstep3PreferencesRoute: typeof SignupstepsAgentstep3PreferencesRoute
-  SignupstepsAgentstep4ComplianceRoute: typeof SignupstepsAgentstep4ComplianceRoute
-  SignupstepsAgentstep5PeacePactRoute: typeof SignupstepsAgentstep5PeacePactRoute
 }
 
 const SignupstepsAgentRouteRouteChildren: SignupstepsAgentRouteRouteChildren = {
   SignupstepsAgentstep1IdentityRoute: SignupstepsAgentstep1IdentityRoute,
   SignupstepsAgentstep2MarketRoute: SignupstepsAgentstep2MarketRoute,
   SignupstepsAgentstep3PreferencesRoute: SignupstepsAgentstep3PreferencesRoute,
-  SignupstepsAgentstep4ComplianceRoute: SignupstepsAgentstep4ComplianceRoute,
-  SignupstepsAgentstep5PeacePactRoute: SignupstepsAgentstep5PeacePactRoute,
 }
 
 const SignupstepsAgentRouteRouteWithChildren =

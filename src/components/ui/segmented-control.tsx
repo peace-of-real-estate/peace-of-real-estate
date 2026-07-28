@@ -2,27 +2,27 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils/ui'
 
-type SegmentedControlOption = {
-	value: string
+type SegmentedControlOption<T extends string> = {
+	value: T
 	label: string
 	icon?: ReactNode
 }
 
-type SegmentedControlProps = {
-	options: SegmentedControlOption[]
-	value: string
-	onChange: (value: string) => void
+type SegmentedControlProps<T extends string> = {
+	options: SegmentedControlOption<T>[]
+	value: T | undefined
+	onChange: (value: T) => void
 	disabled?: boolean
 	className?: string
 }
 
-export function SegmentedControl({
+export function SegmentedControl<T extends string>({
 	options,
 	value,
 	onChange,
 	disabled = false,
 	className,
-}: SegmentedControlProps) {
+}: SegmentedControlProps<T>) {
 	return (
 		<div
 			className={cn('bg-muted grid w-full rounded-lg p-1 gap-1', className)}

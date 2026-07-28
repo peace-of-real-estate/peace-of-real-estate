@@ -1,23 +1,20 @@
-import { ArrowRightIcon } from '@phosphor-icons/react'
+import { ChartLineIcon, UsersIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import type { AgentDraft } from '@/lib/profile'
-import {
-	averageTransactions as averageTransactionsEnum,
-	parseSlug,
-	yearsLicensed as yearsLicensedEnum,
-} from '@/lib/profile'
+import { SegmentedControl } from '@/components/ui/segmented-control'
+import type { AgentDraft, RepresentationSide } from '@/lib/profile'
+import { representationSide, yearsLicensed } from '@/lib/profile'
 
 import {
 	AnimatedStepCard,
 	StepHeader,
 	useSignupWizardContext,
 } from '../-components/signup-shell'
+import { ContinueButton } from '../-components/ui/continue-button'
+import { FieldSection } from '../-components/ui/field-section'
 import type { AgentFlowStep } from './route'
 
 export const Route = createFileRoute('/signup/(steps)/agent/(step-1)/identity')(
@@ -41,6 +38,22 @@ function AgentIdentityRoute() {
 	)
 }
 
+const yearsLicensedOptions = yearsLicensed.slugs.map((slug) => ({
+	value: slug,
+	label: yearsLicensed.labels[slug].replace(' years', ''),
+}))
+
+const representationSideIcons = {
+	buyer: <UsersIcon className="h-4 w-4" weight="duotone" />,
+	seller: <ChartLineIcon className="h-4 w-4" weight="duotone" />,
+} satisfies Record<RepresentationSide, ReactNode>
+
+const representationSideOptions = representationSide.slugs.map((slug) => ({
+	value: slug,
+	label: representationSide.labels[slug],
+	icon: representationSideIcons[slug],
+}))
+
 function AgentIdentity({
 	state,
 	onUpdate,
@@ -50,202 +63,151 @@ function AgentIdentity({
 	onUpdate: (patch: Partial<AgentDraft>) => void
 	onContinue: () => void
 }) {
-	const [firstName, setFirstName] = useState(state.firstName ?? '')
-	const [lastName, setLastName] = useState(state.lastName ?? '')
 	const [brokerageName, setBrokerageName] = useState(state.brokerageName ?? '')
-	const [email, setEmail] = useState(state.email ?? '')
-	const [phone, setPhone] = useState(state.phone ?? '')
-	const [businessAddress, setBusinessAddress] = useState(
-		state.businessAddress ?? '',
-	)
 	const [licenseNumberState, setLicenseNumberState] = useState(
 		state.licenseNumberState ?? '',
 	)
-	const [licenseProof, setLicenseProof] = useState(state.licenseProof ?? '')
-	const [yearsLicensed, setYearsLicensed] = useState(state.yearsLicensed ?? '')
-	const [averageTransactions, setAverageTransactions] = useState(
-		state.averageTransactions ?? '',
+	const [yearsLicensedValue, setYearsLicensedValue] = useState(
+		state.yearsLicensed ?? undefined,
 	)
-	const [employmentStatus, setEmploymentStatus] = useState(
-		state.employmentStatus ?? '',
-	)
+	const [side, setSide] = useState(state.representationSide ?? undefined)
+	const [hasTriedContinue, setHasTriedContinue] = useState(false)
 
+	const brokerageComplete = brokerageName.trim().length > 0
+	const licenseComplete = licenseNumberState.trim().length > 0
 	const canContinue =
-		firstName.trim().length > 0 &&
-		lastName.trim().length > 0 &&
-		brokerageName.trim().length > 0 &&
-		licenseNumberState.trim().length > 0
+		brokerageComplete &&
+		licenseComplete &&
+		yearsLicensedValue !== undefined &&
+		side !== undefined
+
+	const showSideError = hasTriedContinue && !side
+	const showBrokerageError = hasTriedContinue && !brokerageComplete
+	const showLicenseError = hasTriedContinue && !licenseComplete
+	const showYearsError = hasTriedContinue && yearsLicensedValue === undefined
 
 	const handleContinue = () => {
-		if (!canContinue) return
+		if (!canContinue || !yearsLicensedValue || !side) {
+			setHasTriedContinue(true)
+			return
+		}
 		onUpdate({
-			firstName,
-			lastName,
-			brokerageName,
-			email,
-			phone,
-			businessAddress,
-			licenseNumberState,
-			licenseProof,
-			yearsLicensed: parseSlug(yearsLicensedEnum, yearsLicensed),
-			averageTransactions: parseSlug(
-				averageTransactionsEnum,
-				averageTransactions,
-			),
-			employmentStatus,
+			brokerageName: brokerageName.trim(),
+			licenseNumberState: licenseNumberState.trim(),
+			yearsLicensed: yearsLicensedValue,
+			representationSide: side,
 		})
 		onContinue()
-	}
-
-	const fillDebugData = () => {
-		setFirstName('Alex')
-		setLastName('Morgan')
-		setBrokerageName('PRE Realty Group')
-		setEmail('alex.morgan@example.com')
-		setPhone('555-123-4567')
-		setBusinessAddress('123 Main St, Austin, TX 78701')
-		setLicenseNumberState('TX-12345678')
-		setLicenseProof('https://license.example.com/alex-morgan')
-		setYearsLicensed('6-10')
-		setAverageTransactions('16-30')
-		setEmploymentStatus('Full time')
 	}
 
 	return (
 		<AnimatedStepCard stepKey="identity">
 			<Card size="sm" className="shadow-sm">
-				<CardContent className="space-y-6">
-					<div className="flex items-start justify-between gap-4">
-						<StepHeader stepNumber={1} totalSteps={5} title="Identity" />
-						{import.meta.env.DEV ? (
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={fillDebugData}
-								className="shrink-0"
-							>
-								Fill test data
-							</Button>
-						) : null}
-					</div>
+				<CardContent className="space-y-8">
+					<StepHeader stepNumber={1} totalSteps={3} title="Your practice" />
 
-					<div className="grid gap-4 sm:grid-cols-2">
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							First name
-							<Input
-								value={firstName}
-								onChange={(event) => setFirstName(event.target.value)}
-								placeholder="Jane"
+					<div className="space-y-8">
+						<FieldSection
+							title={
+								<span
+									className={showSideError ? 'text-destructive' : undefined}
+								>
+									Who do you represent?
+								</span>
+							}
+						>
+							<SegmentedControl
+								options={representationSideOptions}
+								value={side}
+								onChange={setSide}
 							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Last name
-							<Input
-								value={lastName}
-								onChange={(event) => setLastName(event.target.value)}
-								placeholder="Doe"
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Brokerage name
+							{showSideError ? (
+								<p role="alert" className="sr-only">
+									Select who you represent.
+								</p>
+							) : null}
+						</FieldSection>
+
+						<FieldSection
+							title={
+								<span
+									className={
+										showBrokerageError ? 'text-destructive' : undefined
+									}
+								>
+									Brokerage
+								</span>
+							}
+							description="The brokerage you hang your license with."
+						>
 							<Input
 								value={brokerageName}
 								onChange={(event) => setBrokerageName(event.target.value)}
+								placeholder="Harborline Realty"
+								autoComplete="organization"
+								aria-label="Brokerage"
+								aria-invalid={showBrokerageError || undefined}
+								aria-describedby={
+									showBrokerageError ? 'brokerage-error' : undefined
+								}
 							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Email
-							<Input
-								type="email"
-								value={email}
-								onChange={(event) => setEmail(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Phone
-							<Input
-								type="tel"
-								value={phone}
-								onChange={(event) => setPhone(event.target.value)}
-							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							License number & state
+							{showBrokerageError ? (
+								<p id="brokerage-error" className="text-destructive text-xs">
+									Enter your brokerage.
+								</p>
+							) : null}
+						</FieldSection>
+
+						<FieldSection
+							title={
+								<span
+									className={showLicenseError ? 'text-destructive' : undefined}
+								>
+									License number & state
+								</span>
+							}
+							description="We use this to verify your license is active."
+						>
 							<Input
 								value={licenseNumberState}
 								onChange={(event) => setLicenseNumberState(event.target.value)}
 								placeholder="CA-DRE-01234567"
+								aria-label="License number & state"
+								aria-invalid={showLicenseError || undefined}
+								aria-describedby={
+									showLicenseError ? 'license-error' : undefined
+								}
 							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase sm:col-span-2">
-							Business address
-							<Input
-								value={businessAddress}
-								onChange={(event) => setBusinessAddress(event.target.value)}
+							{showLicenseError ? (
+								<p id="license-error" className="text-destructive text-xs">
+									Enter your license number & state.
+								</p>
+							) : null}
+						</FieldSection>
+
+						<FieldSection
+							title={
+								<span
+									className={showYearsError ? 'text-destructive' : undefined}
+								>
+									Years licensed
+								</span>
+							}
+						>
+							<SegmentedControl
+								options={yearsLicensedOptions}
+								value={yearsLicensedValue}
+								onChange={setYearsLicensedValue}
 							/>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Years licensed
-							<select
-								value={yearsLicensed}
-								onChange={(event) => setYearsLicensed(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								{yearsLicensedEnum.slugs.map((option) => (
-									<option key={option} value={option}>
-										{yearsLicensedEnum.labels[option]}
-									</option>
-								))}
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Avg transactions / year
-							<select
-								value={averageTransactions}
-								onChange={(event) => setAverageTransactions(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								{averageTransactionsEnum.slugs.map((option) => (
-									<option key={option} value={option}>
-										{averageTransactionsEnum.labels[option]}
-									</option>
-								))}
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							Full / part time
-							<select
-								value={employmentStatus}
-								onChange={(event) => setEmploymentStatus(event.target.value)}
-								className="h-10 w-full rounded-md border px-3"
-							>
-								<option value="">Select...</option>
-								<option value="Full time">Full time</option>
-								<option value="Part time">Part time</option>
-							</select>
-						</Label>
-						<Label className="flex-col items-start gap-2 text-xs font-semibold tracking-wide uppercase">
-							License proof URL / note
-							<Input
-								value={licenseProof}
-								onChange={(event) => setLicenseProof(event.target.value)}
-							/>
-						</Label>
+							{showYearsError ? (
+								<p role="alert" className="sr-only">
+									Select your years licensed.
+								</p>
+							) : null}
+						</FieldSection>
 					</div>
 
-					<div>
-						<Button
-							onClick={handleContinue}
-							disabled={!canContinue}
-							size="lg"
-							className="w-full gap-2"
-						>
-							Continue
-							<ArrowRightIcon className="h-4 w-4" />
-						</Button>
-					</div>
+					<ContinueButton onClick={handleContinue} />
 				</CardContent>
 			</Card>
 		</AnimatedStepCard>
