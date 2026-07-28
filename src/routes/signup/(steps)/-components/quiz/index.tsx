@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import type {
 	FreeFormQuestion,
-	MultiQuestion,
 	Question,
 	QuestionRecord,
 	SingleQuestion,
@@ -18,7 +17,6 @@ import {
 	StepProgressHeader,
 } from '../signup-shell'
 import { FreeFormQuestionCard } from './free-form'
-import { MultiSelectQuestionCard } from './multi-question'
 import { QuestionPrompt } from './question-prompt'
 import { QuestionCard } from './single-question'
 import { useQuestionFlow } from './use-question-flow'
@@ -171,23 +169,6 @@ function QuizQuestionContent<
 					question={singleQuestion}
 					answer={singleAnswer}
 					onSelect={(value) =>
-						// oxlint-disable-next-line typescript/consistent-type-assertions
-						onSelect(value as TDraft[TQuestionId] | undefined)
-					}
-					disabled={disabled}
-				/>
-			)
-		}
-		case 'multi': {
-			// oxlint-disable-next-line typescript/consistent-type-assertions
-			const multiQuestion = question as MultiQuestion<TQuestionId, string>
-			// oxlint-disable-next-line typescript/consistent-type-assertions
-			const multiAnswer = (answer as string[] | null | undefined) ?? null
-			return (
-				<MultiSelectQuestionCard
-					question={multiQuestion}
-					answer={multiAnswer}
-					onChange={(value) =>
 						// oxlint-disable-next-line typescript/consistent-type-assertions
 						onSelect(value as TDraft[TQuestionId] | undefined)
 					}

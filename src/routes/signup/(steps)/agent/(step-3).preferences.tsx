@@ -27,7 +27,7 @@ function AgentPreferencesRoute() {
 		<PreferencesStep
 			title="Preferences"
 			stepNumber={3}
-			totalSteps={5}
+			totalSteps={3}
 			stepKey="preferences"
 			questionIds={agentWorkStyleQuestionIds}
 			questions={agentWorkStyleQuestions}
@@ -36,10 +36,10 @@ function AgentPreferencesRoute() {
 			goToStep={goToStep}
 			advanceOnSelect={(id) => agentWorkStyleQuestions[id].kind === 'single'}
 			isSkippable={(id) => id === notFitForQuestion.id}
-			onComplete={() => goToStep('compliance')}
+			onComplete={() => goToStep('preview')}
 			freeForm={{
 				isSkippable: (id) => id === notFitForQuestion.id,
-				onSkip: () => goToStep('compliance'),
+				onSkip: () => goToStep('preview'),
 			}}
 		/>
 	)
