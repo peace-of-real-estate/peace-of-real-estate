@@ -48,7 +48,7 @@ export function SelectionCard({
 			disabled={disabled}
 			aria-pressed={selected}
 			className={cn(
-				'group relative flex items-center gap-3 rounded-lg border px-4 py-4 text-left transition-all duration-150',
+				'group relative flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left transition-all duration-150',
 				isVertical && 'flex-col justify-center gap-2 py-5 text-center',
 				selected && variant === 'solid'
 					? 'border-primary bg-primary text-primary-foreground shadow-sm'

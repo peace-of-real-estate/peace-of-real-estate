@@ -148,10 +148,6 @@ function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 
 function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 	const summaryItems = getProfileSummary({ role: 'agent', profile })
-	const fullName = [profile.firstName, profile.lastName]
-		.filter(Boolean)
-		.join(' ')
-	const title = fullName || 'Your Agent Profile'
 	const subtitle = profile.brokerageName
 		? `${profile.brokerageName}${profile.zipCodes[0] ? ` · ${profile.zipCodes[0]}` : ''}`
 		: profile.zipCodes[0]
@@ -164,7 +160,7 @@ function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 				</div>
 				<div className="min-w-0 flex-1">
 					<h3 className="font-heading text-foreground text-xl font-bold tracking-tight">
-						{title}
+						How clients see you
 					</h3>
 					{subtitle ? (
 						<p className="text-muted-foreground text-sm">{subtitle}</p>
