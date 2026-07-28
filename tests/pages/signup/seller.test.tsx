@@ -6,11 +6,12 @@ import { test, vi, beforeEach, expect } from 'vitest'
 import type { SellerDraft } from '@/lib/profile'
 
 var mockSellerDraft: SellerDraft | null = null
+var saveSellerDraft = vi.fn()
 
 vi.mock('@/lib/utils/localstorage', () => ({
 	createLocalStorage: () => ({
 		load: () => mockSellerDraft,
-		save: () => {},
+		save: saveSellerDraft,
 		clear: () => {
 			mockSellerDraft = null
 		},
@@ -19,6 +20,7 @@ vi.mock('@/lib/utils/localstorage', () => ({
 
 beforeEach(() => {
 	mockSellerDraft = null
+	saveSellerDraft.mockReset()
 })
 
 const step1: SellerDraft = {
@@ -50,6 +52,35 @@ test('location step screenshot', async () => {
 	mockSellerDraft = step1
 	await renderRoute({ path: '/signup/seller/location' })
 	await expectScreenshot(document.body, { name: 'step-1-location' })
+})
+
+test('location step shows hint when continuing without a city', async () => {
+	await renderRoute({ path: '/signup/seller/location' })
+
+	await page.getByRole('button', { name: 'Continue' }).click()
+
+	await expect.element(page.getByText('Enter a city.')).toBeVisible()
+	expect(saveSellerDraft).not.toHaveBeenCalled()
+	await expect
+		.element(page.getByRole('heading', { name: 'Location', exact: true }))
+		.toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-1-location-error' })
+})
+
+test('home step shows hint when continuing without a home type', async () => {
+	mockSellerDraft = step1
+	await renderRoute({ path: '/signup/seller/home' })
+
+	await page.getByRole('button', { name: 'Continue' }).click()
+
+	await expect
+		.element(page.getByText('Select at least one home type.'))
+		.toBeVisible()
+	expect(saveSellerDraft).not.toHaveBeenCalled()
+	await expect
+		.element(page.getByRole('heading', { name: 'Home', exact: true }))
+		.toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-2-home-error' })
 })
 
 test('home step screenshot', async () => {
