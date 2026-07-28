@@ -36,7 +36,9 @@ export function LocationStep() {
 							label={null}
 						/>
 						{hasTriedContinue && !canContinue ? (
-							<p className="text-destructive text-xs">Enter a city.</p>
+							<p role="alert" className="text-destructive text-xs">
+								Enter a city.
+							</p>
 						) : null}
 					</div>
 					<ContinueButton
