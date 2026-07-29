@@ -1,0 +1,2 @@
+[[post-create]]
+bootstrap = "./scripts/bootstrap.sh"
