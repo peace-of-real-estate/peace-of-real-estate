@@ -1,18 +1,8 @@
 import { formatCityName } from '@/lib/geography/zip'
-import { enjoyedClientType } from '@/lib/profile/profile-fields'
+import { enjoyedClientType, specialty } from '@/lib/profile/profile-fields'
 import type { AgentProfile } from '@/lib/profile/types'
 
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
-
-const DIMENSIONS: ScoreBucket[] = [
-	'Location',
-	'Price Fit',
-	'Specialization',
-	'Decision Support',
-	'Communication',
-	'Risk Comfort',
-	'Commission',
-]
 
 export interface AgentMatchData {
 	id: string
@@ -25,8 +15,9 @@ export interface AgentMatchData {
 	date: string
 	experience?: string
 	agency?: string
-	enjoyedClients?: string
-	scores: Record<string, number>
+	enjoyedClients: string
+	specialties: string
+	scores: Record<ScoreBucket, number>
 	avatar?: string
 }
 
@@ -35,6 +26,13 @@ interface ToAgentMatchDataInput {
 	user: { name: string; email: string }
 	score: FitScoreResult
 	avatar?: string | undefined
+}
+
+function formatEnumList<TSlug extends string>(
+	values: readonly TSlug[],
+	labels: Readonly<Record<TSlug, string>>,
+): string {
+	return values.map((value) => labels[value]).join(', ')
 }
 
 export function toAgentMatchData({
@@ -54,16 +52,12 @@ export function toAgentMatchData({
 		date: new Date(agent.updatedAt).toLocaleDateString(),
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
-		...(agent.enjoyedClients.length
-			? {
-					enjoyedClients: agent.enjoyedClients
-						.map((slug) => enjoyedClientType.labels[slug])
-						.join(', '),
-				}
-			: {}),
-		scores: Object.fromEntries(
-			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
+		enjoyedClients: formatEnumList(
+			agent.enjoyedClients,
+			enjoyedClientType.labels,
 		),
+		specialties: formatEnumList(agent.specialties, specialty.labels),
+		scores: { ...score.scores },
 		...(avatar ? { avatar } : {}),
 	}
 }

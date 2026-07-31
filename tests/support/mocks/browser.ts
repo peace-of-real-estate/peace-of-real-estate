@@ -22,6 +22,14 @@ export function setMockAgentProfile(profile: unknown) {
 	profileState.agentProfile = profile
 }
 
+const adminState = vi.hoisted<{ isAdmin: boolean }>(() => ({
+	isAdmin: false,
+}))
+
+export function setMockIsAdmin(isAdmin: boolean) {
+	adminState.isAdmin = isAdmin
+}
+
 vi.mock('@/lib/auth/client', () => ({
 	authClient: {
 		useSession: () => ({ data: authState.session, isPending: false }),
@@ -39,9 +47,6 @@ vi.mock('@/lib/auth/client', () => ({
 }))
 
 vi.mock('@/lib/auth/functions', () => ({
-	getCurrentSession: () => authState.session,
-	redirectAuthenticatedUsers: () => undefined,
-	redirectUnauthenticatedUsers: () => ({ session: authState.session }),
 	authenticateBeta: async () => ({ success: true }),
 	hasBetaAccess: () => true,
 }))
@@ -50,6 +55,32 @@ vi.mock('@/lib/auth/session', () => ({
 	getCurrentSession: () => Promise.resolve(authState.session),
 	requireUserId: () => Promise.resolve('user-1'),
 }))
+
+vi.mock('@/lib/auth/is-admin', () => ({
+	getIsAdmin: () => Promise.resolve(adminState.isAdmin),
+}))
+
+vi.mock('@/lib/auth/redirects', async () => {
+	const { redirect } = await import('@tanstack/react-router')
+	return {
+		redirectAuthenticatedUsers: () => undefined,
+		redirectUnauthenticatedUsers: ({ redirectTo }: { redirectTo: string }) => {
+			if (!authState.session) {
+				throw redirect({ to: '/auth/login', search: { redirect: redirectTo } })
+			}
+			return authState.session
+		},
+		redirectNonAdminUsers: ({ redirectTo }: { redirectTo: string }) => {
+			if (!authState.session) {
+				throw redirect({ to: '/auth/login', search: { redirect: redirectTo } })
+			}
+			if (!adminState.isAdmin) {
+				throw redirect({ to: '/' })
+			}
+			return authState.session
+		},
+	}
+})
 
 vi.mock('@/routes/__root', async () => {
 	const React = await import('react')
