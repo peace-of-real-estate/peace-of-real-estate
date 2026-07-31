@@ -41,6 +41,7 @@ import {
 	ACTIVE_STATUSES,
 	isClosedStatus,
 	PAIR_BLOCKING_STATUSES,
+	type IntroductionNotificationKind,
 } from './intro-data'
 import type { IntroAccessWindow } from './types'
 import {
@@ -67,6 +68,31 @@ export type AcceptResult =
 	| { ok: false; error: GuardError }
 
 export type MutationResult = { ok: true } | { ok: false; error: GuardError }
+
+class IntroductionVanishedError extends Error {
+	constructor() {
+		super('Introduction vanished before the transaction could lock it.')
+		this.name = 'IntroductionVanishedError'
+	}
+}
+
+const INTRODUCTION_NOT_FOUND: GuardError = {
+	code: 'NOT_FOUND',
+	message: 'Introduction not found.',
+}
+
+async function catchingVanished<T>(
+	fn: () => Promise<T>,
+): Promise<T | { ok: false; error: GuardError }> {
+	try {
+		return await fn()
+	} catch (error) {
+		if (error instanceof IntroductionVanishedError) {
+			return { ok: false, error: INTRODUCTION_NOT_FOUND }
+		}
+		throw error
+	}
+}
 
 // ===== Client ================================================================
 
@@ -117,6 +143,7 @@ export const Client = {
 					gt(introAccessWindows.endsAt, new Date()),
 				),
 			)
+			.orderBy(desc(introAccessWindows.endsAt))
 			.limit(1)
 		return window ?? null
 	},
@@ -255,30 +282,32 @@ export const Client = {
 		const loaded = await loadIntroductionForUpdate(db, input.introductionId)
 		if (!loaded.ok) return loaded
 
-		return loaded.run(async (tx, intro) => {
-			const now = new Date()
-			const withdrawGuard = checkWithdrawable(intro, now)
-			if (withdrawGuard) return { ok: false as const, error: withdrawGuard }
+		return catchingVanished(() =>
+			loaded.run(async (tx, intro) => {
+				const now = new Date()
+				const withdrawGuard = checkWithdrawable(intro, now)
+				if (withdrawGuard) return { ok: false as const, error: withdrawGuard }
 
-			await tx
-				.update(introductions)
-				.set({
-					status: 'withdrawn',
-					closedAt: now,
-					updatedAt: now,
-				})
-				.where(eq(introductions.id, intro.id))
-			await tx
-				.delete(introductionNotificationJobs)
-				.where(
-					and(
-						eq(introductionNotificationJobs.introductionId, intro.id),
-						eq(introductionNotificationJobs.kind, 'sent'),
-						isNull(introductionNotificationJobs.sentAt),
-					),
-				)
-			return { ok: true as const }
-		})
+				await tx
+					.update(introductions)
+					.set({
+						status: 'withdrawn',
+						closedAt: now,
+						updatedAt: now,
+					})
+					.where(eq(introductions.id, intro.id))
+				await tx
+					.delete(introductionNotificationJobs)
+					.where(
+						and(
+							eq(introductionNotificationJobs.introductionId, intro.id),
+							eq(introductionNotificationJobs.kind, 'sent'),
+							isNull(introductionNotificationJobs.sentAt),
+						),
+					)
+				return { ok: true as const }
+			}),
+		)
 	},
 
 	async list(
@@ -338,28 +367,30 @@ export const Agent = {
 		const loaded = await loadIntroductionForUpdate(db, input.introductionId)
 		if (!loaded.ok) return loaded
 
-		return loaded.run(async (tx, intro) => {
-			const pendingGuard = checkPending(intro.status)
-			if (pendingGuard) return { ok: false as const, error: pendingGuard }
+		return catchingVanished(() =>
+			loaded.run(async (tx, intro) => {
+				const pendingGuard = checkPending(intro.status)
+				if (pendingGuard) return { ok: false as const, error: pendingGuard }
 
-			const window = await Client.getActiveWindow(tx, intro.clientProfileId)
-			const now = new Date()
-			const connect = window !== null
-			const status = connect ? ('connected' as const) : ('accepted' as const)
+				const window = await Client.getActiveWindow(tx, intro.clientProfileId)
+				const now = new Date()
+				const connect = window !== null
+				const status = connect ? ('connected' as const) : ('accepted' as const)
 
-			await tx
-				.update(introductions)
-				.set({
-					status,
-					acceptedAt: now,
-					connectedAt: connect ? now : null,
-					updatedAt: now,
-				})
-				.where(eq(introductions.id, intro.id))
-			if (connect) await queueConnectedNotifications(tx, [intro.id])
-			else await queueNotifications(tx, [intro.id], 'accepted')
-			return { ok: true as const, status }
-		})
+				await tx
+					.update(introductions)
+					.set({
+						status,
+						acceptedAt: now,
+						connectedAt: connect ? now : null,
+						updatedAt: now,
+					})
+					.where(eq(introductions.id, intro.id))
+				if (connect) await queueConnectedNotifications(tx, [intro.id])
+				else await queueNotifications(tx, [intro.id], 'accepted')
+				return { ok: true as const, status }
+			}),
+		)
 	},
 
 	async decline(
@@ -369,22 +400,24 @@ export const Agent = {
 		const loaded = await loadIntroductionForUpdate(db, input.introductionId)
 		if (!loaded.ok) return loaded
 
-		return loaded.run(async (tx, intro) => {
-			const pendingGuard = checkPending(intro.status)
-			if (pendingGuard) return { ok: false as const, error: pendingGuard }
+		return catchingVanished(() =>
+			loaded.run(async (tx, intro) => {
+				const pendingGuard = checkPending(intro.status)
+				if (pendingGuard) return { ok: false as const, error: pendingGuard }
 
-			const now = new Date()
-			await tx
-				.update(introductions)
-				.set({
-					status: 'declined',
-					closedAt: now,
-					updatedAt: now,
-				})
-				.where(eq(introductions.id, intro.id))
-			await queueNotifications(tx, [intro.id], 'declined')
-			return { ok: true as const }
-		})
+				const now = new Date()
+				await tx
+					.update(introductions)
+					.set({
+						status: 'declined',
+						closedAt: now,
+						updatedAt: now,
+					})
+					.where(eq(introductions.id, intro.id))
+				await queueNotifications(tx, [intro.id], 'declined')
+				return { ok: true as const }
+			}),
+		)
 	},
 
 	async list(db: Db, agentProfileId: string): Promise<AgentIntroView[]> {
@@ -412,14 +445,20 @@ export const Agent = {
 		const distinctProfiles = [
 			...new Map(rows.map((row) => [row.profile.id, row.profile])).values(),
 		]
-		const flatProfiles = new Map<string, ClientProfile | undefined>(
+		const flatProfiles = new Map<string, ClientProfile | undefined>()
+		for (
+			let index = 0;
+			index < distinctProfiles.length;
+			index += FLAT_PROFILE_LOAD_CONCURRENCY
+		) {
 			await Promise.all(
-				distinctProfiles.map(
-					async (profile) =>
-						[profile.id, await loadFlatProfile(profile, db)] as const,
-				),
-			),
-		)
+				distinctProfiles
+					.slice(index, index + FLAT_PROFILE_LOAD_CONCURRENCY)
+					.map(async (profile) => {
+						flatProfiles.set(profile.id, await loadFlatProfile(profile, db))
+					}),
+			)
+		}
 
 		return rows.flatMap((row) => {
 			const flatProfile = flatProfiles.get(row.profile.id)
@@ -464,6 +503,7 @@ export const System = {
 		clientProfileId: string,
 		introductionIds?: string[],
 	): Promise<string[]> {
+		if (introductionIds && introductionIds.length === 0) return []
 		await System.lockProfile(tx, clientProfileId)
 		const now = new Date()
 		const rows = await tx
@@ -491,6 +531,10 @@ export const System = {
 
 // ===== Internals (unexported) ================================================
 
+// Bounds concurrent flat-profile loads so large intro lists cannot exhaust
+// the database pool.
+const FLAT_PROFILE_LOAD_CONCURRENCY = 8
+
 async function queueConnectedNotifications(
 	tx: Tx,
 	introductionIds: string[],
@@ -505,7 +549,7 @@ async function queueConnectedNotifications(
 async function queueNotifications(
 	tx: Tx,
 	introductionIds: string[],
-	kind: 'sent' | 'accepted' | 'declined',
+	kind: IntroductionNotificationKind,
 ): Promise<void> {
 	if (introductionIds.length === 0) return
 	await tx
@@ -539,10 +583,7 @@ async function loadIntroductionForUpdate(
 		.where(eq(introductions.id, introductionId))
 		.limit(1)
 	if (!intro) {
-		return {
-			ok: false,
-			error: { code: 'NOT_FOUND', message: 'Introduction not found.' },
-		}
+		return { ok: false, error: INTRODUCTION_NOT_FOUND }
 	}
 	return {
 		ok: true,
@@ -555,7 +596,8 @@ async function loadIntroductionForUpdate(
 					.from(introductions)
 					.where(eq(introductions.id, introductionId))
 					.limit(1)
-				return fn(tx, locked ?? intro)
+				if (!locked) throw new IntroductionVanishedError()
+				return fn(tx, locked)
 			}),
 	}
 }

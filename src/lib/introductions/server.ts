@@ -103,7 +103,10 @@ export const sendIntroductions = createServerFn({ method: 'POST' })
 		await requireOwnedClientProfile(userId, data.clientProfileId)
 		const result = await Client.send(db, data)
 		if (result.ok) {
-			void retryIntroductionNotifications(db, {
+			// Awaited so the first delivery attempt finishes before the response;
+			// fire-and-forget work can be dropped once the response completes.
+			// Retry-on-read in the getters stays as the fallback.
+			await retryIntroductionNotifications(db, {
 				introductionIds: result.ids,
 			})
 		}

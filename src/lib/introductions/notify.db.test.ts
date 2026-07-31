@@ -69,7 +69,7 @@ test('does not deliver a queued sent email after withdrawal', async ({
 		.select()
 		.from(introductionNotificationJobs)
 		.where(eq(introductionNotificationJobs.introductionId, intro.id))
-	expect(job?.sentAt).not.toBeNull()
+	expect(job?.sentAt).toEqual(expect.any(Date))
 })
 
 test('withdrawal cancels an unsent introduction email', async ({ db }) => {
@@ -129,7 +129,7 @@ test('failed lifecycle email remains queued and can be retried', async ({
 		.select()
 		.from(introductionNotificationJobs)
 		.where(eq(introductionNotificationJobs.introductionId, intro.id))
-	expect(job?.sentAt).not.toBeNull()
+	expect(job?.sentAt).toEqual(expect.any(Date))
 	expect(mocks.sendIntroAcceptedEmail).toHaveBeenLastCalledWith(
 		expect.objectContaining({ idempotencyKey: `intro-accepted-${intro.id}` }),
 	)
@@ -171,7 +171,7 @@ test('checkpoints each recipient independently with stable idempotency keys', as
 		.from(connectionNotificationJobs)
 		.where(eq(connectionNotificationJobs.introductionId, intro.id))
 	expect(job?.agentSentAt).toBeNull()
-	expect(job?.clientSentAt).not.toBeNull()
+	expect(job?.clientSentAt).toEqual(expect.any(Date))
 
 	mocks.sendConnectedAgentEmail.mockResolvedValue(undefined)
 	await notifyConnected(db, { introductionIds: [intro.id] })

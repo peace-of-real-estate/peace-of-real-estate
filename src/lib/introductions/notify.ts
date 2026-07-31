@@ -84,7 +84,7 @@ function notificationScopeFilter(
 async function deliverLifecycleNotifications(
 	db: Db,
 	introductionIds: string[],
-	kind: 'sent' | 'accepted' | 'declined',
+	kind: IntroductionNotificationKind,
 ): Promise<void> {
 	if (introductionIds.length === 0) return
 	const jobs = await db
@@ -104,16 +104,32 @@ async function deliverLifecycleNotifications(
 	)
 	const byIntroductionId = new Map(rows.map((row) => [row.intro.id, row]))
 	const errors: unknown[] = []
-	const markJobSent = (jobId: string) =>
-		db
+	// Claim-before-send: only the reader that flips sentAt from null may
+	// deliver, so concurrent readers cannot invoke the email provider twice.
+	// A failed delivery releases the claim so the job stays retryable.
+	const claimJob = async (jobId: string) => {
+		const claimed = await db
 			.update(introductionNotificationJobs)
 			.set({ sentAt: new Date() })
+			.where(
+				and(
+					eq(introductionNotificationJobs.id, jobId),
+					isNull(introductionNotificationJobs.sentAt),
+				),
+			)
+			.returning({ id: introductionNotificationJobs.id })
+		return claimed.length > 0
+	}
+	const releaseJob = (jobId: string) =>
+		db
+			.update(introductionNotificationJobs)
+			.set({ sentAt: null })
 			.where(eq(introductionNotificationJobs.id, jobId))
 	for (const job of jobs) {
+		if (!(await claimJob(job.id))) continue
 		const row = byIntroductionId.get(job.introductionId)
 		if (!row) {
 			// The introduction no longer resolves; the job can never deliver.
-			await markJobSent(job.id)
 			continue
 		}
 		try {
@@ -143,11 +159,17 @@ async function deliverLifecycleNotifications(
 				// The connected notification supersedes an acceptance email.
 			} else {
 				// The status moved past this kind; the job is stale.
-				await markJobSent(job.id)
 				continue
 			}
-			await markJobSent(job.id)
 		} catch (error) {
+			try {
+				await releaseJob(job.id)
+			} catch (releaseError) {
+				console.error(
+					`Intro notification claim release failed (${job.id}):`,
+					releaseError,
+				)
+			}
 			errors.push(error)
 		}
 	}
@@ -228,10 +250,57 @@ export async function notifyConnected(
 	const errors: unknown[] = []
 	for (const { job } of jobs) {
 		const row = byIntroductionId.get(job.introductionId)
-		if (!row || row.intro.status !== 'connected') continue
+		if (!row || row.intro.status !== 'connected') {
+			// Unresolvable or no longer connected; retire the job so it does
+			// not stay pending for future selections.
+			const now = new Date()
+			await db
+				.update(connectionNotificationJobs)
+				.set({
+					agentSentAt: job.agentSentAt ?? now,
+					clientSentAt: job.clientSentAt ?? now,
+				})
+				.where(
+					eq(connectionNotificationJobs.introductionId, job.introductionId),
+				)
+			continue
+		}
 		const agentName = row.agentUserName
 		const agentEmail = row.agentUserEmail
-		if (!job.agentSentAt) {
+		// Claim-before-send: flip the side's timestamp under an isNull guard
+		// before calling the provider so concurrent callers cannot both send.
+		// A failed delivery releases the claim so the side stays retryable.
+		const claimSide = async (column: 'agentSentAt' | 'clientSentAt') => {
+			const claimed = await db
+				.update(connectionNotificationJobs)
+				.set({ [column]: new Date() })
+				.where(
+					and(
+						eq(connectionNotificationJobs.introductionId, job.introductionId),
+						isNull(connectionNotificationJobs[column]),
+					),
+				)
+				.returning({
+					introductionId: connectionNotificationJobs.introductionId,
+				})
+			return claimed.length > 0
+		}
+		const releaseSide = async (column: 'agentSentAt' | 'clientSentAt') => {
+			try {
+				await db
+					.update(connectionNotificationJobs)
+					.set({ [column]: null })
+					.where(
+						eq(connectionNotificationJobs.introductionId, job.introductionId),
+					)
+			} catch (releaseError) {
+				console.error(
+					`Connection notification claim release failed (${job.introductionId}, ${column}):`,
+					releaseError,
+				)
+			}
+		}
+		if (!job.agentSentAt && (await claimSide('agentSentAt'))) {
 			try {
 				await sendConnectedAgentEmail({
 					to: agentEmail,
@@ -239,15 +308,12 @@ export async function notifyConnected(
 					clientEmail: row.clientEmail,
 					idempotencyKey: `intro-connected-agent-${row.intro.id}`,
 				})
-				await db
-					.update(connectionNotificationJobs)
-					.set({ agentSentAt: new Date() })
-					.where(eq(connectionNotificationJobs.introductionId, row.intro.id))
 			} catch (error) {
+				await releaseSide('agentSentAt')
 				errors.push(error)
 			}
 		}
-		if (!job.clientSentAt) {
+		if (!job.clientSentAt && (await claimSide('clientSentAt'))) {
 			try {
 				await sendConnectedClientEmail({
 					to: row.clientEmail,
@@ -256,11 +322,8 @@ export async function notifyConnected(
 					role: row.profile.role,
 					idempotencyKey: `intro-connected-client-${row.intro.id}`,
 				})
-				await db
-					.update(connectionNotificationJobs)
-					.set({ clientSentAt: new Date() })
-					.where(eq(connectionNotificationJobs.introductionId, row.intro.id))
 			} catch (error) {
+				await releaseSide('clientSentAt')
 				errors.push(error)
 			}
 		}

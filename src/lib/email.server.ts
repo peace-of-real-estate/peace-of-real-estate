@@ -27,6 +27,14 @@ export function escapeEmailHtml(value: string): string {
 	)
 }
 
+// CR/LF in a subject can inject extra headers or mangle the subject line.
+function sanitizeSubjectName(value: string): string {
+	return value
+		.replace(/[\r\n]+/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim()
+}
+
 function appUrl(path: string): string {
 	return `${new URL(env.BETTER_AUTH_URL).origin}${path}`
 }
@@ -146,7 +154,7 @@ export async function sendIntroAcceptedEmail({
 	const url = appUrl(clientIntroductionsPath(role))
 	await deliver({
 		to,
-		subject: `${agentName} accepted your introduction`,
+		subject: `${sanitizeSubjectName(agentName)} accepted your introduction`,
 		html: `<p>${escapeEmailHtml(agentName)} accepted your introduction request.</p><p>Unlock their contact info: <a href="${url}">${url}</a></p>`,
 		text: `${agentName} accepted your introduction request. Unlock their contact info: ${url}`,
 		devSummary: `${agentName} accepted: ${url}`,
@@ -187,7 +195,7 @@ export async function sendConnectedAgentEmail({
 }) {
 	await deliver({
 		to,
-		subject: `You're connected with ${clientName}`,
+		subject: `You're connected with ${sanitizeSubjectName(clientName)}`,
 		html: `<p>You're now connected with ${escapeEmailHtml(clientName)} on Peace of Real Estate.</p><p>Reach them directly at <a href="mailto:${escapeEmailHtml(clientEmail)}">${escapeEmailHtml(clientEmail)}</a>.</p>`,
 		text: `You're now connected with ${clientName} on Peace of Real Estate. Reach them directly at ${clientEmail}.`,
 		devSummary: `Connected with ${clientName} <${clientEmail}>`,
@@ -211,7 +219,7 @@ export async function sendConnectedClientEmail({
 	const url = appUrl(clientIntroductionsPath(role))
 	await deliver({
 		to,
-		subject: `You're connected with ${agentName}`,
+		subject: `You're connected with ${sanitizeSubjectName(agentName)}`,
 		html: `<p>You're now connected with ${escapeEmailHtml(agentName)} on Peace of Real Estate.</p><p>Reach them directly at <a href="mailto:${escapeEmailHtml(agentEmail)}">${escapeEmailHtml(agentEmail)}</a>.</p><p>Your introductions: <a href="${url}">${url}</a></p>`,
 		text: `You're now connected with ${agentName} on Peace of Real Estate. Reach them directly at ${agentEmail}. Your introductions: ${url}`,
 		devSummary: `Connected with ${agentName} <${agentEmail}>: ${url}`,

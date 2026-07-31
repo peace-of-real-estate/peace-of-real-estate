@@ -10,6 +10,12 @@ export const INTRODUCTION_STATUSES: [
 
 export type IntroductionStatus = (typeof INTRODUCTION_STATUSES)[number]
 
+export const INTRODUCTION_NOTIFICATION_KINDS: ['sent', 'accepted', 'declined'] =
+	['sent', 'accepted', 'declined']
+
+export type IntroductionNotificationKind =
+	(typeof INTRODUCTION_NOTIFICATION_KINDS)[number]
+
 export type LifecycleTimestampField = 'acceptedAt' | 'connectedAt' | 'closedAt'
 
 type StatusSpec = {

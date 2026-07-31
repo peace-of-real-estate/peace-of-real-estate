@@ -20,6 +20,7 @@ import { US_POSTAL_CODES } from '@/lib/geography/states'
 import {
 	ACTIVE_STATUSES,
 	buildIntroductionDataChecks,
+	INTRODUCTION_NOTIFICATION_KINDS,
 	INTRODUCTION_STATUSES,
 	PAIR_BLOCKING_STATUSES,
 	statusIn,
@@ -352,7 +353,7 @@ export const introductionStatus = pgEnum(
 
 export const introductionNotificationKind = pgEnum(
 	'introduction_notification_kind',
-	['sent', 'accepted', 'declined'],
+	INTRODUCTION_NOTIFICATION_KINDS,
 )
 
 export const agentProfileZips = snakeCase.table(
