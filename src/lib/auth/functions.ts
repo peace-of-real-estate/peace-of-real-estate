@@ -1,36 +1,9 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
 
 import { serverEnv as env } from '@/env.server'
-import { getUserDashboardPath } from '@/lib/profile/server'
-
-import { getCurrentSession } from './session'
-
-export async function redirectAuthenticatedUsers() {
-	const session = await getCurrentSession()
-
-	if (session) {
-		const dashboardPath = await getUserDashboardPath()
-		throw redirect({ to: dashboardPath })
-	}
-}
-
-export async function redirectUnauthenticatedUsers({
-	redirectTo,
-}: {
-	redirectTo: string
-}) {
-	const session = await getCurrentSession()
-
-	if (!session) {
-		throw redirect({ to: '/auth/login', search: { redirect: redirectTo } })
-	}
-
-	return session
-}
 
 const BETA_COOKIE = 'beta_auth'
 const BETA_VALUE = 'true'

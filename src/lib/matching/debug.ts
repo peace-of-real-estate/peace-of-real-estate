@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { db } from '@/db/connection'
 import { cities, clientProfiles, clientRole, user } from '@/db/schema'
-import { requireUserId } from '@/lib/auth/session'
+import { requireAdmin } from '@/lib/auth/session'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { formatCityName } from '@/lib/geography/zip'
 import { buildScoreDistribution } from '@/lib/matching/match.view'
@@ -157,7 +157,8 @@ function scoredAgentToDebugMatch(
 
 export const loadDebugClientOptions = createServerFn({ method: 'GET' }).handler(
 	async (): Promise<DebugClientOption[]> => {
-		await requireUserId()
+		await requireAdmin()
+
 		const clients = await db
 			.select({
 				profile: clientProfiles,
@@ -239,7 +240,7 @@ export const loadDebugMatches = createServerFn({ method: 'GET' })
 		loadDebugMatchesInput.parse(data),
 	)
 	.handler(async ({ data }): Promise<DebugMatchesPayload> => {
-		await requireUserId()
+		await requireAdmin()
 
 		const { profile, scored } = await loadScoreAgentsForProfile({ data })
 		return buildDebugPayload(profile, data.side, scored)

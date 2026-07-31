@@ -391,27 +391,32 @@ describe('checkout reservation', () => {
 	test('concurrent checkout requests share one reservation and idempotency key', async ({
 		db,
 	}) => {
-		const { client, intro } = await seedAcceptedPair(db)
-		const input = {
-			userId: client.user.id,
-			role: 'buyer' as const,
-			origin: 'https://example.test',
-			returnPath: '/buyer/introductions',
-			introductionIds: [intro.id],
+		vi.useFakeTimers({ toFake: ['Date'] })
+		try {
+			const { client, intro } = await seedAcceptedPair(db)
+			const input = {
+				userId: client.user.id,
+				role: 'buyer' as const,
+				origin: 'https://example.test',
+				returnPath: '/buyer/introductions',
+				introductionIds: [intro.id],
+			}
+
+			const sessions = await Promise.all([
+				createIntroUnlockCheckout(db, input),
+				createIntroUnlockCheckout(db, input),
+			])
+
+			const reservations = await db.select().from(introCheckoutReservations)
+			expect(reservations).toHaveLength(1)
+			expect(new Set(sessions.map((session) => session.sessionId)).size).toBe(1)
+			const idempotencyKeys = mocks.createSession.mock.calls.map(
+				(call) => call[1].idempotencyKey,
+			)
+			expect(new Set(idempotencyKeys).size).toBe(1)
+		} finally {
+			vi.useRealTimers()
 		}
-
-		const sessions = await Promise.all([
-			createIntroUnlockCheckout(db, input),
-			createIntroUnlockCheckout(db, input),
-		])
-
-		const reservations = await db.select().from(introCheckoutReservations)
-		expect(reservations).toHaveLength(1)
-		expect(new Set(sessions.map((session) => session.sessionId)).size).toBe(1)
-		const idempotencyKeys = mocks.createSession.mock.calls.map(
-			(call) => call[1].idempotencyKey,
-		)
-		expect(new Set(idempotencyKeys).size).toBe(1)
 	})
 
 	test('an open existing session is reused instead of creating another', async ({
