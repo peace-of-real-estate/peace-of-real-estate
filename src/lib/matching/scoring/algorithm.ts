@@ -5,10 +5,7 @@ import {
 	toAgentPriceBucket,
 	type PriceRange,
 } from '@/lib/price-range'
-import type {
-	BestClientTypeSlug,
-	PropertyTypeSlug,
-} from '@/lib/profile/profile-fields'
+import type { EnjoyedClientTypeSlug } from '@/lib/profile/profile-fields'
 import type {
 	AgentProfile,
 	BuyerProfile,
@@ -19,26 +16,15 @@ import type {
 
 import {
 	baseDimensionWeights,
-	type DimensionId,
-	buyerBiddingWarMatrix,
-	buyerDecisionMakingMatrix,
-	buyerIdealRelationshipMatrix,
 	commissionMatrix,
 	DIMENSION_IDS,
 	DIMENSION_LABELS,
-	experienceWeightModulation,
+	type DimensionId,
 	lookUpAffinity,
-	notFitForClientTypeHits,
-	notFitForNegativeScore,
-	priorityToDimension,
-	scoreChannel,
-	scoreDelivery,
-	scoreFrequency,
-	scoreResponseTime,
-	scoreSellerFrequency,
-	sellerHomeConnectionMatrix,
-	sellerRepresentationMatrix,
-	sellerStakesModulation,
+	ordinalScore,
+	ordinalScores3,
+	ordinalScores4,
+	riskScores,
 } from '../affinities'
 import type {
 	DimensionResult,
@@ -47,7 +33,6 @@ import type {
 	FitScoreResult,
 	PriceRangeValue,
 	ScoreBucket,
-	SubCheck,
 } from './types'
 import {
 	clamp01,
@@ -63,16 +48,6 @@ export const SCORING_LINEAR_WEIGHT = 0.7
 export const SCORING_GEOMETRIC_WEIGHT = 0.3
 export const SCORING_RECIPROCAL_AGENT_FLOOR = 0.5
 
-const propertyTypeToClientTypes: Record<
-	PropertyTypeSlug,
-	BestClientTypeSlug[]
-> = {
-	singleFamily: ['firstTime', 'moveUp'],
-	condoTownhome: ['condoTownhome', 'moveUp'],
-	multiFamily: ['landMultiFamily', 'investor'],
-	land: ['landMultiFamily', 'investor'],
-}
-
 const LUXURY_PRICE_FLOOR = 1_000_000
 
 function haversineMiles(
@@ -81,7 +56,7 @@ function haversineMiles(
 	lat2: number,
 	lng2: number,
 ): number {
-	const EARTH_RADIUS_MILES = 3958.8
+	const earthRadiusMiles = 3958.8
 	const dLat = ((lat2 - lat1) * Math.PI) / 180
 	const dLng = ((lng2 - lng1) * Math.PI) / 180
 	const a =
@@ -91,7 +66,7 @@ function haversineMiles(
 			Math.sin(dLng / 2) *
 			Math.sin(dLng / 2)
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-	return EARTH_RADIUS_MILES * c
+	return earthRadiusMiles * c
 }
 
 function distanceBetweenZips(
@@ -107,7 +82,7 @@ function distanceBetweenZips(
 }
 
 function distanceScore(miles: number): number {
-	if (miles <= 0) return 1.0
+	if (miles <= 0) return 1
 	if (miles <= 2) return 0.95
 	if (miles <= 5) return 0.8
 	if (miles <= 10) return 0.6
@@ -132,26 +107,23 @@ export function scoreLocation(
 	const clientZips = [...clientCenters.keys()]
 	const agentZips = [...agentCenters.keys()]
 
-	const checks: SubCheck[] = []
 	let bestFitSum = 0
-
 	if (clientCenters.size > 0 && agentCenters.size > 0) {
 		for (const [clientZip, clientCenter] of clientCenters) {
 			let best = 0
 			for (const [agentZip, agentCenter] of agentCenters) {
-				if (clientZip === agentZip) {
-					best = Math.max(best, 1.0)
-				} else {
-					const miles = distanceBetweenZips(clientCenter, agentCenter)
-					best = Math.max(best, distanceScore(miles))
-				}
+				best = Math.max(
+					best,
+					clientZip === agentZip
+						? 1
+						: distanceScore(distanceBetweenZips(clientCenter, agentCenter)),
+				)
 			}
 			bestFitSum += best
 		}
 	}
 
 	const zipFit = clientZips.length > 0 ? bestFitSum / clientZips.length : 0
-
 	const clientCenter = client.city.center
 	const agentCenter = agent.city.center
 	const centroidMiles = haversineMiles(
@@ -161,41 +133,30 @@ export function scoreLocation(
 		agentCenter.lng,
 	)
 	const cityFit = cityFitScore(centroidMiles)
-
 	const locationScore = Math.max(zipFit, cityFit)
-
-	const explanationParts: string[] = []
-	if (zipFit > 0) explanationParts.push(`zip distance score ${round2(zipFit)}`)
-	if (cityFit > 0) explanationParts.push(`city-centroid fit ${round2(cityFit)}`)
-	if (explanationParts.length === 0)
-		explanationParts.push('no geographic overlap')
-	const explanation = explanationParts.join(' · ')
-
-	checks.push({
-		label: 'zip codes',
-		client: formatList(clientZips),
-		agent: formatList(agentZips),
-		passed: zipFit > 0,
-		effect:
-			zipFit > 0
-				? `distance-aware zip fit ${round2(zipFit)}`
-				: 'no shared/nearby zips',
-	})
-	checks.push({
-		label: 'city centroid',
-		client: `${round2(clientCenter.lat)}, ${round2(clientCenter.lng)}`,
-		agent: `${round2(agentCenter.lat)}, ${round2(agentCenter.lng)}`,
-		passed: cityFit > 0,
-		effect:
-			cityFit > 0
-				? `continuous taper ${round2(cityFit)} (${round2(centroidMiles)} mi)`
-				: 'cities ≥ 50 mi apart',
-	})
 
 	return {
 		score: round2(locationScore),
-		explanation,
-		checks,
+		explanation:
+			locationScore > 0
+				? `zip ${round2(zipFit)} · city ${round2(cityFit)}`
+				: 'no geographic overlap',
+		checks: [
+			{
+				label: 'zip codes',
+				client: formatList(clientZips),
+				agent: formatList(agentZips),
+				passed: zipFit > 0,
+				effect: `distance-aware zip fit ${round2(zipFit)}`,
+			},
+			{
+				label: 'city centroid',
+				client: `${round2(clientCenter.lat)}, ${round2(clientCenter.lng)}`,
+				agent: `${round2(agentCenter.lat)}, ${round2(agentCenter.lng)}`,
+				passed: cityFit > 0,
+				effect: `continuous taper ${round2(cityFit)} (${round2(centroidMiles)} mi)`,
+			},
+		],
 		geo: {
 			client: clientCenter,
 			agent: agentCenter,
@@ -217,13 +178,9 @@ function scorePriceFit(
 	const clientRange = clientPriceRange(client)
 	const agentBucket = toAgentPriceBucket(agent.typicalPriceRange)
 	const agentRange = agentBucket ? AGENT_PRICE_RANGES[agentBucket] : undefined
-
-	const clientCell = formatPriceRangeValue(clientRange)
 	const agentCell = agentRange
 		? `${agent.typicalPriceRange} (${formatPriceRangeValue(agentRange)})`
 		: agent.typicalPriceRange
-			? `"${agent.typicalPriceRange}" (unknown bucket)`
-			: '(none)'
 
 	if (!agentRange) {
 		return {
@@ -232,7 +189,7 @@ function scorePriceFit(
 			checks: [
 				{
 					label: 'price range',
-					client: clientCell,
+					client: formatPriceRangeValue(clientRange),
 					agent: agentCell,
 					passed: false,
 					effect: 'cannot score → 0',
@@ -243,26 +200,19 @@ function scorePriceFit(
 
 	const bucketIndex = agentBucket ? BUCKET_ORDER.indexOf(agentBucket) : -1
 	const adjacentBuckets: PriceRange[] = []
-	if (bucketIndex >= 0) {
-		if (bucketIndex > 0) {
-			const prev = AGENT_PRICE_RANGES[BUCKET_ORDER[bucketIndex - 1]!]
-			if (prev) adjacentBuckets.push(prev)
-		}
-		if (bucketIndex < BUCKET_ORDER.length - 1) {
-			const next = AGENT_PRICE_RANGES[BUCKET_ORDER[bucketIndex + 1]!]
-			if (next) adjacentBuckets.push(next)
-		}
-	}
+	if (bucketIndex > 0)
+		adjacentBuckets.push(AGENT_PRICE_RANGES[BUCKET_ORDER[bucketIndex - 1]!]!)
+	if (bucketIndex < BUCKET_ORDER.length - 1)
+		adjacentBuckets.push(AGENT_PRICE_RANGES[BUCKET_ORDER[bucketIndex + 1]!]!)
 
 	const bucketOverlap = priceOverlapRatio(clientRange, agentRange)
 	const adjacentOverlap = adjacentBuckets.length
 		? Math.max(
-				...adjacentBuckets.map((bucket) =>
-					priceOverlapRatio(clientRange, bucket),
+				...adjacentBuckets.map((range) =>
+					priceOverlapRatio(clientRange, range),
 				),
 			)
 		: 0
-
 	const score = Math.min(1, bucketOverlap + 0.4 * adjacentOverlap)
 
 	return {
@@ -274,7 +224,7 @@ function scorePriceFit(
 		checks: [
 			{
 				label: 'price range',
-				client: clientCell,
+				client: formatPriceRangeValue(clientRange),
 				agent: agentCell,
 				passed: score > 0,
 				effect: `score ${round2(score)}`,
@@ -290,55 +240,59 @@ function bucketCentrality(
 	return priceOverlapRatio(clientRange, agentBucket)
 }
 
-// The discriminated ClientProfile union already carries its side in
-// `role`; pairing them here narrows the union once so the dimension
-// scorers below never re-narrow.
 type ClientSideProfile =
 	| { side: 'buyer'; client: BuyerProfile }
 	| { side: 'seller'; client: SellerProfile }
 
 function toClientSideProfile(client: ClientProfile): ClientSideProfile {
-	if (client.role === 'buyer') {
-		return { side: 'buyer', client }
-	}
-	return { side: 'seller', client }
+	return client.role === 'buyer'
+		? { side: 'buyer', client }
+		: { side: 'seller', client }
 }
 
 function expectedClientTypeSources(
 	clientBySide: ClientSideProfile,
-): Map<BestClientTypeSlug, string[]> {
-	const sources = new Map<BestClientTypeSlug, string[]>()
-	const add = (slug: BestClientTypeSlug, source: string) => {
+): Map<EnjoyedClientTypeSlug, string[]> {
+	const sources = new Map<EnjoyedClientTypeSlug, string[]>()
+	const add = (slug: EnjoyedClientTypeSlug, source: string) => {
 		const existing = sources.get(slug)
 		if (existing) existing.push(source)
 		else sources.set(slug, [source])
 	}
 
-	if (clientBySide.side === 'seller') add('seller', 'seller side')
 	if (clientBySide.side === 'buyer') {
-		for (const propertyType of clientBySide.client.propertyTypes ?? []) {
-			for (const slug of propertyTypeToClientTypes[propertyType] ?? []) {
-				add(slug, propertyType)
-			}
+		if (clientBySide.client.buyingExperience === 'firstTime') {
+			add('firstTimeBuyers', 'first-time buyer')
+		}
+		if (clientBySide.client.buyingExperience === 'severalTimes') {
+			add('experiencedLowMaintenance', 'experienced buyer')
+		}
+	} else {
+		add('firstTimeSellers', 'seller side')
+		if (clientBySide.client.sellingMotivation === 'lifeChange') {
+			add('lifeChangeSellers', 'life change')
+		}
+		if (clientBySide.client.sellingMotivation === 'relocating') {
+			add('relocating', 'relocating')
 		}
 	}
-	const clientRange = clientPriceRange(clientBySide.client)
-	if (clientRange.min >= LUXURY_PRICE_FLOOR) {
+	if (clientBySide.client.priceMin >= LUXURY_PRICE_FLOOR)
 		add('luxury', 'budget ≥ $1M')
-	}
-	if (
-		clientBySide.side === 'buyer' &&
-		clientBySide.client.experienceLevel === 'firstTime'
-	) {
-		add('firstTime', 'first-time buyer')
-	}
 	return sources
 }
 
 export function deriveExpectedClientTypes(
 	client: ClientProfile,
-): BestClientTypeSlug[] {
+): EnjoyedClientTypeSlug[] {
 	return [...expectedClientTypeSources(toClientSideProfile(client)).keys()]
+}
+
+function overlapCount(
+	left: readonly string[],
+	right: readonly string[],
+): number {
+	const rightSet = new Set(right)
+	return left.filter((value) => rightSet.has(value)).length
 }
 
 function scoreSpecialization(
@@ -347,417 +301,143 @@ function scoreSpecialization(
 ): DimensionResult {
 	const sources = expectedClientTypeSources(clientBySide)
 	const expected = [...sources.keys()]
-	const primary = agent.bestClientType
-
-	const checks: SubCheck[] = []
-
-	if (primary === 'other') {
-		checks.push({
-			label: 'agent specialty',
-			client: formatList(expected),
-			agent: 'other',
-			passed: null,
-			effect: 'neutral 0.5',
-		})
-		return {
-			score: 0.5,
-			explanation:
-				"agent's best work is 'other' — carries no specialization signal, neutral 0.5",
-			checks,
-		}
-	}
-
-	if (expected.length === 0) {
-		checks.push({
-			label: 'client signals',
-			client: '(none)',
-			agent: formatList([primary]),
-			passed: null,
-			effect: 'neutral 0.5',
-		})
-		return {
-			score: 0.5,
-			explanation:
-				'client has no property-type, side, or experience signals — neutral 0.5',
-			checks,
-		}
-	}
-
-	let sum = 0
-	let creditedMatches = 0
-	for (const slug of expected) {
-		let match = 0
-		if (slug === primary) match = 1.0
-		let source = sources.get(slug) ?? []
-		if (slug === primary) source = [...source, 'primary']
-		sum += match
-		if (match > 0) creditedMatches++
-		checks.push({
-			label: slug,
-			client: `expected — from ${source.join(', ')}`,
-			agent: match > 0 ? 'served' : 'not served',
-			passed: match > 0,
-			effect: match > 0 ? `match ${match}` : '0',
-		})
-	}
-
-	const score = sum / expected.length
+	const enjoyedClients = agent.enjoyedClients ?? []
+	const clientTypeScore = expected.length
+		? expected.some((slug) => enjoyedClients.includes(slug))
+			? 1
+			: 0.4
+		: 0.5
+	const clientSpecialties = clientBySide.client.situationSpecialties ?? []
+	const agentSpecialties = agent.specialties ?? []
+	const specialtyScore = clientSpecialties.length
+		? overlapCount(clientSpecialties, agentSpecialties) /
+			clientSpecialties.length
+		: 0.5
+	const score = (clientTypeScore + specialtyScore) / 2
 
 	return {
 		score: round2(score),
-		explanation: `agent matches ${creditedMatches} of ${expected.length} expected client types`,
-		checks,
-	}
-}
-
-function scoreWorkingStyle(
-	clientBySide: ClientSideProfile,
-	agent: AgentProfile,
-): DimensionResult {
-	if (clientBySide.side === 'buyer') {
-		return scoreBuyerWorkingStyle(clientBySide.client, agent)
-	}
-	return scoreSellerWorkingStyle(clientBySide.client, agent)
-}
-
-function scoreBuyerWorkingStyle(
-	client: BuyerProfile,
-	agent: AgentProfile,
-): DimensionResult {
-	const checks: SubCheck[] = []
-
-	const decision =
-		lookUpAffinity(
-			buyerDecisionMakingMatrix,
-			client.decisionMakingNeed,
-			agent.clientDescription,
-		) ?? 0
-	checks.push({
-		label: 'decision-making need',
-		client: client.decisionMakingNeed,
-		agent: agent.clientDescription,
-		passed: decision >= 0.7,
-		effect: `affinity ${round2(decision)}`,
-	})
-
-	const bidding =
-		lookUpAffinity(
-			buyerBiddingWarMatrix,
-			client.biddingWarResponse,
-			agent.difficultDealInstinct,
-		) ?? 0
-	checks.push({
-		label: 'bidding-war response',
-		client: client.biddingWarResponse,
-		agent: agent.difficultDealInstinct,
-		passed: bidding >= 0.7,
-		effect: `affinity ${round2(bidding)}`,
-	})
-
-	const ideal =
-		lookUpAffinity(
-			buyerIdealRelationshipMatrix,
-			client.idealAgentRelationship,
-			agent.clientDescription,
-		) ?? 0
-	checks.push({
-		label: 'ideal relationship',
-		client: client.idealAgentRelationship,
-		agent: agent.clientDescription,
-		passed: ideal >= 0.7,
-		effect: `affinity ${round2(ideal)}`,
-	})
-
-	const score = (decision + bidding + ideal) / 3
-	return {
-		score: round2(score),
-		explanation: `decision ${round2(decision)} · bidding ${round2(bidding)} · relationship ${round2(ideal)}`,
-		checks,
-	}
-}
-
-function scoreSellerWorkingStyle(
-	client: SellerProfile,
-	agent: AgentProfile,
-): DimensionResult {
-	const checks: SubCheck[] = []
-
-	const home =
-		lookUpAffinity(
-			sellerHomeConnectionMatrix,
-			client.homeConnection,
-			agent.clientDescription,
-		) ?? 0
-	checks.push({
-		label: 'home connection',
-		client: client.homeConnection,
-		agent: agent.clientDescription,
-		passed: home >= 0.7,
-		effect: `affinity ${round2(home)}`,
-	})
-
-	const representation =
-		lookUpAffinity(
-			sellerRepresentationMatrix,
-			client.representationPreference,
-			agent.unrepresentedBuyerApproach,
-		) ?? 0
-	checks.push({
-		label: 'representation preference',
-		client: client.representationPreference,
-		agent: agent.unrepresentedBuyerApproach,
-		passed: representation >= 0.7,
-		effect: `affinity ${round2(representation)}`,
-	})
-
-	const score = (home + representation) / 2
-	return {
-		score: round2(score),
-		explanation: `home ${round2(home)} · representation ${round2(representation)}`,
-		checks,
-	}
-}
-
-function scoreCommunication(
-	clientBySide: ClientSideProfile,
-	agent: AgentProfile,
-): DimensionResult {
-	const client = clientBySide.client
-	const checks: SubCheck[] = []
-
-	const channel = scoreChannel(
-		client.quickCommunicationChannel,
-		agent.quickCommunicationChannel,
-	)
-	checks.push({
-		label: 'quick channel',
-		client: client.quickCommunicationChannel,
-		agent: agent.quickCommunicationChannel,
-		passed: channel >= 0.85,
-		effect: `score ${round2(channel)}`,
-	})
-
-	const delivery = scoreDelivery(
-		client.updateDeliveryMethod,
-		agent.updateDeliveryMethod,
-	)
-	checks.push({
-		label: 'update delivery',
-		client: client.updateDeliveryMethod,
-		agent: agent.updateDeliveryMethod,
-		passed: delivery >= 0.7,
-		effect: `score ${round2(delivery)}`,
-	})
-
-	const clientFrequency =
-		clientBySide.side === 'buyer'
-			? clientBySide.client.involvementLevel
-			: clientBySide.client.agentSilencePreference
-	const frequency =
-		clientBySide.side === 'buyer'
-			? scoreFrequency(clientFrequency, agent.communicationFrequency)
-			: scoreSellerFrequency(clientFrequency, agent.communicationFrequency)
-	checks.push({
-		label: 'frequency',
-		client: clientFrequency,
-		agent: agent.communicationFrequency,
-		passed: frequency >= 0.7,
-		effect: `score ${round2(frequency)}`,
-	})
-
-	const response = scoreResponseTime(
-		client.responseTimeExpectation,
-		agent.responseTime,
-	)
-	checks.push({
-		label: 'response time',
-		client: client.responseTimeExpectation,
-		agent: agent.responseTime,
-		passed: response >= 0.7,
-		effect: `score ${round2(response)}`,
-	})
-
-	const score = (channel + delivery + frequency + response) / 4
-	return {
-		score: round2(score),
-		explanation: `channel ${round2(channel)} · delivery ${round2(delivery)} · frequency ${round2(frequency)} · response ${round2(response)}`,
-		checks,
-	}
-}
-
-function scoreBusinessTerms(
-	client: ClientProfile,
-	agent: AgentProfile,
-): DimensionResult {
-	const commission =
-		lookUpAffinity(
-			commissionMatrix,
-			client.commissionComfort,
-			agent.commissionApproach,
-		) ?? 0
-
-	return {
-		score: round2(commission),
-		explanation: `commission comfort ${client.commissionComfort} × approach ${agent.commissionApproach} → ${round2(commission)}`,
+		explanation: `client type ${round2(clientTypeScore)} · specialty ${round2(specialtyScore)}`,
 		checks: [
 			{
-				label: 'commission',
-				client: client.commissionComfort,
-				agent: agent.commissionApproach,
-				passed: commission >= 0.7,
-				effect: `score ${round2(commission)}`,
+				label: 'client types',
+				client: expected.length ? formatList(expected) : '(none)',
+				agent: enjoyedClients.length ? formatList(enjoyedClients) : '(none)',
+				passed:
+					clientTypeScore >= 0.7
+						? true
+						: clientTypeScore === 0.5
+							? null
+							: false,
+				effect: `score ${round2(clientTypeScore)}`,
+			},
+			{
+				label: 'special situations',
+				client: clientSpecialties.length
+					? formatList(clientSpecialties)
+					: '(none)',
+				agent: agentSpecialties.length
+					? formatList(agentSpecialties)
+					: '(none)',
+				passed:
+					specialtyScore >= 0.7 ? true : specialtyScore === 0.5 ? null : false,
+				effect: `score ${round2(specialtyScore)}`,
 			},
 		],
 	}
 }
 
-function rankOrderCentroidWeights(
-	rankedDimensions: DimensionId[],
-): Record<DimensionId, number> {
-	const k = rankedDimensions.length
-	const weights: Record<DimensionId, number> = { ...baseDimensionWeights }
-	for (let i = 0; i < k; i++) {
-		const dimension = rankedDimensions[i]
-		if (!dimension) continue
-		let sum = 0
-		for (let j = i; j < k; j++) {
-			sum += 1 / (j + 1)
-		}
-		weights[dimension] = (sum / k) * 100
+function simpleDimension(
+	label: string,
+	client: string,
+	agent: string,
+	score: number,
+): DimensionResult {
+	return {
+		score: round2(score),
+		explanation: `${label} → ${round2(score)}`,
+		checks: [
+			{
+				label,
+				client,
+				agent,
+				passed: score >= 0.7,
+				effect: `score ${round2(score)}`,
+			},
+		],
 	}
-	return weights
 }
 
-function baseRank(): DimensionId[] {
-	return [...DIMENSION_IDS].sort(
-		(a, b) => baseDimensionWeights[b] - baseDimensionWeights[a],
+function scoreDecisions(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const score = ordinalScore(
+		['letThemLead', 'walkMeThrough', 'middleGround', 'finalCall'],
+		client.decisionStyle,
+		agent.clientDecisionStyle,
+		ordinalScores4,
+	)
+	return simpleDimension(
+		'decision style',
+		client.decisionStyle,
+		agent.clientDecisionStyle,
+		score,
 	)
 }
 
-function applyPriorityRanking(
-	baseRanks: DimensionId[],
-	priorities: string[] | null | undefined,
-): DimensionId[] {
-	const ranked = [...baseRanks]
-	const priorityDimensions: DimensionId[] = []
-	for (const priority of priorities ?? []) {
-		const dimension = priorityToDimension[priority]
-		if (dimension !== undefined) priorityDimensions.push(dimension)
-	}
-	const seen = new Set<DimensionId>()
-	for (const dimension of priorityDimensions) {
-		if (seen.has(dimension)) continue
-		seen.add(dimension)
-		const index = ranked.indexOf(dimension)
-		if (index > 0) {
-			ranked.splice(index, 1)
-			ranked.splice(index - 1, 0, dimension)
-		}
-	}
-	return ranked
-}
-
-function addModulations(
-	weights: Record<DimensionId, number>,
-	modulators: { dimension: DimensionId; source: string; delta: number }[],
-	modulation: Partial<Record<DimensionId, number>>,
-	source: string,
-): void {
-	for (const dimension of DIMENSION_IDS) {
-		const delta = modulation[dimension]
-		if (delta === undefined) continue
-		weights[dimension] = (weights[dimension] ?? 0) + delta
-		modulators.push({ dimension, source, delta })
-	}
-}
-
-function applyModulation(
-	weights: Record<DimensionId, number>,
-	clientBySide: ClientSideProfile,
-): {
-	weights: Record<DimensionId, number>
-	modulators: { dimension: DimensionId; source: string; delta: number }[]
-} {
-	const adjusted = { ...weights }
-	const modulators: {
-		dimension: DimensionId
-		source: string
-		delta: number
-	}[] = []
-
-	if (clientBySide.side === 'buyer') {
-		const { experienceLevel } = clientBySide.client
-		const modulation = experienceWeightModulation[experienceLevel]
-		if (modulation) {
-			addModulations(
-				adjusted,
-				modulators,
-				modulation,
-				`experienceLevel=${experienceLevel}`,
-			)
-		}
-	} else {
-		const { saleMotivation, successfulSaleLooksLike } = clientBySide.client
-		if (saleMotivation === 'financialPressure') {
-			addModulations(
-				adjusted,
-				modulators,
-				sellerStakesModulation.financialPressure ?? {},
-				'saleMotivation=financialPressure',
-			)
-		}
-		const saleModulation = sellerStakesModulation[successfulSaleLooksLike]
-		if (saleModulation) {
-			addModulations(
-				adjusted,
-				modulators,
-				saleModulation,
-				`successfulSaleLooksLike=${successfulSaleLooksLike}`,
-			)
-		}
-	}
-
-	return { weights: adjusted, modulators }
-}
-
-function resolveDimensionWeights(clientBySide: ClientSideProfile): {
-	weights: Record<DimensionId, number>
-	boosted: Set<DimensionId>
-} {
-	const baseRanks = baseRank()
-	const priorityRanks = applyPriorityRanking(
-		baseRanks,
-		clientBySide.client.matchPriorities,
+function scoreRisk(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const score = ordinalScore(
+		['noRisk', 'lowRisk', 'moderateRisk', 'allIn'],
+		client.riskComfort,
+		agent.riskAdviceComfort,
+		riskScores,
 	)
-	const rocWeights = rankOrderCentroidWeights(priorityRanks)
-
-	const raw: Record<DimensionId, number> = { ...baseDimensionWeights }
-	for (const dimension of DIMENSION_IDS) {
-		raw[dimension] =
-			(baseDimensionWeights[dimension] + rocWeights[dimension]) / 2
-	}
-
-	const { weights: modulated } = applyModulation(raw, clientBySide)
-
-	const total = Object.values(modulated).reduce(
-		(sum, weight) => sum + weight,
-		0,
+	return simpleDimension(
+		'risk comfort',
+		client.riskComfort,
+		agent.riskAdviceComfort,
+		score,
 	)
-	const weights: Record<DimensionId, number> = { ...baseDimensionWeights }
-	for (const dimension of DIMENSION_IDS) {
-		weights[dimension] = Number(
-			((modulated[dimension] / total) * 100).toFixed(2),
-		)
-	}
+}
 
-	const boosted = new Set<DimensionId>()
-	for (const dimension of DIMENSION_IDS) {
-		if (weights[dimension] > baseDimensionWeights[dimension]) {
-			boosted.add(dimension)
-		}
-	}
+function scoreCommunication(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const score = ordinalScore(
+		['whenItMatters', 'regularCheckins', 'handsOn'],
+		client.contactStyle,
+		agent.clientContactStyle,
+		ordinalScores3,
+	)
+	return simpleDimension(
+		'contact style',
+		client.contactStyle,
+		agent.clientContactStyle,
+		score,
+	)
+}
 
-	return { weights, boosted }
+function scoreCommission(
+	client: ClientProfile,
+	agent: AgentProfile,
+): DimensionResult {
+	const score =
+		lookUpAffinity(
+			commissionMatrix,
+			client.commissionPlan,
+			agent.commissionStyle,
+		) ?? 0
+	return simpleDimension(
+		'commission',
+		client.commissionPlan,
+		agent.commissionStyle,
+		score,
+	)
 }
 
 function evaluateDisqualifiers(
@@ -769,10 +449,6 @@ function evaluateDisqualifiers(
 ): DisqualifierTrace[] {
 	const sideMismatch = agent.representationSide !== side
 	const stateMismatch = client.city.state !== agent.city.state
-
-	const locationDisqualified = locationResult.score <= 0
-	const priceDisqualified = priceResult.score <= 0
-
 	return [
 		{
 			id: 'representationSide',
@@ -789,42 +465,22 @@ function evaluateDisqualifiers(
 		{
 			id: 'location',
 			label: 'Location floor',
-			disqualified: locationDisqualified,
-			detail: locationDisqualified
-				? 'no geographic overlap (zip distance > 20 mi and city centroids ≥ 50 mi apart)'
-				: `location score ${locationResult.score}`,
+			disqualified: locationResult.score <= 0,
+			detail:
+				locationResult.score <= 0
+					? 'no geographic overlap'
+					: `location score ${locationResult.score}`,
 		},
 		{
 			id: 'priceFit',
 			label: 'Price contact',
-			disqualified: priceDisqualified,
-			detail: priceDisqualified
-				? 'client range does not touch agent bucket or adjacent buckets'
-				: `price score ${priceResult.score}`,
+			disqualified: priceResult.score <= 0,
+			detail:
+				priceResult.score <= 0
+					? 'client range does not touch agent bucket or adjacent buckets'
+					: `price score ${priceResult.score}`,
 		},
 	]
-}
-
-function applyNotFitPenalty(
-	clientBySide: ClientSideProfile,
-	agent: AgentProfile,
-	score: number,
-): { score: number; penalized: boolean; reason: string } {
-	const notFitFor = agent.notFitFor ?? []
-	if (notFitFor.length === 0) return { score, penalized: false, reason: '' }
-
-	const expected = [...expectedClientTypeSources(clientBySide).keys()]
-	for (const slug of notFitFor) {
-		const hits = notFitForClientTypeHits[slug]
-		if (hits && expected.some((type) => hits.includes(type))) {
-			return {
-				score: score * notFitForNegativeScore,
-				penalized: true,
-				reason: slug,
-			}
-		}
-	}
-	return { score, penalized: false, reason: '' }
 }
 
 function harmonicMean(a: number, b: number): number {
@@ -837,23 +493,22 @@ export function calculateFitScore(
 	client: ClientProfile,
 ): FitScoreResult {
 	const clientBySide = toClientSideProfile(client)
-	const { weights, boosted } = resolveDimensionWeights(clientBySide)
-
+	const weights: Record<DimensionId, number> = { ...baseDimensionWeights }
 	const results: Record<DimensionId, DimensionResult> = {
 		location: scoreLocation(client, agent),
 		priceFit: scorePriceFit(client, agent),
 		specialization: scoreSpecialization(clientBySide, agent),
-		workingStyle: scoreWorkingStyle(clientBySide, agent),
-		communication: scoreCommunication(clientBySide, agent),
-		businessTerms: scoreBusinessTerms(client, agent),
+		decisions: scoreDecisions(client, agent),
+		communication: scoreCommunication(client, agent),
+		risk: scoreRisk(client, agent),
+		commission: scoreCommission(client, agent),
 	}
 
 	const normalizedWeights: Record<DimensionId, number> = {
 		...baseDimensionWeights,
 	}
-	for (const dimension of DIMENSION_IDS) {
+	for (const dimension of DIMENSION_IDS)
 		normalizedWeights[dimension] = weights[dimension] / 100
-	}
 
 	let linear = 0
 	let geometric = 1
@@ -865,31 +520,17 @@ export function calculateFitScore(
 	}
 	const consumerScore =
 		SCORING_LINEAR_WEIGHT * linear + SCORING_GEOMETRIC_WEIGHT * geometric
-
-	const clientRange = clientPriceRange(client)
 	const agentBucket = toAgentPriceBucket(agent.typicalPriceRange)
 	const agentRange = agentBucket ? AGENT_PRICE_RANGES[agentBucket] : undefined
 	const centrality = agentRange
-		? clamp01(bucketCentrality(clientRange, agentRange))
+		? clamp01(bucketCentrality(clientPriceRange(client), agentRange))
 		: 0
-
-	const clientTypeFit = results.specialization.score
-	const agentFit = (centrality + clientTypeFit) / 2
+	const agentFit = (centrality + results.specialization.score) / 2
 	const reciprocalBlend = harmonicMean(
 		consumerScore,
 		SCORING_RECIPROCAL_AGENT_FLOOR + 0.5 * agentFit,
 	)
-
-	const baseFinalScore = Math.round(reciprocalBlend * 100)
-
-	const notFitPenalty = applyNotFitPenalty(
-		clientBySide,
-		agent,
-		baseFinalScore / 100,
-	)
-	const finalScore = notFitPenalty.penalized
-		? Math.round(notFitPenalty.score * 100)
-		: baseFinalScore
+	const computedScore = Math.round(reciprocalBlend * 100)
 
 	const dimensions = DIMENSION_IDS.map((id): DimensionTrace => {
 		const result = results[id]
@@ -897,9 +538,7 @@ export function calculateFitScore(
 		return {
 			id,
 			label: DIMENSION_LABELS[id],
-			baseWeight: baseDimensionWeights[id],
 			weight: round2(weight),
-			boosted: boosted.has(id),
 			score: round2(result.score),
 			contribution: round2(weight * result.score),
 			explanation: result.explanation,
@@ -915,24 +554,20 @@ export function calculateFitScore(
 		results.priceFit,
 	)
 	const disqualified = disqualifiers.some((entry) => entry.disqualified)
-	const fitScore = disqualified ? 0 : finalScore
-
+	const fitScore = disqualified ? 0 : computedScore
 	const scores: Record<ScoreBucket, number> = {
 		Location: toStars(results.location.score),
 		'Price Fit': toStars(results.priceFit.score),
 		Specialization: toStars(results.specialization.score),
-		'Working Style': toStars(results.workingStyle.score),
+		'Decision Support': toStars(results.decisions.score),
 		Communication: toStars(results.communication.score),
-		'Business Terms': toStars(results.businessTerms.score),
+		'Risk Comfort': toStars(results.risk.score),
+		Commission: toStars(results.commission.score),
 	}
-
 	const dimensionFormula = dimensions
 		.map((dimension) => `${dimension.weight} × ${dimension.score}`)
 		.join(' + ')
-	const penaltyText = notFitPenalty.penalized
-		? `; notFitFor penalty (${notFitPenalty.reason}) → ${finalScore}`
-		: ''
-	const fullFormula = `consumerScore = ${SCORING_LINEAR_WEIGHT}·linear + ${SCORING_GEOMETRIC_WEIGHT}·geometric; harmonicMean(consumerScore, ${SCORING_RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit) → ${round2(reciprocalBlend)}${penaltyText}; dims: ${dimensionFormula}`
+	const fullFormula = `consumerScore = ${SCORING_LINEAR_WEIGHT}·linear + ${SCORING_GEOMETRIC_WEIGHT}·geometric; harmonicMean(consumerScore, ${SCORING_RECIPROCAL_AGENT_FLOOR} + 0.5·agentFit) → ${round2(reciprocalBlend)}; dims: ${dimensionFormula}`
 
 	return {
 		fitScore,
@@ -941,11 +576,10 @@ export function calculateFitScore(
 		trace: {
 			mode: 'client-scored',
 			side: clientBySide.side,
-			matchPriorities: client.matchPriorities ?? [],
 			disqualifiers,
 			disqualified,
 			dimensions,
-			computedScore: baseFinalScore,
+			computedScore,
 			fitScore,
 			formula: disqualified
 				? `disqualified (${disqualifiers
@@ -960,13 +594,6 @@ export function calculateFitScore(
 				geometric: round2(geometric),
 				consumerScore: round2(consumerScore),
 			},
-			notFitPenalty: notFitPenalty.penalized
-				? {
-						reason: notFitPenalty.reason,
-						scoreBefore: round2(baseFinalScore / 100),
-						scoreAfter: round2(notFitPenalty.score),
-					}
-				: undefined,
 			geo: results.location.geo,
 		},
 	}
@@ -1015,9 +642,7 @@ export function buildTieBands<T extends { score: { fitScore: number } }>(
 
 export interface RankedTieBandItem<T> {
 	item: T
-	/** 1-based rank after tie-band rotation — the order shown to the client. */
 	displayRank: number
-	/** 1-based rank by raw score before rotation. */
 	preShuffleRank: number
 	bandIndex: number
 	bandSize: number
