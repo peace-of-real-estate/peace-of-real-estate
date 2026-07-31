@@ -102,6 +102,12 @@ const root = import.meta.dirname
 
 export default defineConfig({
 	root,
+	// scripts/setup.ts generates a per-worktree APP_PORT (10000–19999) that
+	// the Stripe listener forwards webhooks to; fall back to the TanStack
+	// Start default when it is not set.
+	server: {
+		port: process.env.APP_PORT ? Number(process.env.APP_PORT) : 3000,
+	},
 	resolve: {
 		tsconfigPaths: true,
 		dedupe: ['react', 'react-dom'],
