@@ -12,6 +12,7 @@ import { Suspense, lazy } from 'react'
 import { NotFoundComponent, ServerErrorComponent } from '@/components/errors'
 import { hasBetaAccess } from '@/lib/auth/functions'
 import { getCurrentSession } from '@/lib/auth/session'
+import { ImpersonationBanner } from '@/routes/(dashboard)/-components/impersonation-banner'
 
 import appCss from '../styles.css?url'
 
@@ -67,7 +68,12 @@ function RootComponent() {
 	const analyticsEnabled = import.meta.env.MODE === 'production' && posthogKey
 	const gtmId = import.meta.env.VITE_PUBLIC_GTM_ID
 	const gtmEnabled = import.meta.env.MODE === 'production' && gtmId
-	const content = <Outlet />
+	const content = (
+		<>
+			<ImpersonationBanner />
+			<Outlet />
+		</>
+	)
 
 	return (
 		<html lang="en">
