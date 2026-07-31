@@ -1,11 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { Wip } from '@/components/wip'
+import { agent } from '@/lib/profile'
+import { AgentIntroductions } from '@/routes/(dashboard)/-components/agent-introductions'
 
 export const Route = createFileRoute('/(dashboard)/agent/introductions')({
-	component: AgentIntroductions,
+	beforeLoad: async () => {
+		const agentProfile = await agent.loadProfile()
+
+		if (!agentProfile) {
+			throw redirect({ to: '/signup/agent/identity' })
+		}
+	},
+	component: AgentIntroductionsRoute,
 })
 
-function AgentIntroductions() {
-	return <Wip title="Introductions" />
+function AgentIntroductionsRoute() {
+	return <AgentIntroductions />
 }
