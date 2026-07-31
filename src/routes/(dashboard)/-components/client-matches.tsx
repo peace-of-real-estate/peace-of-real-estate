@@ -268,8 +268,10 @@ export function ClientMatches({
 							Cancel
 						</Button>
 						<Button
-							onClick={() => sendMutation.mutate([...selectedIds])}
-							disabled={sendMutation.isPending || selectedIds.size === 0}
+							onClick={() =>
+								sendMutation.mutate(selectedMatches.map((match) => match.id))
+							}
+							disabled={sendMutation.isPending || selectedMatches.length === 0}
 						>
 							{sendMutation.isPending ? 'Sending…' : 'Send introductions'}
 						</Button>

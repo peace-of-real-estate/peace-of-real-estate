@@ -284,7 +284,7 @@ export function ProfileSummaryGrid({
 			{items.map((item) => {
 				const Icon = item.icon
 				return (
-					<div key={item.label} className={itemClass}>
+					<div key={item.key} className={itemClass}>
 						<div className={iconContainerClass}>
 							<Icon className={iconSize} />
 						</div>

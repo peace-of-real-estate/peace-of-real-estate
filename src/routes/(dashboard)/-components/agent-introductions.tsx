@@ -159,7 +159,7 @@ export function AgentIntroductions() {
 								<h2 className="text-sm font-semibold">
 									Pending
 									<span className="text-muted-foreground ml-1 text-xs font-normal">
-										{groups.pending.length}
+										{pendingCount}
 									</span>
 								</h2>
 								<div className="space-y-2">

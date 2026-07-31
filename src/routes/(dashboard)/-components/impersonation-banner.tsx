@@ -1,5 +1,7 @@
 import { WarningIcon } from '@phosphor-icons/react'
 import { useRouter } from '@tanstack/react-router'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { authClient } from '@/lib/auth/client'
 
@@ -7,11 +9,19 @@ export function ImpersonationBanner() {
 	const router = useRouter()
 	const { data } = authClient.useSession()
 	const impersonatedBy = data?.session.impersonatedBy
+	const [isReturning, setIsReturning] = useState(false)
 
 	if (!impersonatedBy) return null
 
 	const handleReturn = async () => {
-		await authClient.admin.stopImpersonating()
+		setIsReturning(true)
+		try {
+			await authClient.admin.stopImpersonating()
+		} catch {
+			toast.error('Could not stop impersonating. Try again.')
+			setIsReturning(false)
+			return
+		}
 		await router.navigate({ to: '/admin/users' })
 		await router.invalidate()
 	}
@@ -24,10 +34,11 @@ export function ImpersonationBanner() {
 			</span>
 			<button
 				type="button"
+				disabled={isReturning}
 				onClick={() => void handleReturn()}
-				className="bg-destructive text-destructive-foreground rounded-md px-3 py-1 text-xs font-medium"
+				className="bg-destructive text-destructive-foreground rounded-md px-3 py-1 text-xs font-medium disabled:opacity-60"
 			>
-				Return to admin
+				{isReturning ? 'Returning…' : 'Return to admin'}
 			</button>
 		</div>
 	)
