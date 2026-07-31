@@ -10,7 +10,9 @@ main_root="$(jj workspace root --name default 2>/dev/null || true)"
 if [[ -n "$main_root" && "$main_root" != "$PWD" ]]; then
 	for file in .env.local .env.development.local; do
 		if [[ ! -f "$file" && -f "$main_root/$file" ]]; then
-			cp "$main_root/$file" "$file"
+			# DATABASE_URL is per-workspace (generated into .env.compose by
+			# scripts/setup.ts); copying it would point at the wrong port.
+			grep -v '^DATABASE_URL=' "$main_root/$file" >"$file"
 			echo "copied $file from $main_root"
 		fi
 	done
