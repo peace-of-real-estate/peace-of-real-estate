@@ -187,6 +187,9 @@ export default defineConfig({
 					// parallel files race it (spurious vi.mock hoisting errors,
 					// failed dynamic imports). Serial files are ~30s total.
 					fileParallelism: false,
+					// groupOrder 1 intentionally runs this browser project after
+					// the default-order unit and server projects.
+					sequence: { groupOrder: 1 },
 					browser: {
 						instances: [{ browser: 'chromium' }],
 						provider: playwright(),
