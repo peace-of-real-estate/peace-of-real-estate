@@ -17,7 +17,6 @@ export function MatchList({ matches }: { matches: AgentMatchData[] }) {
 }
 
 function MatchCard({ match }: { match: AgentMatchData }) {
-	const topSpecialties = match.specialties.slice(0, 3)
 	const [failedAvatar, setFailedAvatar] = useState<string>()
 	const showAvatar = Boolean(match.avatar) && match.avatar !== failedAvatar
 
@@ -65,18 +64,9 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 						)}
 					</div>
 
-					{topSpecialties.length > 0 && (
-						<div className="mt-2 flex flex-wrap gap-1">
-							{topSpecialties.map((specialty) => (
-								<span
-									key={specialty}
-									className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium"
-								>
-									{specialty}
-								</span>
-							))}
-						</div>
-					)}
+					<span className="bg-secondary text-secondary-foreground mt-2 inline-block w-fit rounded-sm px-2 py-0.5 text-xs font-medium">
+						{match.bestClientType}
+					</span>
 				</div>
 
 				<Button variant="outline" size="sm" className="shrink-0">

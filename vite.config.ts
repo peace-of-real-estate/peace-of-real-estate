@@ -159,6 +159,10 @@ export default defineConfig({
 					name: 'server',
 					include: ['src/**/*.{server,db}.test.ts'],
 					testTimeout: 10_000,
+					globalSetup: ['./tests/support/db.global-setup.ts'],
+					// db test files share one container from globalSetup and reset
+					// it per file — parallel files would race the reset
+					fileParallelism: false,
 				},
 			},
 			{
