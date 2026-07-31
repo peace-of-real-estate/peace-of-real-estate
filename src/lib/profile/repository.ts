@@ -11,7 +11,7 @@ import {
 	clientProfileZips,
 	sellerDetails,
 	user,
-} from '@/db/tables'
+} from '@/db/schema'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { toZipGeography, type ResolvedCity } from '@/lib/geography/zip'
 
@@ -413,6 +413,32 @@ export const Agent = {
 			executor,
 		)
 		return toAgentProfile(row.agent, row.city, geographyRows)
+	},
+
+	async loadByIds(
+		profileIds: string[],
+		executor: DbOrTx = db,
+	): Promise<AgentProfile[]> {
+		if (profileIds.length === 0) return []
+		const rows = await executor
+			.select({ agent: agentProfiles, city: cities })
+			.from(agentProfiles)
+			.innerJoin(cities, eq(agentProfiles.cityId, cities.id))
+			.where(inArray(agentProfiles.id, profileIds))
+		const rowsByProfile = groupByProfile(
+			await loadGeographyRows(
+				agentProfileZips,
+				rows.map((row) => row.agent.id),
+				executor,
+			),
+		)
+		return rows.map((row) =>
+			toAgentProfile(
+				row.agent,
+				row.city,
+				rowsByProfile.get(row.agent.id) ?? [],
+			),
+		)
 	},
 
 	// `filter.state` pushes the matching algorithm's state disqualifier into
