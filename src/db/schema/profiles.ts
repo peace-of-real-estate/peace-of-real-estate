@@ -1,9 +1,6 @@
 import { sql } from 'drizzle-orm'
 import {
-	boolean,
 	check,
-	customType,
-	doublePrecision,
 	foreignKey,
 	index,
 	pgEnum,
@@ -15,7 +12,6 @@ import {
 	uuid,
 } from 'drizzle-orm/pg-core'
 
-import { US_POSTAL_CODES } from '@/lib/geography/states'
 import {
 	agentIdentityColumns,
 	agentMatchingColumns,
@@ -28,179 +24,8 @@ import {
 	sellerQuizColumns,
 } from '@/lib/profile/db'
 
-export const entitlementKey = pgEnum('entitlement_key', [
-	'client_lifetime_premium',
-	'agent_subscription',
-])
-
-export const entitlementSource = pgEnum('entitlement_source', [
-	'manual',
-	'stripe_checkout',
-	'stripe_subscription',
-])
-
-export const usPostalCode = pgEnum('us_postal_code', US_POSTAL_CODES)
-
-const citext = customType<{ data: string }>({
-	dataType: () => 'citext',
-})
-
-export const user = snakeCase.table(
-	'user',
-	{
-		id: text().primaryKey().notNull(),
-		name: text().notNull(),
-		email: text().notNull(),
-		emailVerified: boolean().default(false).notNull(),
-		image: text(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [uniqueIndex('user_email_index').on(table.email)],
-)
-
-export const userEntitlements = snakeCase.table(
-	'user_entitlements',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		key: entitlementKey().notNull(),
-		source: entitlementSource().notNull(),
-		stripeCustomerId: text(),
-		stripePaymentIntentId: text(),
-		stripeSubscriptionId: text(),
-		startsAt: timestamp({ withTimezone: true }).notNull(),
-		endsAt: timestamp({ withTimezone: true }),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		index('user_entitlements_user_id_index').using('btree', table.userId),
-		uniqueIndex('user_entitlements_user_key_index').on(table.userId, table.key),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'user_entitlements_user_id_fk',
-		}).onDelete('cascade'),
-	],
-)
-
-export const session = snakeCase.table(
-	'session',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		token: text().notNull(),
-		expiresAt: timestamp({ withTimezone: true }).notNull(),
-		ipAddress: text(),
-		userAgent: text(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		uniqueIndex('session_token_index').on(table.token),
-		index('session_user_id_index').on(table.userId),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'session_user_id_fk',
-		}).onDelete('cascade'),
-	],
-)
-
-export const account = snakeCase.table(
-	'account',
-	{
-		id: text().primaryKey().notNull(),
-		userId: text().notNull(),
-		accountId: text().notNull(),
-		providerId: text().notNull(),
-		accessToken: text(),
-		refreshToken: text(),
-		accessTokenExpiresAt: timestamp({
-			withTimezone: true,
-		}),
-		refreshTokenExpiresAt: timestamp({
-			withTimezone: true,
-		}),
-		scope: text(),
-		idToken: text(),
-		password: text(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [
-		index('account_user_id_index').using('btree', table.userId),
-		uniqueIndex('account_provider_account_index').on(
-			table.providerId,
-			table.accountId,
-		),
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [user.id],
-			name: 'account_user_id_fk',
-		}).onDelete('cascade'),
-	],
-)
-
-export const verification = snakeCase.table(
-	'verification',
-	{
-		id: text().primaryKey().notNull(),
-		identifier: text().notNull(),
-		value: text().notNull(),
-		expiresAt: timestamp({ withTimezone: true }).notNull(),
-		createdAt: timestamp({ withTimezone: true }).notNull(),
-		updatedAt: timestamp({ withTimezone: true }).notNull(),
-	},
-	(table) => [index('verification_identifier_index').on(table.identifier)],
-)
-
-export const cities = snakeCase.table(
-	'cities',
-	{
-		id: uuid().primaryKey().notNull(),
-		name: citext().notNull(),
-		state: usPostalCode().notNull(),
-		centerLat: doublePrecision().notNull(),
-		centerLng: doublePrecision().notNull(),
-		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
-	},
-	(table) => [
-		uniqueIndex('cities_name_state_index').on(table.name, table.state),
-		index('cities_state_index').on(table.state),
-	],
-)
-
-export const cityZips = snakeCase.table(
-	'city_zips',
-	{
-		id: text().primaryKey().notNull(),
-		cityId: uuid().notNull(),
-		zip: text().notNull(),
-		// Per-zip centroid from the seed dataset; scoring resolves zip
-		// distances from these so the `zipcodes` package is only needed at
-		// seed time. Zips without coordinates are excluded at seed time.
-		lat: doublePrecision().notNull(),
-		lng: doublePrecision().notNull(),
-		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
-	},
-	(table) => [
-		// One zip belongs to exactly one city (the seed dataset has one record
-		// per zip). Accepted limitation: zips labeled with a borough/neighborhood
-		// city (e.g. Brooklyn, Flushing) no longer roll up to their metro city
-		// (New York, NY lost ~200 zips when the old NYC_ZIP_RANGES aliasing was
-		// removed). Revisit with metro aliasing if a zip ever needs two cities.
-		uniqueIndex('city_zips_zip_unique').on(table.zip),
-		index('city_zips_city_id_index').on(table.cityId),
-		unique('city_zips_id_city_id_unique').on(table.id, table.cityId),
-		foreignKey({
-			columns: [table.cityId],
-			foreignColumns: [cities.id],
-			name: 'city_zips_city_id_fk',
-		}),
-	],
-)
+import { user } from './auth'
+import { cities, cityZips } from './geo'
 
 export const clientRole = pgEnum('client_role', ['buyer', 'seller'])
 

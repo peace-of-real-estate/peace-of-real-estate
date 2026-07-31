@@ -7,7 +7,7 @@ import { inject } from 'vite-plus/test'
 
 import { test as baseTest } from './server'
 
-const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
+const DEFAULT_SCHEMA_PATH = 'src/db/schema/index.ts'
 const ROOT_MARKERS = [
 	'vite.config.ts',
 	'vite.config.mts',

@@ -11,7 +11,7 @@ import {
 	clientProfileZips,
 	sellerDetails,
 	user,
-} from '@/db/tables'
+} from '@/db/schema'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { toZipGeography, type ResolvedCity } from '@/lib/geography/zip'
 

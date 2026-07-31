@@ -13,7 +13,7 @@ import {
 	session,
 	user,
 	userEntitlements,
-} from '../../../src/db/tables'
+} from '../../../src/db/schema'
 import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
 import { BUCKET_ORDER } from '../../../src/lib/price-range'
 import {
