@@ -170,6 +170,11 @@ export async function createIntroUnlockCheckout(
 			)
 			.limit(1)
 		if (existing) {
+			const selected = existing.selectedIntroductionIds ?? []
+			const unchanged =
+				selected.length === introductionIds.length &&
+				selected.every((id, index) => id === introductionIds[index])
+			if (unchanged) return existing
 			const [updated] = await tx
 				.update(introCheckoutReservations)
 				.set({ selectedIntroductionIds: introductionIds, updatedAt: now })
@@ -227,6 +232,20 @@ export async function createIntroUnlockCheckout(
 		}
 	}
 
+	// updatedAt anchors the idempotency key: it moves only when the selection
+	// changes or a stored session turns out to be unusable, so concurrent
+	// callers sharing one snapshot keep one key while a replacement session
+	// always mints a fresh key (reusing one would replay the dead session).
+	let keyStamp = reservation.updatedAt.getTime()
+	if (reservation.stripeSessionId) {
+		const [bumped] = await db
+			.update(introCheckoutReservations)
+			.set({ updatedAt: new Date() })
+			.where(eq(introCheckoutReservations.id, reservation.id))
+			.returning({ updatedAt: introCheckoutReservations.updatedAt })
+		keyStamp = bumped!.updatedAt.getTime()
+	}
+
 	const session = await stripe.checkout.sessions.create(
 		{
 			mode: 'payment',
@@ -240,10 +259,7 @@ export async function createIntroUnlockCheckout(
 			cancel_url: `${input.origin}${input.returnPath}`,
 		},
 		{
-			// updatedAt changes whenever the reservation snapshot changes, so
-			// retries after an expired session mint a new Stripe session while
-			// concurrent callers sharing one snapshot keep one key.
-			idempotencyKey: `intro-unlock-${reservation.id}-${reservation.updatedAt.getTime()}`,
+			idempotencyKey: `intro-unlock-${reservation.id}-${keyStamp}`,
 		},
 	)
 
@@ -261,7 +277,7 @@ export async function createIntroUnlockCheckout(
 	}
 	await db
 		.update(introCheckoutReservations)
-		.set({ stripeSessionId: session.id, updatedAt: new Date() })
+		.set({ stripeSessionId: session.id })
 		.where(eq(introCheckoutReservations.id, reservation.id))
 	return { url: session.url, sessionId: session.id }
 }

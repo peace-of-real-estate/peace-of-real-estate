@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequestUrl } from '@tanstack/react-start/server'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
@@ -22,7 +21,7 @@ export const createIntroUnlockCheckout = createServerFn({ method: 'POST' })
 		return createCheckout(db, {
 			userId,
 			role: data.role,
-			origin: getRequestUrl().origin,
+			origin: new URL(serverEnv.BETTER_AUTH_URL).origin,
 			returnPath: data.returnPath,
 			introductionIds: data.introductionIds,
 		})
