@@ -45,6 +45,9 @@ export interface AgentSummaryProfile {
 }
 
 export type SummaryItem = {
+	/** Stable identifier (question id or profile-field slug) for grouping and
+	 * styling; `label` is display-only and free to change. */
+	key: string
 	label: string
 	value: string
 	icon: ElementType
@@ -80,6 +83,7 @@ function getClientSummaryItems(
 ): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
 		{
+			key: 'budget',
 			label: 'Budget',
 			value: formatPriceRange({
 				min: profile.priceMin,
@@ -89,6 +93,7 @@ function getClientSummaryItems(
 		},
 		profile.propertyTypes.length
 			? {
+					key: 'homeType',
 					label: 'Home Type',
 					value: profile.propertyTypes
 						.map((type) => getEnumLabel(propertyType.labels, type))
@@ -181,7 +186,9 @@ function formatQuestionSummary(
 			const slug = question.options.slugs.find((slug) => slug === answer)
 			if (slug === undefined) return null
 			const value = question.options.labels[slug]
-			return value ? { label: question.label, value, icon } : null
+			return value
+				? { key: question.id, label: question.label, value, icon }
+				: null
 		}
 		case 'freeForm': {
 			return null
@@ -192,11 +199,13 @@ function formatQuestionSummary(
 function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
 		{
+			key: 'typicalPriceRange',
 			label: 'Typical price range',
 			value: AGENT_PRICE_BUCKET_LABELS[profile.typicalPriceRange],
 			icon: MoneyIcon,
 		},
 		{
+			key: 'representationSide',
 			label: 'Representation',
 			value: getEnumLabel(
 				representationSide.labels,
@@ -206,6 +215,7 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 		},
 		profile.zipCodes.length
 			? {
+					key: 'serviceAreas',
 					label: 'Service areas',
 					value: profile.zipCodes.slice(0, 3).join(', '),
 					icon: BriefcaseIcon,
@@ -213,6 +223,7 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 			: null,
 		profile.bestClientType
 			? {
+					key: 'bestClientType',
 					label: 'Best clients',
 					value: getEnumLabel(bestClientType.labels, profile.bestClientType),
 					icon: UserIcon,
@@ -220,6 +231,7 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 			: null,
 		profile.yearsLicensed
 			? {
+					key: 'experience',
 					label: 'Experience',
 					value: getEnumLabel(yearsLicensed.labels, profile.yearsLicensed),
 					icon: StarIcon,
