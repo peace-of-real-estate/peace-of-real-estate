@@ -17,6 +17,14 @@ import {
 
 import { US_POSTAL_CODES } from '@/lib/geography/states'
 import {
+	ACTIVE_STATUSES,
+	buildIntroductionDataChecks,
+	INTRODUCTION_NOTIFICATION_KINDS,
+	INTRODUCTION_STATUSES,
+	PAIR_BLOCKING_STATUSES,
+	statusIn,
+} from '@/lib/introductions/intro-data'
+import {
 	agentIdentityColumns,
 	agentMatchingColumns,
 	agentQuizColumns,
@@ -337,6 +345,16 @@ export const clientProfileZips = snakeCase.table(
 	],
 )
 
+export const introductionStatus = pgEnum(
+	'introduction_status',
+	INTRODUCTION_STATUSES,
+)
+
+export const introductionNotificationKind = pgEnum(
+	'introduction_notification_kind',
+	INTRODUCTION_NOTIFICATION_KINDS,
+)
+
 export const agentProfileZips = snakeCase.table(
 	'agent_profile_zips',
 	{
@@ -359,5 +377,119 @@ export const agentProfileZips = snakeCase.table(
 			foreignColumns: [cityZips.id, cityZips.cityId],
 			name: 'agent_profile_zips_city_zip_city_fk',
 		}),
+	],
+)
+
+export const introductions = snakeCase.table(
+	'introductions',
+	{
+		id: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		agentProfileId: text().notNull(),
+		status: introductionStatus().default('pending').notNull(),
+		acceptedAt: timestamp({ withTimezone: true }),
+		connectedAt: timestamp({ withTimezone: true }),
+		closedAt: timestamp({ withTimezone: true }),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'introductions_client_profile_id_fk',
+		}).onDelete('cascade'),
+		foreignKey({
+			columns: [table.agentProfileId],
+			foreignColumns: [agentProfiles.id],
+			name: 'introductions_agent_profile_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('introductions_active_pair_index')
+			.on(table.agentProfileId, table.clientProfileId)
+			.where(statusIn(table.status, PAIR_BLOCKING_STATUSES)),
+		index('introductions_client_active_index')
+			.on(table.clientProfileId)
+			.where(statusIn(table.status, ACTIVE_STATUSES)),
+		index('introductions_client_created_index').on(
+			table.clientProfileId,
+			table.createdAt,
+		),
+		index('introductions_agent_status_index').on(
+			table.agentProfileId,
+			table.status,
+		),
+		...buildIntroductionDataChecks(table).map(({ name, predicate }) =>
+			check(name, predicate),
+		),
+	],
+)
+
+export const connectionNotificationJobs = snakeCase.table(
+	'connection_notification_jobs',
+	{
+		introductionId: text().primaryKey().notNull(),
+		agentSentAt: timestamp({ withTimezone: true }),
+		clientSentAt: timestamp({ withTimezone: true }),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.introductionId],
+			foreignColumns: [introductions.id],
+			name: 'connection_notification_jobs_introduction_id_fk',
+		}).onDelete('cascade'),
+	],
+)
+
+export const introductionNotificationJobs = snakeCase.table(
+	'introduction_notification_jobs',
+	{
+		id: text().primaryKey().notNull(),
+		introductionId: text().notNull(),
+		kind: introductionNotificationKind().notNull(),
+		sentAt: timestamp({ withTimezone: true }),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.introductionId],
+			foreignColumns: [introductions.id],
+			name: 'introduction_notification_jobs_introduction_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('introduction_notification_jobs_intro_kind_index').on(
+			table.introductionId,
+			table.kind,
+		),
+		index('introduction_notification_jobs_pending_index')
+			.on(table.kind)
+			.where(sql`${table.sentAt} is null`),
+	],
+)
+
+export const introAccessWindows = snakeCase.table(
+	'intro_access_windows',
+	{
+		id: text().primaryKey().notNull(),
+		clientProfileId: text().notNull(),
+		stripePaymentIntentId: text().notNull(),
+		startsAt: timestamp({ withTimezone: true }).notNull(),
+		endsAt: timestamp({ withTimezone: true }).notNull(),
+		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp({ withTimezone: true }).notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.clientProfileId],
+			foreignColumns: [clientProfiles.id],
+			name: 'intro_access_windows_client_profile_id_fk',
+		}).onDelete('cascade'),
+		uniqueIndex('intro_access_windows_profile_index').on(table.clientProfileId),
+		uniqueIndex('intro_access_windows_payment_intent_index').on(
+			table.stripePaymentIntentId,
+		),
+		check(
+			'intro_access_windows_range_check',
+			sql`${table.endsAt} > ${table.startsAt}`,
+		),
 	],
 )
