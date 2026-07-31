@@ -3,14 +3,11 @@ import { dirname, resolve } from 'node:path'
 
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Pool } from 'pg'
-
-import { REQUIRED_EXTENSIONS } from '@/db/extensions'
+import { inject } from 'vite-plus/test'
 
 import { test as baseTest } from './server'
 
 const DEFAULT_SCHEMA_PATH = 'src/db/tables.ts'
-const DEFAULT_IMAGE = 'postgres:17'
-const DEFAULT_EXTENSIONS = REQUIRED_EXTENSIONS
 const ROOT_MARKERS = [
 	'vite.config.ts',
 	'vite.config.mts',
@@ -25,7 +22,6 @@ const ROOT_MARKERS = [
 export interface DbConfig {
 	root?: string
 	schemaPath?: string
-	postgresImage?: string
 }
 
 export type Database = NodePgDatabase & {
@@ -63,33 +59,23 @@ export const test = baseTest.extend<DbFixture>({
 	],
 	db: [
 		async ({ seedFunction }, use) => {
-			const { PostgreSqlContainer } = await import('@testcontainers/postgresql')
 			const { drizzle } = await import('drizzle-orm/node-postgres')
-			const { Wait } = await import('testcontainers')
 			const { Pool } = await import('pg')
 			const root = dbConfig.root ?? findProjectRoot()
 			const schemaPath = resolve(
 				root,
 				dbConfig.schemaPath ?? DEFAULT_SCHEMA_PATH,
 			)
-			const container = await new PostgreSqlContainer(
-				dbConfig.postgresImage ?? DEFAULT_IMAGE,
-			)
-				.withWaitStrategy(Wait.forHealthCheck())
-				.start()
-			const client = new Pool({
-				connectionString: container.getConnectionUri(),
-			})
+			const client = new Pool({ connectionString: inject('dbUri') })
 			const db = Object.assign(drizzle({ client }), {
 				$client: client,
 			})
 
 			try {
-				await seedDatabase(db, { schemaPath, seedFunction })
+				await resetDatabase(db, { schemaPath, seedFunction })
 				await use(db)
 			} finally {
 				await db.$client.end()
-				await container.stop()
 			}
 		},
 		{ scope: 'file' },
@@ -106,30 +92,18 @@ export function initDb(
 	seedFunction = seed
 }
 
-export interface SeedDatabaseOptions {
+export interface ResetDatabaseOptions {
 	schemaPath: string
 	seedFunction?: (db: Database) => Promise<void> | void
-	extensions?: readonly string[]
 }
 
-export async function seedDatabase(
+export async function resetDatabase(
 	db: Database,
-	{
-		schemaPath,
-		seedFunction,
-		extensions = DEFAULT_EXTENSIONS,
-	}: SeedDatabaseOptions,
+	{ schemaPath, seedFunction }: ResetDatabaseOptions,
 ) {
-	const { migrate } = await import('drizzle-orm/node-postgres/migrator')
 	const { reset } = await import('drizzle-seed')
 	const schema = await import(/* @vite-ignore */ schemaPath)
 
-	for (const ext of extensions) {
-		await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
-	}
-	await migrate(db, {
-		migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
-	})
 	await reset(db, schema)
 	if (seedFunction) await seedFunction(db)
 }
