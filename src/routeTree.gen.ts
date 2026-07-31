@@ -14,6 +14,7 @@ import { Route as ChooseRoleRouteImport } from './routes/choose-role'
 import { Route as dashboardAgentRouteRouteImport } from './routes/(dashboard)/agent/route'
 import { Route as dashboardBuyerRouteRouteImport } from './routes/(dashboard)/buyer/route'
 import { Route as dashboardSellerRouteRouteImport } from './routes/(dashboard)/seller/route'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe-webhook'
 import { Route as AuthBetaRouteImport } from './routes/auth/beta'
 import { Route as AuthCompleteRouteImport } from './routes/auth/complete'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -70,6 +71,11 @@ const dashboardBuyerRouteRoute = dashboardBuyerRouteRouteImport.update({
 const dashboardSellerRouteRoute = dashboardSellerRouteRouteImport.update({
   id: '/(dashboard)/seller',
   path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe-webhook',
+  path: '/api/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthBetaRoute = AuthBetaRouteImport.update({
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/agent': typeof dashboardAgentRouteRouteWithChildren
   '/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/(dashboard)/agent': typeof dashboardAgentRouteRouteWithChildren
   '/(dashboard)/buyer': typeof dashboardBuyerRouteRouteWithChildren
   '/(dashboard)/seller': typeof dashboardSellerRouteRouteWithChildren
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
   '/auth/beta': typeof AuthBetaRoute
   '/auth/complete': typeof AuthCompleteRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -375,6 +384,7 @@ export interface FileRouteTypes {
     | '/agent'
     | '/buyer'
     | '/seller'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
@@ -414,6 +424,7 @@ export interface FileRouteTypes {
     | '/agent'
     | '/buyer'
     | '/seller'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
@@ -453,6 +464,7 @@ export interface FileRouteTypes {
     | '/(dashboard)/agent'
     | '/(dashboard)/buyer'
     | '/(dashboard)/seller'
+    | '/api/stripe-webhook'
     | '/auth/beta'
     | '/auth/complete'
     | '/auth/forgot-password'
@@ -493,6 +505,7 @@ export interface RootRouteChildren {
   dashboardAgentRouteRoute: typeof dashboardAgentRouteRouteWithChildren
   dashboardBuyerRouteRoute: typeof dashboardBuyerRouteRouteWithChildren
   dashboardSellerRouteRoute: typeof dashboardSellerRouteRouteWithChildren
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   AuthBetaRoute: typeof AuthBetaRoute
   AuthCompleteRoute: typeof AuthCompleteRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -544,6 +557,13 @@ declare module '@tanstack/react-router' {
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof dashboardSellerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe-webhook': {
+      id: '/api/stripe-webhook'
+      path: '/api/stripe-webhook'
+      fullPath: '/api/stripe-webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/beta': {
@@ -879,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   dashboardAgentRouteRoute: dashboardAgentRouteRouteWithChildren,
   dashboardBuyerRouteRoute: dashboardBuyerRouteRouteWithChildren,
   dashboardSellerRouteRoute: dashboardSellerRouteRouteWithChildren,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   AuthBetaRoute: AuthBetaRoute,
   AuthCompleteRoute: AuthCompleteRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
