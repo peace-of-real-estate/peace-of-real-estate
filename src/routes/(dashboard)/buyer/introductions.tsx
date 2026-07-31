@@ -1,11 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { Wip } from '@/components/wip'
+import {
+	clientIntroductionsSearchSchema,
+	ClientIntroductionsRoute,
+	requireClientIntroductionsProfile,
+} from '@/routes/(dashboard)/-components/client-introductions-route'
 
 export const Route = createFileRoute('/(dashboard)/buyer/introductions')({
-	component: Introductions,
+	validateSearch: clientIntroductionsSearchSchema,
+	beforeLoad: () => requireClientIntroductionsProfile('buyer'),
+	component: IntroductionsRoute,
 })
 
-function Introductions() {
-	return <Wip title="Introductions" />
+function IntroductionsRoute() {
+	const { unlock } = Route.useSearch()
+	return <ClientIntroductionsRoute clientRole="buyer" unlock={unlock} />
 }
