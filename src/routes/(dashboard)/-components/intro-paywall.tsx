@@ -16,6 +16,8 @@ import {
 import { createIntroUnlockCheckout } from '@/lib/payments/server'
 import type { ClientRole } from '@/lib/profile/types'
 
+import { formatIntroductionDate } from './introduction-utils'
+
 const unlockPrice = new Intl.NumberFormat('en-US', {
 	style: 'currency',
 	currency: INTRO_UNLOCK_CURRENCY,
@@ -70,13 +72,7 @@ export function IntroPaywall({
 		return (
 			<Badge variant="secondary" className="gap-1.5 px-3 py-1.5 text-xs">
 				<ShieldCheckIcon className="h-3.5 w-3.5" />
-				Access active until{' '}
-				{new Date(endsAt).toLocaleDateString('en-US', {
-					month: 'short',
-					day: 'numeric',
-					year: 'numeric',
-					timeZone: 'UTC',
-				})}
+				Access active until {formatIntroductionDate(endsAt)}
 			</Badge>
 		)
 	}
