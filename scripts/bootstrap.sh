@@ -12,7 +12,7 @@ if [[ -n "$main_root" && "$main_root" != "$PWD" ]]; then
 		if [[ ! -f "$file" && -f "$main_root/$file" ]]; then
 			# DATABASE_URL is per-workspace (generated into .env.compose by
 			# scripts/setup.ts); copying it would point at the wrong port.
-			grep -v '^DATABASE_URL=' "$main_root/$file" >"$file"
+			sed '/^DATABASE_URL=/d' "$main_root/$file" >"$file"
 			echo "copied $file from $main_root"
 		fi
 	done

@@ -40,7 +40,7 @@ import { pickWeighted, sample, type WeightedOption } from './stats'
 const agentAnswerPickers: {
 	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>
 } = {
-	bestClientType: () => pick(agentQuestions['bestClientType'].options.slugs),
+	bestClientType: () => pick(CLIENT_TYPES),
 	clientDescription: () =>
 		pick(agentQuestions['clientDescription'].options.slugs),
 	communicationFrequency: () =>
@@ -95,7 +95,7 @@ function generatePersona(): AgentPersona {
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
 		typicalPriceRange: pick(BUCKET_ORDER),
-		bestClientType: pick(CLIENT_TYPES),
+		bestClientType: pickAnswer('bestClientType'),
 		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
 		clientDescription: pickAnswer('clientDescription'),

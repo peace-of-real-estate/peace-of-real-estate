@@ -136,5 +136,5 @@ test('preview screenshot', async () => {
 	mockAgentDraft = { ...identity, ...market, ...preferences }
 	await renderRoute({ path: '/signup/preview/agent' })
 	await expect.element(page.getByText('$400k – $750k')).toBeVisible()
-	await expectScreenshot(document.body, { name: 'step-6-preview' })
+	await expectScreenshot(document.body, { name: 'step-4-preview' })
 })

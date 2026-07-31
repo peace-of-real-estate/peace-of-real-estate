@@ -25,15 +25,18 @@ export default async function setup(project: TestProject) {
 
 	try {
 		const client = new Pool({ connectionString: container.getConnectionUri() })
-		const db = drizzle({ client })
-		const schemaPath = resolve(process.cwd(), 'src/db/tables.ts')
-		for (const ext of REQUIRED_EXTENSIONS) {
-			await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
+		try {
+			const db = drizzle({ client })
+			const schemaPath = resolve(process.cwd(), 'src/db/tables.ts')
+			for (const ext of REQUIRED_EXTENSIONS) {
+				await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
+			}
+			await migrate(db, {
+				migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
+			})
+		} finally {
+			await client.end()
 		}
-		await migrate(db, {
-			migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
-		})
-		await client.end()
 	} catch (error) {
 		await container.stop()
 		throw error

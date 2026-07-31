@@ -166,15 +166,6 @@ type SummaryQuestion =
 				labels: Readonly<Record<string, string>>
 			}
 	  }
-	| {
-			kind: 'multi'
-			id: string
-			label: string
-			options: {
-				slugs: readonly string[]
-				labels: Readonly<Record<string, string>>
-			}
-	  }
 	| { kind: 'freeForm'; id: string; label: string }
 
 function formatQuestionSummary(
@@ -190,15 +181,6 @@ function formatQuestionSummary(
 			const slug = question.options.slugs.find((slug) => slug === answer)
 			if (slug === undefined) return null
 			const value = question.options.labels[slug]
-			return value ? { label: question.label, value, icon } : null
-		}
-		case 'multi': {
-			const selected = question.options.slugs.filter((slug) =>
-				answer.includes(slug),
-			)
-			const value = selected
-				.map((slug) => question.options.labels[slug])
-				.join(', ')
 			return value ? { label: question.label, value, icon } : null
 		}
 		case 'freeForm': {

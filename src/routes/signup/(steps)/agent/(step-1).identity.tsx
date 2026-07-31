@@ -122,7 +122,7 @@ function AgentIdentity({
 								onChange={setSide}
 							/>
 							{showSideError ? (
-								<p role="alert" className="sr-only">
+								<p role="alert" className="text-destructive text-xs">
 									Select who you represent.
 								</p>
 							) : null}
@@ -200,7 +200,7 @@ function AgentIdentity({
 								onChange={setYearsLicensedValue}
 							/>
 							{showYearsError ? (
-								<p role="alert" className="sr-only">
+								<p role="alert" className="text-destructive text-xs">
 									Select your years licensed.
 								</p>
 							) : null}

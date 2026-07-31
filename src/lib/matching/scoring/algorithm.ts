@@ -351,6 +351,22 @@ function scoreSpecialization(
 
 	const checks: SubCheck[] = []
 
+	if (primary === 'other') {
+		checks.push({
+			label: 'agent specialty',
+			client: formatList(expected),
+			agent: 'other',
+			passed: null,
+			effect: 'neutral 0.5',
+		})
+		return {
+			score: 0.5,
+			explanation:
+				"agent's best work is 'other' — carries no specialization signal, neutral 0.5",
+			checks,
+		}
+	}
+
 	if (expected.length === 0) {
 		checks.push({
 			label: 'client signals',

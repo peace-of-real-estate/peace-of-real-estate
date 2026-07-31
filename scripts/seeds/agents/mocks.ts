@@ -1,4 +1,5 @@
-import { bestClientType } from '../../../src/lib/profile'
+import { bestClientType, representationSide } from '../../../src/lib/profile'
+import type { SlugOf } from '../../../src/lib/profile'
 import type { WeightedOption } from './stats'
 
 export const FIRST_NAMES = [
@@ -397,7 +398,9 @@ export const CITIES = [
 	},
 ] as const
 
-export const REPRESENTATION_SIDES: WeightedOption<'buyer' | 'seller'>[] = [
+export const REPRESENTATION_SIDES: WeightedOption<
+	SlugOf<typeof representationSide>
+>[] = [
 	{ value: 'buyer', weight: 60 },
 	{ value: 'seller', weight: 40 },
 ]

@@ -61,11 +61,10 @@ function AgentMarket({
 	const showPriceError = hasTriedContinue && !priceComplete
 
 	const handleContinue = () => {
-		if (!canContinue) {
+		if (!canContinue || priceBucket === undefined) {
 			setHasTriedContinue(true)
 			return
 		}
-		if (!priceBucket) return
 
 		onUpdate({ typicalPriceRange: priceBucket })
 		onContinue()
@@ -123,7 +122,7 @@ function AgentMarket({
 								onChange={setPriceBucket}
 							/>
 							{showPriceError ? (
-								<p role="alert" className="sr-only">
+								<p role="alert" className="text-destructive text-xs">
 									Select a typical price range.
 								</p>
 							) : null}
