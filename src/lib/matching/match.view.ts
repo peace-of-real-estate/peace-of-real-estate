@@ -4,15 +4,6 @@ import type { AgentProfile } from '@/lib/profile/types'
 
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
 
-const DIMENSIONS: ScoreBucket[] = [
-	'Location',
-	'Price Fit',
-	'Specialization',
-	'Working Style',
-	'Communication',
-	'Business Terms',
-]
-
 export interface AgentMatchData {
 	id: string
 	name: string
@@ -25,7 +16,7 @@ export interface AgentMatchData {
 	experience?: string
 	agency?: string
 	bestClientType: string
-	scores: Record<string, number>
+	scores: Record<ScoreBucket, number>
 	avatar?: string
 }
 
@@ -54,9 +45,7 @@ export function toAgentMatchData({
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
 		bestClientType: bestClientType.labels[agent.bestClientType],
-		scores: Object.fromEntries(
-			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
-		),
+		scores: { ...score.scores },
 		...(avatar ? { avatar } : {}),
 	}
 }
