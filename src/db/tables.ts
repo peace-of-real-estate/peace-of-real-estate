@@ -62,6 +62,13 @@ export const user = snakeCase.table(
 		email: text().notNull(),
 		emailVerified: boolean().default(false).notNull(),
 		image: text(),
+		// better-auth admin plugin fields. `role` is only ever read by the plugin
+		// itself to authorize impersonation — this app's own admin check stays
+		// the ADMIN_EMAILS allowlist in src/lib/auth/session.ts.
+		role: text(),
+		banned: boolean().default(false),
+		banReason: text(),
+		banExpires: timestamp({ withTimezone: true }),
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
@@ -103,6 +110,9 @@ export const session = snakeCase.table(
 		expiresAt: timestamp({ withTimezone: true }).notNull(),
 		ipAddress: text(),
 		userAgent: text(),
+		// better-auth admin plugin: set while an admin is impersonating this
+		// session's user; cleared by stopImpersonating.
+		impersonatedBy: text(),
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
