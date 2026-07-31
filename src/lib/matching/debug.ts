@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { cities, clientProfiles, clientRole, user } from '@/db/tables'
+import { cities, clientProfiles, clientRole, user } from '@/db/schema'
 import { requireUserId } from '@/lib/auth/session'
 import type { UsPostalCode } from '@/lib/geography/states'
 import { formatCityName } from '@/lib/geography/zip'

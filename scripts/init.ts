@@ -4,7 +4,7 @@ import { sql } from 'drizzle-orm'
 import * as zipcodes from 'zipcodes'
 
 import { db } from '../src/db/connection'
-import { cities, cityZips } from '../src/db/tables'
+import { cities, cityZips } from '../src/db/schema'
 import {
 	usPostalCodeSchema,
 	type UsPostalCode,
