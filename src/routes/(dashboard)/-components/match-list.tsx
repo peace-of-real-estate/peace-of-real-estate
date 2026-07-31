@@ -64,9 +64,11 @@ function MatchCard({ match }: { match: AgentMatchData }) {
 						)}
 					</div>
 
-					<span className="bg-secondary text-secondary-foreground mt-2 inline-block w-fit rounded-sm px-2 py-0.5 text-xs font-medium">
-						{match.bestClientType}
-					</span>
+					{match.enjoyedClients ? (
+						<span className="bg-secondary text-secondary-foreground mt-2 inline-block w-fit rounded-sm px-2 py-0.5 text-xs font-medium">
+							{match.enjoyedClients}
+						</span>
+					) : null}
 				</div>
 
 				<Button variant="outline" size="sm" className="shrink-0">

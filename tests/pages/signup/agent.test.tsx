@@ -38,15 +38,13 @@ const market: AgentDraft = {
 }
 
 const preferences: AgentDraft = {
-	bestClientType: 'firstTime',
-	clientDescription: 'strategicDataDriven',
-	communicationFrequency: 'scheduled',
-	quickCommunicationChannel: 'text',
-	updateDeliveryMethod: 'email',
-	difficultDealInstinct: 'factsFast',
-	responseTime: 'within10Min',
-	commissionApproach: 'proactiveOpen',
-	unrepresentedBuyerApproach: 'representSellerOnly',
+	enjoyedClients: ['firstTimeBuyers'],
+	clientDecisionStyle: 'middleGround',
+	clientContactStyle: 'regularCheckins',
+	riskAdviceComfort: 'lowRisk',
+	commissionStyle: 'walkThroughRate',
+	specialties: [],
+	energyFocus: ['calm', 'explainSteps'],
 }
 
 test('identity step screenshot', async () => {
@@ -104,15 +102,6 @@ test('market step screenshot', async () => {
 	await renderRoute({ path: '/signup/agent/market' })
 	await expectScreenshot(document.body, {
 		name: 'step-2-market',
-		prepare: waitForZipMapIdle,
-	})
-})
-
-test('market step idle screenshot', async () => {
-	mockAgentDraft = { ...identity, ...market }
-	await renderRoute({ path: '/signup/agent/market' })
-	await expectScreenshot(document.body, {
-		name: 'step-2-market-idle',
 		prepare: waitForZipMapIdle,
 	})
 })

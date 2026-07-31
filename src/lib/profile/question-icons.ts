@@ -1,10 +1,8 @@
 import {
 	BriefcaseIcon,
 	ChatIcon,
-	ClockIcon,
-	EnvelopeIcon,
+	CurrencyDollarIcon,
 	HouseIcon,
-	LightningIcon,
 	ScalesIcon,
 	ShieldIcon,
 	StarIcon,
@@ -14,43 +12,32 @@ import {
 import type { ElementType } from 'react'
 
 import type {
-	AgentWorkStyleQuestionId,
+	AgentQuestionId,
 	BuyerQuestionId,
 	SellerQuestionId,
 } from './profile-fields'
 
+const clientSharedQuestionIcons = {
+	decisionStyle: ScalesIcon,
+	contactStyle: ChatIcon,
+	riskComfort: ShieldIcon,
+	commissionPlan: CurrencyDollarIcon,
+	situationSpecialties: BriefcaseIcon,
+} as const
+
 const questionIconMap = {
-	// Buyer
-	experienceLevel: StarIcon,
-	idealAgentRelationship: ChatIcon,
-	decisionMakingNeed: ScalesIcon,
-	biddingWarResponse: TargetIcon,
-	quickCommunicationChannel: ChatIcon,
-	updateDeliveryMethod: EnvelopeIcon,
-	responseTimeExpectation: ClockIcon,
-	involvementLevel: TargetIcon,
-	commissionComfort: ShieldIcon,
-
-	// Seller
-	saleMotivation: StarIcon,
-	successfulSaleLooksLike: TargetIcon,
-	homeConnection: HouseIcon,
-	agentSilencePreference: ClockIcon,
-	representationPreference: ShieldIcon,
-
-	// Agent
-	bestClientType: BriefcaseIcon,
-	clientDescription: UserIcon,
-	communicationFrequency: ChatIcon,
-	difficultDealInstinct: ScalesIcon,
-	responseTime: ClockIcon,
-	commissionApproach: ShieldIcon,
-	unrepresentedBuyerApproach: LightningIcon,
-
-	// Free form
-	notFitFor: UserIcon,
+	buyingExperience: StarIcon,
+	sellingMotivation: HouseIcon,
+	...clientSharedQuestionIcons,
+	enjoyedClients: BriefcaseIcon,
+	clientDecisionStyle: ScalesIcon,
+	clientContactStyle: ChatIcon,
+	riskAdviceComfort: ShieldIcon,
+	commissionStyle: CurrencyDollarIcon,
+	specialties: BriefcaseIcon,
+	energyFocus: TargetIcon,
 } satisfies Record<
-	BuyerQuestionId | SellerQuestionId | AgentWorkStyleQuestionId,
+	BuyerQuestionId | SellerQuestionId | AgentQuestionId,
 	ElementType
 >
 
