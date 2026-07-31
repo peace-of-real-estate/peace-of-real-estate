@@ -1,7 +1,18 @@
-export function QuestionPrompt({ title }: { title: string }) {
+export function QuestionPrompt({
+	title,
+	subtitle,
+}: {
+	title: string
+	subtitle?: string | undefined
+}) {
 	return (
-		<h3 className="font-heading text-xl font-semibold tracking-tight">
-			{title}
-		</h3>
+		<div className="space-y-1">
+			<h3 className="font-heading text-2xl font-semibold tracking-tight">
+				{title}
+			</h3>
+			{subtitle ? (
+				<p className="text-muted-foreground text-sm">{subtitle}</p>
+			) : null}
+		</div>
 	)
 }
