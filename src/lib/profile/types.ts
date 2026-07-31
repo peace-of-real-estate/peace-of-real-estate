@@ -7,7 +7,7 @@ import {
 	clientProfiles,
 	clientRole,
 	sellerDetails,
-} from '@/db/tables'
+} from '@/db/schema'
 import type { ResolvedCity, ZipGeography } from '@/lib/geography/zip'
 import { agentPriceBucketSchema, priceBoundSchema } from '@/lib/price-range'
 import { agentQuestionIds, propertyType } from '@/lib/profile/profile-fields'
@@ -131,6 +131,15 @@ export type AgentProfile = Omit<typeof agentProfiles.$inferSelect, 'cityId'> &
 	ResolvedGeography
 
 export type ClientProfile = BuyerProfile | SellerProfile
+
+export type ClientWorkStyle = Pick<
+	ClientProfile,
+	| 'quickCommunicationChannel'
+	| 'updateDeliveryMethod'
+	| 'responseTimeExpectation'
+	| 'involvementLevel'
+	| 'commissionComfort'
+>
 
 export type BuyerDraft = z.infer<typeof buyerDraftSchema>
 
