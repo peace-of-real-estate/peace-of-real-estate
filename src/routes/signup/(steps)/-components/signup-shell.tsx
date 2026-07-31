@@ -300,68 +300,11 @@ function WizardChrome<TStep extends string>({
 				<div className="bg-card border-b px-4 py-4 lg:hidden">{progress}</div>
 			) : null}
 
-			<main className="flex flex-1 flex-col overflow-y-auto xl:pr-72">
+			<main className="relative isolate flex flex-1 flex-col overflow-y-auto xl:pr-72">
 				<div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:py-12 xl:py-16">
 					{children}
 				</div>
 			</main>
-		</div>
-	)
-}
-
-export function StepProgressHeader({
-	stepNumber,
-	totalSteps,
-	title,
-	items,
-	titleIcon: TitleIcon,
-	showTitle = true,
-}: {
-	stepNumber: number
-	totalSteps: number
-	title: string
-	items: boolean[]
-	titleIcon?: Icon
-	showTitle?: boolean
-}) {
-	const completedCount = items.filter(Boolean).length
-	const total = items.length
-	const isComplete = completedCount === total
-
-	return (
-		<div className="space-y-2">
-			{showTitle && (
-				<div className="flex items-center justify-between gap-3">
-					<div>
-						<p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-							Step {stepNumber} of {totalSteps}
-						</p>
-						<h2 className="font-heading flex items-center gap-2 text-xl font-semibold tracking-tight">
-							{TitleIcon && <TitleIcon className="h-5 w-5" />}
-							{title}
-						</h2>
-					</div>
-				</div>
-			)}
-			<div className="flex items-center gap-3">
-				<div
-					className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full"
-					aria-hidden="true"
-				>
-					<div
-						className="bg-primary h-full rounded-full transition-all duration-300"
-						style={{ width: `${(completedCount / total) * 100}%` }}
-					/>
-				</div>
-				<span
-					className={cn(
-						'text-xs font-semibold whitespace-nowrap tabular-nums transition-colors',
-						isComplete ? 'text-primary' : 'text-muted-foreground',
-					)}
-				>
-					{completedCount} of {total}
-				</span>
-			</div>
 		</div>
 	)
 }

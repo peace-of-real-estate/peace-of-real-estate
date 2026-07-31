@@ -37,15 +37,12 @@ const step2: BuyerDraft = {
 }
 
 const step3: BuyerDraft = {
-	experienceLevel: 'firstTime',
-	idealAgentRelationship: 'trustedAdvisor',
-	decisionMakingNeed: 'numbersData',
-	biddingWarResponse: 'factsOptions',
-	quickCommunicationChannel: 'text',
-	updateDeliveryMethod: 'email',
-	involvementLevel: 'veryInvolved',
-	responseTimeExpectation: 'within10Min',
-	commissionComfort: 'negotiate',
+	buyingExperience: 'firstTime',
+	decisionStyle: 'walkMeThrough',
+	contactStyle: 'regularCheckins',
+	riskComfort: 'lowRisk',
+	commissionPlan: 'negotiate',
+	situationSpecialties: [],
 }
 
 test('location step screenshot', async () => {

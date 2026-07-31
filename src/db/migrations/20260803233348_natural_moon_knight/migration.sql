@@ -1,0 +1,26 @@
+ALTER TABLE "agent_profiles" DROP COLUMN "best_client_type";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "not_fit_for";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "client_description";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "communication_frequency";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "quick_communication_channel";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "update_delivery_method";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "difficult_deal_instinct";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "response_time";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "commission_approach";--> statement-breakpoint
+ALTER TABLE "agent_profiles" DROP COLUMN "unrepresented_buyer_approach";--> statement-breakpoint
+ALTER TABLE "buyer_details" DROP COLUMN "experience_level";--> statement-breakpoint
+ALTER TABLE "buyer_details" DROP COLUMN "ideal_agent_relationship";--> statement-breakpoint
+ALTER TABLE "buyer_details" DROP COLUMN "decision_making_need";--> statement-breakpoint
+ALTER TABLE "buyer_details" DROP COLUMN "bidding_war_response";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "quick_communication_channel";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "update_delivery_method";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "response_time_expectation";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "involvement_level";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "commission_comfort";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "match_priorities";--> statement-breakpoint
+ALTER TABLE "client_profiles" DROP COLUMN "match_details";--> statement-breakpoint
+ALTER TABLE "seller_details" DROP COLUMN "sale_motivation";--> statement-breakpoint
+ALTER TABLE "seller_details" DROP COLUMN "successful_sale_looks_like";--> statement-breakpoint
+ALTER TABLE "seller_details" DROP COLUMN "home_connection";--> statement-breakpoint
+ALTER TABLE "seller_details" DROP COLUMN "agent_silence_preference";--> statement-breakpoint
+ALTER TABLE "seller_details" DROP COLUMN "representation_preference";

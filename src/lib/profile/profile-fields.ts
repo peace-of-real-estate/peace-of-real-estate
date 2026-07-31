@@ -1,14 +1,11 @@
 import {
 	defineEnum,
-	freeForm,
+	multi,
 	questionIds,
 	questionRecord,
 	single,
-	type OptionMeta,
 	type SlugOf,
 } from '@/lib/profile/question-types'
-
-// --- Profile / business enums ---
 
 export const profileStatus = defineEnum('profile_status', [
 	['draft', 'Draft'],
@@ -44,20 +41,6 @@ export const propertyType = defineEnum('property_type', [
 
 export type PropertyTypeSlug = SlugOf<typeof propertyType>
 
-export const bestClientType = defineEnum('best_client_type', [
-	['firstTime', 'First-time buyers'],
-	['moveUp', 'Move-up or downsizing'],
-	['relocation', 'Relocation'],
-	['luxury', 'Luxury'],
-	['investor', 'Investors'],
-	['landMultiFamily', 'Land or multi-family'],
-	['seller', 'Sellers & listings'],
-	['condoTownhome', 'Condos & townhomes'],
-	['other', 'Other'],
-])
-
-export type BestClientTypeSlug = SlugOf<typeof bestClientType>
-
 export const timeline = defineEnum('timeline', [
 	['exploring', 'Just exploring'],
 	['1month', '1 month'],
@@ -74,290 +57,202 @@ export const timeline = defineEnum('timeline', [
 	['12monthsPlus', '12+ months'],
 ])
 
-// --- Question option sets shared across roles ---
-
-export const quickCommunicationChannel = defineEnum(
-	'quick_communication_channel',
-	[
-		['text', 'Text'],
-		['phone', 'Phone'],
-		['either', 'Either is fine'],
-	],
-)
-
-export const updateDeliveryMethod = defineEnum('update_delivery_method', [
-	['email', 'Email'],
-	['textWithAttachments', 'Text with attachments'],
-	['phoneThenEmailRecap', 'Phone, then email recap'],
+export const riskComfort = defineEnum('risk_comfort', [
+	['noRisk', 'No avoidable risk'],
+	['lowRisk', 'Low risk'],
+	['moderateRisk', 'Moderate risk'],
+	['allIn', 'High risk when the upside justifies it'],
 ])
 
-const responseTimeEntries = [
-	['within10Min', 'Within 10 minutes'],
-	['within30Min', 'Within 30 minutes'],
-	['fewHours', 'A few hours'],
-	['within24Hours', 'Within 24 hours'],
+export const contactStyle = defineEnum('contact_style', [
+	['whenItMatters', 'Only when it matters'],
+	['regularCheckins', 'Regular texts, calls for anything major'],
+	['handsOn', 'Frequent contact — calls and walkthroughs'],
+])
+
+export const specialty = defineEnum('specialty', [
+	['vaMilitary', 'VA / military'],
+	['fhaDownPayment', 'FHA / down payment help'],
+	['assumableLoans', 'Assumable loans'],
+	['bridgeLoans', 'Bridge loans'],
+	['ownerFinancing', 'Owner financing'],
+	['renovationLoans', 'Renovation loans'],
+	['exchange1031', '1031 exchange'],
+	['reverseMortgage', 'Reverse mortgage'],
+	['investmentRental', 'Investment / rental'],
+	['newConstruction', 'New construction'],
+	['shortSales', 'Short sales'],
+	['probateEstate', 'Probate / estate'],
+	['tenantOccupied', 'Tenant-occupied property'],
+	['auction', 'Auction'],
+	['multigenerational', 'Multigenerational'],
+	['seniors55Plus', '55+ / seniors'],
+	['relocationOutOfState', 'Out-of-state relocation'],
+	['internationalBuyers', 'International buyers'],
+])
+
+export const buyerExperience = defineEnum('buyer_experience', [
+	['firstTime', 'First time'],
+	['onceOrTwice', 'Once or twice'],
+	['severalTimes', 'Several times'],
+])
+
+export const sellerMotivation = defineEnum('seller_motivation', [
+	['differentSize', 'Need a different size or setup'],
+	['relocating', 'Relocating'],
+	['lifeChange', 'Major life change'],
+	['rightTime', 'It is simply the right time'],
+])
+
+export const enjoyedClientType = defineEnum('enjoyed_client_type', [
+	['firstTimeBuyers', 'First-time buyers'],
+	['firstTimeSellers', 'First-time sellers'],
+	['moveUp', 'Move-up buyers'],
+	['downsizers', 'Downsizers'],
+	['relocating', 'Relocating clients'],
+	['experiencedLowMaintenance', 'Experienced, low-maintenance clients'],
+	['luxury', 'Luxury clients'],
+	['investors', 'Investors'],
+	['lifeChangeSellers', 'Life-change sellers'],
+])
+
+export type EnjoyedClientTypeSlug = SlugOf<typeof enjoyedClientType>
+
+export const agentEnergyFocus = defineEnum('agent_energy_focus', [
+	['fightHard', 'Fighting hard'],
+	['calm', 'Staying calm and steady'],
+	['moveFast', 'Moving fast'],
+	['spotProblems', 'Spotting problems early'],
+	['explainSteps', 'Explaining each step'],
+	['localKnowledge', 'Local knowledge'],
+])
+
+export const clientDecisionStyle = defineEnum('client_decision_style', [
+	['letThemLead', 'Let them lead'],
+	['walkMeThrough', 'Walk me through it'],
+	['middleGround', 'Meet me in the middle'],
+	['finalCall', 'Give your view, but I make the final call'],
+])
+
+export const agentDecisionStyle = defineEnum('agent_decision_style', [
+	['theyLetMeLead', 'They let me lead'],
+	['walkThroughFollow', 'I walk them through it'],
+	['middleGround', 'We meet in the middle'],
+	['theirCall', 'I advise, they decide'],
+])
+
+export const clientCommissionPlan = defineEnum('client_commission_plan', [
+	['negotiate', 'I plan to negotiate'],
+	['discussThenDecide', 'Discuss it, then decide'],
+	['acceptRate', 'Accept the stated rate if the fit is right'],
+])
+
+export const agentCommissionStyle = defineEnum('agent_commission_style', [
+	['openToNegotiating', 'Open to negotiating'],
+	['walkThroughRate', "I'll walk you through my rate"],
+	['rateIsSet', 'My rate is set'],
+])
+
+export const sharedClientQuestions = [
+	single('decisionStyle', {
+		title: 'How do you want decisions to work with your agent?',
+		label: 'Decision style',
+		options: clientDecisionStyle,
+	}),
+	single('contactStyle', {
+		title: 'How do you want your agent to stay in touch?',
+		label: 'Staying in touch',
+		options: contactStyle,
+	}),
+	single('riskComfort', {
+		title: 'How comfortable are you with risk?',
+		label: 'Risk comfort',
+		options: riskComfort,
+	}),
+	single('commissionPlan', {
+		title: 'How do you plan to handle commission?',
+		label: 'Commission plan',
+		options: clientCommissionPlan,
+	}),
+	multi('situationSpecialties', {
+		title: 'Do any special situations apply?',
+		label: 'Special situations',
+		options: specialty,
+		minSelections: 0,
+		maxSelections: 5,
+	}),
 ] as const
-
-export const responseTimeExpectation = defineEnum(
-	'response_time_expectation',
-	responseTimeEntries,
-)
-
-export const involvementLevel = defineEnum('involvement_level', [
-	['veryInvolved', 'Very involved'],
-	['keyDetails', 'Key details only'],
-	['handsOff', 'Hands off'],
-])
-
-export const commissionComfort = defineEnum('commission_comfort', [
-	['negotiate', 'I want to negotiate'],
-	['openOptions', 'I want to understand options'],
-	['payFairRate', "I'll pay a fair rate for the right fit"],
-	['dontUnderstand', "I'm not sure how commission works"],
-])
-
-const involvementLevelMeta: Partial<
-	Record<SlugOf<typeof involvementLevel>, OptionMeta>
-> = {
-	veryInvolved: { level: 3, description: 'I want to see everything' },
-	keyDetails: { level: 2, description: 'Keep me in the loop' },
-	handsOff: { level: 1, description: 'Tell me when it matters' },
-}
-
-// --- Quiz question lists ---
-
-const sharedClientQuestions = [
-	single('quickCommunicationChannel', {
-		title: 'How do you prefer quick back-and-forth communication?',
-		label: 'Quick chat',
-		options: quickCommunicationChannel,
-	}),
-	single('updateDeliveryMethod', {
-		title: 'How do you prefer updates, timelines, and documents?',
-		label: 'Updates & docs',
-		options: updateDeliveryMethod,
-	}),
-	single('responseTimeExpectation', {
-		title: 'How quickly do you expect a response?',
-		label: 'Response time',
-		options: responseTimeExpectation,
-	}),
-	single('involvementLevel', {
-		title: 'How involved do you want to be?',
-		label: 'Involvement',
-		options: involvementLevel,
-		optionMeta: involvementLevelMeta,
-	}),
-] as const
-
-const commissionComfortQuestion = (title: string) =>
-	single('commissionComfort', {
-		title,
-		label: 'Commission',
-		options: commissionComfort,
-	})
 
 const buyerQuestionList = [
-	single('experienceLevel', {
-		title: 'How familiar does this process feel?',
-		label: 'Experience',
-		options: defineEnum('buyer_experience_level', [
-			['firstTime', "First time; I'll want guidance"],
-			['experienced', "I've done this before, but want help staying on track"],
-			['veryExperienced', 'I know the process and want a strong operator'],
-		]),
-	}),
-	single('idealAgentRelationship', {
-		title: 'What does your ideal agent relationship look like?',
-		label: 'Ideal relationship',
-		options: defineEnum('buyer_ideal_agent_relationship', [
-			['trustedAdvisor', 'Trusted advisor'],
-			['thinkingPartner', 'Thinking partner (collaborator)'],
-			['skilledExecutor', 'Skilled executor'],
-		]),
-	}),
-	single('decisionMakingNeed', {
-		title: 'What do you need most to make a big decision?',
-		label: 'Decision support',
-		options: defineEnum('buyer_decision_making_need', [
-			['numbersData', 'The numbers/data'],
-			['timeAndSpace', 'Time and space'],
-			['trustedPerspective', 'A trusted perspective'],
-			['gutFeeling', 'A gut feeling'],
-		]),
-	}),
-	single('biddingWarResponse', {
-		title: 'After losing a bidding war, what do you need from your agent?',
-		label: 'After a loss',
-		options: defineEnum('buyer_bidding_war_response', [
-			['factsOptions', 'Facts & options immediately'],
-			['space', 'Space to step back'],
-			['reassurance', 'Reassurance'],
-			['calmPresence', 'Calm, steady presence'],
-		]),
+	single('buyingExperience', {
+		title: 'Have you bought a home before?',
+		label: 'Buying experience',
+		options: buyerExperience,
 	}),
 	...sharedClientQuestions,
-	commissionComfortQuestion(
-		'How do you plan to handle commission with your agent?',
-	),
 ] as const
 
 export const buyerQuestionIds = questionIds(buyerQuestionList)
 export type BuyerQuestionId = (typeof buyerQuestionIds)[number]
-
 export const buyerQuestions = questionRecord(buyerQuestionList)
 
 const sellerQuestionList = [
-	single('saleMotivation', {
-		title: 'What is driving this sale?',
-		label: 'Motivation',
-		options: defineEnum('seller_sale_motivation', [
-			['lifestyleChange', 'Lifestyle change'],
-			['relocation', 'Relocation'],
-			['financialPressure', 'Financial pressure'],
-			['rightTime', 'Right time'],
-			['majorTransition', 'Major life transition'],
-			['other', 'Other'],
-		]),
-	}),
-	single('successfulSaleLooksLike', {
-		title: 'What does a successful sale look like to you?',
-		label: 'Success definition',
-		options: defineEnum('seller_successful_sale_looks_like', [
-			['maximumPrice', 'Maximum price'],
-			['strongPriceSmoothProcess', 'Strong price + smooth process'],
-			['speedCertainty', 'Speed and certainty'],
-			['mustCloseByDate', 'Must close by a specific date'],
-		]),
-	}),
-	single('homeConnection', {
-		title: 'How would you describe your connection to this home?',
-		label: 'Home connection',
-		options: defineEnum('seller_home_connection', [
-			['asset', 'An asset'],
-			['goodMemories', 'Good memories'],
-			['partOfIdentity', 'Part of my identity'],
-			['complicated', 'Complicated feelings'],
-		]),
-	}),
-	single('agentSilencePreference', {
-		title: 'When not hearing from your agent, what do you prefer?',
-		label: 'Check-ins',
-		options: defineEnum('seller_agent_silence_preference', [
-			['scheduled', 'Scheduled check-ins'],
-			['milestones', 'Milestone updates'],
-			['clientLed', 'I reach out when I need something'],
-		]),
-	}),
-	single('representationPreference', {
-		title: 'Which matters more to you?',
-		label: 'Exclusivity',
-		options: defineEnum('seller_representation_preference', [
-			['broadConnections', 'Broad connections'],
-			['exclusiveRepresentationOnly', 'Exclusive representation only'],
-		]),
+	single('sellingMotivation', {
+		title: 'What is motivating your sale?',
+		label: 'Selling motivation',
+		options: sellerMotivation,
 	}),
 	...sharedClientQuestions,
-	commissionComfortQuestion(
-		'How do you plan to handle listing-agent commission?',
-	),
 ] as const
 
 export const sellerQuestionIds = questionIds(sellerQuestionList)
 export type SellerQuestionId = (typeof sellerQuestionIds)[number]
-
 export const sellerQuestions = questionRecord(sellerQuestionList)
 
 const agentQuestionList = [
-	single('bestClientType', {
-		title: 'Where do you do your best work?',
-		label: 'Best work',
-		options: bestClientType,
+	multi('enjoyedClients', {
+		title: 'Which clients do you most enjoy working with?',
+		label: 'Enjoyed clients',
+		options: enjoyedClientType,
+		minSelections: 1,
+		maxSelections: 2,
 	}),
-	single('clientDescription', {
-		title: 'How would clients describe working with you?',
-		label: 'Client description',
-		options: defineEnum('agent_client_description', [
-			['strategicDataDriven', 'Strategic and data-driven'],
-			['calmSteady', 'Calm and steady'],
-			['warmRelational', 'Warm and relational'],
-			['efficientDecisive', 'Efficient and decisive'],
-		]),
+	single('clientDecisionStyle', {
+		title: 'How do decisions work with your best clients?',
+		label: 'Client decisions',
+		options: agentDecisionStyle,
 	}),
-	single('communicationFrequency', {
-		title: 'How often do you communicate during a transaction?',
-		label: 'Communication frequency',
-		options: defineEnum('agent_communication_frequency', [
-			['scheduled', 'Scheduled updates'],
-			['milestones', 'At key milestones'],
-			['clientLed', 'When client reaches out'],
-		]),
+	single('clientContactStyle', {
+		title: 'How do you usually keep clients updated?',
+		label: 'Client updates',
+		options: contactStyle,
 	}),
-	single('quickCommunicationChannel', {
-		title: 'Preferred quick back-and-forth channel?',
-		label: 'Quick chat',
-		options: quickCommunicationChannel,
+	single('riskAdviceComfort', {
+		title: 'How much risk are you comfortable advising through?',
+		label: 'Risk advice',
+		options: riskComfort,
 	}),
-	single('updateDeliveryMethod', {
-		title: 'How do you deliver updates, timelines, documents?',
-		label: 'Updates & docs',
-		options: updateDeliveryMethod,
+	single('commissionStyle', {
+		title: 'How do you approach commission?',
+		label: 'Commission style',
+		options: agentCommissionStyle,
 	}),
-	single('difficultDealInstinct', {
-		title: 'Instinct when a deal gets difficult?',
-		label: 'Difficult deals',
-		options: defineEnum('agent_difficult_deal_instinct', [
-			['factsFast', 'Get facts fast'],
-			['slowItDown', 'Slow it down and regroup'],
-			['takeControl', 'Take control of the situation'],
-			['deEscalateFirst', 'De-escalate first'],
-		]),
+	multi('specialties', {
+		title: 'Which special situations are you strongest in?',
+		label: 'Specialties',
+		options: specialty,
+		minSelections: 0,
+		maxSelections: 5,
 	}),
-	single('responseTime', {
-		title: 'How quickly do you typically respond to clients?',
-		label: 'Response time',
-		options: defineEnum('agent_response_time', responseTimeEntries),
-	}),
-	single('commissionApproach', {
-		title: 'How do you approach commission conversations?',
-		label: 'Commission approach',
-		options: defineEnum('agent_commission_approach', [
-			['proactiveFixed', 'Proactive, fixed structure'],
-			['proactiveOpen', 'Proactive, open to discussion'],
-			['reactiveFixed', 'Reactive, fixed structure'],
-			['reactiveOpen', 'Reactive, open to discussion'],
-		]),
-	}),
-	single('unrepresentedBuyerApproach', {
-		title:
-			'If a buyer without an agent wants to see your listing, how do you prefer to handle it?',
-		label: 'Unrepresented buyers',
-		options: defineEnum('agent_unrepresented_buyer_approach', [
-			['referSeparateBrokerage', 'Refer to separate brokerage'],
-			['representSellerOnly', 'Represent seller only'],
-			['anotherAgentInBrokerage', 'Another agent in my brokerage'],
-		]),
+	multi('energyFocus', {
+		title: 'Where do you put the most energy?',
+		label: 'Energy focus',
+		options: agentEnergyFocus,
+		minSelections: 2,
+		maxSelections: 2,
 	}),
 ] as const
 
 export const agentQuestionIds = questionIds(agentQuestionList)
+export type AgentQuestionId = (typeof agentQuestionIds)[number]
 export const agentQuestions = questionRecord(agentQuestionList)
-
-export const notFitForQuestion = freeForm('notFitFor', {
-	title: 'Who are you NOT the right fit for?',
-	label: 'Not fit for',
-	allowSkip: true,
-})
-
-const agentWorkStyleQuestionList = [
-	...agentQuestionList,
-	notFitForQuestion,
-] as const
-
-export const agentWorkStyleQuestionIds = questionIds(agentWorkStyleQuestionList)
-export type AgentWorkStyleQuestionId =
-	(typeof agentWorkStyleQuestionIds)[number]
-
-export const agentWorkStyleQuestions = questionRecord(
-	agentWorkStyleQuestionList,
-)

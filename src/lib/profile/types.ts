@@ -132,6 +132,15 @@ export type AgentProfile = Omit<typeof agentProfiles.$inferSelect, 'cityId'> &
 
 export type ClientProfile = BuyerProfile | SellerProfile
 
+export type ClientWorkStyle = Pick<
+	ClientProfile,
+	| 'decisionStyle'
+	| 'contactStyle'
+	| 'riskComfort'
+	| 'commissionPlan'
+	| 'situationSpecialties'
+>
+
 export type BuyerDraft = z.infer<typeof buyerDraftSchema>
 
 export type SellerDraft = z.infer<typeof sellerDraftSchema>
