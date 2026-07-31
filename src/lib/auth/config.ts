@@ -4,7 +4,7 @@ import { oAuthProxy } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 
 import { db } from '@/db/connection'
-import { account, session, user, verification } from '@/db/tables'
+import { account, session, user, verification } from '@/db/schema'
 import { serverEnv as env } from '@/env.server'
 import { sendPasswordResetEmail } from '@/lib/email.server'
 

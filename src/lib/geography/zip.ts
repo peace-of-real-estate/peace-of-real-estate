@@ -4,7 +4,7 @@ import type { FeatureCollection } from 'geojson'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { cities, cityZips } from '@/db/tables'
+import { cities, cityZips } from '@/db/schema'
 
 import type { UsPostalCode } from './states'
 

@@ -1,4 +1,4 @@
-import { cities } from '@/db/tables'
+import { cities } from '@/db/schema'
 import type { UsPostalCode } from '@/lib/geography/states'
 import type {
 	CityCenter,
