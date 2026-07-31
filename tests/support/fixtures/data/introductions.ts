@@ -1,3 +1,5 @@
+import { and, eq } from 'drizzle-orm'
+
 import {
 	agentProfiles,
 	agentProfileZips,
@@ -11,159 +13,93 @@ import {
 	user,
 } from '@/db/schema'
 import type { ResolvedCity, ZipGeography } from '@/lib/geography/zip'
-import type { ProfileStatus } from '@/lib/profile/profile-fields'
+import type { IntroductionStatus } from '@/lib/introductions/types'
+import type { AgentProfile, BuyerProfile } from '@/lib/profile/types'
 
 import type { Database } from '../db'
-import { makeIntroUser } from './user'
+import { makeAgent } from './agent-profile'
+import { makeBuyerProfile } from './buyer-profile'
+import { makeIntroUser, type IntroUser } from './user'
 
-const HOUR_MS = 3_600_000
 const DAY_MS = 86_400_000
 
-export function hoursAgo(hours: number): Date {
-	return new Date(Date.now() - hours * HOUR_MS)
+export function daysAgo(days: number, from: Date = new Date()): Date {
+	return new Date(from.getTime() - days * DAY_MS)
 }
 
-export function daysAgo(days: number): Date {
-	return new Date(Date.now() - days * DAY_MS)
+export function hoursAgo(hours: number, from: Date = new Date()): Date {
+	return new Date(from.getTime() - hours * 3_600_000)
 }
 
-const baltimoreCity: ResolvedCity = {
+// Seeded clients and agents share the Baltimore market so location and state
+// disqualifiers don't fire unless a test opts into them.
+const INTRO_CITY: ResolvedCity = {
 	id: '01936f00-0000-7000-8000-000000000ba1',
 	name: 'Baltimore',
 	state: 'MD',
 	center: { lat: 39.2904, lng: -76.6122 },
 }
 
-const baltimoreGeography: ZipGeography = [
+const INTRO_GEOGRAPHY: ZipGeography = [
 	{ zip: '21201', center: { lat: 39.2946, lng: -76.6239 } },
-	{ zip: '21202', center: { lat: 39.3051, lng: -76.6056 } },
 ]
 
-// Deterministic ids let repeated seeds in a file-shared database dedupe via
-// onConflictDoNothing.
-const cityZipRowId = (zip: string) => `cityzips-${zip}`
-
-async function ensureCity(
-	db: Database,
-	city: ResolvedCity,
-	geography: ZipGeography,
-) {
-	await db
-		.insert(cities)
-		.values({
-			id: city.id,
-			name: city.name,
-			state: city.state,
-			centerLat: city.center.lat,
-			centerLng: city.center.lng,
-		})
-		.onConflictDoNothing()
-	if (geography.length === 0) return
-	await db
-		.insert(cityZips)
-		.values(
-			geography.map(({ zip, center }) => ({
-				id: cityZipRowId(zip),
-				cityId: city.id,
-				zip,
-				lat: center.lat,
-				lng: center.lng,
-			})),
-		)
-		.onConflictDoNothing()
+export type IntroClientSeed = {
+	user: IntroUser
+	profile: BuyerProfile
 }
 
-export async function seedClient(
-	db: Database,
-	overrides: { status?: ProfileStatus } = {},
-) {
-	const now = new Date()
+export function makeIntroClient(
+	overrides: Partial<BuyerProfile> = {},
+): IntroClientSeed {
 	const account = makeIntroUser()
-	await db.insert(user).values(account)
-	await ensureCity(db, baltimoreCity, baltimoreGeography)
-	const profile: typeof clientProfiles.$inferSelect = {
+	const profile = makeBuyerProfile({
 		id: crypto.randomUUID(),
 		userId: account.id,
-		role: 'buyer',
-		status: overrides.status ?? 'active',
-		cityId: baltimoreCity.id,
-		timeline: 'exploring',
+		status: 'active',
+		city: INTRO_CITY,
+		geography: INTRO_GEOGRAPHY,
 		priceMin: 400_000,
-		priceMax: 750_000,
-		propertyTypes: ['singleFamily'],
-		quickCommunicationChannel: 'text',
-		updateDeliveryMethod: 'email',
-		responseTimeExpectation: 'within30Min',
-		involvementLevel: 'veryInvolved',
-		commissionComfort: 'openOptions',
-		matchPriorities: null,
-		matchDetails: null,
-		createdAt: now,
-		updatedAt: now,
-	}
-	await db.insert(clientProfiles).values(profile)
-	await db.insert(buyerDetails).values({
-		clientProfileId: profile.id,
-		experienceLevel: 'firstTime',
-		idealAgentRelationship: 'trustedAdvisor',
-		decisionMakingNeed: 'numbersData',
-		biddingWarResponse: 'factsOptions',
+		priceMax: 600_000,
+		...overrides,
 	})
-	await db.insert(clientProfileZips).values(
-		baltimoreGeography.map(({ zip }) => ({
-			id: crypto.randomUUID(),
-			profileId: profile.id,
-			cityZipId: cityZipRowId(zip),
-			cityId: baltimoreCity.id,
-		})),
-	)
-	return { profile, user: account }
+	return { user: account, profile }
 }
 
-export async function seedAgent(
-	db: Database,
-	overrides: { city?: ResolvedCity; geography?: ZipGeography } = {},
-) {
-	const now = new Date()
-	const city = overrides.city ?? baltimoreCity
-	const geography = overrides.geography ?? baltimoreGeography
-	const account = makeIntroUser({ name: 'Test Agent' })
-	await db.insert(user).values(account)
-	await ensureCity(db, city, geography)
-	const profile: typeof agentProfiles.$inferSelect = {
+export type IntroAgentSeed = {
+	user: IntroUser
+	profile: AgentProfile
+}
+
+export function makeIntroAgent(
+	overrides: Partial<AgentProfile> = {},
+): IntroAgentSeed {
+	const profile = makeAgent({
 		id: crypto.randomUUID(),
-		userId: account.id,
-		representationSide: 'buyer',
-		cityId: city.id,
-		typicalPriceRange: '400kTo750k',
-		bestClientType: 'firstTime',
-		notFitFor: [],
-		brokerageName: 'Harborline Realty',
-		licenseNumberState: 'LIC-123456-MD',
-		yearsLicensed: '6-10',
-		clientDescription: 'strategicDataDriven',
-		communicationFrequency: 'scheduled',
-		quickCommunicationChannel: 'text',
-		updateDeliveryMethod: 'email',
-		difficultDealInstinct: 'factsFast',
-		responseTime: 'within30Min',
-		commissionApproach: 'proactiveOpen',
-		unrepresentedBuyerApproach: 'referSeparateBrokerage',
-		createdAt: now,
-		updatedAt: now,
+		userId: crypto.randomUUID(),
+		...overrides,
+	})
+	return { user: makeIntroUser({ id: profile.userId }), profile }
+}
+
+export function introTimestampsFor(
+	status: IntroductionStatus,
+	at: Date = new Date(),
+): Pick<
+	typeof introductions.$inferInsert,
+	'acceptedAt' | 'connectedAt' | 'closedAt'
+> {
+	switch (status) {
+		case 'pending':
+			return {}
+		case 'accepted':
+			return { acceptedAt: at }
+		case 'connected':
+			return { acceptedAt: at, connectedAt: at }
+		case 'declined':
+		case 'withdrawn':
+			return { closedAt: at }
 	}
-	await db.insert(agentProfiles).values(profile)
-	if (geography.length > 0) {
-		await db.insert(agentProfileZips).values(
-			geography.map(({ zip }) => ({
-				id: crypto.randomUUID(),
-				profileId: profile.id,
-				cityZipId: cityZipRowId(zip),
-				cityId: city.id,
-			})),
-		)
-	}
-	return { profile, user: account }
 }
 
 export function makeIntroduction(input: {
@@ -173,22 +109,16 @@ export function makeIntroduction(input: {
 }): typeof introductions.$inferInsert {
 	const now = new Date()
 	const status = input.overrides?.status ?? 'pending'
-	const row: typeof introductions.$inferInsert = {
+	return {
 		id: crypto.randomUUID(),
 		clientProfileId: input.clientProfileId,
 		agentProfileId: input.agentProfileId,
 		status,
-		acceptedAt: null,
-		connectedAt: null,
-		closedAt: null,
+		...introTimestampsFor(status, now),
 		createdAt: now,
 		updatedAt: now,
+		...input.overrides,
 	}
-	// The status data checks require lifecycle timestamps to match the status.
-	if (status === 'accepted' || status === 'connected') row.acceptedAt = now
-	if (status === 'connected') row.connectedAt = now
-	if (status === 'declined' || status === 'withdrawn') row.closedAt = now
-	return { ...row, ...input.overrides }
 }
 
 export function makeAccessWindow(
@@ -200,10 +130,117 @@ export function makeAccessWindow(
 		id: crypto.randomUUID(),
 		clientProfileId,
 		stripePaymentIntentId: `pi_${crypto.randomUUID()}`,
-		startsAt: hoursAgo(1),
-		endsAt: new Date(now.getTime() + 30 * DAY_MS),
+		startsAt: daysAgo(1, now),
+		endsAt: new Date(now.getTime() + 180 * DAY_MS),
 		createdAt: now,
 		updatedAt: now,
 		...overrides,
 	}
+}
+
+// The dev/test database may already contain the fixture city under a
+// different id (cities are unique on name+state), so callers must use the
+// returned id rather than the fixture's.
+async function seedCity(db: Database, city: ResolvedCity): Promise<string> {
+	const [inserted] = await db
+		.insert(cities)
+		.values({
+			id: city.id,
+			name: city.name,
+			state: city.state,
+			centerLat: city.center.lat,
+			centerLng: city.center.lng,
+		})
+		.onConflictDoNothing()
+		.returning({ id: cities.id })
+	if (inserted) return inserted.id
+	const [existing] = await db
+		.select({ id: cities.id })
+		.from(cities)
+		.where(and(eq(cities.name, city.name), eq(cities.state, city.state)))
+	if (!existing)
+		throw new Error(`failed to seed city ${city.name}, ${city.state}`)
+	return existing.id
+}
+
+async function seedCityZips(
+	db: Database,
+	cityId: string,
+	geography: ZipGeography,
+): Promise<string[]> {
+	const ids: string[] = []
+	for (const { zip, center } of geography) {
+		const [inserted] = await db
+			.insert(cityZips)
+			.values({
+				id: crypto.randomUUID(),
+				cityId,
+				zip,
+				lat: center.lat,
+				lng: center.lng,
+			})
+			.onConflictDoNothing({ target: cityZips.zip })
+			.returning({ id: cityZips.id })
+		if (inserted) {
+			ids.push(inserted.id)
+			continue
+		}
+		const [existing] = await db
+			.select({ id: cityZips.id })
+			.from(cityZips)
+			.where(eq(cityZips.zip, zip))
+		if (existing) ids.push(existing.id)
+	}
+	return ids
+}
+
+export async function seedClient(
+	db: Database,
+	overrides: Partial<BuyerProfile> = {},
+): Promise<IntroClientSeed> {
+	const seed = makeIntroClient(overrides)
+	const { city, geography, ...flat } = seed.profile
+	const { buyingExperience, ...base } = flat
+	await db.insert(user).values(seed.user)
+	const cityId = await seedCity(db, city)
+	await db.insert(clientProfiles).values({ ...base, cityId })
+	await db.insert(buyerDetails).values({
+		clientProfileId: seed.profile.id,
+		buyingExperience,
+	})
+	const cityZipIds = await seedCityZips(db, cityId, geography)
+	if (cityZipIds.length > 0) {
+		await db.insert(clientProfileZips).values(
+			cityZipIds.map((cityZipId) => ({
+				id: crypto.randomUUID(),
+				profileId: seed.profile.id,
+				cityZipId,
+				cityId,
+			})),
+		)
+	}
+	return seed
+}
+
+export async function seedAgent(
+	db: Database,
+	overrides: Partial<AgentProfile> = {},
+): Promise<IntroAgentSeed> {
+	const seed = makeIntroAgent(overrides)
+	const { city, geography, ...values } = seed.profile
+	await db.insert(user).values(seed.user)
+	const cityId = await seedCity(db, city)
+	await db.insert(agentProfiles).values({ ...values, cityId })
+	const cityZipIds = await seedCityZips(db, cityId, geography)
+	if (cityZipIds.length > 0) {
+		await db.insert(agentProfileZips).values(
+			cityZipIds.map((cityZipId) => ({
+				id: crypto.randomUUID(),
+				profileId: seed.profile.id,
+				cityZipId,
+				cityId,
+			})),
+		)
+	}
+	return seed
 }

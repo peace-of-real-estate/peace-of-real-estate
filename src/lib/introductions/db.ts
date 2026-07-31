@@ -482,11 +482,11 @@ export const Agent = {
 				}),
 				propertyTypes: row.profile.propertyTypes,
 				workStyle: {
-					quickCommunicationChannel: row.profile.quickCommunicationChannel,
-					updateDeliveryMethod: row.profile.updateDeliveryMethod,
-					responseTimeExpectation: row.profile.responseTimeExpectation,
-					involvementLevel: row.profile.involvementLevel,
-					commissionComfort: row.profile.commissionComfort,
+					decisionStyle: row.profile.decisionStyle,
+					contactStyle: row.profile.contactStyle,
+					riskComfort: row.profile.riskComfort,
+					commissionPlan: row.profile.commissionPlan,
+					situationSpecialties: row.profile.situationSpecialties,
 				},
 				fitScore: fit.fitScore,
 			})

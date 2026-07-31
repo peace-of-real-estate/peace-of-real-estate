@@ -65,11 +65,11 @@ const clientInput: AgentIntroClientInput = {
 	priceRange: '$400k – $600k',
 	propertyTypes: ['singleFamily'],
 	workStyle: {
-		quickCommunicationChannel: 'text',
-		updateDeliveryMethod: 'email',
-		responseTimeExpectation: 'within30Min',
-		involvementLevel: 'keyDetails',
-		commissionComfort: 'openOptions',
+		decisionStyle: 'middleGround',
+		contactStyle: 'regularCheckins',
+		riskComfort: 'lowRisk',
+		commissionPlan: 'discussThenDecide',
+		situationSpecialties: [],
 	},
 	fitScore: 82,
 }
