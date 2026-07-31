@@ -2,7 +2,6 @@ import {
 	BriefcaseIcon,
 	HouseIcon,
 	MoneyIcon,
-	ShieldIcon,
 	StarIcon,
 	UserIcon,
 } from '@phosphor-icons/react'
@@ -14,7 +13,6 @@ import {
 	type AgentPriceBucket,
 } from '@/lib/price-range'
 import {
-	averageTransactions,
 	bestClientType,
 	buyerQuestionIds,
 	buyerQuestions,
@@ -24,7 +22,6 @@ import {
 	sellerQuestionIds,
 	sellerQuestions,
 	yearsLicensed,
-	type AverageTransactions,
 	type BestClientTypeSlug,
 	type ClientRole,
 	type PropertyTypeSlug,
@@ -43,10 +40,8 @@ export interface AgentSummaryProfile {
 	typicalPriceRange: AgentPriceBucket
 	representationSide: RepresentationSide
 	zipCodes: string[]
-	bestClientTypes: BestClientTypeSlug[]
+	bestClientType: BestClientTypeSlug
 	yearsLicensed?: YearsLicensed | null | undefined
-	averageTransactions?: AverageTransactions | null | undefined
-	eoInsuranceStatus: string
 }
 
 export type SummaryItem = {
@@ -171,15 +166,6 @@ type SummaryQuestion =
 				labels: Readonly<Record<string, string>>
 			}
 	  }
-	| {
-			kind: 'multi'
-			id: string
-			label: string
-			options: {
-				slugs: readonly string[]
-				labels: Readonly<Record<string, string>>
-			}
-	  }
 	| { kind: 'freeForm'; id: string; label: string }
 
 function formatQuestionSummary(
@@ -195,15 +181,6 @@ function formatQuestionSummary(
 			const slug = question.options.slugs.find((slug) => slug === answer)
 			if (slug === undefined) return null
 			const value = question.options.labels[slug]
-			return value ? { label: question.label, value, icon } : null
-		}
-		case 'multi': {
-			const selected = question.options.slugs.filter((slug) =>
-				answer.includes(slug),
-			)
-			const value = selected
-				.map((slug) => question.options.labels[slug])
-				.join(', ')
 			return value ? { label: question.label, value, icon } : null
 		}
 		case 'freeForm': {
@@ -234,12 +211,10 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 					icon: BriefcaseIcon,
 				}
 			: null,
-		profile.bestClientTypes.length
+		profile.bestClientType
 			? {
 					label: 'Best clients',
-					value: profile.bestClientTypes
-						.map((slug) => getEnumLabel(bestClientType.labels, slug))
-						.join(', '),
+					value: getEnumLabel(bestClientType.labels, profile.bestClientType),
 					icon: UserIcon,
 				}
 			: null,
@@ -250,21 +225,6 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 					icon: StarIcon,
 				}
 			: null,
-		profile.averageTransactions
-			? {
-					label: 'Transaction volume',
-					value: getEnumLabel(
-						averageTransactions.labels,
-						profile.averageTransactions,
-					),
-					icon: HouseIcon,
-				}
-			: null,
-		{
-			label: 'E&O insurance',
-			value: profile.eoInsuranceStatus,
-			icon: ShieldIcon,
-		},
 	]
 
 	const result: SummaryItem[] = []

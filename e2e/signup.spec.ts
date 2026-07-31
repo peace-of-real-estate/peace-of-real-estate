@@ -105,16 +105,16 @@ test.describe('with beta access', () => {
 		test.slow()
 		await page.goto('/signup/agent/identity')
 		await expect(
-			page.getByRole('heading', { name: 'Identity', exact: true }),
+			page.getByRole('heading', { name: 'Your practice', exact: true }),
 		).toBeVisible()
-		await page.getByRole('textbox', { name: 'First name' }).fill('Alex')
-		await page.getByRole('textbox', { name: 'Last name' }).fill('Morgan')
+		await page.getByRole('button', { name: 'Buyers', exact: true }).click()
 		await page
-			.getByRole('textbox', { name: 'Brokerage name' })
+			.getByRole('textbox', { name: 'Brokerage' })
 			.fill('PRE Realty Group')
 		await page
 			.getByRole('textbox', { name: 'License number & state' })
 			.fill('TX-12345678')
+		await page.getByRole('button', { name: '3-5', exact: true }).click()
 		await page.getByRole('button', { name: 'Continue' }).click()
 
 		await expect(
@@ -122,29 +122,9 @@ test.describe('with beta access', () => {
 		).toBeVisible()
 		await selectCity(page, 'Search for your city')
 		await page.getByRole('button', { name: /Under \$400k/ }).click()
-		await page.getByRole('button', { name: 'Buyers', exact: true }).click()
-		await page.getByRole('button', { name: 'First-time buyers' }).click()
 		await page.getByRole('button', { name: 'Continue' }).click()
 
-		await answerQuestionFlow(page, /\/signup\/agent\/compliance$/)
-
-		await expect(
-			page.getByRole('heading', { name: 'Compliance', exact: true }),
-		).toBeVisible()
-		await page.getByRole('checkbox').first().click()
-		await page
-			.getByRole('radio', { name: 'Yes, I carry my own E&O policy' })
-			.click()
-		await page.getByRole('button', { name: 'Continue' }).click()
-
-		await expect(
-			page.getByRole('heading', { name: 'Peace Pact', exact: true }),
-		).toBeVisible()
-		await page.getByRole('checkbox').first().click()
-		await page
-			.getByRole('textbox', { name: 'Agent Signature' })
-			.fill('Alex Morgan')
-		await page.getByRole('button', { name: 'Sign & continue' }).click()
+		await answerQuestionFlow(page, /\/signup\/preview\/agent$/)
 
 		await expect(page).toHaveURL(/\/signup\/preview\/agent$/)
 		await expect(

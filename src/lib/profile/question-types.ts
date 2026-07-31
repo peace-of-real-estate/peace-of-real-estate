@@ -68,11 +68,6 @@ export type SingleQuestion<
 	TSlug extends string,
 > = BaseQuestion<TKey, TSlug> & { kind: 'single' }
 
-export type MultiQuestion<
-	TKey extends string,
-	TSlug extends string,
-> = BaseQuestion<TKey, TSlug> & { kind: 'multi' }
-
 export type FreeFormQuestion<TKey extends string> = {
 	kind: 'freeForm'
 	id: TKey
@@ -90,15 +85,13 @@ export type QuestionSlug<TAnswer> = [NonNullable<TAnswer>] extends [
 		: never
 
 /**
- * The question shape a draft field of type TAnswer demands: array fields get
- * a multi-select question, string fields a single-select, and the question's
+ * The question shape a draft field of type TAnswer demands: the question's
  * option slugs must exactly match the field's union. This is what ties every
  * question back to its DB column.
  */
 export type Question<TKey extends string, TAnswer> =
 	| FreeFormQuestion<TKey>
 	| SingleQuestion<TKey, QuestionSlug<TAnswer>>
-	| MultiQuestion<TKey, QuestionSlug<TAnswer>>
 
 type StringKeys<T> = keyof T & string
 
@@ -128,18 +121,6 @@ export function single<TKey extends string, TSlug extends string>(
 	},
 ): SingleQuestion<TKey, TSlug> {
 	return { kind: 'single', id, ...config }
-}
-
-export function multi<TKey extends string, TSlug extends string>(
-	id: TKey,
-	config: {
-		title: string
-		label: string
-		options: EnumDef<TSlug>
-		optionMeta?: Partial<Record<TSlug, OptionMeta>>
-	},
-): MultiQuestion<TKey, TSlug> {
-	return { kind: 'multi', id, ...config }
 }
 
 export function freeForm<TKey extends string>(

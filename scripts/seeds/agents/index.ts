@@ -18,11 +18,9 @@ import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities
 import { BUCKET_ORDER } from '../../../src/lib/price-range'
 import {
 	agentQuestions,
-	averageTransactions,
 	yearsLicensed,
 	type AgentProfile,
 	type AgentWorkStyle,
-	type AverageTransactions,
 	type YearsLicensed,
 } from '../../../src/lib/profile'
 import { cityKey } from '../../city-key'
@@ -31,19 +29,18 @@ import {
 	BROKERAGE_POOLS,
 	CITIES,
 	CLIENT_TYPES,
-	EMPLOYMENT_STATUSES,
-	EO_INSURANCE_STATUSES,
 	FIRST_NAMES,
 	LAST_NAMES,
 	REPRESENTATION_SIDES,
 	type City,
 } from './mocks'
-import { buildAddress, buildPhone, pick, randInt } from './stats'
+import { pick, randInt } from './stats'
 import { pickWeighted, sample, type WeightedOption } from './stats'
 
 const agentAnswerPickers: {
 	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>
 } = {
+	bestClientType: () => pick(CLIENT_TYPES),
 	clientDescription: () =>
 		pick(agentQuestions['clientDescription'].options.slugs),
 	communicationFrequency: () =>
@@ -72,11 +69,9 @@ function pickAnswer<K extends keyof AgentWorkStyle>(
 type AgentPersona = {
 	representationSide: AgentProfile['representationSide']
 	typicalPriceRange: AgentProfile['typicalPriceRange']
-	bestClientTypes: AgentProfile['bestClientTypes']
+	bestClientType: AgentProfile['bestClientType']
 	notFitFor: AgentProfile['notFitFor']
 	yearsLicensed: YearsLicensed
-	averageTransactions: AverageTransactions
-	employmentStatus: string
 	clientDescription: AgentProfile['clientDescription']
 	communicationFrequency: AgentProfile['communicationFrequency']
 	quickCommunicationChannel: AgentProfile['quickCommunicationChannel']
@@ -85,13 +80,9 @@ type AgentPersona = {
 	responseTime: AgentProfile['responseTime']
 	commissionApproach: AgentProfile['commissionApproach']
 	unrepresentedBuyerApproach: AgentProfile['unrepresentedBuyerApproach']
-	eoInsuranceStatus: string
-	peacePactSigned: boolean
-	usePaxWriter: boolean
 }
 
 function generatePersona(): AgentPersona {
-	const clientTypeCount = randInt(2, 4)
 	const notFitForSlugs = [
 		...Object.keys(structuredNotFitForOptions).filter(
 			(slug) => slug !== 'other',
@@ -104,11 +95,9 @@ function generatePersona(): AgentPersona {
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
 		typicalPriceRange: pick(BUCKET_ORDER),
-		bestClientTypes: sample(CLIENT_TYPES, clientTypeCount),
+		bestClientType: pickAnswer('bestClientType'),
 		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
-		averageTransactions: pick(averageTransactions.slugs),
-		employmentStatus: pick(EMPLOYMENT_STATUSES),
 		clientDescription: pickAnswer('clientDescription'),
 		communicationFrequency: pickAnswer('communicationFrequency'),
 		quickCommunicationChannel: pickAnswer('quickCommunicationChannel'),
@@ -117,9 +106,6 @@ function generatePersona(): AgentPersona {
 		responseTime: pickAnswer('responseTime'),
 		commissionApproach: pickAnswer('commissionApproach'),
 		unrepresentedBuyerApproach: pickAnswer('unrepresentedBuyerApproach'),
-		eoInsuranceStatus: pick(EO_INSURANCE_STATUSES),
-		peacePactSigned: Math.random() < 0.75,
-		usePaxWriter: Math.random() < 0.8,
 	}
 }
 
@@ -220,7 +206,6 @@ async function insertAgent(
 	const email = generateEmail(firstName, lastName)
 	const userId = crypto.randomUUID()
 	const agentId = crypto.randomUUID()
-	const addressZip = pick(cityZipRows).zip
 
 	await db.insert(user).values({
 		id: userId,
@@ -238,18 +223,11 @@ async function insertAgent(
 		cityId,
 		representationSide: persona.representationSide,
 		typicalPriceRange: persona.typicalPriceRange,
-		bestClientTypes: persona.bestClientTypes,
+		bestClientType: persona.bestClientType,
 		notFitFor: persona.notFitFor,
-		firstName,
-		lastName,
 		brokerageName: pick(BROKERAGE_POOLS),
-		email,
-		phone: buildPhone(),
-		businessAddress: buildAddress(location, addressZip),
 		licenseNumberState: `LIC-${randInt(100000, 999999)}-${location.state}`,
 		yearsLicensed: persona.yearsLicensed,
-		averageTransactions: persona.averageTransactions,
-		employmentStatus: persona.employmentStatus,
 		clientDescription: persona.clientDescription,
 		communicationFrequency: persona.communicationFrequency,
 		quickCommunicationChannel: persona.quickCommunicationChannel,
@@ -258,14 +236,6 @@ async function insertAgent(
 		responseTime: persona.responseTime,
 		commissionApproach: persona.commissionApproach,
 		unrepresentedBuyerApproach: persona.unrepresentedBuyerApproach,
-		usePaxWriter: persona.usePaxWriter,
-		licenseAttested: true,
-		eoInsuranceStatus: persona.eoInsuranceStatus,
-		peacePactSigned: persona.peacePactSigned,
-		peacePactSignature: `${firstName} ${lastName}`,
-		peacePactSignedAt: persona.peacePactSigned
-			? new Date(now.getTime() - randInt(0, 90) * 86400000)
-			: null,
 		createdAt: now,
 		updatedAt: now,
 	})

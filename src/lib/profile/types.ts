@@ -10,11 +10,7 @@ import {
 } from '@/db/tables'
 import type { ResolvedCity, ZipGeography } from '@/lib/geography/zip'
 import { agentPriceBucketSchema, priceBoundSchema } from '@/lib/price-range'
-import {
-	agentQuestionIds,
-	bestClientType,
-	propertyType,
-} from '@/lib/profile/profile-fields'
+import { agentQuestionIds, propertyType } from '@/lib/profile/profile-fields'
 import type { PreferencesFor } from '@/lib/profile/question-types'
 
 export const agentInsertSchema = createInsertSchema(agentProfiles, {
@@ -162,7 +158,6 @@ export const sellerPreviewProfileSchema = sellerCompletedDraftBaseSchema
 
 export const agentPreviewProfileSchema = agentCompletedDraftSchema.extend({
 	zipCodes: z.array(z.string()),
-	bestClientTypes: z.array(z.enum(bestClientType.slugs)).min(1),
 })
 
 export type BuyerPreviewProfile = z.infer<typeof buyerPreviewProfileSchema>

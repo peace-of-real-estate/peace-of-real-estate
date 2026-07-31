@@ -15,10 +15,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog'
-import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 
 export const Route = createFileRoute('/')({
-	beforeLoad: redirectAuthenticatedUsers,
 	component: LandingPage,
 })
 

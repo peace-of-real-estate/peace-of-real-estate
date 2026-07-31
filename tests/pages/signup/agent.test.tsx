@@ -24,28 +24,20 @@ beforeEach(() => {
 })
 
 const identity: AgentDraft = {
-	firstName: 'Alex',
-	lastName: 'Morgan',
 	brokerageName: 'PRE Realty Group',
-	email: 'alex.morgan@example.com',
-	phone: '555-123-4567',
-	businessAddress: '123 Main St, Austin, TX 78701',
 	licenseNumberState: 'TX-12345678',
-	licenseProof: 'https://license.example.com/alex-morgan',
-	employmentStatus: 'Full time',
+	yearsLicensed: '6-10',
+	representationSide: 'buyer',
 }
 
 const market: AgentDraft = {
 	cityId: '01936f00-0000-7000-8000-000000000aa1',
 	zipCodes: ['78701', '78704'],
 	typicalPriceRange: '400kTo750k',
-	representationSide: 'both',
-	bestClientTypes: ['firstTime', 'moveUp'],
-	yearsLicensed: '6-10',
-	averageTransactions: '16-30',
 }
 
 const preferences: AgentDraft = {
+	bestClientType: 'firstTime',
 	clientDescription: 'strategicDataDriven',
 	communicationFrequency: 'scheduled',
 	quickCommunicationChannel: 'text',
@@ -56,38 +48,49 @@ const preferences: AgentDraft = {
 	unrepresentedBuyerApproach: 'representSellerOnly',
 }
 
-const compliance: AgentDraft = {
-	licenseAttested: true,
-	eoInsuranceStatus: 'Yes, I carry my own E&O policy',
-}
-
-const peacePact: AgentDraft = {
-	peacePactSigned: true,
-	peacePactSignature: 'Alex Morgan',
-}
-
 test('identity step screenshot', async () => {
 	mockAgentDraft = identity
 	await renderRoute({ path: '/signup/agent/identity' })
 	await expectScreenshot(document.body, { name: 'step-1-identity' })
 })
 
+test('identity step shows hints when continuing with missing fields', async () => {
+	await renderRoute({ path: '/signup/agent/identity' })
+
+	await page.getByRole('button', { name: 'Continue' }).click()
+
+	await expect.element(page.getByText('Enter your brokerage.')).toBeVisible()
+	await expect
+		.element(page.getByText('Enter your license number & state.'))
+		.toBeVisible()
+	expect(saveAgentDraft).not.toHaveBeenCalled()
+	await expect
+		.element(page.getByRole('heading', { name: 'Your practice', exact: true }))
+		.toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-1-identity-error' })
+})
+
 test('identity step submits the draft and advances to market', async () => {
 	await renderRoute({ path: '/signup/agent/identity' })
 
-	await page.getByRole('textbox', { name: 'First name' }).fill('Alex')
-	await page.getByRole('textbox', { name: 'Last name' }).fill('Morgan')
 	await page
-		.getByRole('textbox', { name: 'Brokerage name' })
+		.getByRole('textbox', { name: 'Brokerage' })
 		.fill('PRE Realty Group')
 	await page
 		.getByRole('textbox', { name: 'License number & state' })
 		.fill('TX-12345678')
+	await page.getByRole('button', { name: '6-10' }).click()
+	await page.getByRole('button', { name: 'Buyers' }).click()
 	await page.getByRole('button', { name: 'Continue' }).click()
 
 	await vi.waitFor(() => {
 		expect(saveAgentDraft).toHaveBeenCalledWith(
-			expect.objectContaining({ firstName: 'Alex', lastName: 'Morgan' }),
+			expect.objectContaining({
+				brokerageName: 'PRE Realty Group',
+				licenseNumberState: 'TX-12345678',
+				yearsLicensed: '6-10',
+				representationSide: 'buyer',
+			}),
 		)
 	})
 	await expect
@@ -101,47 +104,37 @@ test('market step screenshot', async () => {
 	await expectScreenshot(document.body, { name: 'step-2-market' })
 })
 
+test('market step shows hints when continuing with missing fields', async () => {
+	mockAgentDraft = identity
+	await renderRoute({ path: '/signup/agent/market' })
+
+	await page.getByRole('button', { name: 'Continue' }).click()
+
+	await expect.element(page.getByText('Enter a city.')).toBeVisible()
+	expect(saveAgentDraft).not.toHaveBeenCalled()
+	await expect
+		.element(page.getByRole('heading', { name: 'Market', exact: true }))
+		.toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-2-market-error' })
+})
+
 test('preferences step screenshot', async () => {
 	mockAgentDraft = { ...identity, ...market, ...preferences }
 	await renderRoute({ path: '/signup/agent/preferences' })
 	await expectScreenshot(document.body, { name: 'step-3-preferences' })
 })
 
-test('compliance step screenshot', async () => {
-	mockAgentDraft = { ...identity, ...market, ...preferences, ...compliance }
-	await renderRoute({ path: '/signup/agent/compliance' })
-	await expectScreenshot(document.body, { name: 'step-4-compliance' })
-})
-
-test('peace pact step screenshot', async () => {
-	mockAgentDraft = {
-		...identity,
-		...market,
-		...preferences,
-		...compliance,
-		...peacePact,
-	}
-	await renderRoute({ path: '/signup/agent/peace-pact' })
-	await expectScreenshot(document.body, { name: 'step-5-peace-pact' })
-})
-
 test('preview redirects incomplete drafts to the first step', async () => {
-	mockAgentDraft = { ...identity, ...market, ...compliance, ...peacePact }
+	mockAgentDraft = { ...identity, ...market }
 	await renderRoute({ path: '/signup/preview/agent' })
 	await expect
-		.element(page.getByRole('heading', { name: 'Identity', exact: true }))
+		.element(page.getByRole('heading', { name: 'Your practice', exact: true }))
 		.toBeVisible()
 })
 
 test('preview screenshot', async () => {
-	mockAgentDraft = {
-		...identity,
-		...market,
-		...preferences,
-		...compliance,
-		...peacePact,
-	}
+	mockAgentDraft = { ...identity, ...market, ...preferences }
 	await renderRoute({ path: '/signup/preview/agent' })
 	await expect.element(page.getByText('$400k – $750k')).toBeVisible()
-	await expectScreenshot(document.body, { name: 'step-6-preview' })
+	await expectScreenshot(document.body, { name: 'step-4-preview' })
 })

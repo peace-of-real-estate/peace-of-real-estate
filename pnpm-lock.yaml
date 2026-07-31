@@ -145,8 +145,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       varlock:
-        specifier: ^1.11.0
-        version: 1.11.0
+        specifier: ^1.14.1
+        version: 1.14.1
       vite-plugin-svgr:
         specifier: ^5.2.0
         version: 5.2.0(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(typescript@6.0.3)
@@ -185,8 +185,8 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
       '@varlock/vite-integration':
-        specifier: ^1.3.0
-        version: 1.3.0(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(varlock@1.11.0)
+        specifier: ^1.4.0
+        version: 1.4.0(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(varlock@1.14.1)
       '@vitest/browser-playwright':
         specifier: 4.1.9
         version: 4.1.9(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(msw@2.14.6(@types/node@26.1.1)(typescript@6.0.3))(playwright@1.61.0)(vitest@4.1.9)
@@ -3210,11 +3210,11 @@ packages:
   '@types/validate-npm-package-name@4.0.2':
     resolution: {integrity: sha512-lrpDziQipxCEeK5kWxvljWYhUvOiB2A9izZd9B2AFarYAkqZshb4lPbRs7zKEic6eGtH8V/2qJW+dPp9OtF6bw==}
 
-  '@varlock/vite-integration@1.3.0':
-    resolution: {integrity: sha512-U/jt8Pk76yeVncjNTxoaCrW75573ricf1/x2QydR86/JEVQ1seC813L338Xpxp3yQaiYUWh+W1Yi78cF1vzoLQ==}
+  '@varlock/vite-integration@1.4.0':
+    resolution: {integrity: sha512-nHEJ9hIEa3aLU/l7DLP6OWWFXD2Y8NoWwA+D0ppDim2tLrHtMMOp19EAHvzFxbdzWw0PwN7Z6lHtGapPuEliGQ==}
     engines: {node: '>=22'}
     peerDependencies:
-      varlock: ^1.11.0
+      varlock: ^1.14.0
       vite: '>=5'
 
   '@vercel/cli-config@0.2.0':
@@ -6196,8 +6196,8 @@ packages:
     resolution: {integrity: sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  varlock@1.11.0:
-    resolution: {integrity: sha512-URO8CZtjk+OkVtjJtw7u07udMGlhgyR7b6J/Lv0T+kcwv80NrPImedwVQkzm2SlhfdU8y3xRYRr1KwN6N1E6zA==}
+  varlock@1.14.1:
+    resolution: {integrity: sha512-7KT7yhhqnNsliBRir2q0Lj2jk1wFHCRHH2YNaN5vWupgdqYWdKDGGAfd2DbKr9MqAhlG3o8ap5J4QzsQWrOCqQ==}
     engines: {bun: '>=1.3.3', node: '>=22.3.0'}
     hasBin: true
 
@@ -9267,9 +9267,9 @@ snapshots:
 
   '@types/validate-npm-package-name@4.0.2': {}
 
-  '@varlock/vite-integration@1.3.0(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(varlock@1.11.0)':
+  '@varlock/vite-integration@1.4.0(@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0))(varlock@1.14.1)':
     dependencies:
-      varlock: 1.11.0
+      varlock: 1.14.1
       vite: '@voidzero-dev/vite-plus-core@0.2.1(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.5)(typescript@6.0.3)(yaml@2.9.0)'
 
   '@vercel/cli-config@0.2.0':
@@ -12036,7 +12036,7 @@ snapshots:
 
   validate-npm-package-name@7.0.2: {}
 
-  varlock@1.11.0: {}
+  varlock@1.14.1: {}
 
   vary@1.1.2: {}
 

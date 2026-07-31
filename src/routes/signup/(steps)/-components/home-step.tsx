@@ -72,10 +72,14 @@ export function HomeStep<TStep extends string>({
 			0,
 		),
 	)
+	const [hasTriedContinue, setHasTriedContinue] = useState(false)
 	const priceComplete =
-		priceRange.min >= PRICE_MIN && priceRange.max <= PRICE_MAX
+		priceRange.min >= PRICE_MIN &&
+		priceRange.max <= PRICE_MAX &&
+		priceRange.min <= priceRange.max
 	const propertyComplete = propertyTypes.length > 0
 	const canContinue = priceComplete && propertyComplete
+	const showPropertyError = hasTriedContinue && !propertyComplete
 	const [firstDeadline] = deadlineOptions
 	const lastDeadline = deadlineOptions.at(-1)
 	const selectedDeadline = deadlineOptions[deadlineIndex]
@@ -89,7 +93,13 @@ export function HomeStep<TStep extends string>({
 					<StepHeader stepNumber={2} totalSteps={3} title="Home" />
 					<div className="space-y-8">
 						<FieldSection
-							title="Home type"
+							title={
+								<span
+									className={showPropertyError ? 'text-destructive' : undefined}
+								>
+									Home type
+								</span>
+							}
 							description="Select all that apply."
 							action={
 								propertyComplete ? (
@@ -108,6 +118,11 @@ export function HomeStep<TStep extends string>({
 								selected={propertyTypes}
 								onChange={setPropertyTypes}
 							/>
+							{showPropertyError ? (
+								<p role="alert" className="text-destructive text-xs">
+									Select at least one home type.
+								</p>
+							) : null}
 						</FieldSection>
 						<FieldSection
 							title={priceTitle}
@@ -190,9 +205,11 @@ export function HomeStep<TStep extends string>({
 						</FieldSection>
 					</div>
 					<ContinueButton
-						disabled={!canContinue}
 						onClick={() => {
-							if (!canContinue) return
+							if (!canContinue) {
+								setHasTriedContinue(true)
+								return
+							}
 							updateState({
 								priceMin: priceRange.min,
 								priceMax: priceRange.max,

@@ -1,4 +1,5 @@
-import { bestClientType } from '../../../src/lib/profile'
+import { bestClientType, representationSide } from '../../../src/lib/profile'
+import type { SlugOf } from '../../../src/lib/profile'
 import type { WeightedOption } from './stats'
 
 export const FIRST_NAMES = [
@@ -397,58 +398,18 @@ export const CITIES = [
 	},
 ] as const
 
-export const STREETS = [
-	'Main St',
-	'Oak Ave',
-	'Elm St',
-	'Maple Dr',
-	'Cedar Ln',
-	'Pine St',
-	'Park Ave',
-	'Broadway',
-	'Lake Dr',
-	'Hill Rd',
-	'River Rd',
-	'Forest Ave',
-	'Highland Blvd',
-	'Sunset Blvd',
-	'Magnolia Ave',
-	'Chestnut St',
-	'Walnut St',
-	'Cherry Ln',
-	'Birch Ct',
-	'Ash Blvd',
-] as const
-
 export const REPRESENTATION_SIDES: WeightedOption<
-	'buyer' | 'seller' | 'both'
+	SlugOf<typeof representationSide>
 >[] = [
-	{ value: 'both', weight: 50 },
-	{ value: 'buyer', weight: 30 },
-	{ value: 'seller', weight: 20 },
+	{ value: 'buyer', weight: 60 },
+	{ value: 'seller', weight: 40 },
 ]
 
-// Slugs from bestClientType — the format the agent signup market step
-// writes to bestClientTypes. 'other' is excluded because it carries no
-// matching signal.
+// Slugs from the bestClientType enum, which maps to the best_client_type
+// column on agents. 'other' is excluded because it carries no matching signal.
 export const CLIENT_TYPES = bestClientType.slugs.filter(
 	(slug) => slug !== 'other',
 )
-
-export const EMPLOYMENT_STATUSES = [
-	'Salesperson',
-	'Realtor',
-	'Broker Associate',
-	'Associate Broker',
-	'Broker',
-	'Managing Broker',
-]
-
-export const EO_INSURANCE_STATUSES = [
-	'Active',
-	'Pending',
-	'Not required',
-] as const
 
 export const BROKERAGE_POOLS = [
 	...LUXURY_BROKERAGES,
