@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { db } from '@/db/connection'
-import { agentProfiles, clientProfiles } from '@/db/tables'
+import { agentProfiles, clientProfiles } from '@/db/schema'
 import { requireUserId } from '@/lib/auth/session'
 
 import { Agent, Buyer, ProfileValidationError, Seller } from './repository'
