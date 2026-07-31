@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { authClient } from '@/lib/auth/client'
-import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
+import { redirectAuthenticatedUsers } from '@/lib/auth/redirects'
 import { useGoogleAuth, sanitizeRedirect } from '@/lib/auth/use-google-auth'
 
 const DEFAULT_POST_AUTH_REDIRECT = '/choose-role'
