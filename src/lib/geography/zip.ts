@@ -115,13 +115,13 @@ const loadCitySuggestions = createServerFn({ method: 'GET' })
 
 const loadCityById = createServerFn({ method: 'GET' })
 	.validator((cityId: string) => z.uuid().parse(cityId))
-	.handler(async ({ data }): Promise<City | undefined> => {
+	.handler(async ({ data }): Promise<City | null> => {
 		const [row] = await db
 			.select(cityColumns)
 			.from(cities)
 			.where(eq(cities.id, data))
 			.limit(1)
-		return row
+		return row ?? null
 	})
 
 export type CityCenter = { lat: number; lng: number }
@@ -152,7 +152,7 @@ const loadCityCenter = createServerFn({ method: 'GET' })
 			.where(eq(cities.id, data))
 			.limit(1)
 
-		return row
+		return row ?? null
 	})
 
 const loadZipCodeBoundaries = createServerFn({ method: 'GET' })

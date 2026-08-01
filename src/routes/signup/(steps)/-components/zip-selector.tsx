@@ -91,6 +91,14 @@ export function CityZipSelector({
 		staleTime: 1000 * 60 * 60,
 	})
 
+	// A persisted draft can reference a city that no longer exists (e.g. the
+	// DB was wiped and reseeded). `null` is a definitive not-found — clear the
+	// stale selection so the step doesn't sit complete-but-broken.
+	useEffect(() => {
+		if (displayedCity !== null || !selectedCityId) return
+		onChange({ cityId: undefined, zipCodes: [] })
+	}, [displayedCity, selectedCityId, onChange])
+
 	const { data: boundaries } = useQuery({
 		queryKey: ['zip-code-boundaries', selectedCityId],
 		queryFn: selectedCityId
