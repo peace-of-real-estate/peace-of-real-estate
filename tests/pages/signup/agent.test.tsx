@@ -1,3 +1,4 @@
+import { waitForZipMapIdle } from '@tests/support/render/map'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 import { page } from 'vite-plus/test/browser'
@@ -101,7 +102,19 @@ test('identity step submits the draft and advances to market', async () => {
 test('market step screenshot', async () => {
 	mockAgentDraft = { ...identity, ...market }
 	await renderRoute({ path: '/signup/agent/market' })
-	await expectScreenshot(document.body, { name: 'step-2-market' })
+	await expectScreenshot(document.body, {
+		name: 'step-2-market',
+		prepare: waitForZipMapIdle,
+	})
+})
+
+test('market step idle screenshot', async () => {
+	mockAgentDraft = { ...identity, ...market }
+	await renderRoute({ path: '/signup/agent/market' })
+	await expectScreenshot(document.body, {
+		name: 'step-2-market-idle',
+		prepare: waitForZipMapIdle,
+	})
 })
 
 test('market step shows hints when continuing with missing fields', async () => {

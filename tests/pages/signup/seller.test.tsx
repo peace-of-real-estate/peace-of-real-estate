@@ -1,3 +1,4 @@
+import { waitForZipMapIdle } from '@tests/support/render/map'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
 import { page } from 'vite-plus/test/browser'
@@ -51,7 +52,10 @@ const step3: SellerDraft = {
 test('location step screenshot', async () => {
 	mockSellerDraft = step1
 	await renderRoute({ path: '/signup/seller/location' })
-	await expectScreenshot(document.body, { name: 'step-1-location' })
+	await expectScreenshot(document.body, {
+		name: 'step-1-location',
+		prepare: waitForZipMapIdle,
+	})
 })
 
 test('location step shows hint when continuing without a city', async () => {
