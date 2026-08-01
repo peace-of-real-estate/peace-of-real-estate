@@ -33,11 +33,6 @@ export function DimensionRow({ dimension }: DimensionRowProps) {
 							<Badge variant="outline" className="px-1 font-mono text-[10px]">
 								w {dimension.weight}
 							</Badge>
-							{dimension.boosted && (
-								<span className="text-primary font-mono text-[10px]">
-									↑{dimension.baseWeight}
-								</span>
-							)}
 						</div>
 					</div>
 

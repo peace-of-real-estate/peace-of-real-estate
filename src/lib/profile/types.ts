@@ -134,11 +134,11 @@ export type ClientProfile = BuyerProfile | SellerProfile
 
 export type ClientWorkStyle = Pick<
 	ClientProfile,
-	| 'quickCommunicationChannel'
-	| 'updateDeliveryMethod'
-	| 'responseTimeExpectation'
-	| 'involvementLevel'
-	| 'commissionComfort'
+	| 'decisionStyle'
+	| 'contactStyle'
+	| 'riskComfort'
+	| 'commissionPlan'
+	| 'situationSpecialties'
 >
 
 export type BuyerDraft = z.infer<typeof buyerDraftSchema>

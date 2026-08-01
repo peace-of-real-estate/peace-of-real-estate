@@ -281,23 +281,9 @@ export function ClientMatches({
 		</DashboardPage>
 	)
 }
-const COMMUNICATION_KEYS = new Set([
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'responseTimeExpectation',
-	'responseTime',
-	'communicationFrequency',
-	'agentSilencePreference',
-])
+const COMMUNICATION_KEYS = new Set(['contactStyle', 'clientContactStyle'])
 
-const TERMS_KEYS = new Set([
-	'commissionComfort',
-	'commissionApproach',
-	'representationPreference',
-	'biddingWarResponse',
-	'difficultDealInstinct',
-	'unrepresentedBuyerApproach',
-])
+const TERMS_KEYS = new Set(['commissionPlan', 'commissionStyle'])
 
 const BASIC_KEYS = new Set(['budget', 'homeType'])
 
@@ -305,19 +291,12 @@ const BASIC_KEYS = new Set(['budget', 'homeType'])
 const VALUE_ICON_KEYS = new Set([
 	'location',
 	'homeType',
-	'quickCommunicationChannel',
-	'updateDeliveryMethod',
-	'responseTimeExpectation',
-	'responseTime',
+	'contactStyle',
+	'clientContactStyle',
 ])
 
 /** Items rendered in amber — the traits that drive matching hardest. */
-const SIGNATURE_KEYS = new Set([
-	'budget',
-	'responseTimeExpectation',
-	'responseTime',
-	'decisionMakingNeed',
-])
+const SIGNATURE_KEYS = new Set(['budget', 'contactStyle', 'decisionStyle'])
 
 const GROUP_BANDS = {
 	comms: 'bg-brand/10 text-brand',

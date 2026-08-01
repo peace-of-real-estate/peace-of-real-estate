@@ -19,7 +19,6 @@ interface BlendEquationProps {
 
 export function BlendEquation({ trace }: BlendEquationProps) {
 	const stage2 = trace.stage2
-	const penalty = trace.notFitPenalty
 
 	const weightedLinear = stage2
 		? stage2.linear * SCORING_LINEAR_WEIGHT
@@ -74,23 +73,9 @@ export function BlendEquation({ trace }: BlendEquationProps) {
 					label="×100"
 					value={trace.computedScore}
 					suffix="pts"
-					tooltip="Blend scaled to points, before penalties and gates"
+					tooltip="Blend scaled to points before hard gates"
 				/>
 			</div>
-
-			{penalty && (
-				<>
-					<Operator className="my-2 justify-center">↓</Operator>
-					<div className="rounded-md border border-red-500/20 bg-red-500/5 p-2 text-center">
-						<p className="text-[10px] font-semibold text-red-700 uppercase dark:text-red-300">
-							notFitFor penalty ({penalty.reason})
-						</p>
-						<p className="font-mono text-sm font-semibold text-red-700 tabular-nums dark:text-red-300">
-							{penalty.scoreBefore.toFixed(2)} → {penalty.scoreAfter.toFixed(2)}
-						</p>
-					</div>
-				</>
-			)}
 		</Card>
 	)
 }

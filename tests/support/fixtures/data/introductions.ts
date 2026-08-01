@@ -200,22 +200,13 @@ export async function seedClient(
 ): Promise<IntroClientSeed> {
 	const seed = makeIntroClient(overrides)
 	const { city, geography, ...flat } = seed.profile
-	const {
-		experienceLevel,
-		idealAgentRelationship,
-		decisionMakingNeed,
-		biddingWarResponse,
-		...base
-	} = flat
+	const { buyingExperience, ...base } = flat
 	await db.insert(user).values(seed.user)
 	const cityId = await seedCity(db, city)
 	await db.insert(clientProfiles).values({ ...base, cityId })
 	await db.insert(buyerDetails).values({
 		clientProfileId: seed.profile.id,
-		experienceLevel,
-		idealAgentRelationship,
-		decisionMakingNeed,
-		biddingWarResponse,
+		buyingExperience,
 	})
 	const cityZipIds = await seedCityZips(db, cityId, geography)
 	if (cityZipIds.length > 0) {

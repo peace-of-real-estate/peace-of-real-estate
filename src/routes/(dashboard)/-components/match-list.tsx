@@ -6,6 +6,7 @@ import {
 	MapPinIcon,
 	MoneyIcon,
 	ReceiptIcon,
+	ShieldCheckIcon,
 	UsersIcon,
 } from '@phosphor-icons/react'
 import { useMemo, useState, type ElementType } from 'react'
@@ -182,27 +183,30 @@ const DIMENSION_ICONS: Record<DimensionId, ElementType> = {
 	location: MapPinIcon,
 	priceFit: MoneyIcon,
 	specialization: BriefcaseIcon,
-	workingStyle: UsersIcon,
+	decisions: UsersIcon,
 	communication: ChatCircleIcon,
-	businessTerms: ReceiptIcon,
+	risk: ShieldCheckIcon,
+	commission: ReceiptIcon,
 }
 
 const DIMENSION_SCORE_KEYS: Record<DimensionId, ScoreBucket> = {
 	location: 'Location',
 	priceFit: 'Price Fit',
 	specialization: 'Specialization',
-	workingStyle: 'Working Style',
+	decisions: 'Decision Support',
 	communication: 'Communication',
-	businessTerms: 'Business Terms',
+	risk: 'Risk Comfort',
+	commission: 'Commission',
 }
 
 const DIMENSION_ORDER: DimensionId[] = [
 	'location',
 	'priceFit',
 	'specialization',
-	'workingStyle',
 	'communication',
-	'businessTerms',
+	'decisions',
+	'risk',
+	'commission',
 ]
 
 /** Score at or above which a dimension slot lights up amber. */
@@ -446,9 +450,11 @@ function MatchRowDetails({ match }: { match: AgentMatchData }) {
 				)}
 			</div>
 
-			<span className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium">
-				{match.bestClientType}
-			</span>
+			{match.enjoyedClients ? (
+				<span className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium">
+					{match.enjoyedClients}
+				</span>
+			) : null}
 		</div>
 	)
 }

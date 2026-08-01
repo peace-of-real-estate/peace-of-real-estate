@@ -76,17 +76,8 @@ function buildStages(trace: ScoreTrace, fitScore: number): Stage[] {
 	stages.push({
 		label: '×100',
 		value: trace.computedScore.toFixed(1),
-		tooltip: 'Blend scaled to points, before penalties and gates',
+		tooltip: 'Blend scaled to points before hard gates',
 	})
-	if (trace.notFitPenalty) {
-		stages.push({
-			label: '×0.3 notFit',
-			value: trace.notFitPenalty.scoreAfter.toFixed(1),
-			tooltip: `notFitFor penalty: ${trace.notFitPenalty.reason}`,
-			className:
-				'border-red-500/30 bg-red-500/5 text-red-700 dark:text-red-300',
-		})
-	}
 
 	if (trace.disqualified) {
 		stages.push({

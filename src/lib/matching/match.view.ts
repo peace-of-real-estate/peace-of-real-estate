@@ -1,5 +1,5 @@
 import { formatCityName } from '@/lib/geography/zip'
-import { bestClientType } from '@/lib/profile/profile-fields'
+import { enjoyedClientType, specialty } from '@/lib/profile/profile-fields'
 import type { AgentProfile } from '@/lib/profile/types'
 
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
@@ -15,7 +15,8 @@ export interface AgentMatchData {
 	date: string
 	experience?: string
 	agency?: string
-	bestClientType: string
+	enjoyedClients: string
+	specialties: string
 	scores: Record<ScoreBucket, number>
 	avatar?: string
 }
@@ -25,6 +26,13 @@ interface ToAgentMatchDataInput {
 	user: { name: string; email: string }
 	score: FitScoreResult
 	avatar?: string | undefined
+}
+
+function formatEnumList<TSlug extends string>(
+	values: readonly TSlug[],
+	labels: Readonly<Record<TSlug, string>>,
+): string {
+	return values.map((value) => labels[value]).join(', ')
 }
 
 export function toAgentMatchData({
@@ -44,7 +52,11 @@ export function toAgentMatchData({
 		date: new Date(agent.updatedAt).toLocaleDateString(),
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
-		bestClientType: bestClientType.labels[agent.bestClientType],
+		enjoyedClients: formatEnumList(
+			agent.enjoyedClients,
+			enjoyedClientType.labels,
+		),
+		specialties: formatEnumList(agent.specialties, specialty.labels),
 		scores: { ...score.scores },
 		...(avatar ? { avatar } : {}),
 	}

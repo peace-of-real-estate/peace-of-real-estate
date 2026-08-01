@@ -52,11 +52,6 @@ function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 		}),
 		priceMin: 400_000,
 		priceMax: 600_000,
-		involvementLevel: 'veryInvolved',
-		commissionComfort: 'dontUnderstand',
-		idealAgentRelationship: 'thinkingPartner',
-		decisionMakingNeed: 'numbersData',
-		biddingWarResponse: 'factsOptions',
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
@@ -74,15 +69,7 @@ function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
 		}),
 		priceMin: 400_000,
 		priceMax: 600_000,
-		involvementLevel: 'keyDetails',
-		quickCommunicationChannel: 'phone',
-		updateDeliveryMethod: 'phoneThenEmailRecap',
-		commissionComfort: 'payFairRate',
-		saleMotivation: 'relocation',
-		successfulSaleLooksLike: 'strongPriceSmoothProcess',
-		homeConnection: 'asset',
-		agentSilencePreference: 'milestones',
-		representationPreference: 'exclusiveRepresentationOnly',
+		sellingMotivation: 'relocating',
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
@@ -119,14 +106,29 @@ describe('priceOverlapRatio', () => {
 })
 
 describe('deriveExpectedClientTypes', () => {
-	test('buyer single-family', () => {
-		const buyer = makeBuyer({ propertyTypes: ['singleFamily'] })
-		expect(deriveExpectedClientTypes(buyer)).toEqual(['firstTime', 'moveUp'])
+	test('first-time buyer', () => {
+		const buyer = makeBuyer({ buyingExperience: 'firstTime' })
+		expect(deriveExpectedClientTypes(buyer)).toEqual(['firstTimeBuyers'])
+	})
+
+	test('experienced buyer', () => {
+		const buyer = makeBuyer({ buyingExperience: 'severalTimes' })
+		expect(deriveExpectedClientTypes(buyer)).toEqual([
+			'experiencedLowMaintenance',
+		])
 	})
 
 	test('seller', () => {
-		const seller = makeSeller()
-		expect(deriveExpectedClientTypes(seller)).toEqual(['seller'])
+		const seller = makeSeller({ sellingMotivation: 'differentSize' })
+		expect(deriveExpectedClientTypes(seller)).toEqual(['firstTimeSellers'])
+	})
+
+	test('life-change seller', () => {
+		const seller = makeSeller({ sellingMotivation: 'lifeChange' })
+		expect(deriveExpectedClientTypes(seller)).toEqual([
+			'firstTimeSellers',
+			'lifeChangeSellers',
+		])
 	})
 
 	test('luxury buyer', () => {
@@ -275,11 +277,13 @@ describe('calculateFitScore', () => {
 	test('perfect buyer match scores 100', () => {
 		const agent = makeAgent({
 			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
+			specialties: ['vaMilitary'],
 		})
 		const buyer = makeBuyer({
 			geography: geoOf({ '21201': { lat: 39.2946, lng: -76.6239 } }),
 			propertyTypes: [],
-			experienceLevel: 'firstTime',
+			buyingExperience: 'firstTime',
+			situationSpecialties: ['vaMilitary'],
 		})
 		const result = calculateFitScore(agent, buyer)
 		expect(result.fitScore).toBe(100)
@@ -354,18 +358,12 @@ describe('calculateFitScore', () => {
 		expect(result.disqualified).toBe(false)
 	})
 
-	test('seller match uses seller matrices', () => {
+	test('seller match is not disqualified', () => {
 		const agent = makeAgent({ representationSide: 'seller' })
 		const seller = makeSeller()
 		const result = calculateFitScore(agent, seller)
 		expect(result.disqualified).toBe(false)
 		expect(result.fitScore).toBeGreaterThan(0)
-		const workingStyle = result.trace.dimensions.find(
-			(d) => d.id === 'workingStyle',
-		)
-		expect(
-			workingStyle?.checks.some((c) => c.label === 'home connection'),
-		).toBe(true)
 	})
 
 	test('no disqualified agent outranks a qualified one', () => {
@@ -421,25 +419,7 @@ describe('calculateFitScore trace', () => {
 		const expected =
 			(2 * stage2!.consumerScore * (0.5 + 0.5 * agentFit!)) /
 			(stage2!.consumerScore + 0.5 + 0.5 * agentFit!)
-		expect(reciprocalBlend).toBeCloseTo(expected, 2)
-	})
-
-	test('notFitPenalty is populated exactly when penalized', () => {
-		const agent = makeAgent({ notFitFor: ['entryLevel'] })
-		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer)
-		expect(result.trace.notFitPenalty).toBeDefined()
-		expect(result.trace.notFitPenalty!.scoreAfter).toBeCloseTo(
-			result.trace.notFitPenalty!.scoreBefore * 0.3,
-			2,
-		)
-	})
-
-	test('notFitPenalty is omitted when not penalized', () => {
-		const agent = makeAgent()
-		const buyer = makeBuyer()
-		const result = calculateFitScore(agent, buyer)
-		expect(result.trace.notFitPenalty).toBeUndefined()
+		expect(reciprocalBlend).toBe(Math.round(expected * 100) / 100)
 	})
 })
 
