@@ -102,6 +102,9 @@ const root = import.meta.dirname
 
 export default defineConfig({
 	root,
+	server: {
+		port: 3000,
+	},
 	resolve: {
 		tsconfigPaths: true,
 		dedupe: ['react', 'react-dom'],
