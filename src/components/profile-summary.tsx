@@ -13,16 +13,18 @@ import {
 	type AgentPriceBucket,
 } from '@/lib/price-range'
 import {
-	bestClientType,
+	agentQuestions,
 	buyerQuestionIds,
 	buyerQuestions,
+	enjoyedClientType,
 	propertyType,
 	getQuestionIcon,
 	representationSide,
 	sellerQuestionIds,
 	sellerQuestions,
+	specialty,
 	yearsLicensed,
-	type BestClientTypeSlug,
+	type EnjoyedClientTypeSlug,
 	type ClientRole,
 	type PropertyTypeSlug,
 	type RepresentationSide,
@@ -40,7 +42,8 @@ export interface AgentSummaryProfile {
 	typicalPriceRange: AgentPriceBucket
 	representationSide: RepresentationSide
 	zipCodes: string[]
-	bestClientType: BestClientTypeSlug
+	enjoyedClients?: EnjoyedClientTypeSlug[] | undefined
+	specialties?: string[] | undefined
 	yearsLicensed?: YearsLicensed | null | undefined
 }
 
@@ -161,17 +164,15 @@ function getAnswer(
 	return undefined
 }
 
-type SummaryQuestion =
-	| {
-			kind: 'single'
-			id: string
-			label: string
-			options: {
-				slugs: readonly string[]
-				labels: Readonly<Record<string, string>>
-			}
-	  }
-	| { kind: 'freeForm'; id: string; label: string }
+type SummaryQuestion = {
+	kind: 'single' | 'multi'
+	id: string
+	label: string
+	options: {
+		slugs: readonly string[]
+		labels: Readonly<Record<string, string>>
+	}
+}
 
 function formatQuestionSummary(
 	question: SummaryQuestion,
@@ -190,8 +191,19 @@ function formatQuestionSummary(
 				? { key: question.id, label: question.label, value, icon }
 				: null
 		}
-		case 'freeForm': {
-			return null
+		case 'multi': {
+			if (!Array.isArray(answer) || answer.length === 0) return null
+			const labels: string[] = []
+			for (const slug of answer) {
+				if (!slug) continue
+				const label = question.options.labels[slug]
+				if (!label) continue
+				labels.push(label)
+			}
+			const value = labels.join(', ')
+			return value
+				? { key: question.id, label: question.label, value, icon }
+				: null
 		}
 	}
 }
@@ -221,12 +233,24 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 					icon: BriefcaseIcon,
 				}
 			: null,
-		profile.bestClientType
+		profile.enjoyedClients?.length
 			? {
-					key: 'bestClientType',
-					label: 'Best clients',
-					value: getEnumLabel(bestClientType.labels, profile.bestClientType),
+					key: 'enjoyedClients',
+					label: agentQuestions.enjoyedClients.label,
+					value: profile.enjoyedClients
+						.map((slug) => getEnumLabel(enjoyedClientType.labels, slug))
+						.join(', '),
 					icon: UserIcon,
+				}
+			: null,
+		profile.specialties?.length
+			? {
+					key: 'specialties',
+					label: agentQuestions.specialties.label,
+					value: profile.specialties
+						.map((slug) => getEnumLabel(specialty.labels, slug))
+						.join(', '),
+					icon: BriefcaseIcon,
 				}
 			: null,
 		profile.yearsLicensed

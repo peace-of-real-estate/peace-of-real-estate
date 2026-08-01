@@ -27,6 +27,7 @@ import {
 	propertyType,
 	sellerQuestions,
 	timeline,
+	type ClientWorkStyle,
 } from '@/lib/profile'
 import {
 	DashboardPage,
@@ -438,19 +439,28 @@ function lookupLabel(
 
 function workStyleEntries(
 	role: ClientRole,
-	workStyle: Record<string, string | null>,
+	workStyle: ClientWorkStyle,
 ): Array<{ label: string; value: string }> {
 	const questions = Object.values(
 		role === 'buyer' ? buyerQuestions : sellerQuestions,
 	)
-	return Object.entries(workStyle).flatMap(([key, slug]) => {
-		if (!slug) return []
+	return Object.entries(workStyle).flatMap(([key, value]) => {
+		if (!value || (Array.isArray(value) && value.length === 0)) return []
 		const question = questions.find((entry) => entry.id === key)
-		if (!question) return [{ label: key, value: slug }]
+		if (!question) {
+			return [
+				{ label: key, value: Array.isArray(value) ? value.join(', ') : value },
+			]
+		}
+		const displayValue = Array.isArray(value)
+			? value
+					.map((slug) => lookupLabel(question.options.labels, slug))
+					.join(', ')
+			: lookupLabel(question.options.labels, value)
 		return [
 			{
 				label: question.label,
-				value: lookupLabel(question.options.labels, slug),
+				value: displayValue,
 			},
 		]
 	})

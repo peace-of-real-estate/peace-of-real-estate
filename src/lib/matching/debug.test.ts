@@ -30,9 +30,10 @@ function makeScoredAgent(
 				Location: 4,
 				'Price Fit': 4,
 				Specialization: 4,
-				'Working Style': 4,
+				'Decision Support': 4,
 				Communication: 4,
-				'Business Terms': 4,
+				'Risk Comfort': 4,
+				Commission: 4,
 			},
 			disqualified,
 			trace: {
