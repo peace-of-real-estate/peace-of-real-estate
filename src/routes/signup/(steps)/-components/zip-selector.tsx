@@ -91,6 +91,14 @@ export function CityZipSelector({
 		staleTime: 1000 * 60 * 60,
 	})
 
+	// A persisted draft can reference a city that no longer exists (e.g. the
+	// DB was wiped and reseeded). `null` is a definitive not-found — clear the
+	// stale selection so the step doesn't sit complete-but-broken.
+	useEffect(() => {
+		if (displayedCity !== null || !selectedCityId) return
+		onChange({ cityId: undefined, zipCodes: [] })
+	}, [displayedCity, selectedCityId, onChange])
+
 	const { data: boundaries } = useQuery({
 		queryKey: ['zip-code-boundaries', selectedCityId],
 		queryFn: selectedCityId
@@ -107,7 +115,7 @@ export function CityZipSelector({
 			)
 		: undefined
 
-	const { data: centerForCity } = useQuery({
+	const { data: centerForCity, isPending: centerPending } = useQuery({
 		queryKey: ['city-center', selectedCityId],
 		queryFn: selectedCityId
 			? () => loadCityCenter({ data: selectedCityId })
@@ -295,8 +303,12 @@ export function CityZipSelector({
 						)}
 					</div>
 					<div className="bg-muted/30 border-border overflow-hidden rounded-lg border p-3">
-						{!centerForCity ? (
-							<Skeleton className={cn('rounded-lg', mapHeight)} />
+						{centerPending ? (
+							<Skeleton
+								data-testid="zip-map"
+								data-idle="false"
+								className={cn('rounded-lg', mapHeight)}
+							/>
 						) : (
 							<ZipCodeMap
 								boundaries={
@@ -307,7 +319,7 @@ export function CityZipSelector({
 								}
 								selectedZipCodes={selectedZipCodes}
 								onToggleZipCode={toggleZipCode}
-								center={centerForCity}
+								center={centerForCity ?? undefined}
 								className={mapHeight}
 							/>
 						)}
@@ -452,6 +464,8 @@ function getBounds(features: FeatureCollection['features']): BBox | undefined {
 function ZipCodeMapSkeleton({ className }: { className?: string | undefined }) {
 	return (
 		<div
+			data-testid="zip-map"
+			data-idle="false"
 			className={cn(
 				'relative min-h-64 overflow-hidden rounded-lg border',
 				className,
@@ -471,6 +485,7 @@ function ZipCodeMapImpl({
 }: ZipCodeMapProps) {
 	const mapRef = useRef<MapRef>(null)
 	const [mapLoaded, setMapLoaded] = useState(false)
+	const [mapIdle, setMapIdle] = useState(false)
 	const [hovered, setHovered] = useState<{
 		zipCode: string
 		x: number
@@ -484,6 +499,12 @@ function ZipCodeMapImpl({
 			? `${center.lng},${center.lat}`
 			: ''
 	const lastFitKey = useRef('')
+
+	const [renderedFitKey, setRenderedFitKey] = useState(fitKey)
+	if (renderedFitKey !== fitKey) {
+		setRenderedFitKey(fitKey)
+		setMapIdle(false)
+	}
 
 	useEffect(() => {
 		const map = mapRef.current
@@ -585,7 +606,11 @@ function ZipCodeMapImpl({
 			}
 
 	return (
-		<div className={cn('relative h-80 overflow-hidden rounded-lg', className)}>
+		<div
+			data-testid="zip-map"
+			data-idle={mapIdle ? 'true' : 'false'}
+			className={cn('relative h-80 overflow-hidden rounded-lg', className)}
+		>
 			<Map
 				ref={mapRef}
 				mapStyle={CARTO_STYLE}
@@ -597,6 +622,7 @@ function ZipCodeMapImpl({
 				onMouseEnter={handleMouseEnter}
 				onMouseMove={handleMouseMove}
 				onMouseLeave={handleMouseLeave}
+				onIdle={() => setMapIdle(true)}
 				onLoad={(event) => {
 					event.target.touchZoomRotate.disableRotation()
 					setMapLoaded(true)
