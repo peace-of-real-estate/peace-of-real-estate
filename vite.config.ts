@@ -160,14 +160,18 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: 'unit',
-					include: ['src/**/*.test.ts', '!src/**/*.{server,db}.test.ts'],
+					include: ['src/**/*.unit.test.ts'],
 				},
 			},
 			{
 				extends: true,
 				test: {
 					name: 'server',
-					include: ['src/**/*.{server,db}.test.ts'],
+					include: [
+						'src/**/*.{server,db}.test.ts',
+						'src/**/db.test.ts',
+						'src/**/server.test.ts',
+					],
 					testTimeout: 10_000,
 					globalSetup: ['./tests/support/db.global-setup.ts'],
 					// db test files share one container from globalSetup and reset
