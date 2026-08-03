@@ -56,7 +56,7 @@ export const clientProfiles = snakeCase.table(
 		}),
 		check(
 			'client_profiles_price_range_check',
-			sql`"price_min" >= 0 AND "price_max" <= 2000000 AND "price_min" <= "price_max"`,
+			sql`${table.priceMin} >= 0 AND ${table.priceMax} <= 2000000 AND ${table.priceMin} <= ${table.priceMax}`,
 		),
 	],
 )

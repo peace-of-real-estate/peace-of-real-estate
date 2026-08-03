@@ -69,9 +69,6 @@ export const session = snakeCase.table(
 		expiresAt: timestamp({ withTimezone: true }).notNull(),
 		ipAddress: text(),
 		userAgent: text(),
-		// better-auth admin plugin: set while an admin is impersonating this
-		// session's user; cleared by stopImpersonating.
-		impersonatedBy: text(),
 		createdAt: timestamp({ withTimezone: true }).notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},
