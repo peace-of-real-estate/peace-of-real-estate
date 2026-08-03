@@ -13,7 +13,7 @@ import { authClient } from '@/lib/auth/client'
 import { redirectAuthenticatedUsers } from '@/lib/auth/functions'
 import { useGoogleAuth, sanitizeRedirect } from '@/lib/auth/use-google-auth'
 
-const DEFAULT_POST_AUTH_REDIRECT = '/'
+const DEFAULT_POST_AUTH_REDIRECT = '/choose-role'
 
 export const Route = createFileRoute('/auth/login')({
 	validateSearch: z.object({
