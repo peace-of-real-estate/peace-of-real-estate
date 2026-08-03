@@ -1,0 +1,3708 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "753888cb-bbdd-47b8-8fc0-c033a7f38b7d",
+  "prevIds": [
+    "61bdd26d-a5b0-4408-8f39-33d61cbe8f8c"
+  ],
+  "ddl": [
+    {
+      "values": [
+        "AL",
+        "AK",
+        "AZ",
+        "AR",
+        "CA",
+        "CO",
+        "CT",
+        "DE",
+        "DC",
+        "FL",
+        "GA",
+        "HI",
+        "ID",
+        "IL",
+        "IN",
+        "IA",
+        "KS",
+        "KY",
+        "LA",
+        "ME",
+        "MD",
+        "MA",
+        "MI",
+        "MN",
+        "MS",
+        "MO",
+        "MT",
+        "NE",
+        "NV",
+        "NH",
+        "NJ",
+        "NM",
+        "NY",
+        "NC",
+        "ND",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VT",
+        "VA",
+        "WA",
+        "WV",
+        "WI",
+        "WY",
+        "AS",
+        "FM",
+        "GU",
+        "MH",
+        "MP",
+        "PR",
+        "PW",
+        "VI",
+        "AA",
+        "AE",
+        "AP"
+      ],
+      "name": "us_postal_code",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "buyer",
+        "seller"
+      ],
+      "name": "client_role",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "client_lifetime_premium",
+        "agent_subscription"
+      ],
+      "name": "entitlement_key",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "manual",
+        "stripe_checkout",
+        "stripe_subscription"
+      ],
+      "name": "entitlement_source",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "sent",
+        "accepted",
+        "declined"
+      ],
+      "name": "introduction_notification_kind",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "pending",
+        "accepted",
+        "declined",
+        "withdrawn",
+        "connected"
+      ],
+      "name": "introduction_status",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "openToNegotiating",
+        "walkThroughRate",
+        "rateIsSet"
+      ],
+      "name": "agent_commission_style",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "theyLetMeLead",
+        "walkThroughFollow",
+        "middleGround",
+        "theirCall"
+      ],
+      "name": "agent_decision_style",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "fightHard",
+        "calm",
+        "moveFast",
+        "spotProblems",
+        "explainSteps",
+        "localKnowledge"
+      ],
+      "name": "agent_energy_focus",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "under400k",
+        "400kTo750k",
+        "750kTo1_5m",
+        "1_5mPlus"
+      ],
+      "name": "agent_price_bucket",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "firstTime",
+        "onceOrTwice",
+        "severalTimes"
+      ],
+      "name": "buyer_experience",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "negotiate",
+        "discussThenDecide",
+        "acceptRate"
+      ],
+      "name": "client_commission_plan",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "letThemLead",
+        "walkMeThrough",
+        "middleGround",
+        "finalCall"
+      ],
+      "name": "client_decision_style",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "whenItMatters",
+        "regularCheckins",
+        "handsOn"
+      ],
+      "name": "contact_style",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "firstTimeBuyers",
+        "firstTimeSellers",
+        "moveUp",
+        "downsizers",
+        "relocating",
+        "experiencedLowMaintenance",
+        "luxury",
+        "investors",
+        "lifeChangeSellers"
+      ],
+      "name": "enjoyed_client_type",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "draft",
+        "essentials_submitted",
+        "active",
+        "enriched"
+      ],
+      "name": "profile_status",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "singleFamily",
+        "condoTownhome",
+        "multiFamily",
+        "land"
+      ],
+      "name": "property_type",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "buyer",
+        "seller"
+      ],
+      "name": "representation_side",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "noRisk",
+        "lowRisk",
+        "moderateRisk",
+        "allIn"
+      ],
+      "name": "risk_comfort",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "differentSize",
+        "relocating",
+        "lifeChange",
+        "rightTime"
+      ],
+      "name": "seller_motivation",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "vaMilitary",
+        "fhaDownPayment",
+        "assumableLoans",
+        "bridgeLoans",
+        "ownerFinancing",
+        "renovationLoans",
+        "exchange1031",
+        "reverseMortgage",
+        "investmentRental",
+        "newConstruction",
+        "shortSales",
+        "probateEstate",
+        "tenantOccupied",
+        "auction",
+        "multigenerational",
+        "seniors55Plus",
+        "relocationOutOfState",
+        "internationalBuyers"
+      ],
+      "name": "specialty",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "exploring",
+        "1month",
+        "2months",
+        "3months",
+        "4months",
+        "5months",
+        "6months",
+        "7months",
+        "8months",
+        "9months",
+        "10months",
+        "11months",
+        "12monthsPlus"
+      ],
+      "name": "timeline",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "0-2",
+        "3-5",
+        "6-10",
+        "10+"
+      ],
+      "name": "years_licensed",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "account",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "session",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "user",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "verification",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "cities",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "city_zips",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "agent_profile_zips",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "agent_profiles",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "buyer_details",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "client_profile_zips",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "client_profiles",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "seller_details",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "intro_access_windows",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "intro_checkout_reservations",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "intro_unlock_fulfillments",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "user_entitlements",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "connection_notification_jobs",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "introduction_notification_jobs",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "introductions",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "account_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "provider_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "access_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "refresh_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "access_token_expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "refresh_token_expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "scope",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "password",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ip_address",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_agent",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "impersonated_by",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "email_verified",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "image",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "banned",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ban_reason",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ban_expires",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "identifier",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "value",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "citext",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "us_postal_code",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "state",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "double precision",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "center_lat",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "double precision",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "center_lng",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "zip",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "double precision",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "lat",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "double precision",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "lng",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_zip_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "representation_side",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "representation_side",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "agent_price_bucket",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "typical_price_range",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "enjoyed_client_type",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "name": "enjoyed_clients",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "brokerage_name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "license_number_state",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "years_licensed",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "years_licensed",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "agent_energy_focus",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "energy_focus",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "agent_decision_style",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_decision_style",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "contact_style",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_contact_style",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "risk_comfort",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "risk_advice_comfort",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "agent_commission_style",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "commission_style",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "specialty",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "name": "specialties",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "buyer_details"
+    },
+    {
+      "type": "client_role",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'buyer'",
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "buyer_details"
+    },
+    {
+      "type": "buyer_experience",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "buying_experience",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "buyer_details"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_zip_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "client_role",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "profile_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'draft'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "city_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "timeline",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "timeline",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "price_min",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "price_max",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "property_type",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "property_types",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "client_decision_style",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "decision_style",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "contact_style",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "contact_style",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "risk_comfort",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "risk_comfort",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "client_commission_plan",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "commission_plan",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "specialty",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": "'{}'",
+      "generated": null,
+      "identity": null,
+      "name": "situation_specialties",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "seller_details"
+    },
+    {
+      "type": "client_role",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'seller'",
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "seller_details"
+    },
+    {
+      "type": "seller_motivation",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "selling_motivation",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "seller_details"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_payment_intent_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "starts_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ends_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_session_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "selected_introduction_ids",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_payment_intent_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_unlock_fulfillments"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_unlock_fulfillments"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "fulfilled_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "intro_unlock_fulfillments"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "entitlement_key",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "key",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "entitlement_source",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "source",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_customer_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_payment_intent_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "stripe_subscription_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "starts_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ends_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "introduction_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "agent_sent_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_sent_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "canceled_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "introduction_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "type": "introduction_notification_kind",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "kind",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sent_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "client_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "agent_profile_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "introduction_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'pending'",
+      "generated": null,
+      "identity": null,
+      "name": "status",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "accepted_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "connected_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "closed_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "account_user_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "provider_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "account_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "account_provider_account_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "token",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "session_token_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "session_user_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "email",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "user_email_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "user"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "identifier",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "verification_identifier_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "verification"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "name",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "state",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "cities_name_state_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "state",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "cities_state_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "cities"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "zip",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "city_zips_zip_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "city_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "city_zips_city_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "city_zip_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "agent_profile_zips_profile_id_city_zip_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "agent_profile_zips_profile_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "agent_profiles_user_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "city_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "agent_profiles_city_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "city_zip_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "client_profile_zips_profile_id_city_zip_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "client_profile_zips_profile_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "role",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "client_profiles_user_role_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "client_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "intro_access_windows_profile_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "stripe_payment_intent_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "intro_access_windows_payment_intent_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "client_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "intro_checkout_reservations_profile_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "stripe_session_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "intro_checkout_reservations_session_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "user_entitlements_user_id_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "key",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "user_entitlements_user_key_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "introduction_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "kind",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introduction_notification_jobs_intro_kind_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "kind",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": "\"sent_at\" is null",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introduction_notification_jobs_pending_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "agent_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "client_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": "\"status\" in ('pending', 'accepted', 'connected')",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introductions_active_pair_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "client_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": "\"status\" in ('pending', 'accepted')",
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introductions_client_active_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "client_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introductions_client_created_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "agent_profile_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "status",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "introductions_agent_status_index",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "account_user_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "account"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "session_user_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "session"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "cities",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "city_zips_city_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "profile_id",
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "agent_profiles",
+      "columnsTo": [
+        "id",
+        "city_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "agent_profile_zips_profile_city_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "city_zip_id",
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "city_zips",
+      "columnsTo": [
+        "id",
+        "city_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "agent_profile_zips_city_zip_city_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "agent_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "agent_profiles_user_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "cities",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "agent_profiles_city_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id",
+        "role"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id",
+        "role"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "buyer_details_profile_role_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "buyer_details"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "profile_id",
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id",
+        "city_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "client_profile_zips_profile_city_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "city_zip_id",
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "city_zips",
+      "columnsTo": [
+        "id",
+        "city_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "client_profile_zips_city_zip_city_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "client_profile_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "client_profiles_user_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "city_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "cities",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "client_profiles_city_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id",
+        "role"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id",
+        "role"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "seller_details_profile_role_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "seller_details"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "intro_access_windows_client_profile_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "intro_checkout_reservations_client_profile_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "intro_checkout_reservations"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "name": "intro_unlock_fulfillments_client_profile_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "intro_unlock_fulfillments"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "user",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "user_entitlements_user_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "user_entitlements"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "introduction_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "introductions",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "connection_notification_jobs_introduction_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "connection_notification_jobs"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "introduction_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "introductions",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "introduction_notification_jobs_introduction_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "introduction_notification_jobs"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "client_profile_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "client_profiles",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "introductions_client_profile_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "agent_profile_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "agent_profiles",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "introductions_agent_profile_id_fk",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "account_pkey",
+      "schema": "public",
+      "table": "account",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "session_pkey",
+      "schema": "public",
+      "table": "session",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "user_pkey",
+      "schema": "public",
+      "table": "user",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "verification_pkey",
+      "schema": "public",
+      "table": "verification",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "cities_pkey",
+      "schema": "public",
+      "table": "cities",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "city_zips_pkey",
+      "schema": "public",
+      "table": "city_zips",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "agent_profile_zips_pkey",
+      "schema": "public",
+      "table": "agent_profile_zips",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "agent_profiles_pkey",
+      "schema": "public",
+      "table": "agent_profiles",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "client_profile_id"
+      ],
+      "nameExplicit": false,
+      "name": "buyer_details_pkey",
+      "schema": "public",
+      "table": "buyer_details",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "client_profile_zips_pkey",
+      "schema": "public",
+      "table": "client_profile_zips",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "client_profiles_pkey",
+      "schema": "public",
+      "table": "client_profiles",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "client_profile_id"
+      ],
+      "nameExplicit": false,
+      "name": "seller_details_pkey",
+      "schema": "public",
+      "table": "seller_details",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "intro_access_windows_pkey",
+      "schema": "public",
+      "table": "intro_access_windows",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "intro_checkout_reservations_pkey",
+      "schema": "public",
+      "table": "intro_checkout_reservations",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "stripe_payment_intent_id"
+      ],
+      "nameExplicit": false,
+      "name": "intro_unlock_fulfillments_pkey",
+      "schema": "public",
+      "table": "intro_unlock_fulfillments",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "user_entitlements_pkey",
+      "schema": "public",
+      "table": "user_entitlements",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "introduction_id"
+      ],
+      "nameExplicit": false,
+      "name": "connection_notification_jobs_pkey",
+      "schema": "public",
+      "table": "connection_notification_jobs",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "introduction_notification_jobs_pkey",
+      "schema": "public",
+      "table": "introduction_notification_jobs",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "introductions_pkey",
+      "schema": "public",
+      "table": "introductions",
+      "entityType": "pks"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "id",
+        "city_id"
+      ],
+      "nullsNotDistinct": false,
+      "name": "city_zips_id_city_id_unique",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "city_zips"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "id",
+        "city_id"
+      ],
+      "nullsNotDistinct": false,
+      "name": "agent_profiles_id_city_id_unique",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "agent_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "id",
+        "role"
+      ],
+      "nullsNotDistinct": false,
+      "name": "client_profiles_id_role_index",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        "id",
+        "city_id"
+      ],
+      "nullsNotDistinct": false,
+      "name": "client_profiles_id_city_id_unique",
+      "entityType": "uniques",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "value": "\"role\" = 'buyer'",
+      "name": "buyer_details_role_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "buyer_details"
+    },
+    {
+      "value": "\"price_min\" >= 0 AND \"price_max\" <= 2000000 AND \"price_min\" <= \"price_max\"",
+      "name": "client_profiles_price_range_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "client_profiles"
+    },
+    {
+      "value": "\"role\" = 'seller'",
+      "name": "seller_details_role_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "seller_details"
+    },
+    {
+      "value": "\"ends_at\" > \"starts_at\"",
+      "name": "intro_access_windows_range_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "intro_access_windows"
+    },
+    {
+      "value": "\"status\" <> 'pending' OR (\"accepted_at\" IS NULL AND \"connected_at\" IS NULL AND \"closed_at\" IS NULL)",
+      "name": "introductions_pending_data_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "value": "\"status\" <> 'accepted' OR (\"accepted_at\" IS NOT NULL AND \"connected_at\" IS NULL AND \"closed_at\" IS NULL)",
+      "name": "introductions_accepted_data_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "value": "\"status\" NOT IN ('declined', 'withdrawn') OR (\"closed_at\" IS NOT NULL AND \"accepted_at\" IS NULL AND \"connected_at\" IS NULL)",
+      "name": "introductions_closed_data_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "introductions"
+    },
+    {
+      "value": "\"status\" <> 'connected' OR (\"accepted_at\" IS NOT NULL AND \"connected_at\" IS NOT NULL AND \"closed_at\" IS NULL)",
+      "name": "introductions_connected_data_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "introductions"
+    }
+  ],
+  "renames": []
+}
