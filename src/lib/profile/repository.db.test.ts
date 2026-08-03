@@ -20,8 +20,6 @@ function buyerInsert(cityId: string) {
 			responseTimeExpectation: 'within30Min' as const,
 			involvementLevel: 'veryInvolved' as const,
 			commissionComfort: 'openOptions' as const,
-			matchPriorities: null,
-			matchDetails: null,
 		},
 		details: {
 			experienceLevel: 'firstTime' as const,

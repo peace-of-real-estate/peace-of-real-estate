@@ -4,7 +4,6 @@ import { z } from 'zod'
 
 import { db } from '@/db/connection'
 import { clientRole } from '@/db/schema'
-import { serverEnv } from '@/env.server'
 import { requireUserId } from '@/lib/auth/session'
 import { MAX_ACTIVE_INTROS } from '@/lib/introductions/guards'
 

@@ -57,7 +57,6 @@ function makeBuyer(overrides: Partial<BuyerProfile> = {}): BuyerProfile {
 		idealAgentRelationship: 'thinkingPartner',
 		decisionMakingNeed: 'numbersData',
 		biddingWarResponse: 'factsOptions',
-		matchPriorities: [],
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
@@ -84,7 +83,6 @@ function makeSeller(overrides: Partial<SellerProfile> = {}): SellerProfile {
 		homeConnection: 'asset',
 		agentSilencePreference: 'milestones',
 		representationPreference: 'exclusiveRepresentationOnly',
-		matchPriorities: [],
 		createdAt: FIXED_DATE,
 		updatedAt: FIXED_DATE,
 		...overrides,
@@ -356,17 +354,6 @@ describe('calculateFitScore', () => {
 		expect(result.disqualified).toBe(false)
 	})
 
-	test('priority boost raises priceFit weight', () => {
-		const agent = makeAgent()
-		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
-		const result = calculateFitScore(agent, buyer)
-		const priceDimension = result.trace.dimensions.find(
-			(d) => d.id === 'priceFit',
-		)
-		expect(priceDimension?.boosted).toBe(true)
-		expect(priceDimension?.weight).toBeGreaterThan(16)
-	})
-
 	test('seller match uses seller matrices', () => {
 		const agent = makeAgent({ representationSide: 'seller' })
 		const seller = makeSeller()
@@ -413,7 +400,7 @@ describe('agent price buckets', () => {
 describe('calculateFitScore trace', () => {
 	test('stage2 values are internally consistent', () => {
 		const agent = makeAgent()
-		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
+		const buyer = makeBuyer()
 		const result = calculateFitScore(agent, buyer)
 		const stage2 = result.trace.stage2
 		expect(stage2).toBeDefined()
@@ -427,7 +414,7 @@ describe('calculateFitScore trace', () => {
 
 	test('reciprocalBlend equals harmonic mean of consumerScore and agentFit floor', () => {
 		const agent = makeAgent()
-		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
+		const buyer = makeBuyer()
 		const result = calculateFitScore(agent, buyer)
 		const { stage2, agentFit, reciprocalBlend } = result.trace
 		expect(reciprocalBlend).toBeDefined()
@@ -439,7 +426,7 @@ describe('calculateFitScore trace', () => {
 
 	test('notFitPenalty is populated exactly when penalized', () => {
 		const agent = makeAgent({ notFitFor: ['entryLevel'] })
-		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
+		const buyer = makeBuyer()
 		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeDefined()
 		expect(result.trace.notFitPenalty!.scoreAfter).toBeCloseTo(
@@ -450,7 +437,7 @@ describe('calculateFitScore trace', () => {
 
 	test('notFitPenalty is omitted when not penalized', () => {
 		const agent = makeAgent()
-		const buyer = makeBuyer({ matchPriorities: ['priceRange'] })
+		const buyer = makeBuyer()
 		const result = calculateFitScore(agent, buyer)
 		expect(result.trace.notFitPenalty).toBeUndefined()
 	})

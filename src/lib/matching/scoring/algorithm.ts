@@ -30,7 +30,6 @@ import {
 	lookUpAffinity,
 	notFitForClientTypeHits,
 	notFitForNegativeScore,
-	priorityToDimension,
 	scoreChannel,
 	scoreDelivery,
 	scoreFrequency,
@@ -634,29 +633,6 @@ function baseRank(): DimensionId[] {
 	)
 }
 
-function applyPriorityRanking(
-	baseRanks: DimensionId[],
-	priorities: string[] | null | undefined,
-): DimensionId[] {
-	const ranked = [...baseRanks]
-	const priorityDimensions: DimensionId[] = []
-	for (const priority of priorities ?? []) {
-		const dimension = priorityToDimension[priority]
-		if (dimension !== undefined) priorityDimensions.push(dimension)
-	}
-	const seen = new Set<DimensionId>()
-	for (const dimension of priorityDimensions) {
-		if (seen.has(dimension)) continue
-		seen.add(dimension)
-		const index = ranked.indexOf(dimension)
-		if (index > 0) {
-			ranked.splice(index, 1)
-			ranked.splice(index - 1, 0, dimension)
-		}
-	}
-	return ranked
-}
-
 function addModulations(
 	weights: Record<DimensionId, number>,
 	modulators: { dimension: DimensionId; source: string; delta: number }[],
@@ -724,12 +700,7 @@ function resolveDimensionWeights(clientBySide: ClientSideProfile): {
 	weights: Record<DimensionId, number>
 	boosted: Set<DimensionId>
 } {
-	const baseRanks = baseRank()
-	const priorityRanks = applyPriorityRanking(
-		baseRanks,
-		clientBySide.client.matchPriorities,
-	)
-	const rocWeights = rankOrderCentroidWeights(priorityRanks)
+	const rocWeights = rankOrderCentroidWeights(baseRank())
 
 	const raw: Record<DimensionId, number> = { ...baseDimensionWeights }
 	for (const dimension of DIMENSION_IDS) {
@@ -941,7 +912,6 @@ export function calculateFitScore(
 		trace: {
 			mode: 'client-scored',
 			side: clientBySide.side,
-			matchPriorities: client.matchPriorities ?? [],
 			disqualifiers,
 			disqualified,
 			dimensions,
