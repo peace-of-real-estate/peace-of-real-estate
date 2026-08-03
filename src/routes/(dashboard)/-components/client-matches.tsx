@@ -309,18 +309,20 @@ function KeyedRow({ item }: { item: SummaryItem }) {
 	const showIcon = VALUE_ICON_KEYS.has(item.key)
 	const ValueIcon = item.icon
 	return (
-		<div className="flex items-start justify-between gap-2 text-xs">
-			<span className="text-muted-foreground shrink-0 pt-px">{item.label}</span>
+		<div className="flex flex-col gap-0.5">
+			<span className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
+				{item.label}
+			</span>
 			<span
 				className={cn(
-					'flex min-w-0 items-center gap-1 text-right leading-tight font-semibold tabular-nums',
+					'flex items-start gap-1 text-xs leading-tight font-semibold tabular-nums',
 					signature ? 'text-amber-foreground' : 'text-foreground',
 				)}
 			>
 				{showIcon && (
 					<ValueIcon
 						className={cn(
-							'h-3 w-3 shrink-0',
+							'mt-px h-3 w-3 shrink-0',
 							!signature && 'text-muted-foreground',
 						)}
 					/>
@@ -354,7 +356,7 @@ function PreferenceGroup({
 				<GroupIcon className="h-3 w-3 shrink-0" />
 				{title}
 			</h3>
-			<div className="space-y-1.5 p-3">
+			<div className="space-y-2.5 p-3">
 				{items.map((item) => (
 					<KeyedRow key={item.key} item={item} />
 				))}
@@ -417,7 +419,7 @@ function PreferencesSummaryCard({
 						</span>
 					</div>
 					{basicItems.length > 0 ? (
-						<div className="border-border mt-3 space-y-1.5 border-t border-dashed pt-3">
+						<div className="border-border mt-3 space-y-2.5 border-t border-dashed pt-3">
 							{basicItems.map((item) => (
 								<KeyedRow key={item.key} item={item} />
 							))}
