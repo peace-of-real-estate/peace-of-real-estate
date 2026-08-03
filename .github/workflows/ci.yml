@@ -10,15 +10,10 @@ concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-# No real secrets on CI: varlock loads dummy values from .env.test
-env:
-  APP_ENV: test
-
 jobs:
   check:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs: ubuntu-24
     env:
-      GITHUB_STEP_SUMMARY: /tmp/vitest-check-summary.md
     steps:
       - name: checkout
         uses: actions/checkout@v6
@@ -30,7 +25,7 @@ jobs:
       - run: vp test run --project unit
 
   test-db:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24
     steps:
       - name: checkout
         uses: actions/checkout@v6
@@ -42,7 +37,7 @@ jobs:
         run: vp test run --project server
 
   test-visual:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-24
     steps:
       - name: checkout
         uses: actions/checkout@v6
