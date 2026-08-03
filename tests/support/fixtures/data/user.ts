@@ -1,4 +1,4 @@
-import { user } from '@/db/tables'
+import { user } from '@/db/schema'
 
 export type IntroUser = typeof user.$inferInsert
 

@@ -125,5 +125,8 @@ test('location step city dropdown open', async () => {
 	await expect.element(trigger).toBeVisible()
 	await trigger.click()
 	await expect.element(page.getByPlaceholder('Search city...')).toBeVisible()
-	await expectScreenshot(document.body, { name: 'step-1-city-dropdown' })
+	await expectScreenshot(document.body, {
+		name: 'step-1-city-dropdown',
+		prepare: waitForZipMapIdle,
+	})
 }, 60000)

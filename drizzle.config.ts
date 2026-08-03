@@ -2,7 +2,7 @@ import 'varlock/auto-load'
 import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
-	schema: ['./src/db/tables.ts', './src/lib/profile/db.ts'],
+	schema: ['./src/db/schema/index.ts', './src/lib/profile/db.ts'],
 	out: './src/db/migrations',
 	dialect: 'postgresql',
 	dbCredentials: {

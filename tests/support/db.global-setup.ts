@@ -1,4 +1,4 @@
-import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import type { TestProject } from 'vitest/node'
 
@@ -27,12 +27,13 @@ export default async function setup(project: TestProject) {
 		const client = new Pool({ connectionString: container.getConnectionUri() })
 		try {
 			const db = drizzle({ client })
-			const schemaPath = resolve(process.cwd(), 'src/db/tables.ts')
 			for (const ext of REQUIRED_EXTENSIONS) {
 				await db.execute(`CREATE EXTENSION IF NOT EXISTS "${ext}"`)
 			}
 			await migrate(db, {
-				migrationsFolder: resolve(dirname(schemaPath), 'migrations'),
+				migrationsFolder: fileURLToPath(
+					new URL('../../src/db/migrations', import.meta.url),
+				),
 			})
 		} finally {
 			await client.end()

@@ -3,7 +3,7 @@ import { describe, expect, test } from '@tests/support/fixtures/db'
 import { seedCities, uniqueCity } from '@tests/support/fixtures/geography'
 import { eq } from 'drizzle-orm'
 
-import { cityZips, clientProfiles, clientProfileZips, user } from '@/db/tables'
+import { cityZips, clientProfiles, clientProfileZips, user } from '@/db/schema'
 import { Buyer, Seller } from '@/lib/profile/repository'
 
 function buyerInsert(cityId: string) {

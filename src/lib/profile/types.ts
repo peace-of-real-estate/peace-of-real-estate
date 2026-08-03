@@ -7,7 +7,7 @@ import {
 	clientProfiles,
 	clientRole,
 	sellerDetails,
-} from '@/db/tables'
+} from '@/db/schema'
 import type { ResolvedCity, ZipGeography } from '@/lib/geography/zip'
 import { agentPriceBucketSchema, priceBoundSchema } from '@/lib/price-range'
 import { agentQuestionIds, propertyType } from '@/lib/profile/profile-fields'
