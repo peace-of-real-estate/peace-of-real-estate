@@ -5,8 +5,10 @@ import {
 	MapPinIcon,
 	WarningIcon,
 } from '@phosphor-icons/react'
+import * as Sentry from '@sentry/tanstackstart-react'
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -53,7 +55,11 @@ export function NotFoundComponent() {
 // * Server Error
 // ========================================================================
 
-export function ServerErrorComponent({ reset }: ErrorComponentProps) {
+export function ServerErrorComponent({ error, reset }: ErrorComponentProps) {
+	useEffect(() => {
+		Sentry.captureException(error)
+	}, [error])
+
 	return (
 		<div className="flex flex-1 flex-col items-center justify-center px-6 py-24">
 			<Card className="mx-auto max-w-xl text-center">
