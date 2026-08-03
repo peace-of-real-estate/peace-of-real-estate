@@ -25,8 +25,6 @@ export function makeBuyerProfile(
 		biddingWarResponse: 'factsOptions',
 		responseTimeExpectation: 'within30Min',
 		commissionComfort: 'openOptions',
-		matchPriorities: null,
-		matchDetails: null,
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		...overrides,

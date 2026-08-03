@@ -111,11 +111,6 @@ export const clientWorkStyleColumns = {
 	commissionComfort: commissionComfortEnum().notNull(),
 }
 
-export const clientMatchTuningColumns = {
-	matchPriorities: text().array(),
-	matchDetails: text(),
-}
-
 export const buyerQuizColumns = {
 	experienceLevel: buyerExperienceLevelEnum().notNull(),
 	idealAgentRelationship: buyerIdealAgentRelationshipEnum().notNull(),

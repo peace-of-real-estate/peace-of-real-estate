@@ -64,7 +64,6 @@ export interface DisqualifierTrace {
 export interface ScoreTrace {
 	mode: 'client-scored'
 	side: ClientRole
-	matchPriorities: string[]
 	disqualifiers: DisqualifierTrace[]
 	disqualified: boolean
 	dimensions: DimensionTrace[]

@@ -38,7 +38,6 @@ function makeScoredAgent(
 			trace: {
 				mode: 'client-scored',
 				side: 'buyer',
-				matchPriorities: [],
 				disqualifiers: [],
 				disqualified,
 				dimensions: [],
