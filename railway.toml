@@ -1,12 +1,11 @@
-[build]
-builder = "RAILPACK"
-buildCommand = "vp build"
-
+# Source is a GHCR image built by .github/workflows/deploy.yml; Railway does
+# not build from this repo. pnpm wrappers put node_modules/.bin (vp, varlock)
+# on PATH, which Railway's plain shell does not.
 [deploy]
-preDeployCommand = "vp run db:migrate && vp run db:init"
+preDeployCommand = "pnpm db:migrate && pnpm db:init"
 runtime = "V2"
 numReplicas = 1
-startCommand = "vp run start"
+startCommand = "pnpm start"
 healthcheckPath = "/"
 sleepApplication = true
 useLegacyStacker = false
