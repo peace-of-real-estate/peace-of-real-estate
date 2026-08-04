@@ -44,6 +44,29 @@ This project uses the React Compiler (`reactCompilerPreset()` in
   render, and respond to events in event handlers. If you think an effect is
   unavoidable, stop and ask first.
 
+## Env vars & secrets
+
+Varlock (`.env.schema`) is the source of truth for env var _definitions_;
+Bitwarden Secrets Manager (BWS) is the source of truth for secret _values_.
+
+- Secret values live only in BWS (projects: `pre-dev`, `pre-prod`; shared
+  secrets in `pre-dev`). Committed files reference them via `bitwarden("uuid")`
+  — UUIDs are not secrets and are safe to commit.
+- Cross-env secrets → refs in `.env.schema`. Dev-only → `.env.development`.
+  Prod-only → `.env.production`. `.env.test` uses dummies (CI never touches
+  BWS); every schema-level `bitwarden()` ref must have a dummy override there.
+- Local machine account token: set `BITWARDEN_ACCESS_TOKEN=varlock(prompt)` in
+  `.env.local` (gitignored), then run `vp exec varlock load` once to encrypt it.
+  This is the only secret that should remain in local env files.
+- To add a new secret: create it in BWS, add the item to `.env.schema`, wire a
+  `bitwarden("uuid")` ref in the right env file, add a dummy to `.env.test` if
+  the ref is in the schema, then `vp exec varlock load` to validate.
+- To rotate: update the value in BWS; redeploy/restart. The GitHub Actions
+  `BETA_PASSWORD` secret (used by e2e against PR deploys) is manually synced —
+  update it when the BWS value rotates.
+- Never paste raw secret values into committed files. Validate with
+  `vp exec varlock load` and `vp exec varlock scan --staged` before committing.
+
 ## Comments
 
 Never write comments that restate what the code already says — if a comment

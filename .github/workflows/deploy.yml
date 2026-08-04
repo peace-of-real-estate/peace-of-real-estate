@@ -1,0 +1,78 @@
+name: Deploy
+
+# Builds the app image on Blacksmith (layer-cached), pushes to GHCR, and
+# points the Railway environment at the new image. Production deploys on
+# main; each PR gets a "pr-<n>" Railway environment.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: deploy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/peace-of-real-estate
+
+jobs:
+  build-deploy:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+
+      - name: setup Blacksmith docker builder
+        uses: useblacksmith/setup-docker-builder@v1
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve tags
+        run: |
+          if [ -n "${{ github.event.pull_request.number }}" ]; then
+            echo "TAG=pr-${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
+            echo "RAILWAY_ENV=peace-of-real-estate-pr-${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
+          else
+            echo "TAG=main" >> "$GITHUB_ENV"
+            echo "RAILWAY_ENV=production" >> "$GITHUB_ENV"
+          fi
+          echo "IMAGE_TAG=$IMAGE_NAME:${{ github.sha }}" >> "$GITHUB_ENV"
+
+      # Secrets resolve from Bitwarden at build time and are baked into the
+      # image as an encrypted blob; the mounts never land in layers. Docker
+      # layer caching comes from the Blacksmith builder's sticky disk.
+      - name: Build and push image
+        uses: useblacksmith/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          secrets: |
+            BITWARDEN_ACCESS_TOKEN=${{ secrets.BITWARDEN_ACCESS_TOKEN }}
+            _VARLOCK_ENV_KEY=${{ secrets._VARLOCK_ENV_KEY }}
+
+      - name: setup vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          version: '0.2.1'
+      - run: vp install
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_SERVICE_NAME: peace-of-real-estate
+          RAILWAY_ENVIRONMENT: ${{ env.RAILWAY_ENV }}
+          IMAGE: ${{ env.IMAGE_TAG }}
+        run: vp exec tsx scripts/railway-deploy.ts

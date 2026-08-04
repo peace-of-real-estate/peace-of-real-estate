@@ -1,0 +1,19 @@
+.git
+.opencode
+node_modules
+.output
+.nitro
+.tanstack
+
+# Local secret overrides must never enter the image
+.env*.local
+.env.compose
+
+.playwright
+.vitest-attachments
+visual-diffs.html
+e2e/.auth
+src/**/__screenshots__
+
+Dockerfile
+.dockerignore
