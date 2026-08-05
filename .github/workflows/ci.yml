@@ -17,8 +17,6 @@ env:
 jobs:
   check:
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    env:
-      GITHUB_STEP_SUMMARY: /tmp/vitest-check-summary.md
     steps:
       - name: checkout
         uses: actions/checkout@v6
