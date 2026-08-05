@@ -1,5 +1,5 @@
 import { formatCityName } from '@/lib/geography/zip'
-import { bestClientType } from '@/lib/profile/profile-fields'
+import { enjoyedClientType } from '@/lib/profile/profile-fields'
 import type { AgentProfile } from '@/lib/profile/types'
 
 import type { FitScoreResult, ScoreBucket } from './scoring/types'
@@ -8,9 +8,10 @@ const DIMENSIONS: ScoreBucket[] = [
 	'Location',
 	'Price Fit',
 	'Specialization',
-	'Working Style',
+	'Decision Support',
 	'Communication',
-	'Business Terms',
+	'Risk Comfort',
+	'Commission',
 ]
 
 export interface AgentMatchData {
@@ -24,7 +25,7 @@ export interface AgentMatchData {
 	date: string
 	experience?: string
 	agency?: string
-	bestClientType: string
+	enjoyedClients?: string
 	scores: Record<string, number>
 	avatar?: string
 }
@@ -53,7 +54,13 @@ export function toAgentMatchData({
 		date: new Date(agent.updatedAt).toLocaleDateString(),
 		experience: agent.yearsLicensed ?? '',
 		agency: agent.brokerageName ?? '',
-		bestClientType: bestClientType.labels[agent.bestClientType],
+		...(agent.enjoyedClients.length
+			? {
+					enjoyedClients: agent.enjoyedClients
+						.map((slug) => enjoyedClientType.labels[slug])
+						.join(', '),
+				}
+			: {}),
 		scores: Object.fromEntries(
 			DIMENSIONS.map((dimension) => [dimension, score.scores[dimension]!]),
 		),

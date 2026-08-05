@@ -1,29 +1,32 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type {
-	FreeFormQuestion,
+	MultiQuestion,
 	Question,
 	QuestionRecord,
 	SingleQuestion,
 } from '@/lib/profile'
-import { cn } from '@/lib/utils/ui'
 
-import {
-	AnimatedStepCard,
-	StepHeader,
-	StepProgressHeader,
-} from '../signup-shell'
-import { FreeFormQuestionCard } from './free-form'
-import { QuestionPrompt } from './question-prompt'
+import { AnimatedStepCard, StepHeader } from '../signup-shell'
+import { MultiQuestionCard } from './multi-question-card'
+import { QuizProgress } from './quiz-progress'
 import { QuestionCard } from './single-question'
 import { useQuestionFlow } from './use-question-flow'
+
+const slideVariants = {
+	enter: (direction: number) => ({ opacity: 0, x: direction * 24 }),
+	center: { opacity: 1, x: 0 },
+	exit: (direction: number) => ({ opacity: 0, x: direction * -24 }),
+}
 
 function QuestionFlow({
 	currentStepIndex,
 	totalSteps,
+	direction,
 	canAdvance,
 	isLastQuestion,
 	children,
@@ -32,98 +35,69 @@ function QuestionFlow({
 }: {
 	currentStepIndex: number
 	totalSteps: number
+	direction: number
 	canAdvance: boolean
 	isLastQuestion: boolean
 	children: ReactNode
 	onQuestionIndexChange: (index: number) => void
 	onComplete: () => void
 }) {
-	const [direction, setDirection] = useState(1)
-	const [isTransitioning, setIsTransitioning] = useState(false)
-	const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-	const completeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-	const topRef = useRef<HTMLDivElement>(null)
 	const currentStepIndexClamped = Math.min(currentStepIndex, totalSteps - 1)
 	const isFirstQuestion = currentStepIndexClamped === 0
 
-	useEffect(() => {
-		return () => {
-			for (const ref of [transitionTimer, completeTimer]) {
-				if (ref.current) {
-					clearTimeout(ref.current)
-					ref.current = null
-				}
-			}
-		}
-	}, [])
-
-	const advance = () => {
-		if (currentStepIndexClamped < totalSteps - 1) {
-			setDirection(1)
-			setIsTransitioning(true)
-			if (transitionTimer.current) clearTimeout(transitionTimer.current)
-			transitionTimer.current = setTimeout(() => {
-				onQuestionIndexChange(currentStepIndexClamped + 1)
-				setIsTransitioning(false)
-			}, 120)
-		}
-	}
-
 	const goBack = () => {
-		if (currentStepIndexClamped > 0) {
-			setDirection(-1)
-			onQuestionIndexChange(currentStepIndexClamped - 1)
-		}
+		if (!isFirstQuestion) onQuestionIndexChange(currentStepIndexClamped - 1)
 	}
 
-	const complete = () => {
-		setIsTransitioning(true)
-		if (completeTimer.current) clearTimeout(completeTimer.current)
-		completeTimer.current = setTimeout(() => {
+	const goForward = () => {
+		if (!canAdvance) return
+		if (isLastQuestion) {
 			onComplete()
-		}, 100)
+		} else {
+			onQuestionIndexChange(currentStepIndexClamped + 1)
+		}
 	}
 
 	return (
 		<div className="space-y-6">
-			<div ref={topRef} className="scroll-mt-4" />
-
-			<div className="flex items-center justify-end gap-3">
-				<button
-					type="button"
+			<div className="flex items-center gap-3">
+				<Button
+					variant="ghost"
+					size="sm"
 					onClick={goBack}
-					disabled={isFirstQuestion || isTransitioning}
-					className="border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-25"
+					disabled={isFirstQuestion}
+					className="-ml-2 shrink-0"
 				>
-					<ArrowLeftIcon className="h-4 w-4" />
-					<span className="sr-only">Previous question</span>
-				</button>
-
-				<button
-					type="button"
-					onClick={isLastQuestion ? complete : advance}
-					disabled={!canAdvance || isTransitioning}
-					className="border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground flex h-8 w-8 items-center justify-center rounded-full border transition disabled:cursor-not-allowed disabled:opacity-25"
+					<ArrowLeftIcon data-icon="inline-start" />
+					Back
+				</Button>
+				<QuizProgress
+					current={currentStepIndexClamped + 1}
+					total={totalSteps}
+					direction={direction}
+					className="min-w-0 flex-1"
+				/>
+				<Button
+					size="sm"
+					onClick={goForward}
+					disabled={!canAdvance}
+					className="shrink-0"
 				>
-					<ArrowRightIcon className="h-4 w-4" />
-					<span className="sr-only">
-						{isLastQuestion ? 'Finish' : 'Next question'}
-					</span>
-				</button>
+					{isLastQuestion ? 'Finish' : 'Next'}
+					<ArrowRightIcon data-icon="inline-end" />
+				</Button>
 			</div>
 
-			<AnimatePresence mode="wait" custom={direction}>
+			<AnimatePresence mode="wait" custom={direction} initial={false}>
 				<motion.div
 					key={currentStepIndexClamped}
 					custom={direction}
-					initial={{ opacity: 0, x: direction * 24 }}
-					animate={{ opacity: 1, x: 0 }}
-					exit={{ opacity: 0, x: direction * -24 }}
-					transition={{ duration: 0.2, ease: 'easeInOut' }}
-					className={cn(
-						'min-h-70 space-y-4',
-						isTransitioning && 'pointer-events-none',
-					)}
+					variants={slideVariants}
+					initial="enter"
+					animate="center"
+					exit="exit"
+					transition={{ duration: 0.18, ease: 'easeOut' }}
+					className="min-h-70 space-y-4"
 				>
 					{children}
 				</motion.div>
@@ -140,26 +114,14 @@ function QuizQuestionContent<
 	answer,
 	onSelect,
 	disabled,
-	freeForm,
 }: {
 	question: Question<TQuestionId, TDraft[TQuestionId]>
 	answer: TDraft[TQuestionId] | null | undefined
 	onSelect: (value: TDraft[TQuestionId] | undefined) => void
 	disabled?: boolean | undefined
-	freeForm?:
-		| {
-				isLastQuestion: boolean
-				canAdvance: boolean
-				onComplete?: (() => void) | undefined
-				onSkip?: (() => void) | undefined
-		  }
-		| undefined
 }) {
 	switch (question.kind) {
 		case 'single': {
-			// Correlated-union boundary: TS cannot narrow the generic union between
-			// `question`, `answer`, and `onSelect` across the Question kind.
-			// Runtime shapes match the single-question contract.
 			// oxlint-disable-next-line typescript/consistent-type-assertions
 			const singleQuestion = question as SingleQuestion<TQuestionId, string>
 			// oxlint-disable-next-line typescript/consistent-type-assertions
@@ -176,25 +138,21 @@ function QuizQuestionContent<
 				/>
 			)
 		}
-		case 'freeForm': {
-			if (!freeForm) return null
+		case 'multi': {
 			// oxlint-disable-next-line typescript/consistent-type-assertions
-			const freeFormQuestion = question as FreeFormQuestion<TQuestionId>
-			// oxlint-disable-next-line typescript/consistent-type-assertions
-			const freeFormAnswer = (answer as string | null | undefined) ?? null
+			const multiQuestion = question as MultiQuestion<TQuestionId, string>
+			const multiAnswer = Array.isArray(answer) ? answer : []
 			return (
-				<>
-					<QuestionPrompt title={question.title} />
-					<FreeFormQuestionCard
-						question={freeFormQuestion}
-						value={freeFormAnswer}
-						onChange={(value) =>
-							// oxlint-disable-next-line typescript/consistent-type-assertions
-							onSelect(value as TDraft[TQuestionId] | undefined)
-						}
-						{...freeForm}
-					/>
-				</>
+				<MultiQuestionCard
+					question={multiQuestion}
+					// oxlint-disable-next-line typescript/consistent-type-assertions
+					answer={multiAnswer as string[]}
+					onSelect={(value) =>
+						// oxlint-disable-next-line typescript/consistent-type-assertions
+						onSelect(value as TDraft[TQuestionId] | undefined)
+					}
+					disabled={disabled}
+				/>
 			)
 		}
 	}
@@ -216,7 +174,6 @@ export function PreferencesStep<
 	advanceOnSelect,
 	isSkippable,
 	onComplete,
-	freeForm,
 }: {
 	title: string
 	stepNumber: number
@@ -230,21 +187,18 @@ export function PreferencesStep<
 	advanceOnSelect?: (questionId: TQuestionId) => boolean
 	isSkippable?: (questionId: TQuestionId) => boolean
 	onComplete: () => void
-	freeForm?: {
-		isSkippable: (questionId: TQuestionId) => boolean
-		onSkip: (questionId: TQuestionId) => void
-	}
 }) {
 	const {
 		currentQuestionIndex,
 		questionId,
-		setCurrentQuestionIndex,
+		direction,
+		goToQuestion,
 		isLastQuestion,
-		answeredFlags,
 		canAdvance,
 		handleSelect,
 	} = useQuestionFlow({
 		questionIds,
+		questions,
 		advanceOnSelect,
 		isSkippable,
 		state,
@@ -261,45 +215,20 @@ export function PreferencesStep<
 						totalSteps={totalSteps}
 						title={title}
 					/>
-					<StepProgressHeader
-						stepNumber={stepNumber}
-						totalSteps={totalSteps}
-						title={title}
-						items={answeredFlags}
-						showTitle={false}
-					/>
 					{questionId ? (
 						<QuestionFlow
 							currentStepIndex={currentQuestionIndex}
 							totalSteps={questionIds.length}
+							direction={direction}
 							canAdvance={canAdvance}
 							isLastQuestion={isLastQuestion}
-							onQuestionIndexChange={setCurrentQuestionIndex}
+							onQuestionIndexChange={goToQuestion}
 							onComplete={onComplete}
 						>
 							<QuizQuestionContent
 								question={questions[questionId]}
 								answer={state[questionId]}
 								onSelect={(value) => handleSelect(questionId, value)}
-								freeForm={
-									freeForm
-										? {
-												isLastQuestion,
-												canAdvance,
-												onComplete,
-												onSkip: freeForm.isSkippable(questionId)
-													? () => {
-															// Correlated-union boundary: dynamic key assignment into a generic Partial patch.
-															// oxlint-disable-next-line typescript/consistent-type-assertions
-															updateState({
-																[questionId]: undefined,
-															} as Partial<TDraft>)
-															freeForm.onSkip(questionId)
-														}
-													: undefined,
-											}
-										: undefined
-								}
 							/>
 						</QuestionFlow>
 					) : null}
