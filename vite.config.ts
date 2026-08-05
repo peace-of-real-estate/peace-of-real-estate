@@ -1,6 +1,7 @@
 import { resolve } from 'node:path'
 
 import babel from '@rolldown/plugin-babel'
+import { sentryTanstackStart } from '@sentry/tanstackstart-react/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -135,6 +136,11 @@ export default defineConfig({
 			svgrOptions: { exportType: 'default' },
 		}),
 		varlockVitePlugin({ ssrInjectMode: 'resolved-env' }),
+		sentryTanstackStart({
+			org: 'peace-of-real-estate',
+			project: 'javascript-tanstackstart-react',
+			authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
+		}),
 	],
 	fmt: fmt,
 	lint: lint,

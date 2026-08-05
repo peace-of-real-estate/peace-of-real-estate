@@ -1,6 +1,6 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "vp build"
+buildCommand = "vp run build"
 
 [deploy]
 preDeployCommand = "vp run db:migrate && vp run db:init"
