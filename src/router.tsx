@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/tanstackstart-react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
@@ -8,7 +9,7 @@ import { queryClient } from '@/lib/utils/query'
 import { routeTree } from './routeTree.gen'
 
 export const getRouter = () => {
-	return createRouter({
+	const router = createRouter({
 		routeTree,
 		scrollRestoration: true,
 		defaultPreloadStaleTime: 0,
@@ -24,4 +25,12 @@ export const getRouter = () => {
 			)
 		},
 	})
+
+	if (!router.isServer) {
+		Sentry.addIntegration(
+			Sentry.tanstackRouterBrowserTracingIntegration(router),
+		)
+	}
+
+	return router
 }
