@@ -132,7 +132,6 @@ function PreferencesSummaryCard({
 	const locationItems: SummaryItem[] = []
 	if (profile?.city) {
 		locationItems.push({
-			key: 'location',
 			label: 'Location',
 			value: `${profile.city.name}, ${profile.city.state}`,
 			icon: MapPin,

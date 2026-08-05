@@ -13,18 +13,16 @@ import {
 	type AgentPriceBucket,
 } from '@/lib/price-range'
 import {
-	agentQuestions,
+	bestClientType,
 	buyerQuestionIds,
 	buyerQuestions,
-	enjoyedClientType,
 	propertyType,
 	getQuestionIcon,
 	representationSide,
 	sellerQuestionIds,
 	sellerQuestions,
-	specialty,
 	yearsLicensed,
-	type EnjoyedClientTypeSlug,
+	type BestClientTypeSlug,
 	type ClientRole,
 	type PropertyTypeSlug,
 	type RepresentationSide,
@@ -42,15 +40,11 @@ export interface AgentSummaryProfile {
 	typicalPriceRange: AgentPriceBucket
 	representationSide: RepresentationSide
 	zipCodes: string[]
-	enjoyedClients?: EnjoyedClientTypeSlug[] | undefined
-	specialties?: string[] | undefined
+	bestClientType: BestClientTypeSlug
 	yearsLicensed?: YearsLicensed | null | undefined
 }
 
 export type SummaryItem = {
-	/** Stable identifier (question id or profile-field slug) for grouping and
-	 * styling; `label` is display-only and free to change. */
-	key: string
 	label: string
 	value: string
 	icon: ElementType
@@ -86,7 +80,6 @@ function getClientSummaryItems(
 ): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
 		{
-			key: 'budget',
 			label: 'Budget',
 			value: formatPriceRange({
 				min: profile.priceMin,
@@ -96,7 +89,6 @@ function getClientSummaryItems(
 		},
 		profile.propertyTypes.length
 			? {
-					key: 'homeType',
 					label: 'Home Type',
 					value: profile.propertyTypes
 						.map((type) => getEnumLabel(propertyType.labels, type))
@@ -164,15 +156,17 @@ function getAnswer(
 	return undefined
 }
 
-type SummaryQuestion = {
-	kind: 'single' | 'multi'
-	id: string
-	label: string
-	options: {
-		slugs: readonly string[]
-		labels: Readonly<Record<string, string>>
-	}
-}
+type SummaryQuestion =
+	| {
+			kind: 'single'
+			id: string
+			label: string
+			options: {
+				slugs: readonly string[]
+				labels: Readonly<Record<string, string>>
+			}
+	  }
+	| { kind: 'freeForm'; id: string; label: string }
 
 function formatQuestionSummary(
 	question: SummaryQuestion,
@@ -187,23 +181,10 @@ function formatQuestionSummary(
 			const slug = question.options.slugs.find((slug) => slug === answer)
 			if (slug === undefined) return null
 			const value = question.options.labels[slug]
-			return value
-				? { key: question.id, label: question.label, value, icon }
-				: null
+			return value ? { label: question.label, value, icon } : null
 		}
-		case 'multi': {
-			if (!Array.isArray(answer) || answer.length === 0) return null
-			const labels: string[] = []
-			for (const slug of answer) {
-				if (!slug) continue
-				const label = question.options.labels[slug]
-				if (!label) continue
-				labels.push(label)
-			}
-			const value = labels.join(', ')
-			return value
-				? { key: question.id, label: question.label, value, icon }
-				: null
+		case 'freeForm': {
+			return null
 		}
 	}
 }
@@ -211,13 +192,11 @@ function formatQuestionSummary(
 function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 	const items: (SummaryItem | null | undefined)[] = [
 		{
-			key: 'typicalPriceRange',
 			label: 'Typical price range',
 			value: AGENT_PRICE_BUCKET_LABELS[profile.typicalPriceRange],
 			icon: MoneyIcon,
 		},
 		{
-			key: 'representationSide',
 			label: 'Representation',
 			value: getEnumLabel(
 				representationSide.labels,
@@ -227,35 +206,20 @@ function getAgentSummaryItems(profile: AgentSummaryProfile): SummaryItem[] {
 		},
 		profile.zipCodes.length
 			? {
-					key: 'serviceAreas',
 					label: 'Service areas',
 					value: profile.zipCodes.slice(0, 3).join(', '),
 					icon: BriefcaseIcon,
 				}
 			: null,
-		profile.enjoyedClients?.length
+		profile.bestClientType
 			? {
-					key: 'enjoyedClients',
-					label: agentQuestions.enjoyedClients.label,
-					value: profile.enjoyedClients
-						.map((slug) => getEnumLabel(enjoyedClientType.labels, slug))
-						.join(', '),
+					label: 'Best clients',
+					value: getEnumLabel(bestClientType.labels, profile.bestClientType),
 					icon: UserIcon,
-				}
-			: null,
-		profile.specialties?.length
-			? {
-					key: 'specialties',
-					label: agentQuestions.specialties.label,
-					value: profile.specialties
-						.map((slug) => getEnumLabel(specialty.labels, slug))
-						.join(', '),
-					icon: BriefcaseIcon,
 				}
 			: null,
 		profile.yearsLicensed
 			? {
-					key: 'experience',
 					label: 'Experience',
 					value: getEnumLabel(yearsLicensed.labels, profile.yearsLicensed),
 					icon: StarIcon,
@@ -308,7 +272,7 @@ export function ProfileSummaryGrid({
 			{items.map((item) => {
 				const Icon = item.icon
 				return (
-					<div key={item.key} className={itemClass}>
+					<div key={item.label} className={itemClass}>
 						<div className={iconContainerClass}>
 							<Icon className={iconSize} />
 						</div>

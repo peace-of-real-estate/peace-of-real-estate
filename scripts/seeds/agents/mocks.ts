@@ -1,4 +1,4 @@
-import { enjoyedClientType, representationSide } from '../../../src/lib/profile'
+import { bestClientType, representationSide } from '../../../src/lib/profile'
 import type { SlugOf } from '../../../src/lib/profile'
 import type { WeightedOption } from './stats'
 
@@ -405,7 +405,11 @@ export const REPRESENTATION_SIDES: WeightedOption<
 	{ value: 'seller', weight: 40 },
 ]
 
-export const CLIENT_TYPES = enjoyedClientType.slugs
+// Slugs from the bestClientType enum, which maps to the best_client_type
+// column on agents. 'other' is excluded because it carries no matching signal.
+export const CLIENT_TYPES = bestClientType.slugs.filter(
+	(slug) => slug !== 'other',
+)
 
 export const BROKERAGE_POOLS = [
 	...LUXURY_BROKERAGES,

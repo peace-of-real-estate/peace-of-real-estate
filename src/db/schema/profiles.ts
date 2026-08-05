@@ -19,6 +19,7 @@ import {
 	buyerQuizColumns,
 	clientLifecycleColumns,
 	clientMatchingColumns,
+	clientMatchTuningColumns,
 	clientWorkStyleColumns,
 	sellerQuizColumns,
 } from '@/lib/profile/db'
@@ -37,6 +38,7 @@ export const clientProfiles = snakeCase.table(
 		...clientLifecycleColumns,
 		...clientMatchingColumns,
 		...clientWorkStyleColumns,
+		...clientMatchTuningColumns,
 		createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp({ withTimezone: true }).notNull(),
 	},

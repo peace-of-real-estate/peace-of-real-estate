@@ -37,12 +37,16 @@ const step2: SellerDraft = {
 }
 
 const step3: SellerDraft = {
-	sellingMotivation: 'relocating',
-	decisionStyle: 'walkMeThrough',
-	contactStyle: 'regularCheckins',
-	riskComfort: 'lowRisk',
-	commissionPlan: 'discussThenDecide',
-	situationSpecialties: [],
+	saleMotivation: 'relocation',
+	successfulSaleLooksLike: 'strongPriceSmoothProcess',
+	involvementLevel: 'veryInvolved',
+	quickCommunicationChannel: 'text',
+	updateDeliveryMethod: 'email',
+	homeConnection: 'goodMemories',
+	agentSilencePreference: 'milestones',
+	representationPreference: 'exclusiveRepresentationOnly',
+	responseTimeExpectation: 'within30Min',
+	commissionComfort: 'openOptions',
 }
 
 test('location step screenshot', async () => {

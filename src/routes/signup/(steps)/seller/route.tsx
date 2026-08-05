@@ -8,10 +8,10 @@ import {
 import { getCurrentSession } from '@/lib/auth/session'
 import { loadExistingProfileRoles, sellerDraftSchema } from '@/lib/profile'
 import type { SellerDraft } from '@/lib/profile'
-import { sellerQuestionIds, sellerQuestions } from '@/lib/profile'
+import { sellerQuestionIds } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
-import { isQuestionAnswered } from '../-components/quiz/use-question-flow'
+import { isAnswered } from '../-components/quiz/use-question-flow'
 import {
 	SignupWizardShell,
 	type SignupWizardStep,
@@ -42,9 +42,7 @@ export const Route = createFileRoute('/signup/(steps)/seller')({
 })
 
 function isSellerPreferencesComplete(state: SellerDraft): boolean {
-	return sellerQuestionIds.every((id) =>
-		isQuestionAnswered(sellerQuestions[id], state[id]),
-	)
+	return sellerQuestionIds.every((id) => isAnswered(state[id]))
 }
 
 function SellerWizardRoute() {
@@ -68,7 +66,8 @@ function SellerWizardRoute() {
 				step === 'preview' ? '/signup/preview/seller' : step
 			}
 			getHasDraft={(draft) =>
-				draft.cityId !== undefined || draft.sellingMotivation !== undefined
+				draft.cityId !== undefined ||
+				draft.quickCommunicationChannel !== undefined
 			}
 			getCompletedStepIds={(draft) =>
 				sellerSteps

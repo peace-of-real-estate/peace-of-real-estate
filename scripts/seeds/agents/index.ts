@@ -14,6 +14,7 @@ import {
 	user,
 	userEntitlements,
 } from '../../../src/db/schema'
+import { structuredNotFitForOptions } from '../../../src/lib/matching/affinities'
 import { BUCKET_ORDER } from '../../../src/lib/price-range'
 import {
 	agentQuestions,
@@ -39,15 +40,22 @@ import { pickWeighted, sample, type WeightedOption } from './stats'
 const agentAnswerPickers: {
 	[K in keyof AgentWorkStyle]: () => NonNullable<AgentWorkStyle[K]>
 } = {
-	enjoyedClients: () => sample(CLIENT_TYPES, 2),
-	clientDecisionStyle: () =>
-		pick(agentQuestions.clientDecisionStyle.options.slugs),
-	clientContactStyle: () =>
-		pick(agentQuestions.clientContactStyle.options.slugs),
-	riskAdviceComfort: () => pick(agentQuestions.riskAdviceComfort.options.slugs),
-	commissionStyle: () => pick(agentQuestions.commissionStyle.options.slugs),
-	specialties: () => sample(agentQuestions.specialties.options.slugs, 3),
-	energyFocus: () => sample(agentQuestions.energyFocus.options.slugs, 2),
+	bestClientType: () => pick(CLIENT_TYPES),
+	clientDescription: () =>
+		pick(agentQuestions['clientDescription'].options.slugs),
+	communicationFrequency: () =>
+		pick(agentQuestions['communicationFrequency'].options.slugs),
+	quickCommunicationChannel: () =>
+		pick(agentQuestions['quickCommunicationChannel'].options.slugs),
+	updateDeliveryMethod: () =>
+		pick(agentQuestions['updateDeliveryMethod'].options.slugs),
+	difficultDealInstinct: () =>
+		pick(agentQuestions['difficultDealInstinct'].options.slugs),
+	responseTime: () => pick(agentQuestions['responseTime'].options.slugs),
+	commissionApproach: () =>
+		pick(agentQuestions['commissionApproach'].options.slugs),
+	unrepresentedBuyerApproach: () =>
+		pick(agentQuestions['unrepresentedBuyerApproach'].options.slugs),
 }
 
 function pickAnswer<K extends keyof AgentWorkStyle>(
@@ -61,28 +69,43 @@ function pickAnswer<K extends keyof AgentWorkStyle>(
 type AgentPersona = {
 	representationSide: AgentProfile['representationSide']
 	typicalPriceRange: AgentProfile['typicalPriceRange']
-	enjoyedClients: AgentProfile['enjoyedClients']
+	bestClientType: AgentProfile['bestClientType']
+	notFitFor: AgentProfile['notFitFor']
 	yearsLicensed: YearsLicensed
-	energyFocus: AgentProfile['energyFocus']
-	clientDecisionStyle: AgentProfile['clientDecisionStyle']
-	clientContactStyle: AgentProfile['clientContactStyle']
-	riskAdviceComfort: AgentProfile['riskAdviceComfort']
-	commissionStyle: AgentProfile['commissionStyle']
-	specialties: AgentProfile['specialties']
+	clientDescription: AgentProfile['clientDescription']
+	communicationFrequency: AgentProfile['communicationFrequency']
+	quickCommunicationChannel: AgentProfile['quickCommunicationChannel']
+	updateDeliveryMethod: AgentProfile['updateDeliveryMethod']
+	difficultDealInstinct: AgentProfile['difficultDealInstinct']
+	responseTime: AgentProfile['responseTime']
+	commissionApproach: AgentProfile['commissionApproach']
+	unrepresentedBuyerApproach: AgentProfile['unrepresentedBuyerApproach']
 }
 
 function generatePersona(): AgentPersona {
+	const notFitForSlugs = [
+		...Object.keys(structuredNotFitForOptions).filter(
+			(slug) => slug !== 'other',
+		),
+		null,
+		null,
+	]
+	const notFitForSlug = pick(notFitForSlugs)
+
 	return {
 		representationSide: pickWeighted(REPRESENTATION_SIDES),
 		typicalPriceRange: pick(BUCKET_ORDER),
-		enjoyedClients: pickAnswer('enjoyedClients'),
+		bestClientType: pickAnswer('bestClientType'),
+		notFitFor: notFitForSlug ? [notFitForSlug] : [],
 		yearsLicensed: pick(yearsLicensed.slugs),
-		energyFocus: pickAnswer('energyFocus'),
-		clientDecisionStyle: pickAnswer('clientDecisionStyle'),
-		clientContactStyle: pickAnswer('clientContactStyle'),
-		riskAdviceComfort: pickAnswer('riskAdviceComfort'),
-		commissionStyle: pickAnswer('commissionStyle'),
-		specialties: pickAnswer('specialties'),
+		clientDescription: pickAnswer('clientDescription'),
+		communicationFrequency: pickAnswer('communicationFrequency'),
+		quickCommunicationChannel: pickAnswer('quickCommunicationChannel'),
+		updateDeliveryMethod: pickAnswer('updateDeliveryMethod'),
+		difficultDealInstinct: pickAnswer('difficultDealInstinct'),
+		responseTime: pickAnswer('responseTime'),
+		commissionApproach: pickAnswer('commissionApproach'),
+		unrepresentedBuyerApproach: pickAnswer('unrepresentedBuyerApproach'),
 	}
 }
 
@@ -200,16 +223,19 @@ async function insertAgent(
 		cityId,
 		representationSide: persona.representationSide,
 		typicalPriceRange: persona.typicalPriceRange,
-		enjoyedClients: persona.enjoyedClients,
+		bestClientType: persona.bestClientType,
+		notFitFor: persona.notFitFor,
 		brokerageName: pick(BROKERAGE_POOLS),
 		licenseNumberState: `LIC-${randInt(100000, 999999)}-${location.state}`,
 		yearsLicensed: persona.yearsLicensed,
-		energyFocus: persona.energyFocus,
-		clientDecisionStyle: persona.clientDecisionStyle,
-		clientContactStyle: persona.clientContactStyle,
-		riskAdviceComfort: persona.riskAdviceComfort,
-		commissionStyle: persona.commissionStyle,
-		specialties: persona.specialties,
+		clientDescription: persona.clientDescription,
+		communicationFrequency: persona.communicationFrequency,
+		quickCommunicationChannel: persona.quickCommunicationChannel,
+		updateDeliveryMethod: persona.updateDeliveryMethod,
+		difficultDealInstinct: persona.difficultDealInstinct,
+		responseTime: persona.responseTime,
+		commissionApproach: persona.commissionApproach,
+		unrepresentedBuyerApproach: persona.unrepresentedBuyerApproach,
 		createdAt: now,
 		updatedAt: now,
 	})

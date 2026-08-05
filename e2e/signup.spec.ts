@@ -43,12 +43,7 @@ async function answerQuestionFlow(page: Page, stopUrl: RegExp) {
 			pressed: true,
 		})
 		if (await sameSelectedOption.isVisible().catch(() => false)) {
-			const next = page.getByRole('button', { name: /^(Next|Finish)$/ })
-			// Multi-select questions need minSelections picks before Next enables
-			for (let extra = 1; extra < 5 && (await next.isDisabled()); extra++) {
-				await options.nth(extra).click()
-			}
-			await next.click()
+			await page.getByRole('button', { name: /Next question|Finish/ }).click()
 		}
 	}
 

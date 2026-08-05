@@ -9,13 +9,12 @@ import { getCurrentSession } from '@/lib/auth/session'
 import {
 	agentDraftSchema,
 	agentQuestionIds,
-	agentQuestions,
 	loadExistingProfileRoles,
 } from '@/lib/profile'
 import type { AgentDraft } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
-import { isQuestionAnswered } from '../-components/quiz/use-question-flow'
+import { isAnswered } from '../-components/quiz/use-question-flow'
 import {
 	SignupWizardShell,
 	type SignupWizardStep,
@@ -87,8 +86,8 @@ function AgentWizardRoute() {
 							case 'market':
 								return Boolean(draft.cityId && draft.typicalPriceRange)
 							case 'preferences':
-								return agentQuestionIds.every((id) =>
-									isQuestionAnswered(agentQuestions[id], draft[id]),
+								return agentQuestionIds.every(
+									(id) => id in draft && isAnswered(draft[id]),
 								)
 						}
 					})

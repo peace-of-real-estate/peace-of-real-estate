@@ -8,10 +8,10 @@ import {
 import { getCurrentSession } from '@/lib/auth/session'
 import { buyerDraftSchema, loadExistingProfileRoles } from '@/lib/profile'
 import type { BuyerDraft } from '@/lib/profile'
-import { buyerQuestionIds, buyerQuestions } from '@/lib/profile'
+import { buyerQuestionIds } from '@/lib/profile'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
-import { isQuestionAnswered } from '../-components/quiz/use-question-flow'
+import { isAnswered } from '../-components/quiz/use-question-flow'
 import {
 	SignupWizardShell,
 	type SignupWizardStep,
@@ -42,9 +42,7 @@ export const Route = createFileRoute('/signup/(steps)/buyer')({
 })
 
 function isBuyerPreferencesComplete(state: BuyerDraft): boolean {
-	return buyerQuestionIds.every((id) =>
-		isQuestionAnswered(buyerQuestions[id], state[id]),
-	)
+	return buyerQuestionIds.every((id) => isAnswered(state[id]))
 }
 
 function BuyerWizardRoute() {
@@ -68,7 +66,8 @@ function BuyerWizardRoute() {
 				step === 'preview' ? '/signup/preview/buyer' : step
 			}
 			getHasDraft={(draft) =>
-				draft.cityId !== undefined || draft.buyingExperience !== undefined
+				draft.cityId !== undefined ||
+				draft.quickCommunicationChannel !== undefined
 			}
 			getCompletedStepIds={(draft) =>
 				buyerSteps

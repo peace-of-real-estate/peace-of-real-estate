@@ -68,13 +68,12 @@ export type SingleQuestion<
 	TSlug extends string,
 > = BaseQuestion<TKey, TSlug> & { kind: 'single' }
 
-export type MultiQuestion<
-	TKey extends string,
-	TSlug extends string,
-> = BaseQuestion<TKey, TSlug> & {
-	kind: 'multi'
-	minSelections: number
-	maxSelections: number
+export type FreeFormQuestion<TKey extends string> = {
+	kind: 'freeForm'
+	id: TKey
+	title: string
+	label: string
+	allowSkip: boolean
 }
 
 export type QuestionSlug<TAnswer> = [NonNullable<TAnswer>] extends [
@@ -91,8 +90,8 @@ export type QuestionSlug<TAnswer> = [NonNullable<TAnswer>] extends [
  * question back to its DB column.
  */
 export type Question<TKey extends string, TAnswer> =
+	| FreeFormQuestion<TKey>
 	| SingleQuestion<TKey, QuestionSlug<TAnswer>>
-	| MultiQuestion<TKey, QuestionSlug<TAnswer>>
 
 type StringKeys<T> = keyof T & string
 
@@ -124,18 +123,17 @@ export function single<TKey extends string, TSlug extends string>(
 	return { kind: 'single', id, ...config }
 }
 
-export function multi<TKey extends string, TSlug extends string>(
+export function freeForm<TKey extends string>(
 	id: TKey,
-	config: {
-		title: string
-		label: string
-		options: EnumDef<TSlug>
-		minSelections: number
-		maxSelections: number
-		optionMeta?: Partial<Record<TSlug, OptionMeta>>
-	},
-): MultiQuestion<TKey, TSlug> {
-	return { kind: 'multi', id, ...config }
+	config: { title: string; label: string; allowSkip?: boolean },
+): FreeFormQuestion<TKey> {
+	return {
+		kind: 'freeForm',
+		id,
+		title: config.title,
+		label: config.label,
+		allowSkip: config.allowSkip ?? false,
+	}
 }
 
 export function questionIds<

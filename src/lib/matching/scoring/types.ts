@@ -12,10 +12,9 @@ export type ScoreBucket =
 	| 'Location'
 	| 'Price Fit'
 	| 'Specialization'
-	| 'Decision Support'
+	| 'Working Style'
 	| 'Communication'
-	| 'Risk Comfort'
-	| 'Commission'
+	| 'Business Terms'
 
 /** Geographic inputs the location dimension actually scored with. */
 export interface LocationGeoTrace {
@@ -38,7 +37,9 @@ export interface SubCheck {
 export interface DimensionTrace {
 	id: DimensionId
 	label: string
+	baseWeight: number
 	weight: number
+	boosted: boolean
 	score: number
 	contribution: number
 	explanation: string
@@ -63,6 +64,7 @@ export interface DisqualifierTrace {
 export interface ScoreTrace {
 	mode: 'client-scored'
 	side: ClientRole
+	matchPriorities: string[]
 	disqualifiers: DisqualifierTrace[]
 	disqualified: boolean
 	dimensions: DimensionTrace[]
@@ -75,6 +77,9 @@ export interface ScoreTrace {
 	reciprocalBlend?: number
 	stage2?:
 		| { linear: number; geometric: number; consumerScore: number }
+		| undefined
+	notFitPenalty?:
+		| { reason: string; scoreBefore: number; scoreAfter: number }
 		| undefined
 	/** Location-dimension geography, hoisted for map visualizations. */
 	geo?: LocationGeoTrace | undefined

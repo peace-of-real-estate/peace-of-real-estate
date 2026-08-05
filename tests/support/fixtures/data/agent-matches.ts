@@ -10,7 +10,7 @@ export const mockAgentMatches = [
 		date: '2026-04-21',
 		experience: '12 years',
 		agency: 'Horizon Realty Group',
-		enjoyedClients: 'First-time buyers',
+		bestClientType: 'First-time buyers',
 		scores: {
 			Location: 4.9,
 			'Price Fit': 4.7,

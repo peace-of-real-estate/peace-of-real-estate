@@ -1,7 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import type { AgentDraft } from '@/lib/profile'
-import { agentQuestionIds, agentQuestions } from '@/lib/profile'
+import {
+	agentWorkStyleQuestionIds,
+	agentWorkStyleQuestions,
+	notFitForQuestion,
+} from '@/lib/profile'
 
 import { PreferencesStep } from '../-components/quiz'
 import { useSignupWizardContext } from '../-components/signup-shell'
@@ -25,13 +29,18 @@ function AgentPreferencesRoute() {
 			stepNumber={3}
 			totalSteps={3}
 			stepKey="preferences"
-			questionIds={agentQuestionIds}
-			questions={agentQuestions}
+			questionIds={agentWorkStyleQuestionIds}
+			questions={agentWorkStyleQuestions}
 			state={state}
 			updateState={updateState}
 			goToStep={goToStep}
-			advanceOnSelect={(id) => agentQuestions[id].kind === 'single'}
+			advanceOnSelect={(id) => agentWorkStyleQuestions[id].kind === 'single'}
+			isSkippable={(id) => id === notFitForQuestion.id}
 			onComplete={() => goToStep('preview')}
+			freeForm={{
+				isSkippable: (id) => id === notFitForQuestion.id,
+				onSkip: () => goToStep('preview'),
+			}}
 		/>
 	)
 }

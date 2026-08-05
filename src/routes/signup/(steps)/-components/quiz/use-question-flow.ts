@@ -1,24 +1,10 @@
 import { useState } from 'react'
 
-import type { QuestionRecord } from '@/lib/profile'
-
-type AnswerableQuestion =
-	| { kind: 'single' }
-	| { kind: 'multi'; minSelections: number; maxSelections: number }
-
-export function isQuestionAnswered(
-	question: AnswerableQuestion,
-	value: unknown,
-): boolean {
-	switch (question.kind) {
-		case 'single':
-			return value !== undefined && value !== null && value !== ''
-		case 'multi':
-			return Array.isArray(value)
-				? value.length >= question.minSelections &&
-						value.length <= question.maxSelections
-				: question.minSelections === 0
-	}
+export function isAnswered(value: unknown): boolean {
+	if (value === undefined || value === null) return false
+	if (value === '') return false
+	if (Array.isArray(value)) return value.length > 0
+	return true
 }
 
 export function useQuestionFlow<
@@ -26,7 +12,6 @@ export function useQuestionFlow<
 	TQuestionId extends keyof TDraft & string,
 >({
 	questionIds,
-	questions,
 	advanceOnSelect,
 	isSkippable,
 	state,
@@ -34,7 +19,6 @@ export function useQuestionFlow<
 	onComplete,
 }: {
 	questionIds: readonly TQuestionId[]
-	questions: QuestionRecord<Pick<TDraft, TQuestionId>>
 	advanceOnSelect?: ((questionId: TQuestionId) => boolean) | undefined
 	isSkippable?: ((questionId: TQuestionId) => boolean) | undefined
 	state: Partial<TDraft>
@@ -42,21 +26,14 @@ export function useQuestionFlow<
 	onComplete?: (() => void) | undefined
 }) {
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(() =>
-		getFirstUnansweredIndex(questionIds, questions, state),
+		getFirstUnansweredIndex(questionIds, state),
 	)
-	const [direction, setDirection] = useState(1)
-
-	const goToQuestion = (index: number) => {
-		const clamped = Math.max(0, Math.min(index, questionIds.length - 1))
-		setDirection(clamped < currentQuestionIndex ? -1 : 1)
-		setCurrentQuestionIndex(clamped)
-	}
 
 	const questionId = questionIds[currentQuestionIndex]
 	const isLastQuestion = currentQuestionIndex === questionIds.length - 1
+	const answeredFlags = questionIds.map((id) => isAnswered(state[id]))
 	const canAdvance = questionId
-		? isQuestionAnswered(questions[questionId], state[questionId]) ||
-			Boolean(isSkippable?.(questionId))
+		? isAnswered(state[questionId]) || Boolean(isSkippable?.(questionId))
 		: false
 
 	const handleSelect = (
@@ -68,38 +45,32 @@ export function useQuestionFlow<
 		updateState(patch)
 		if (
 			!questionId ||
-			!isQuestionAnswered(questions[questionId], value) ||
+			!isAnswered(value) ||
 			(advanceOnSelect && !advanceOnSelect(questionId))
 		)
 			return
 		if (isLastQuestion) {
 			onComplete?.()
 		} else {
-			goToQuestion(currentQuestionIndex + 1)
+			setCurrentQuestionIndex((index) => index + 1)
 		}
 	}
 
 	return {
 		currentQuestionIndex,
 		questionId,
-		direction,
-		goToQuestion,
+		setCurrentQuestionIndex,
 		isLastQuestion,
+		answeredFlags,
 		canAdvance,
 		handleSelect,
 	}
 }
 
-function getFirstUnansweredIndex<
-	TDraft extends Record<string, unknown>,
-	TQuestionId extends keyof TDraft & string,
->(
+function getFirstUnansweredIndex<TQuestionId extends string>(
 	questionIds: readonly TQuestionId[],
-	questions: QuestionRecord<Pick<TDraft, TQuestionId>>,
-	state: Partial<TDraft>,
+	state: Partial<Record<TQuestionId, unknown>>,
 ): number {
-	const index = questionIds.findIndex(
-		(id) => !isQuestionAnswered(questions[id], state[id]),
-	)
+	const index = questionIds.findIndex((id) => !isAnswered(state[id]))
 	return index === -1 ? questionIds.length - 1 : index
 }
