@@ -4,8 +4,7 @@ import {
 	SpinnerIcon,
 	UserIcon,
 } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useHydrated, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -51,6 +50,7 @@ function SignupForm<TData>({
 	showTerms = true,
 }: SignupFormProps<TData>) {
 	const navigate = useNavigate()
+	const hydrated = useHydrated()
 	const [name, setName] = useState('')
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
@@ -118,7 +118,7 @@ function SignupForm<TData>({
 								placeholder="Jordan Lee"
 								value={name}
 								onChange={(event) => setName(event.target.value)}
-								disabled={isSubmitting || isGoogleLoading}
+								disabled={!hydrated || isSubmitting || isGoogleLoading}
 								required
 								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
 							/>
@@ -136,7 +136,7 @@ function SignupForm<TData>({
 								placeholder="you@example.com"
 								value={email}
 								onChange={(event) => setEmail(event.target.value)}
-								disabled={isSubmitting || isGoogleLoading}
+								disabled={!hydrated || isSubmitting || isGoogleLoading}
 								autoComplete="email"
 								required
 								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
@@ -155,7 +155,7 @@ function SignupForm<TData>({
 								placeholder="Choose a password"
 								value={password}
 								onChange={(event) => setPassword(event.target.value)}
-								disabled={isSubmitting || isGoogleLoading}
+								disabled={!hydrated || isSubmitting || isGoogleLoading}
 								autoComplete="new-password"
 								required
 								className="h-9 pl-10 text-sm lg:h-11 lg:text-base"
@@ -164,7 +164,7 @@ function SignupForm<TData>({
 					</Field>
 					<Button
 						type="submit"
-						disabled={isSubmitting || isGoogleLoading}
+						disabled={!hydrated || isSubmitting || isGoogleLoading}
 						className="h-9 w-full text-sm font-semibold lg:h-11 lg:text-base"
 					>
 						{isSubmitting ? (
@@ -187,7 +187,7 @@ function SignupForm<TData>({
 						onClick={handleGoogleSignIn}
 						isLoading={isGoogleLoading}
 						className="h-9 w-full text-sm font-medium lg:h-11 lg:text-base"
-						disabled={isSubmitting}
+						disabled={!hydrated || isSubmitting}
 					>
 						Continue with Google
 					</GoogleAuthButton>

@@ -94,44 +94,10 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 	draftStorage: { load: () => D | null; clear: () => void }
 	createProfile: (payload: { data: D }) => Promise<unknown>
 }) {
-	return (
-		<ClientOnly fallback={null}>
-			<ClientSignupPreviewContent
-				clientRole={clientRole}
-				previewSchema={previewSchema}
-				completedDraftSchema={completedDraftSchema}
-				draftStorage={draftStorage}
-				createProfile={createProfile}
-			/>
-		</ClientOnly>
-	)
-}
-
-function ClientSignupPreviewContent<P extends ClientPreviewProfile, D>({
-	clientRole,
-	previewSchema,
-	completedDraftSchema,
-	draftStorage,
-	createProfile,
-}: {
-	clientRole: ClientRole
-	previewSchema: z.ZodType<P>
-	completedDraftSchema: z.ZodType
-	draftStorage: { load: () => D | null; clear: () => void }
-	createProfile: (payload: { data: D }) => Promise<unknown>
-}) {
-	const parsed = previewSchema.safeParse({
-		...draftStorage.load(),
-		role: clientRole,
-	})
 	const quizPath =
 		clientRole === 'buyer'
 			? '/signup/buyer/location'
 			: '/signup/seller/location'
-	if (!parsed.success) {
-		return <Navigate to={quizPath} replace />
-	}
-
 	return (
 		<SignupPreviewShell
 			redirect={`/${clientRole}/matches`}
@@ -151,12 +117,43 @@ function ClientSignupPreviewContent<P extends ClientPreviewProfile, D>({
 			mobileTitle="Unlock your matches"
 			mobileSubtitle="Create your profile to view full agent matches."
 		>
-			<div className="mx-auto w-full max-w-2xl space-y-6">
-				<ClientPreviewHeader title="Your Profile" />
-				<ClientProfilePreviewCard profile={parsed.data} />
-				<ClientMatchesPreview />
-			</div>
+			<ClientOnly fallback={null}>
+				<ClientSignupPreviewContent
+					clientRole={clientRole}
+					previewSchema={previewSchema}
+					draftStorage={draftStorage}
+					quizPath={quizPath}
+				/>
+			</ClientOnly>
 		</SignupPreviewShell>
+	)
+}
+
+function ClientSignupPreviewContent<P extends ClientPreviewProfile, D>({
+	clientRole,
+	previewSchema,
+	draftStorage,
+	quizPath,
+}: {
+	clientRole: ClientRole
+	previewSchema: z.ZodType<P>
+	draftStorage: { load: () => D | null }
+	quizPath: string
+}) {
+	const parsed = previewSchema.safeParse({
+		...draftStorage.load(),
+		role: clientRole,
+	})
+	if (!parsed.success) {
+		return <Navigate to={quizPath} replace />
+	}
+
+	return (
+		<div className="mx-auto w-full max-w-2xl space-y-6">
+			<ClientPreviewHeader title="Your Profile" />
+			<ClientProfilePreviewCard profile={parsed.data} />
+			<ClientMatchesPreview />
+		</div>
 	)
 }
 

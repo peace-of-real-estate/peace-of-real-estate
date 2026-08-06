@@ -89,23 +89,6 @@ export const Route = createFileRoute('/signup/preview/agent')({
 
 function AgentPreviewRoute() {
 	return (
-		<ClientOnly fallback={null}>
-			<AgentPreviewContent />
-		</ClientOnly>
-	)
-}
-
-function AgentPreviewContent() {
-	const parsed = agentPreviewProfileSchema.safeParse(agentDraftStorage.load())
-	if (!parsed.success) {
-		return <Navigate to="/signup/agent/identity" replace />
-	}
-
-	return <AgentPreview profile={parsed.data} />
-}
-
-function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
-	return (
 		<SignupPreviewShell
 			redirect="/agent/introductions"
 			oauthRedirect="/auth/complete?role=agent"
@@ -128,24 +111,37 @@ function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {
 			mobileTitle="Activate your profile"
 			mobileSubtitle="Create your account to start matching with clients."
 		>
-			<div className="mx-auto w-full max-w-2xl space-y-6">
-				<div>
-					<span className="border-amber/40 bg-amber/15 text-amber-foreground mb-2 inline-flex rounded-md border px-2.5 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase">
-						Preview
-					</span>
-					<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
-						Your Agent Profile
-					</h2>
-					<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
-						Based on your essentials. Buyers and sellers will see this when you
-						match.
-					</p>
-				</div>
-
-				<AgentProfileCard profile={profile} />
-				<AgentMatchesPreview />
-			</div>
+			<ClientOnly fallback={null}>
+				<AgentPreviewContent />
+			</ClientOnly>
 		</SignupPreviewShell>
+	)
+}
+
+function AgentPreviewContent() {
+	const parsed = agentPreviewProfileSchema.safeParse(agentDraftStorage.load())
+	if (!parsed.success) {
+		return <Navigate to="/signup/agent/identity" replace />
+	}
+
+	return (
+		<div className="mx-auto w-full max-w-2xl space-y-6">
+			<div>
+				<span className="border-amber/40 bg-amber/15 text-amber-foreground mb-2 inline-flex rounded-md border px-2.5 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase">
+					Preview
+				</span>
+				<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
+					Your Agent Profile
+				</h2>
+				<p className="text-muted-foreground mt-2 max-w-md text-base leading-relaxed">
+					Based on your essentials. Buyers and sellers will see this when you
+					match.
+				</p>
+			</div>
+
+			<AgentProfileCard profile={parsed.data} />
+			<AgentMatchesPreview />
+		</div>
 	)
 }
 
