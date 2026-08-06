@@ -84,21 +84,24 @@ const agentPreviewMatches: MatchDetails[] = [
 ]
 
 export const Route = createFileRoute('/signup/preview/agent')({
-	ssr: false,
 	component: AgentPreviewRoute,
 })
 
 function AgentPreviewRoute() {
+	return (
+		<ClientOnly fallback={null}>
+			<AgentPreviewContent />
+		</ClientOnly>
+	)
+}
+
+function AgentPreviewContent() {
 	const parsed = agentPreviewProfileSchema.safeParse(agentDraftStorage.load())
 	if (!parsed.success) {
 		return <Navigate to="/signup/agent/identity" replace />
 	}
 
-	return (
-		<ClientOnly fallback={null}>
-			<AgentPreview profile={parsed.data} />
-		</ClientOnly>
-	)
+	return <AgentPreview profile={parsed.data} />
 }
 
 function AgentPreview({ profile }: { profile: AgentPreviewProfile }) {

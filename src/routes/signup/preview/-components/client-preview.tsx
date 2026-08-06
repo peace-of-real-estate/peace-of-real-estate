@@ -94,6 +94,32 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 	draftStorage: { load: () => D | null; clear: () => void }
 	createProfile: (payload: { data: D }) => Promise<unknown>
 }) {
+	return (
+		<ClientOnly fallback={null}>
+			<ClientSignupPreviewContent
+				clientRole={clientRole}
+				previewSchema={previewSchema}
+				completedDraftSchema={completedDraftSchema}
+				draftStorage={draftStorage}
+				createProfile={createProfile}
+			/>
+		</ClientOnly>
+	)
+}
+
+function ClientSignupPreviewContent<P extends ClientPreviewProfile, D>({
+	clientRole,
+	previewSchema,
+	completedDraftSchema,
+	draftStorage,
+	createProfile,
+}: {
+	clientRole: ClientRole
+	previewSchema: z.ZodType<P>
+	completedDraftSchema: z.ZodType
+	draftStorage: { load: () => D | null; clear: () => void }
+	createProfile: (payload: { data: D }) => Promise<unknown>
+}) {
 	const parsed = previewSchema.safeParse({
 		...draftStorage.load(),
 		role: clientRole,
@@ -107,32 +133,30 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 	}
 
 	return (
-		<ClientOnly fallback={null}>
-			<SignupPreviewShell
-				redirect={`/${clientRole}/matches`}
-				oauthRedirect={`/auth/complete?role=${clientRole}`}
-				quizPath={quizPath}
-				createProfile={createProfile}
-				loadDraft={draftStorage.load}
-				validateDraft={(draft) => completedDraftSchema.safeParse(draft).success}
-				clearDraft={draftStorage.clear}
-				panelTitle={
-					<>
-						Create your profile to <span className="text-brand">unlock</span>{' '}
-						your matches
-					</>
-				}
-				panelDescription={`Save your personalized ${clientRole} profile, view ranked agent matches, and connect with agents who fit your style.`}
-				mobileTitle="Unlock your matches"
-				mobileSubtitle="Create your profile to view full agent matches."
-			>
-				<div className="mx-auto w-full max-w-2xl space-y-6">
-					<ClientPreviewHeader title="Your Profile" />
-					<ClientProfilePreviewCard profile={parsed.data} />
-					<ClientMatchesPreview />
-				</div>
-			</SignupPreviewShell>
-		</ClientOnly>
+		<SignupPreviewShell
+			redirect={`/${clientRole}/matches`}
+			oauthRedirect={`/auth/complete?role=${clientRole}`}
+			quizPath={quizPath}
+			createProfile={createProfile}
+			loadDraft={draftStorage.load}
+			validateDraft={(draft) => completedDraftSchema.safeParse(draft).success}
+			clearDraft={draftStorage.clear}
+			panelTitle={
+				<>
+					Create your profile to <span className="text-brand">unlock</span> your
+					matches
+				</>
+			}
+			panelDescription={`Save your personalized ${clientRole} profile, view ranked agent matches, and connect with agents who fit your style.`}
+			mobileTitle="Unlock your matches"
+			mobileSubtitle="Create your profile to view full agent matches."
+		>
+			<div className="mx-auto w-full max-w-2xl space-y-6">
+				<ClientPreviewHeader title="Your Profile" />
+				<ClientProfilePreviewCard profile={parsed.data} />
+				<ClientMatchesPreview />
+			</div>
+		</SignupPreviewShell>
 	)
 }
 
