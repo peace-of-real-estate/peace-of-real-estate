@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+#MISE description="Manage the local Stripe sandbox"
+#USAGE arg "<action>" help="Sandbox action" {
+#USAGE   choices "create" "provision" "listen"
+#USAGE }
+#USAGE flag "--forward-to <url>" help="Webhook forward URL (listen only)" env="STRIPE_FORWARD_TO" default="http://localhost:3000/api/stripe-webhook"
+#USAGE flag "--events <events>" help="Comma-separated checkout events to listen for (listen only)" env="STRIPE_LISTEN_EVENTS" default="checkout.session.completed,checkout.session.async_payment_succeeded"
+set -euo pipefail
+
+case "${usage_action?}" in
+create)
+	stripe sandbox create
+	;;
+provision)
+	read -r unit_amount currency <<<"$(node_modules/.bin/tsx -e 'import("./src/lib/payments/intro-unlock.config.ts").then((m) => console.log(`${m.INTRO_UNLOCK_PRICE_CENTS} ${m.INTRO_UNLOCK_CURRENCY}`))')"
+	product_id="$(stripe products create \
+		--confirm \
+		--name 'Intro unlock' \
+		--description 'One-time access to an accepted introduction' | jq -r .id)"
+	price_id="$(stripe prices create \
+		--confirm \
+		--product "$product_id" \
+		--unit-amount "$unit_amount" \
+		--currency "$currency" | jq -r .id)"
+
+	printf 'Created sandbox product %s and price %s.\n' "$product_id" "$price_id"
+	printf 'Set STRIPE_INTRO_UNLOCK_PRICE_ID=%s in .env.development.local.\n' "$price_id"
+	;;
+listen)
+	stripe listen --events "${usage_events?}" --forward-to "${usage_forward_to?}"
+	;;
+esac
