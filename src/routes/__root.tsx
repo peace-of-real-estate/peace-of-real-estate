@@ -60,14 +60,34 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
 	const posthogKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
 	const analyticsEnabled = import.meta.env.MODE === 'production' && posthogKey
+	const gtmId = import.meta.env.VITE_PUBLIC_GTM_ID
+	const gtmEnabled = import.meta.env.MODE === 'production' && gtmId
 	const content = <Outlet />
 
 	return (
 		<html lang="en">
 			<head>
+				{gtmEnabled ? (
+					<script
+						dangerouslySetInnerHTML={{
+							__html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`,
+						}}
+					/>
+				) : null}
 				<HeadContent />
 			</head>
 			<body className="min-h-dvh min-w-80">
+				{gtmEnabled ? (
+					<noscript>
+						<iframe
+							src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+							title="Google Tag Manager"
+							height="0"
+							width="0"
+							style={{ display: 'none', visibility: 'hidden' }}
+						/>
+					</noscript>
+				) : null}
 				{analyticsEnabled ? (
 					<PostHogProvider
 						apiKey={posthogKey}

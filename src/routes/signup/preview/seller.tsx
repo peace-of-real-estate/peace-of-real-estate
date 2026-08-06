@@ -10,7 +10,6 @@ import { sellerDraftStorage } from '../(steps)/seller/route'
 import { ClientSignupPreview } from './-components/client-preview'
 
 export const Route = createFileRoute('/signup/preview/seller')({
-	ssr: false,
 	component: SellerPreviewRoute,
 })
 

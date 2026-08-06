@@ -27,4 +27,20 @@ test.describe('with beta access', () => {
 			page.getByRole('heading', { name: 'Welcome Back' }),
 		).toBeVisible()
 	})
+
+	// GTM renders only in the production deployment (see VITE_PUBLIC_GTM_ID);
+	// preview/PR environments run non-production mode and correctly omit it.
+	test('production pages include the GTM snippet', async ({
+		page,
+		baseURL,
+	}) => {
+		test.skip(
+			!baseURL?.includes('beta.peaceofrealestate.com'),
+			'GTM only renders in the production deployment',
+		)
+		const response = await page.goto('/')
+		const html = await response?.text()
+		expect(html).toContain('googletagmanager.com/gtm.js?id=GTM-W74SF279')
+		expect(html).toContain('googletagmanager.com/ns.html?id=GTM-W74SF279')
+	})
 })
