@@ -36,11 +36,12 @@ interests first.
 
 ## Operating Context
 
-- Initial beta geography: Baltimore metro. Copy should name Baltimore for social
-  proof during beta.
+- Initial beta geography: Baltimore metro. Copy names Baltimore for social proof
+  during beta.
 - Client flow: free fit quiz (~2 min, no signup) → matched agents ranked by fit
   with visible rationale → paid introduction unlock (Stripe) → connect on their
-  own terms. Backup matches exist if the first pick is unavailable.
+  own terms. The quiz is free; clients pay only if they choose an introduction.
+  Backup matches exist if the first pick is unavailable.
 - Agent flow: profile + working-style quiz → matched client introductions.
 - Commission coaching (tips/scripts) helps clients ask the right questions
   upfront.
@@ -51,33 +52,29 @@ interests first.
 - Stripe payments for introduction unlocks; PostHog analytics; Cloudflare.
 - Fit-quiz profiles for both roles; matching algorithm ranks by fit, never
   payment.
+- Fit expression: word tiers ("Best fit", "Strong fit", "Good fit")
+  product-wide. Numeric match percentages are being removed from the product,
+  not just the landing.
 - Screenshot/e2e tests cover non-landing surfaces: visual changes during the
   landing-first redesign must not leak into signup, auth, or dashboard styles.
 
 ## Brand Commitments
 
 - Name: **Peace of Real Estate** (peaceofrealestate.com).
-- Brand identity: navy palette anchored on #024A70 (oklch(0.38 0.08 235)) with
-  the existing logomark/wordmark.
-- Imagery style: flat illustrations in the navy/sky family with grain texture —
-  not photography. Applied to hero, step, and feature illustrations in
-  `public/landing/`.
 - "Peace Pact" agent commitment is product terminology.
-- **Standing visual preference (2026-08): the category standard, played
-  straight.** When offered a roll-dealt direction versus the conventional
-  category arrangement, the user chose convention as the commitment — executed
-  at full fidelity, without irony. The craft bar for the landing page is
-  Opendoor / Compass-register polished real-estate marketing.
-- The new landing theme is scoped under the `.pre-canon` class in
-  `src/styles.css` (landing-only); promotion to global tokens is a future step
-  after the redesign is validated.
+- Visual identity is deliberately **not pinned here**. Palette, imagery
+  register, and theme are scoped landing-first under `.pre-canon` and are owned
+  by the surface briefs and DESIGN.md.
+- Standing preference (2026-08-07): the landing plays the **category standard
+  straight** — no experimental visual worlds — at the craft level of Compass and
+  Opendoor. Future landing work treats convention as the commitment, at full
+  fidelity, without irony or smuggled quirk.
 
 ## Evidence on Hand
 
-- New illustration set in `public/landing/` (hero-backdrop, step-1..3, features
-  webp, prompts embedded in sidecar .json files) — navy/sky flat style.
-- Legacy placeholder illustrations (hero.png, step1–3.png, match.png in
-  `public/`) superseded; landing no longer references them.
+- Generated illustration/photo assets in `public/landing/` with prompt sidecar
+  `.json` files (hybrid register per the landing brief: photo backdrops, flat
+  illustrated avatars).
 - No testimonials, customer quotes, or press yet (pre-launch beta). Future work
   must not fabricate them; Baltimore beta naming is the approved social-proof
   device.
