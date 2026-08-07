@@ -82,6 +82,20 @@ function RootComponent() {
 				<HeadContent />
 			</head>
 			<body className="min-h-dvh min-w-80">
+				<div
+					hidden
+					aria-hidden
+					dangerouslySetInnerHTML={{
+						__html: `<!--
+THESIS: Category-standard real-estate marketing played straight at Opendoor/Compass craft level; the matching mechanism itself (fit-ranked agents with visible rationale) is the hero, refusing the stock house-photo hero.
+OWN-WORLD: Warm off-white #FAF7F2, deep ink #17202B, one deep teal #0E5E5A action color; Archivo grotesque; soft ink-cast elevation; rounded cards, pill fit-chips; warm Baltimore rowhouse photography.
+STORY: Visitor sees a match list with fit scores and why-this-match rationale, believes ranking is by fit never payment, and starts the free 2-minute quiz (clients) or joins the Baltimore beta (agents).
+FIRST VIEWPORT: Slim white nav; off-white hero, headline left with teal CTA, agent text link, trust row; elevated white match card over a soft rowhouse photo backdrop right.
+FORM: canon standing exit, chosen by the user over roll seed 7b30ee47 (assigned Match Sheet; challengers dossier/darkroom/quilt declined). Approved comp: .impeccable/mocks/comp-c-product.webp.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->`,
+					}}
+				/>
 				{gtmEnabled ? (
 					<noscript>
 						<iframe

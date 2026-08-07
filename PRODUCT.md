@@ -59,9 +59,11 @@ interests first.
 - Name: **Peace of Real Estate** (peaceofrealestate.com).
 - Brand identity: navy palette anchored on #024A70 (oklch(0.38 0.08 235)) with
   the existing logomark/wordmark.
-- Imagery style: flat illustrations in the navy/sky family with grain texture —
-  not photography. Applied to hero, step, and feature illustrations in
-  `public/landing/`.
+- Imagery style: the original flat editorial illustrations (deep navy, golden
+  mustard, warm peach skin, soft cornflower blue, cream grounds) — not
+  photography. One recurring cast: the woman client (long navy hair, mustard
+  sweater, hoop earrings) carries steps 1–3; the male agent (navy blazer) first
+  appears as her highlighted match and hands her the key in step 3.
 - "Peace Pact" agent commitment is product terminology.
 - **Standing visual preference (2026-08): the category standard, played
   straight.** When offered a roll-dealt direction versus the conventional
@@ -74,10 +76,12 @@ interests first.
 
 ## Evidence on Hand
 
-- New illustration set in `public/landing/` (hero-backdrop, step-1..3, features
-  webp, prompts embedded in sidecar .json files) — navy/sky flat style.
-- Legacy placeholder illustrations (hero.png, step1–3.png, match.png in
-  `public/`) superseded; landing no longer references them.
+- New illustration set in `public/landing/` (hero-backdrop, avatar-1..3,
+  step-1..3 webp, prompts embedded in sidecar .json files) — step illustrations
+  match the original flat editorial style with the recurring client/agent cast.
+- Features section reuses the original `/match.png` illustration; other legacy
+  placeholders (hero.png, step1–3.png in `public/`) are no longer referenced by
+  the landing.
 - No testimonials, customer quotes, or press yet (pre-launch beta). Future work
   must not fabricate them; Baltimore beta naming is the approved social-proof
   device.

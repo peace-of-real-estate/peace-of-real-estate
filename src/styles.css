@@ -3,6 +3,7 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/dm-sans';
 @import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/archivo';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -219,5 +220,70 @@
 
 	to {
 		opacity: 1;
+	}
+}
+
+/* ===== Landing v2: scoped canon theme (route / only) =====
+   Rebrand world scoped under .pre-canon so the incumbent theme keeps serving
+   signup, auth, and dashboard routes until the new system is promoted. */
+.pre-canon {
+	--radius: 0.625rem;
+
+	--background: oklch(0.976 0.007 95);
+	--foreground: oklch(0.24 0.028 250);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.24 0.028 250);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.24 0.028 250);
+
+	--primary: oklch(0.38 0.08 235);
+	--primary-foreground: oklch(0.98 0.005 240);
+	--brand: oklch(0.38 0.08 235);
+	--brand-foreground: oklch(0.98 0.005 240);
+	--ring: oklch(0.38 0.08 235);
+
+	--secondary: oklch(0.94 0.012 95);
+	--secondary-foreground: oklch(0.3 0.03 250);
+	--muted: oklch(0.945 0.01 95);
+	--muted-foreground: oklch(0.46 0.02 250);
+	--accent: oklch(0.93 0.03 228);
+	--accent-foreground: oklch(0.35 0.08 235);
+
+	--border: oklch(0.905 0.012 95);
+	--input: oklch(0.92 0.012 95);
+
+	--font-sans: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+
+	--shadow: 0 4px 20px -8px oklch(0.25 0.05 255 / 0.12);
+	--shadow-md: 0 10px 36px -14px oklch(0.25 0.05 255 / 0.16);
+	--shadow-lg: 0 18px 52px -20px oklch(0.25 0.05 255 / 0.2);
+	--shadow-xl: 0 28px 80px -24px oklch(0.25 0.05 255 / 0.28);
+
+	font-family: var(--font-sans);
+	background-color: var(--background);
+	color: var(--foreground);
+}
+
+/* @theme inline bakes `font-heading` to the incumbent DM Sans literal;
+   rebind the utility to the scoped family inside the landing world. */
+.pre-canon .font-heading {
+	font-family: var(--font-sans);
+}
+
+@keyframes pre-canon-rise {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.pre-canon .match-card-enter {
+		animation: pre-canon-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 	}
 }

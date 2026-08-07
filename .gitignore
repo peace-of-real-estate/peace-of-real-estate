@@ -32,3 +32,6 @@ src/**/__screenshots__/*-matches-desktop-screenshot-*.png
 .worktrees
 
 .projects
+
+# impeccable skill working files
+.impeccable/

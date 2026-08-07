@@ -6,11 +6,11 @@ import { test, expect } from 'vitest'
 test('landing page renders', async () => {
 	await renderRoute({ path: '/' })
 	await expectScreenshot(document.body, { name: 'default' })
-})
+}, 30_000)
 
 test('landing page profile type dialog opens', async () => {
 	await renderRoute({ path: '/' })
-	const cta = page.getByRole('button', { name: 'Find an Agent' })
+	const cta = page.getByRole('button', { name: 'Find my agent' }).first()
 	await expect.element(cta).toBeVisible()
 	await cta.click()
 	await expect

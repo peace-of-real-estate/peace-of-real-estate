@@ -1,0 +1,6 @@
+{
+	"prompt": "Soft-focus photographic backdrop, portrait orientation: a warm Baltimore rowhouse street in gentle daylight, brick facades and white marble entry steps, shallow depth of field so everything is softly blurred, warm and inviting tones, no people, no text, no cars in the foreground. Intended as a quiet background behind a floating white UI card, so keep contrast low and detail soft.",
+	"createdAt": "2026-08-07T00:53:45.065Z",
+	"tool": "generate-image.mjs",
+	"model": "gpt-image-2"
+}
