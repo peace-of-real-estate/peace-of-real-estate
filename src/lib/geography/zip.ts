@@ -73,10 +73,15 @@ function escapeLikePattern(value: string): string {
 	return value.replace(/[\\%_]/g, '\\$&')
 }
 
-const cityColumns = {
-	id: cities.id,
-	name: cities.name,
-	state: cities.state,
+// A function, not a module-level const: evaluating `cities.id` at module scope
+// would keep the pg-core table chain alive in the client bundle — this module
+// is imported by client components for its pure helpers and RPC stubs.
+function cityColumns() {
+	return {
+		id: cities.id,
+		name: cities.name,
+		state: cities.state,
+	}
 }
 
 export async function searchCities(
@@ -85,7 +90,7 @@ export async function searchCities(
 ): Promise<City[]> {
 	if (query.length < 2) {
 		return database
-			.select(cityColumns)
+			.select(cityColumns())
 			.from(cities)
 			.where(buildTopCitiesWhereClause())
 			.orderBy(cities.name)
@@ -94,7 +99,7 @@ export async function searchCities(
 
 	const escapedQuery = escapeLikePattern(query)
 	return database
-		.select(cityColumns)
+		.select(cityColumns())
 		.from(cities)
 		.where(
 			or(
@@ -117,7 +122,7 @@ const loadCityById = createServerFn({ method: 'GET' })
 	.validator((cityId: string) => z.uuid().parse(cityId))
 	.handler(async ({ data }): Promise<City | null> => {
 		const [row] = await db
-			.select(cityColumns)
+			.select(cityColumns())
 			.from(cities)
 			.where(eq(cities.id, data))
 			.limit(1)

@@ -2,21 +2,24 @@ import { createServerFn } from '@tanstack/react-start'
 import { setResponseStatus } from '@tanstack/react-start/server'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { parse as parseDraft } from 'zod/mini'
 
 import { db } from '@/db/connection'
 import { agentProfiles, clientProfiles } from '@/db/schema'
 import { requireUserId } from '@/lib/auth/session'
 
+import {
+	buyerDetailsInsertSchema,
+	buyerInsertSchema,
+	clientProfileInsertSchema,
+	sellerDetailsInsertSchema,
+	sellerInsertSchema,
+} from './insert-schemas.server'
 import { Agent, Buyer, ProfileValidationError, Seller } from './repository'
 import {
 	agentCompletedDraftSchema,
 	buyerCompletedDraftSchema,
-	buyerDetailsInsertSchema,
-	buyerInsertSchema,
-	clientProfileInsertSchema,
 	sellerCompletedDraftSchema,
-	sellerDetailsInsertSchema,
-	sellerInsertSchema,
 	resolveDashboardTarget,
 	type ProfileRole,
 } from './types'
@@ -105,7 +108,7 @@ const loadBuyerProfile = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 const createBuyerProfileFromDraft = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => buyerCompletedDraftSchema.parse(data))
+	.validator((data: unknown) => parseDraft(buyerCompletedDraftSchema, data))
 	.handler(async ({ data }) => createBuyerProfile(await requireUserId(), data))
 
 const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
@@ -116,7 +119,7 @@ const loadSellerProfile = createServerFn({ method: 'GET' }).handler(
 )
 
 const createSellerProfileFromDraft = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => sellerCompletedDraftSchema.parse(data))
+	.validator((data: unknown) => parseDraft(sellerCompletedDraftSchema, data))
 	.handler(async ({ data }) => createSellerProfile(await requireUserId(), data))
 
 const loadAgentProfile = createServerFn({ method: 'GET' }).handler(async () => {
@@ -125,7 +128,7 @@ const loadAgentProfile = createServerFn({ method: 'GET' }).handler(async () => {
 })
 
 const createAgentProfile = createServerFn({ method: 'POST' })
-	.validator((data: unknown) => agentCompletedDraftSchema.parse(data))
+	.validator((data: unknown) => parseDraft(agentCompletedDraftSchema, data))
 	.handler(async ({ data }) => {
 		const userId = await requireUserId()
 		const { zipCodes, ...values } = data

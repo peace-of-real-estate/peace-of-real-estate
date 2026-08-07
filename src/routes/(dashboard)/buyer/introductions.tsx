@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { ClientIntroductionsRoute } from '@/routes/(dashboard)/-components/client-introductions'
 import {
 	clientIntroductionsSearchSchema,
-	ClientIntroductionsRoute,
 	requireClientIntroductionsProfile,
 } from '@/routes/(dashboard)/-components/client-introductions-route'
 

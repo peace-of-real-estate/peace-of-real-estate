@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import { BUCKET_ORDER } from '@/lib/price-range'
 
-import { agentInsertSchema } from './types'
+import { agentInsertSchema } from './insert-schemas.server'
 
 describe('agentInsertSchema typicalPriceRange', () => {
 	test('accepts every bucket slug', () => {

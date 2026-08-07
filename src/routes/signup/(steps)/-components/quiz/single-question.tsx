@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useState } from 'react'
 
 import type { SingleQuestion } from '@/lib/profile'
@@ -43,7 +43,7 @@ export function QuestionCard<TAnswer extends string>({
 					const optionDescription = meta?.description ?? null
 
 					return (
-						<motion.div
+						<m.div
 							key={slug}
 							initial={{ opacity: 0, y: 8 }}
 							animate={{ opacity: 1, y: 0 }}
@@ -59,7 +59,7 @@ export function QuestionCard<TAnswer extends string>({
 								description={optionDescription}
 								media={
 									involvementLevel ? (
-										<motion.span
+										<m.span
 											animate={isPopped ? { scale: 1.2 } : { scale: 1 }}
 											transition={{
 												type: 'spring',
@@ -84,7 +84,7 @@ export function QuestionCard<TAnswer extends string>({
 													/>
 												))}
 											</span>
-										</motion.span>
+										</m.span>
 									) : undefined
 								}
 								selected={isSelected}
@@ -95,7 +95,7 @@ export function QuestionCard<TAnswer extends string>({
 								onClick={() => handleSelect(slug)}
 								className="w-full"
 							/>
-						</motion.div>
+						</m.div>
 					)
 				})}
 			</div>

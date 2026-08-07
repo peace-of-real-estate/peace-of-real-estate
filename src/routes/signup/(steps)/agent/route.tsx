@@ -10,9 +10,9 @@ import {
 	agentDraftSchema,
 	agentQuestionIds,
 	agentQuestions,
-	loadExistingProfileRoles,
 } from '@/lib/profile'
 import type { AgentDraft } from '@/lib/profile'
+import { loadExistingProfileRoles } from '@/lib/profile/server'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 import { isQuestionAnswered } from '../-components/quiz/use-question-flow'

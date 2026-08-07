@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { agent } from '@/lib/profile'
+import { agent } from '@/lib/profile/server'
 import { AgentIntroductions } from '@/routes/(dashboard)/-components/agent-introductions'
 
 export const Route = createFileRoute('/(dashboard)/agent/introductions')({

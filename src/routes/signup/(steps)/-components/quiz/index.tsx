@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@phosphor-icons/react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -89,7 +89,7 @@ function QuestionFlow({
 			</div>
 
 			<AnimatePresence mode="wait" custom={direction} initial={false}>
-				<motion.div
+				<m.div
 					key={currentStepIndexClamped}
 					custom={direction}
 					variants={slideVariants}
@@ -100,7 +100,7 @@ function QuestionFlow({
 					className="min-h-70 space-y-4"
 				>
 					{children}
-				</motion.div>
+				</m.div>
 			</AnimatePresence>
 		</div>
 	)
