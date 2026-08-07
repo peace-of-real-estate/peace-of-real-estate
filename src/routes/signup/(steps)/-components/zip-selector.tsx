@@ -30,12 +30,14 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { cartoRasterStyle } from '@/lib/geography/basemap'
 import {
-	formatCityName,
-	isValidZipCode,
 	loadCityById,
 	loadCityCenter,
 	loadCitySuggestions,
 	loadZipCodeBoundaries,
+} from '@/lib/geography/server'
+import {
+	formatCityName,
+	isValidZipCode,
 	type CityCenter,
 	type City,
 } from '@/lib/geography/zip'

@@ -124,18 +124,12 @@ vi.mock('@/lib/payments/server', () => ({
 		}),
 }))
 
-vi.mock('@/lib/geography/zip', async () => {
-	const actual = await vi.importActual<typeof import('@/lib/geography/zip')>(
-		'@/lib/geography/zip',
-	)
-	return {
-		...actual,
-		loadCitySuggestions: async () => [mockCitySuggestion],
-		loadCityById: async () => mockCitySuggestion,
-		loadCityCenter: async () => austinCity.center,
-		loadZipCodeBoundaries: async () => ({
-			type: 'FeatureCollection',
-			features: [],
-		}),
-	}
-})
+vi.mock('@/lib/geography/server', () => ({
+	loadCitySuggestions: async () => [mockCitySuggestion],
+	loadCityById: async () => mockCitySuggestion,
+	loadCityCenter: async () => austinCity.center,
+	loadZipCodeBoundaries: async () => ({
+		type: 'FeatureCollection',
+		features: [],
+	}),
+}))
