@@ -19,7 +19,7 @@ export function IntroductionStatusBadge({
 	}
 	if (status === 'accepted' || status === 'connected') {
 		return (
-			<Badge className="border-emerald-600/40 bg-emerald-600/10 text-emerald-700">
+			<Badge className="border-success/40 bg-success-tint text-success">
 				{STATUS_LABELS[status]}
 			</Badge>
 		)

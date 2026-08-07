@@ -178,7 +178,7 @@ export function CityZipSelector({
 						variant="outline"
 						aria-expanded={locationOpen}
 						className={cn(
-							'h-12 w-full justify-between rounded-lg px-4 text-left text-base font-semibold transition sm:h-14 sm:text-lg',
+							'h-12 w-full justify-between rounded-md px-4 text-left text-base font-semibold transition sm:h-14 sm:text-lg',
 							marketComplete
 								? 'border-primary/60 bg-background text-foreground shadow-sm hover:bg-primary/[0.04]'
 								: 'border-primary/25 bg-background text-foreground shadow-sm hover:border-primary/50 hover:bg-background',
@@ -188,7 +188,7 @@ export function CityZipSelector({
 							{displayedCity?.state ? (
 								<Badge
 									variant="muted"
-									className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+									className="shrink-0 px-1.5 text-xs font-semibold tracking-wider"
 								>
 									{displayedCity.state}
 								</Badge>
@@ -235,7 +235,7 @@ export function CityZipSelector({
 										>
 											<Badge
 												variant="muted"
-												className="shrink-0 px-1.5 text-[10px] font-semibold tracking-wider"
+												className="shrink-0 px-1.5 text-xs font-semibold tracking-wider"
 											>
 												{suggestion.state}
 											</Badge>
@@ -264,7 +264,7 @@ export function CityZipSelector({
 			{marketComplete ? (
 				<div className="space-y-3">
 					<div className="flex items-center gap-2">
-						<div className="bg-muted/50 relative flex flex-1 items-center rounded-lg border px-3">
+						<div className="bg-muted/50 relative flex flex-1 items-center rounded-md border px-3">
 							<input
 								value={manualZipCode}
 								onChange={(event) => setManualZipCode(event.target.value)}
@@ -292,7 +292,7 @@ export function CityZipSelector({
 									key={zipCode}
 									type="button"
 									onClick={() => toggleZipCode(zipCode)}
-									className="border-primary bg-primary text-primary-foreground shrink-0 rounded-md border px-2 py-0.5 text-xs font-semibold transition hover:opacity-80"
+									className="border-primary bg-primary text-primary-foreground hover:bg-primary-deep shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition"
 									aria-pressed
 								>
 									{zipCode}
@@ -304,12 +304,12 @@ export function CityZipSelector({
 							</p>
 						)}
 					</div>
-					<div className="bg-muted/30 border-border overflow-hidden rounded-lg border p-3">
+					<div className="bg-muted/30 border-border overflow-hidden rounded-xl border p-3">
 						{centerPending ? (
 							<Skeleton
 								data-testid="zip-map"
 								data-idle="false"
-								className={cn('rounded-lg', mapHeight)}
+								className={cn('rounded-xl', mapHeight)}
 							/>
 						) : (
 							<ZipCodeMap
@@ -330,7 +330,7 @@ export function CityZipSelector({
 				</div>
 			) : (
 				<div className="space-y-3">
-					<div className="bg-muted/50 relative flex items-center rounded-lg border px-3 opacity-60">
+					<div className="bg-muted/50 relative flex items-center rounded-md border px-3 opacity-60">
 						<input
 							placeholder="Add ZIP code"
 							disabled
@@ -346,7 +346,7 @@ export function CityZipSelector({
 							Add
 						</Button>
 					</div>
-					<div className="border-border/70 bg-muted/20 overflow-hidden rounded-lg border p-3">
+					<div className="border-border/70 bg-muted/20 overflow-hidden rounded-xl border p-3">
 						<div
 							className={cn(
 								'flex flex-col items-center justify-center gap-2 text-center',
@@ -387,7 +387,7 @@ const LINE_LAYER = {
 	type: 'line',
 	source: 'zip-codes',
 	paint: {
-		'line-color': '#9ca3af',
+		'line-color': '#94a3b8',
 		'line-width': 1,
 	},
 } satisfies LayerProps
@@ -529,10 +529,10 @@ function ZipCodeMap({
 					['in', ['get', 'ZCTA5'], ['literal', selectedZipCodes]],
 					false,
 				],
-				'#2563eb',
+				'#024a70',
 				['==', ['get', 'ZCTA5'], hoveredZipCode],
-				'#93c5fd',
-				'#e5e7eb',
+				'#7dd3fc',
+				'#e2e8f0',
 			],
 			'fill-opacity': 0.5,
 		},
@@ -544,7 +544,7 @@ function ZipCodeMap({
 		source: 'zip-codes',
 		filter: ['in', ['get', 'ZCTA5'], ['literal', selectedZipCodes]],
 		paint: {
-			'line-color': '#2563eb',
+			'line-color': '#024a70',
 			'line-width': 2,
 		},
 	} satisfies LayerProps
@@ -596,7 +596,7 @@ function ZipCodeMap({
 		<div
 			data-testid="zip-map"
 			data-idle={mapIdle ? 'true' : 'false'}
-			className={cn('relative h-80 overflow-hidden rounded-lg', className)}
+			className={cn('relative h-80 overflow-hidden rounded-xl', className)}
 		>
 			<Map
 				ref={mapRef}

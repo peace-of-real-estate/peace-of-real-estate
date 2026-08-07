@@ -88,7 +88,7 @@ export function HomeStep<TStep extends string>({
 
 	return (
 		<AnimatedStepCard stepKey="home">
-			<Card size="sm" className="shadow-sm">
+			<Card size="sm">
 				<CardContent className="space-y-8">
 					<StepHeader stepNumber={2} totalSteps={3} title="Home" />
 					<div className="space-y-8">
@@ -185,7 +185,7 @@ export function HomeStep<TStep extends string>({
 									<span className="text-sm font-semibold">
 										When do you need to move?
 									</span>
-									<span className="bg-primary/10 text-primary rounded-md px-3 py-1 text-sm font-semibold">
+									<span className="bg-sky-tint text-primary rounded-full px-3 py-1 text-sm font-semibold">
 										{selectedDeadline?.label}
 									</span>
 								</div>

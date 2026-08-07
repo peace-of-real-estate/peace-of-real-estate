@@ -55,7 +55,7 @@ function ChooseRolePage() {
 
 	return (
 		<div className="bg-background flex min-h-dvh items-center justify-center px-6 py-12">
-			<Card className="w-full max-w-md shadow-sm">
+			<Card className="w-full max-w-md">
 				<CardContent className="flex flex-col gap-5 p-8">
 					<div className="text-center">
 						<h1 className="font-heading text-2xl tracking-tight">Where to?</h1>

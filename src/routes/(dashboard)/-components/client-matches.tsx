@@ -297,7 +297,7 @@ const VALUE_ICON_KEYS = new Set([
 const SIGNATURE_KEYS = new Set(['budget', 'contactStyle', 'decisionStyle'])
 
 const GROUP_BANDS = {
-	comms: 'bg-brand/10 text-brand',
+	comms: 'bg-sky-tint text-primary',
 	approach: 'bg-success-tint text-success',
 	terms: 'bg-amber/15 text-amber-foreground',
 } as const
@@ -308,7 +308,7 @@ function KeyedRow({ item }: { item: SummaryItem }) {
 	const ValueIcon = item.icon
 	return (
 		<div className="flex flex-col gap-0.5">
-			<span className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
+			<span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 				{item.label}
 			</span>
 			<span
@@ -347,7 +347,7 @@ function PreferenceGroup({
 		<div className="border-border border-dashed sm:border-r sm:last:border-r-0">
 			<h3
 				className={cn(
-					'border-border flex items-center gap-1 border-b px-3 py-1.5 text-[10px] font-bold tracking-[0.2em] uppercase',
+					'border-border flex items-center gap-1 border-b px-3 py-1.5 text-xs font-bold tracking-[0.2em] uppercase',
 					band,
 				)}
 			>
@@ -401,17 +401,17 @@ function PreferencesSummaryCard({
 		termsItems.length > 0
 
 	return (
-		<Card className="border-border bg-card gap-0 overflow-hidden rounded-lg p-0 shadow-sm">
+		<Card className="border-border bg-card shadow-card gap-0 overflow-hidden rounded-xl p-0">
 			<div className="flex flex-col sm:flex-row">
 				<div className="bg-muted/40 border-border flex shrink-0 flex-col border-b p-3.5 sm:w-48 sm:border-r sm:border-b-0">
 					<p className="max-w-full truncate text-sm leading-tight font-bold">
 						{name ?? 'Your profile'}
 					</p>
 					<div className="mt-1.5 flex items-center gap-1.5">
-						<span className="bg-brand rounded-sm px-1.5 py-0.5 text-[9px] font-bold tracking-[0.2em] text-white uppercase">
+						<span className="bg-brand rounded-full px-2.5 py-0.5 text-xs font-bold tracking-[0.2em] text-white uppercase">
 							{role}
 						</span>
-						<span className="border-success/40 bg-success-tint text-success flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[9px] font-bold">
+						<span className="border-success/40 bg-success-tint text-success flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-bold">
 							<SealCheckIcon className="h-3 w-3" weight="fill" />
 							{summaryItems.length} prefs
 						</span>

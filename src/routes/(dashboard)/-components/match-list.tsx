@@ -119,7 +119,7 @@ export function MatchList({
 				{selectedIds.size > 0 ? (
 					<section
 						aria-label="Send introductions"
-						className="bg-background sticky top-4 z-10 flex flex-1 items-center justify-between rounded-xl border p-3 shadow-sm"
+						className="bg-background shadow-card sticky top-4 z-10 flex flex-1 items-center justify-between rounded-xl border p-3"
 					>
 						<div aria-live="polite" className="text-sm">
 							<span className="font-semibold">{selectedIds.size} selected</span>
@@ -225,7 +225,7 @@ function DimensionSlots({ match }: { match: AgentMatchData }) {
 						key={dimensionId}
 						title={`${scoreKey}: ${score}`}
 						className={cn(
-							'flex h-7 w-7 items-center justify-center rounded-sm border',
+							'flex h-7 w-7 items-center justify-center rounded-md border',
 							hot
 								? 'border-amber/40 bg-amber/15 text-amber-foreground'
 								: 'bg-muted text-muted-foreground border-border',
@@ -284,7 +284,7 @@ function ScoreDial({ score }: { score: number }) {
 				y="24"
 				textAnchor="middle"
 				className={cn(
-					'fill-foreground text-[11px] font-bold tabular-nums',
+					'fill-foreground text-xs font-bold tabular-nums',
 					!hot && 'fill-muted-foreground',
 				)}
 			>
@@ -375,7 +375,7 @@ function MatchRow({
 								{match.name}
 							</span>
 						</div>
-						<div className="text-muted-foreground truncate text-[11px]">
+						<div className="text-muted-foreground truncate text-xs">
 							{match.location}
 						</div>
 					</div>
@@ -451,7 +451,7 @@ function MatchRowDetails({ match }: { match: AgentMatchData }) {
 			</div>
 
 			{match.enjoyedClients ? (
-				<span className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium">
+				<span className="bg-sky-tint text-primary inline-block rounded-full px-2.5 py-0.5 text-xs font-medium">
 					{match.enjoyedClients}
 				</span>
 			) : null}

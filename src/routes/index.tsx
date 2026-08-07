@@ -29,7 +29,7 @@ function LandingPage() {
 	const [showProfileTypeDialog, setShowProfileTypeDialog] = useState(false)
 
 	return (
-		<div className="pre-canon flex min-h-dvh flex-col">
+		<div className="flex min-h-dvh flex-col">
 			<DirectionContract />
 			<LandingHeader onOpenProfileType={() => setShowProfileTypeDialog(true)} />
 			<main className="flex w-full flex-1 flex-col overflow-x-hidden">
@@ -81,7 +81,7 @@ function LandingHeader({
 	onOpenProfileType: () => void
 }) {
 	return (
-		<header className="sticky top-0 z-40 w-full border-b border-(--pre-hairline) bg-white/85 backdrop-blur-md">
+		<header className="border-border sticky top-0 z-40 w-full border-b bg-white/85 backdrop-blur-md">
 			<div className="mx-auto flex h-18 w-full max-w-7xl items-center justify-between px-6 lg:px-10">
 				<Link to="/" className="flex items-center gap-2.5">
 					<img
@@ -97,19 +97,19 @@ function LandingHeader({
 				<nav className="hidden items-center gap-8 md:flex">
 					<a
 						href="#how-it-works"
-						className="text-sm font-medium text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
 					>
 						How it works
 					</a>
 					<a
 						href="#buyers"
-						className="text-sm font-medium text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
 					>
 						For buyers &amp; sellers
 					</a>
 					<a
 						href="#agents"
-						className="text-sm font-medium text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+						className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
 					>
 						For agents
 					</a>
@@ -119,14 +119,14 @@ function LandingHeader({
 					<Link
 						to="/auth/login"
 						search={{ redirect: '/' }}
-						className="hidden h-10 items-center justify-center rounded-[10px] px-4 text-sm font-medium whitespace-nowrap transition-colors hover:bg-black/5 sm:inline-flex"
+						className="hover:bg-muted hidden h-10 items-center justify-center rounded-[10px] px-4 text-sm font-medium whitespace-nowrap transition-colors sm:inline-flex"
 					>
 						Log in
 					</Link>
 					<button
 						type="button"
 						onClick={onOpenProfileType}
-						className="inline-flex h-10 items-center justify-center rounded-[10px] bg-(--pre-navy) px-4 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:bg-(--pre-navy-deep)"
+						className="bg-primary hover:bg-primary-deep inline-flex h-10 items-center justify-center rounded-[10px] px-4 text-sm font-semibold whitespace-nowrap text-white transition-colors"
 					>
 						Get matched
 					</button>
@@ -142,7 +142,7 @@ function LandingHeader({
 
 function LandingFooter() {
 	return (
-		<footer className="w-full border-t border-(--pre-hairline)">
+		<footer className="border-border w-full border-t">
 			<div className="mx-auto max-w-7xl px-6 py-14 lg:px-10">
 				<div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
 					<div className="flex flex-col gap-3">
@@ -156,7 +156,7 @@ function LandingFooter() {
 								Peace of Real Estate
 							</span>
 						</Link>
-						<p className="max-w-xs text-sm leading-relaxed text-(--pre-ink-soft)">
+						<p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
 							Matched by mutual fit, never ad spend. Now in Baltimore beta.
 						</p>
 					</div>
@@ -165,19 +165,19 @@ function LandingFooter() {
 						<p className="text-[0.8125rem] font-semibold">Product</p>
 						<a
 							href="#how-it-works"
-							className="text-sm text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
 						>
 							How it works
 						</a>
 						<a
 							href="#buyers"
-							className="text-sm text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
 						>
 							For buyers &amp; sellers
 						</a>
 						<Link
 							to="/signup/agent"
-							className="text-sm text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
 						>
 							For agents
 						</Link>
@@ -188,10 +188,10 @@ function LandingFooter() {
 						{placeholderArticles.map((title) => (
 							<span
 								key={title}
-								className="flex items-baseline gap-2 text-sm text-(--pre-ink-soft)"
+								className="text-muted-foreground flex items-baseline gap-2 text-sm"
 							>
 								{title}
-								<span className="text-[0.6875rem] font-medium tracking-wide uppercase">
+								<span className="text-xs font-medium tracking-wide uppercase">
 									Soon
 								</span>
 							</span>
@@ -202,26 +202,26 @@ function LandingFooter() {
 						<p className="text-[0.8125rem] font-semibold">Support</p>
 						<a
 							href={`mailto:${SUPPORT_EMAIL}`}
-							className="text-sm text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
 						>
 							{SUPPORT_EMAIL}
 						</a>
 						<a
 							href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Bug report')}`}
-							className="text-sm text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+							className="text-muted-foreground hover:text-foreground text-sm transition-colors"
 						>
 							Report a bug
 						</a>
 					</nav>
 				</div>
 
-				<div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-(--pre-hairline) pt-6 md:flex-row md:items-center">
-					<p className="text-[0.8125rem] text-(--pre-ink-soft)">
+				<div className="border-border mt-12 flex flex-col items-start justify-between gap-2 border-t pt-6 md:flex-row md:items-center">
+					<p className="text-muted-foreground text-[0.8125rem]">
 						&copy; 2026 Peace of Real Estate. All rights reserved.
 					</p>
 					<Link
 						to="/signup/agent"
-						className="text-[0.8125rem] font-medium text-(--pre-ink-soft) transition-colors hover:text-(--pre-ink)"
+						className="text-muted-foreground hover:text-foreground text-[0.8125rem] font-medium transition-colors"
 					>
 						Agent Signup
 					</Link>
@@ -270,7 +270,7 @@ const matchRows = [
 
 function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 	return (
-		<section className="w-full border-b border-(--pre-hairline)">
+		<section className="border-border w-full border-b">
 			<div className="grid lg:h-[calc(100dvh-4.5rem-11rem)] lg:min-h-[34rem] lg:grid-cols-[45fr_55fr]">
 				<div className="flex flex-col justify-center px-6 py-12 md:px-12 lg:pr-0 lg:pl-[max(2.5rem,calc((100vw-80rem)/2+2.5rem))]">
 					<div>
@@ -278,7 +278,7 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 							Meet the agent who fits the way you work.
 						</h1>
 
-						<p className="mt-6 max-w-[22rem] text-lg leading-8 text-(--pre-ink-soft)">
+						<p className="text-muted-foreground mt-6 max-w-[22rem] text-lg leading-8">
 							A 2-minute quiz on both sides. Matches ranked by mutual fit, never
 							ad spend — with the reasons shown.
 						</p>
@@ -293,23 +293,23 @@ function HeroSection({ onOpenProfileType }: { onOpenProfileType: () => void }) {
 							</button>
 							<Link
 								to="/signup/agent"
-								className="text-base font-semibold text-(--pre-navy) underline-offset-4 transition-colors hover:text-(--pre-navy-deep) hover:underline"
+								className="text-primary hover:text-primary-deep text-base font-semibold underline-offset-4 transition-colors hover:underline"
 							>
 								I&rsquo;m an agent
 							</Link>
 						</div>
 
-						<ul className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] font-medium text-(--pre-ink-soft)">
+						<ul className="text-muted-foreground mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] font-medium">
 							<li className="flex items-center gap-1.5">
-								<LockIcon className="size-3.5 text-(--pre-navy)" />
+								<LockIcon className="text-primary size-3.5" />
 								100% free
 							</li>
 							<li className="flex items-center gap-1.5">
-								<XCircleIcon className="size-3.5 text-(--pre-navy)" />
+								<XCircleIcon className="text-primary size-3.5" />
 								No obligations
 							</li>
 							<li className="flex items-center gap-1.5">
-								<MapPinIcon className="size-3.5 text-(--pre-navy)" />
+								<MapPinIcon className="text-primary size-3.5" />
 								Baltimore beta
 							</li>
 						</ul>
@@ -336,15 +336,15 @@ function MatchCard() {
 			className="pre-match-card relative z-10 mx-6 -mt-20 w-[calc(100%-3rem)] max-w-sm p-6 md:mx-12 md:-mt-24 lg:mx-0 lg:mt-0 lg:-ml-16 lg:w-full"
 		>
 			<div className="flex items-baseline justify-between gap-3">
-				<p className="text-[0.8125rem] font-medium text-(--pre-ink-soft)">
+				<p className="text-muted-foreground text-[0.8125rem] font-medium">
 					Your matches
 				</p>
-				<p className="text-[0.8125rem] text-(--pre-ink-soft)">
+				<p className="text-muted-foreground text-[0.8125rem]">
 					Ranked by mutual fit
 				</p>
 			</div>
 
-			<div className="mt-3 flex flex-col divide-y divide-(--pre-hairline)">
+			<div className="divide-border mt-3 flex flex-col divide-y">
 				{matchRows.map((row) => (
 					<div key={row.tier} className="py-4 first:pt-1 last:pb-0">
 						<div className="flex items-center gap-3.5">
@@ -354,8 +354,8 @@ function MatchCard() {
 								className="h-12 w-12 shrink-0 rounded-full object-cover"
 							/>
 							<div className="flex min-w-0 flex-1 flex-col gap-1.5">
-								<span className="block h-3 w-24 rounded-full bg-[#e2e8f0]" />
-								<span className="text-[0.8125rem] text-(--pre-ink-soft)">
+								<span className="block h-3 w-24 rounded-full bg-slate-200" />
+								<span className="text-muted-foreground text-[0.8125rem]">
 									{row.detail}
 								</span>
 							</div>
@@ -363,7 +363,7 @@ function MatchCard() {
 						</div>
 
 						{row.why ? (
-							<p className="mt-2 pl-[3.75rem] text-[0.8125rem] leading-snug text-(--pre-ink-soft)">
+							<p className="text-muted-foreground mt-2 pl-[3.75rem] text-[0.8125rem] leading-snug">
 								{row.why}
 							</p>
 						) : null}
@@ -375,10 +375,10 @@ function MatchCard() {
 									{row.rationale.map((reason) => (
 										<li
 											key={reason}
-											className="flex items-start gap-2 text-sm leading-snug text-(--pre-ink-soft)"
+											className="text-muted-foreground flex items-start gap-2 text-sm leading-snug"
 										>
 											<CheckCircleIcon
-												className="mt-0.5 size-4 shrink-0 text-(--pre-navy)"
+												className="text-primary mt-0.5 size-4 shrink-0"
 												weight="fill"
 											/>
 											{reason}
@@ -470,7 +470,7 @@ function HowItWorksSection() {
 	return (
 		<section
 			id="how-it-works"
-			className="w-full bg-(--pre-wash) pt-14 pb-20 md:pt-16 md:pb-28"
+			className="bg-wash w-full pt-14 pb-20 md:pt-16 md:pb-28"
 		>
 			<div className="mx-auto max-w-7xl px-6 lg:px-10">
 				<h2 className="text-4xl font-bold tracking-[-0.025em] text-balance md:text-[2.5rem]">
@@ -481,14 +481,14 @@ function HowItWorksSection() {
 					{howItWorksSteps.map((step) => (
 						<div
 							key={step.numeral}
-							className="flex flex-col gap-5 rounded-[18px] border border-(--pre-hairline) bg-white p-7"
+							className="border-border flex flex-col gap-5 rounded-[18px] border bg-white p-7"
 						>
 							<div className="flex items-center gap-3">
-								<span className="text-2xl font-bold text-(--pre-navy)">
+								<span className="text-primary text-2xl font-bold">
 									{step.numeral}
 								</span>
 								<step.icon
-									className="size-6 text-(--pre-ink-soft)"
+									className="text-muted-foreground size-6"
 									weight="duotone"
 								/>
 							</div>
@@ -496,7 +496,7 @@ function HowItWorksSection() {
 								<h3 className="text-lg leading-snug font-semibold">
 									{step.title}
 								</h3>
-								<p className="mt-1.5 text-sm leading-relaxed text-(--pre-ink-soft)">
+								<p className="text-muted-foreground mt-1.5 text-sm leading-relaxed">
 									{step.description}
 								</p>
 							</div>
@@ -552,14 +552,14 @@ function FeaturesSection({
 						/>
 					</div>
 					<div className="pre-artifact-card relative z-10 mx-4 -mt-12 p-5 md:absolute md:bottom-6 md:left-6 md:mx-0 md:mt-0 md:max-w-xs">
-						<p className="text-[0.8125rem] font-semibold text-(--pre-navy)">
+						<p className="text-primary text-[0.8125rem] font-semibold">
 							Commission coaching
 						</p>
 						<p className="mt-2 text-sm leading-snug font-medium">
 							&ldquo;What&rsquo;s your commission — and what exactly does it
 							include?&rdquo;
 						</p>
-						<p className="mt-2 text-[0.8125rem] leading-relaxed text-(--pre-ink-soft)">
+						<p className="text-muted-foreground mt-2 text-[0.8125rem] leading-relaxed">
 							Tips and scripts, so you ask the right questions upfront.
 						</p>
 					</div>
@@ -577,7 +577,7 @@ function FeaturesSection({
 						{featureItems.map((item) => (
 							<li key={item.lead} className="flex items-start gap-3">
 								<CheckCircleIcon
-									className="mt-0.5 size-5 shrink-0 text-(--pre-navy)"
+									className="text-primary mt-0.5 size-5 shrink-0"
 									weight="fill"
 								/>
 								<span className="text-[0.9375rem] leading-relaxed">
@@ -608,7 +608,7 @@ function FeaturesSection({
 
 function AgentBandSection() {
 	return (
-		<section id="agents" className="w-full bg-(--pre-wash) py-20 md:py-28">
+		<section id="agents" className="bg-wash w-full py-20 md:py-28">
 			<div className="mx-auto grid max-w-7xl items-center gap-12 px-6 md:grid-cols-2 md:gap-16 lg:px-10">
 				<div className="flex w-full flex-col gap-7 max-md:order-2">
 					<div className="flex flex-col items-start gap-4">
@@ -617,7 +617,7 @@ function AgentBandSection() {
 							Clients who fit how you work.
 						</h2>
 					</div>
-					<p className="max-w-md text-lg leading-8 text-(--pre-ink-soft)">
+					<p className="text-muted-foreground max-w-md text-lg leading-8">
 						No lead buying, no cold scripts. You&rsquo;re introduced to clients
 						who picked you for how you actually work — and you both see why.
 					</p>
@@ -650,7 +650,7 @@ function FinalCtaSection({
 	onOpenProfileType: () => void
 }) {
 	return (
-		<section className="w-full bg-(--pre-navy) py-20 md:py-28">
+		<section className="bg-primary w-full py-20 md:py-28">
 			<div className="mx-auto flex max-w-7xl flex-col items-start gap-7 px-6 lg:px-10">
 				<h2 className="max-w-2xl text-4xl font-bold tracking-[-0.025em] text-balance text-white md:text-[2.75rem]">
 					Find your fit in Baltimore.
@@ -662,7 +662,7 @@ function FinalCtaSection({
 				<button
 					type="button"
 					onClick={onOpenProfileType}
-					className="inline-flex h-13 cursor-pointer items-center justify-center rounded-[10px] bg-white px-7 text-base font-semibold text-(--pre-navy) transition-colors hover:bg-white/90"
+					className="text-primary inline-flex h-13 cursor-pointer items-center justify-center rounded-[10px] bg-white px-7 text-base font-semibold transition-colors hover:bg-white/90"
 				>
 					Get matched free
 				</button>

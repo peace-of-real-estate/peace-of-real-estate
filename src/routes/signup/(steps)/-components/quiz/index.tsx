@@ -208,7 +208,7 @@ export function PreferencesStep<
 
 	return (
 		<AnimatedStepCard stepKey={stepKey}>
-			<Card size="sm" className="shadow-sm">
+			<Card size="sm">
 				<CardContent className="space-y-6">
 					<StepHeader
 						stepNumber={stepNumber}

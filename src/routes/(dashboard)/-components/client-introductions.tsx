@@ -416,7 +416,7 @@ function IntroCard({
 				<IntroductionStatusBadge status={intro.status} />
 				{intro.status === 'pending' &&
 					(withdrawableIn > 0 ? (
-						<span className="text-muted-foreground text-[10px]">
+						<span className="text-muted-foreground text-xs">
 							Withdraw available in {formatCountdown(withdrawableIn)}
 						</span>
 					) : (

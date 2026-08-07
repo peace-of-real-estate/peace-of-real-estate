@@ -96,7 +96,7 @@ export function IntroPaywall({
 	}
 
 	return (
-		<div className="rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/20">
+		<div className="border-amber/40 bg-amber/15 rounded-xl border p-3">
 			<div className="flex items-center gap-2 text-sm font-semibold">
 				<LockOpenIcon className="h-4 w-4" />
 				Unlock contact info
