@@ -114,8 +114,14 @@ test('failed lifecycle email remains queued and can be retried', async ({
 		kind: 'accepted',
 	})
 	mocks.sendIntroAcceptedEmail.mockRejectedValueOnce(new Error('temporary'))
+	const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
 
 	await retryIntroductionNotifications(db, { introductionIds: [intro.id] })
+	expect(consoleError).toHaveBeenCalledWith(
+		'Intro notification failed (accepted-pending):',
+		expect.any(AggregateError),
+	)
+	consoleError.mockRestore()
 	expect(mocks.sendIntroAcceptedEmail).toHaveBeenCalledTimes(1)
 	let [job] = await db
 		.select()
