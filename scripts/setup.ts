@@ -123,10 +123,15 @@ function detectWorkspace(): { branch: string; worktree: string } {
 	}
 }
 
+const ENV_SPEC_HEADER = ['# @defaultSensitive=false', '# ---', '']
+
 function updateEnvFile(path: string, updates: Record<string, string>): void {
 	const lines = existsSync(path)
 		? readFileSync(path, 'utf8').split(/\r?\n/)
 		: []
+	if (!lines.some((line) => line.includes('@defaultSensitive'))) {
+		lines.unshift(...ENV_SPEC_HEADER)
+	}
 	const remaining = new Set(Object.keys(updates))
 
 	for (let index = 0; index < lines.length; index++) {
