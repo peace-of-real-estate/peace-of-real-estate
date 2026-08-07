@@ -30,3 +30,5 @@ src/**/__screenshots__/*-matches-desktop-screenshot-*.png
 
 .pnpm-store
 .worktrees
+
+.projects
