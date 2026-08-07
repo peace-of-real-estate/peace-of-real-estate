@@ -127,7 +127,13 @@ export default defineConfig({
 		}),
 		...(process.env.VITEST === 'true'
 			? []
-			: [devtools({ injectSource: { enabled: false } }), nitro()]),
+			: [
+					devtools({ injectSource: { enabled: false } }),
+					nitro({
+						sourcemap: true,
+						experimental: { sourcemapMinify: false },
+					}),
+				]),
 		tailwindcss(),
 		viteReact(),
 		babel({ presets: [reactCompilerPreset()] }),
@@ -141,6 +147,7 @@ export default defineConfig({
 			project: 'javascript-tanstackstart-react',
 			authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
 			telemetry: Boolean(process.env.SENTRY_AUTH_TOKEN),
+			silent: !process.env.CI,
 		}),
 	],
 	fmt: fmt,
