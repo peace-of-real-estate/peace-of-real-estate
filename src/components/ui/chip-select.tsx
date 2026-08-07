@@ -40,7 +40,12 @@ export function ChipSelect<TValue extends string>({
 	}
 
 	return (
-		<div className={cn('grid grid-cols-2 gap-2', className)}>
+		<div
+			className={cn(
+				'grid grid-cols-1 gap-2 min-[480px]:grid-cols-2',
+				className,
+			)}
+		>
 			{options.map((option) => {
 				const isSelected = selected.includes(option.value)
 				const isAtLimit =
@@ -56,9 +61,9 @@ export function ChipSelect<TValue extends string>({
 						onClick={() => toggle(option.value)}
 						aria-pressed={isSelected}
 						className={cn(
-							'flex h-10 items-center gap-2.5 rounded-lg border px-3 text-sm font-medium transition-all',
+							'flex min-h-10 items-center gap-2.5 rounded-md border px-3 py-1.5 text-sm font-medium transition-all',
 							isSelected
-								? 'border-primary bg-primary/10 text-primary'
+								? 'border-primary bg-sky-tint text-primary'
 								: 'border-border bg-background text-foreground hover:border-foreground/30 hover:bg-muted/30',
 							(isAtLimit || disabled) && 'pointer-events-none opacity-50',
 						)}

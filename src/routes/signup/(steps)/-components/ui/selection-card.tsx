@@ -48,12 +48,12 @@ export function SelectionCard({
 			disabled={disabled}
 			aria-pressed={selected}
 			className={cn(
-				'group relative flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left transition-all duration-150',
+				'group relative flex w-full items-center gap-3 rounded-xl border px-4 py-4 text-left transition-all duration-150',
 				isVertical && 'flex-col justify-center gap-2 py-5 text-center',
 				selected && variant === 'solid'
 					? 'border-primary bg-primary text-primary-foreground shadow-sm'
 					: selected && variant === 'subtle'
-						? 'border-primary/60 bg-primary/[0.06] text-foreground shadow-sm'
+						? 'border-primary/60 bg-sky-tint text-foreground shadow-sm'
 						: 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-background hover:shadow-sm',
 				disabled && 'cursor-not-allowed opacity-50',
 				className,
@@ -79,7 +79,7 @@ export function SelectionCard({
 						selected
 							? variant === 'solid'
 								? 'border-primary-foreground/30 bg-primary-foreground/15 text-primary-foreground'
-								: 'border-primary/30 bg-primary/10 text-primary'
+								: 'border-primary/30 bg-sky-tint text-primary'
 							: 'border-muted-foreground/20 bg-muted/30 text-muted-foreground group-hover:border-primary/40 group-hover:text-primary',
 						isVertical && 'h-9 w-9',
 					)}

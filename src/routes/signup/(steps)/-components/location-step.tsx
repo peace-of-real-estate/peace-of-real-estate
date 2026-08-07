@@ -22,7 +22,7 @@ export function LocationStep() {
 
 	return (
 		<AnimatedStepCard stepKey="location">
-			<Card size="sm" className="shadow-sm">
+			<Card size="sm">
 				<CardContent className="space-y-8">
 					<StepHeader stepNumber={1} totalSteps={3} title="Location" />
 					<div className="space-y-4">

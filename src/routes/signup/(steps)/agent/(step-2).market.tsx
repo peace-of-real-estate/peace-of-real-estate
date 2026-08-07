@@ -72,7 +72,7 @@ function AgentMarket({
 
 	return (
 		<AnimatedStepCard stepKey="market">
-			<Card size="sm" className="shadow-sm">
+			<Card size="sm">
 				<CardContent className="space-y-8">
 					<StepHeader stepNumber={2} totalSteps={3} title="Market" />
 

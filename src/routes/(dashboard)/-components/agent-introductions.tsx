@@ -309,7 +309,7 @@ function PendingIntroCard({
 		<div className="rounded-xl border p-4">
 			<div className="flex items-center gap-2">
 				<span className="text-sm font-semibold">{client.displayName}</span>
-				<Badge className="border-emerald-600/40 bg-emerald-600/10 text-emerald-700">
+				<Badge className="border-success/40 bg-success-tint text-success">
 					{client.fitScore}% fit
 				</Badge>
 			</div>

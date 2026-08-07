@@ -55,16 +55,18 @@ interests first.
 - Fit expression: word tiers ("Best fit", "Strong fit", "Good fit")
   product-wide. Numeric match percentages are being removed from the product,
   not just the landing.
-- Screenshot/e2e tests cover non-landing surfaces: visual changes during the
-  landing-first redesign must not leak into signup, auth, or dashboard styles.
+- Screenshot/e2e tests cover every surface. The landing canon was promoted to
+  the global theme 2026-08-07; baselines for signup, auth, and dashboard were
+  regenerated against it.
 
 ## Brand Commitments
 
 - Name: **Peace of Real Estate** (peaceofrealestate.com).
 - "Peace Pact" agent commitment is product terminology.
-- Visual identity is deliberately **not pinned here**. Palette, imagery
-  register, and theme are scoped landing-first under `.pre-canon` and are owned
-  by the surface briefs and DESIGN.md.
+- Visual identity: the landing's category-standard canon (brand navy #024A70,
+  sky tint, slate neutrals on white) is the global visual system as of
+  2026-08-07, owned by DESIGN.md. The landing brief keeps only landing-specific
+  strategy.
 - Standing preference (2026-08-07): the landing plays the **category standard
   straight** — no experimental visual worlds — at the craft level of Compass and
   Opendoor. Future landing work treats convention as the commitment, at full

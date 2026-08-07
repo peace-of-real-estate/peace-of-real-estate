@@ -128,7 +128,7 @@ function AgentPreviewContent() {
 	return (
 		<div className="mx-auto w-full max-w-2xl space-y-6">
 			<div>
-				<span className="border-amber/40 bg-amber/15 text-amber-foreground mb-2 inline-flex rounded-md border px-2.5 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase">
+				<span className="border-amber/40 bg-amber/15 text-amber-foreground mb-2 inline-flex rounded-full border px-3 py-0.5 text-xs font-semibold tracking-[0.08em] uppercase">
 					Preview
 				</span>
 				<h2 className="font-heading text-foreground text-3xl tracking-tight md:text-4xl">
@@ -153,9 +153,9 @@ function AgentProfileCard({ profile }: { profile: AgentPreviewProfile }) {
 		: profile.zipCodes[0]
 
 	return (
-		<Card className="border-border bg-card gap-0 rounded-lg p-0 shadow-sm">
+		<Card className="border-border bg-card shadow-card gap-0 rounded-xl p-0">
 			<div className="flex items-center gap-4 px-5 pt-5 pb-4">
-				<div className="bg-primary/8 text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-lg">
+				<div className="bg-sky-tint text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
 					<UserIcon className="h-5 w-5" />
 				</div>
 				<div className="min-w-0 flex-1">
