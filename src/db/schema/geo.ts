@@ -51,10 +51,9 @@ export const cityZips = snakeCase.table(
 	},
 	(table) => [
 		// One zip belongs to exactly one city (the seed dataset has one record
-		// per zip). Accepted limitation: zips labeled with a borough/neighborhood
-		// city (e.g. Brooklyn, Flushing) no longer roll up to their metro city
-		// (New York, NY lost ~200 zips when the old NYC_ZIP_RANGES aliasing was
-		// removed). Revisit with metro aliasing if a zip ever needs two cities.
+		// per zip). Beta-metro zips (e.g. Brooklyn, Flushing) are aliased to
+		// their curated beta city at seed time — see
+		// scripts/zip-metro-aliases.ts.
 		uniqueIndex('city_zips_zip_unique').on(table.zip),
 		index('city_zips_city_id_index').on(table.cityId),
 		unique('city_zips_id_city_id_unique').on(table.id, table.cityId),

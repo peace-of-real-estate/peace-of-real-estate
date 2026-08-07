@@ -6,10 +6,6 @@ export function formatCityName(city: City): string {
 	return `${city.name}, ${city.state}`
 }
 
-export function isValidZipCode(zipCode: string) {
-	return /^\d{5}$/.test(zipCode)
-}
-
 export type CityCenter = { lat: number; lng: number }
 
 // A resolved `cities` row: the canonical identity of a city plus its

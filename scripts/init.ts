@@ -10,6 +10,7 @@ import {
 	type UsPostalCode,
 } from '../src/lib/geography/states'
 import { cityKey } from './city-key'
+import { METRO_CITY_BY_ZIP } from './zip-metro-aliases'
 
 const BATCH_SIZE_CITIES = 1000
 const BATCH_SIZE_ZIPS = 2000
@@ -44,11 +45,14 @@ async function seedCityData() {
 		// participate in distance scoring, and city_zips.lat/lng are NOT NULL.
 		const hasCoords =
 			Number.isFinite(record.latitude) && Number.isFinite(record.longitude)
-		const key = cityKey(record.city, state)
+		// Beta-metro aliasing: borough/neighborhood-labeled records roll up to
+		// their curated beta city (e.g. Brooklyn/Flushing -> New York).
+		const city = METRO_CITY_BY_ZIP.get(record.zip) ?? record.city
+		const key = cityKey(city, state)
 		let group = cityGroups.get(key)
 		if (!group) {
 			group = {
-				city: record.city,
+				city,
 				state,
 				lats: [],
 				lngs: [],

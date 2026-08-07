@@ -85,7 +85,11 @@ function AgentWizardRoute() {
 									draft.representationSide,
 								)
 							case 'market':
-								return Boolean(draft.cityId && draft.typicalPriceRange)
+								return Boolean(
+									draft.cityId &&
+									draft.zipCodes?.length &&
+									draft.typicalPriceRange,
+								)
 							case 'preferences':
 								return agentQuestionIds.every((id) =>
 									isQuestionAnswered(agentQuestions[id], draft[id]),

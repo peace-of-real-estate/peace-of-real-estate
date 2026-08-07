@@ -1,3 +1,4 @@
+import { baltimoreCity } from '@tests/support/fixtures/geography'
 import { waitForZipMapIdle } from '@tests/support/render/map'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
@@ -25,8 +26,8 @@ beforeEach(() => {
 })
 
 const step1: SellerDraft = {
-	cityId: '01936f00-0000-7000-8000-000000000aa1',
-	zipCodes: [],
+	cityId: baltimoreCity.id,
+	zipCodes: ['21231'],
 }
 
 const step2: SellerDraft = {
@@ -59,7 +60,9 @@ test('location step shows hint when continuing without a city', async () => {
 
 	await page.getByRole('button', { name: 'Continue' }).click()
 
-	await expect.element(page.getByText('Enter a city.')).toBeVisible()
+	await expect
+		.element(page.getByText('Pick a city and at least one community.'))
+		.toBeVisible()
 	expect(saveSellerDraft).not.toHaveBeenCalled()
 	await expect
 		.element(page.getByRole('heading', { name: 'Location', exact: true }))

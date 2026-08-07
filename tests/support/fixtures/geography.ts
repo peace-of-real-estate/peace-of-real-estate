@@ -38,6 +38,13 @@ export const austinCity: ResolvedCity = {
 	center: { lat: 30.2672, lng: -97.7431 },
 }
 
+export const baltimoreCity: ResolvedCity = {
+	id: '01936f00-0000-7000-8000-000000000b02',
+	name: 'Baltimore',
+	state: 'MD',
+	center: { lat: 39.2904, lng: -76.6122 },
+}
+
 export function geoOf(centroids: Record<string, CityCenter>): ZipGeography {
 	return Object.entries(centroids).map(([zip, center]) => ({ zip, center }))
 }

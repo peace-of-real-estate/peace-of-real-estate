@@ -1,3 +1,4 @@
+import { baltimoreCity } from '@tests/support/fixtures/geography'
 import { waitForZipMapIdle } from '@tests/support/render/map'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
@@ -25,8 +26,8 @@ beforeEach(() => {
 })
 
 const step1: BuyerDraft = {
-	cityId: '01936f00-0000-7000-8000-000000000aa1',
-	zipCodes: [],
+	cityId: baltimoreCity.id,
+	zipCodes: ['21231'],
 }
 
 const step2: BuyerDraft = {
@@ -59,7 +60,9 @@ test('location step shows hint when continuing without a city', async () => {
 
 	await page.getByRole('button', { name: 'Continue' }).click()
 
-	await expect.element(page.getByText('Enter a city.')).toBeVisible()
+	await expect
+		.element(page.getByText('Pick a city and at least one community.'))
+		.toBeVisible()
 	expect(saveBuyerDraft).not.toHaveBeenCalled()
 	await expect
 		.element(page.getByRole('heading', { name: 'Location', exact: true }))
@@ -116,14 +119,16 @@ test('preview screenshot', async () => {
 })
 
 test('location step city dropdown open', async () => {
-	mockBuyerDraft = step1
 	await renderRoute({ path: '/signup/buyer/location' })
-	const trigger = page.getByRole('button', { name: /Austin/ })
+	const trigger = page.getByRole('button', {
+		name: 'Search for your city or neighborhood',
+	})
 	await expect.element(trigger).toBeVisible()
 	await trigger.click()
-	await expect.element(page.getByPlaceholder('Search city...')).toBeVisible()
-	await expectScreenshot(document.body, {
-		name: 'step-1-city-dropdown',
-		prepare: waitForZipMapIdle,
-	})
+	await expect
+		.element(page.getByPlaceholder('City or neighborhood...'))
+		.toBeVisible()
+	await expect.element(page.getByText('Fells Point')).toBeVisible()
+	await expect.element(page.getByText('Coming soon')).toBeVisible()
+	await expectScreenshot(document.body, { name: 'step-1-city-dropdown' })
 }, 60000)

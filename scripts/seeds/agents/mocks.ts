@@ -349,10 +349,6 @@ export const CITIES = [
 		state: 'NY',
 	},
 	{
-		city: 'Brooklyn',
-		state: 'NY',
-	},
-	{
 		city: 'Columbus',
 		state: 'OH',
 	},

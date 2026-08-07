@@ -1,3 +1,4 @@
+import { baltimoreCity } from '@tests/support/fixtures/geography'
 import { waitForZipMapIdle } from '@tests/support/render/map'
 import { renderRoute } from '@tests/support/render/route'
 import { expectScreenshot } from '@tests/support/render/screenshot'
@@ -32,8 +33,8 @@ const identity: AgentDraft = {
 }
 
 const market: AgentDraft = {
-	cityId: '01936f00-0000-7000-8000-000000000aa1',
-	zipCodes: ['78701', '78704'],
+	cityId: baltimoreCity.id,
+	zipCodes: ['21231', '21224'],
 	typicalPriceRange: '400kTo750k',
 }
 
@@ -112,7 +113,9 @@ test('market step shows hints when continuing with missing fields', async () => 
 
 	await page.getByRole('button', { name: 'Continue' }).click()
 
-	await expect.element(page.getByText('Enter a city.')).toBeVisible()
+	await expect
+		.element(page.getByText('Pick a city and at least one community.'))
+		.toBeVisible()
 	expect(saveAgentDraft).not.toHaveBeenCalled()
 	await expect
 		.element(page.getByRole('heading', { name: 'Market', exact: true }))

@@ -1,7 +1,7 @@
 import { mockAgentMatches } from '@tests/support/fixtures/data/agent-matches'
 import { makeBuyerProfile } from '@tests/support/fixtures/data/buyer-profile'
 import { makeSellerProfile } from '@tests/support/fixtures/data/seller-profile'
-import { austinCity } from '@tests/support/fixtures/geography'
+import { austinCity, baltimoreCity } from '@tests/support/fixtures/geography'
 import { vi } from 'vite-plus/test'
 
 type MockSession = unknown
@@ -63,7 +63,22 @@ vi.mock('@/routes/__root', async () => {
 	}
 })
 
-const mockCitySuggestion = austinCity
+const mockCitiesById = new Map([
+	[baltimoreCity.id, baltimoreCity],
+	[austinCity.id, austinCity],
+])
+
+const mockLocationSuggestions = [
+	{
+		kind: 'community',
+		key: 'fells-point',
+		name: 'Fells Point',
+		label: 'Fells Point — Baltimore, MD',
+		city: baltimoreCity,
+	},
+	{ kind: 'city', city: baltimoreCity, agentCount: 3, enabled: true },
+	{ kind: 'city', city: austinCity, agentCount: 0, enabled: false },
+]
 
 vi.mock('@/lib/profile/server', async () => {
 	const actual = await vi.importActual<typeof import('@/lib/profile/server')>(
@@ -125,10 +140,12 @@ vi.mock('@/lib/payments/server', () => ({
 }))
 
 vi.mock('@/lib/geography/server', () => ({
-	loadCitySuggestions: async () => [mockCitySuggestion],
-	loadCityById: async () => mockCitySuggestion,
-	loadCityCenter: async () => austinCity.center,
-	loadZipCodeBoundaries: async () => ({
+	searchLocationSuggestions: async () => mockLocationSuggestions,
+	loadCityById: async ({ data: cityId }: { data: string }) =>
+		mockCitiesById.get(cityId) ?? null,
+	loadCityCenter: async ({ data: cityId }: { data: string }) =>
+		mockCitiesById.get(cityId)?.center ?? null,
+	loadCommunityBoundaries: async () => ({
 		type: 'FeatureCollection',
 		features: [],
 	}),

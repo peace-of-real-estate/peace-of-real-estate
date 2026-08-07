@@ -18,7 +18,7 @@ export function LocationStep() {
 	>()
 
 	const [hasTriedContinue, setHasTriedContinue] = useState(false)
-	const canContinue = Boolean(state.cityId)
+	const canContinue = Boolean(state.cityId && state.zipCodes?.length)
 
 	return (
 		<AnimatedStepCard stepKey="location">
@@ -37,13 +37,13 @@ export function LocationStep() {
 						/>
 						{hasTriedContinue && !canContinue ? (
 							<p role="alert" className="text-destructive text-xs">
-								Enter a city.
+								Pick a city and at least one community.
 							</p>
 						) : null}
 					</div>
 					<ContinueButton
 						onClick={() => {
-							if (!state.cityId) {
+							if (!canContinue) {
 								setHasTriedContinue(true)
 								return
 							}

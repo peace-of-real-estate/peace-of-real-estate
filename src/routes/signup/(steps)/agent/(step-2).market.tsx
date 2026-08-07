@@ -54,7 +54,7 @@ function AgentMarket({
 		toAgentPriceBucket(state.typicalPriceRange),
 	)
 
-	const marketComplete = Boolean(state.cityId)
+	const marketComplete = Boolean(state.cityId && state.zipCodes?.length)
 	const priceComplete = priceBucket !== undefined
 	const canContinue = marketComplete && priceComplete
 	const showMarketError = hasTriedContinue && !marketComplete
@@ -99,7 +99,7 @@ function AgentMarket({
 							/>
 							{showMarketError ? (
 								<p role="alert" className="text-destructive text-xs">
-									Enter a city.
+									Pick a city and at least one community.
 								</p>
 							) : null}
 						</FieldSection>

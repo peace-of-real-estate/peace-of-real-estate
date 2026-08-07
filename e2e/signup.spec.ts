@@ -5,7 +5,7 @@ import { test, expect, type Page } from '@playwright/test'
 // renders, but do not submit the signup form or create accounts.
 
 async function selectCity(page: Page, triggerLabel: string) {
-	const input = page.getByPlaceholder('Search city')
+	const input = page.getByPlaceholder('City or neighborhood')
 	const trigger = page.getByRole('button', { name: triggerLabel })
 	for (let i = 0; i < 3; i++) {
 		if (await input.isVisible().catch(() => false)) break
@@ -13,10 +13,17 @@ async function selectCity(page: Page, triggerLabel: string) {
 		await input.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {})
 	}
 	if (!(await input.isVisible().catch(() => false))) {
-		throw new Error('City selector did not open')
+		throw new Error('Location selector did not open')
 	}
-	await input.fill('Austin')
-	await page.getByRole('option').first().click()
+	await input.fill('Baltimore')
+	// City rows carry the agent count; community name matches don't.
+	await page.getByRole('option').filter({ hasText: /agent/ }).first().click()
+	// Continue is gated on at least one community.
+	await page
+		.getByRole('button', { name: /Search Baltimore communities/ })
+		.click()
+	await page.getByRole('option', { name: 'Fells Point' }).click()
+	await page.keyboard.press('Escape')
 }
 
 async function answerQuestionFlow(page: Page, stopUrl: RegExp) {
@@ -66,7 +73,7 @@ test.describe('with beta access', () => {
 		await expect(
 			page.getByRole('heading', { name: 'Location', exact: true }),
 		).toBeVisible()
-		await selectCity(page, 'Search for your city')
+		await selectCity(page, 'Search for your city or neighborhood')
 		await page.getByRole('button', { name: 'Continue' }).click()
 
 		await expect(
@@ -89,7 +96,7 @@ test.describe('with beta access', () => {
 		await expect(
 			page.getByRole('heading', { name: 'Location', exact: true }),
 		).toBeVisible()
-		await selectCity(page, 'Search for your city')
+		await selectCity(page, 'Search for your city or neighborhood')
 		await page.getByRole('button', { name: 'Continue' }).click()
 
 		await expect(
@@ -103,6 +110,34 @@ test.describe('with beta access', () => {
 		await expect(page).toHaveURL(/\/signup\/preview\/seller$/)
 		await expect(
 			page.getByRole('heading', { name: 'Your Profile', exact: true }),
+		).toBeVisible()
+	})
+
+	test('non-beta cities are disabled and communities pick their parent city', async ({
+		page,
+	}) => {
+		await page.goto('/signup/buyer/location')
+
+		const input = page.getByPlaceholder('City or neighborhood')
+		await page
+			.getByRole('button', { name: 'Search for your city or neighborhood' })
+			.click()
+		await input.fill('Austin')
+		const comingSoon = page
+			.getByRole('option')
+			.filter({ hasText: 'Coming soon' })
+			.first()
+		await expect(comingSoon).toBeVisible()
+		await expect(comingSoon).toHaveAttribute('aria-disabled', 'true')
+
+		await input.fill('Fells')
+		await page.getByRole('option', { name: /Fells Point/ }).click()
+
+		await expect(
+			page.getByRole('button', { name: /MD Baltimore/ }),
+		).toBeVisible()
+		await expect(
+			page.getByRole('button', { name: /Fells Point ×/ }),
 		).toBeVisible()
 	})
 
@@ -125,7 +160,7 @@ test.describe('with beta access', () => {
 		await expect(
 			page.getByRole('heading', { name: 'Market', exact: true }),
 		).toBeVisible()
-		await selectCity(page, 'Search for your city')
+		await selectCity(page, 'Search for your city or neighborhood')
 		await page.getByRole('button', { name: /Under \$400k/ }).click()
 		await page.getByRole('button', { name: 'Continue' }).click()
 

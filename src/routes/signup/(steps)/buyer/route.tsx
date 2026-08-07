@@ -76,7 +76,7 @@ function BuyerWizardRoute() {
 					.filter((step) => {
 						switch (step.id) {
 							case 'location':
-								return Boolean(draft.cityId)
+								return Boolean(draft.cityId && draft.zipCodes?.length)
 							case 'home':
 								return Boolean(
 									draft.priceMin !== undefined &&
