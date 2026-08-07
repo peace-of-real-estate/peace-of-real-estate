@@ -1,7 +1,8 @@
 import { MapPinIcon, UserIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { ClientOnly, Navigate } from '@tanstack/react-router'
-import type { z } from 'zod'
+import type { ZodMiniType } from 'zod/mini'
+import { safeParse } from 'zod/mini'
 
 import {
 	getProfileSummary,
@@ -89,8 +90,8 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 	createProfile,
 }: {
 	clientRole: ClientRole
-	previewSchema: z.ZodType<P>
-	completedDraftSchema: z.ZodType
+	previewSchema: ZodMiniType<P>
+	completedDraftSchema: ZodMiniType
 	draftStorage: { load: () => D | null; clear: () => void }
 	createProfile: (payload: { data: D }) => Promise<unknown>
 }) {
@@ -105,7 +106,7 @@ export function ClientSignupPreview<P extends ClientPreviewProfile, D>({
 			quizPath={quizPath}
 			createProfile={createProfile}
 			loadDraft={draftStorage.load}
-			validateDraft={(draft) => completedDraftSchema.safeParse(draft).success}
+			validateDraft={(draft) => safeParse(completedDraftSchema, draft).success}
 			clearDraft={draftStorage.clear}
 			panelTitle={
 				<>
@@ -136,11 +137,11 @@ function ClientSignupPreviewContent<P extends ClientPreviewProfile, D>({
 	quizPath,
 }: {
 	clientRole: ClientRole
-	previewSchema: z.ZodType<P>
+	previewSchema: ZodMiniType<P>
 	draftStorage: { load: () => D | null }
 	quizPath: string
 }) {
-	const parsed = previewSchema.safeParse({
+	const parsed = safeParse(previewSchema, {
 		...draftStorage.load(),
 		role: clientRole,
 	})

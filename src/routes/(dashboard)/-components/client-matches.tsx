@@ -37,7 +37,7 @@ import {
 	loadBuyerAgentMatches,
 	loadSellerAgentMatches,
 } from '@/lib/matching/server'
-import { buyer, seller } from '@/lib/profile'
+import { buyer, seller } from '@/lib/profile/server'
 import type { ClientProfile, ClientRole } from '@/lib/profile/types'
 import { cn } from '@/lib/utils/ui'
 import {

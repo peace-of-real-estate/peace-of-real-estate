@@ -6,9 +6,10 @@ import {
 } from '@tanstack/react-router'
 
 import { getCurrentSession } from '@/lib/auth/session'
-import { buyerDraftSchema, loadExistingProfileRoles } from '@/lib/profile'
+import { buyerDraftSchema } from '@/lib/profile'
 import type { BuyerDraft } from '@/lib/profile'
 import { buyerQuestionIds, buyerQuestions } from '@/lib/profile'
+import { loadExistingProfileRoles } from '@/lib/profile/server'
 import { createLocalStorage } from '@/lib/utils/localstorage'
 
 import { isQuestionAnswered } from '../-components/quiz/use-question-flow'

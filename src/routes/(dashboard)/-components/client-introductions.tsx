@@ -4,8 +4,9 @@ import {
 	SpinnerIcon,
 } from '@phosphor-icons/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -24,9 +25,9 @@ import {
 	withdrawIntroduction,
 } from '@/lib/introductions/server'
 import type { ClientIntroView } from '@/lib/introductions/views'
-import { buyer, seller } from '@/lib/profile'
-import { ClientRole } from '@/lib/profile/types'
+import type { ClientRole } from '@/lib/profile/types'
 import { cn } from '@/lib/utils/ui'
+import { clientRoleConfig } from '@/routes/(dashboard)/-components/client-introductions-route'
 import {
 	DashboardPage,
 	DashboardPageMobileNav,
@@ -41,24 +42,30 @@ import {
 } from '@/routes/(dashboard)/-components/introduction-utils'
 import { QueryErrorCard } from '@/routes/(dashboard)/-components/query-error-card'
 
-export const clientRoleConfig: Record<
-	ClientRole,
-	{
-		loadProfile: () => Promise<{ id: string } | null>
-		returnPath: '/buyer/introductions' | '/seller/introductions'
-		signupPath: '/signup/buyer/location' | '/signup/seller/location'
-	}
-> = {
-	buyer: {
-		loadProfile: buyer.loadProfile,
-		returnPath: '/buyer/introductions',
-		signupPath: '/signup/buyer/location',
-	},
-	seller: {
-		loadProfile: seller.loadProfile,
-		returnPath: '/seller/introductions',
-		signupPath: '/signup/seller/location',
-	},
+export function ClientIntroductionsRoute({
+	clientRole,
+	unlock,
+}: {
+	clientRole: ClientRole
+	unlock?: string | undefined
+}) {
+	const navigate = useNavigate()
+	const returnPath = clientRoleConfig[clientRole].returnPath
+	const clearUnlock = useCallback(() => {
+		void navigate({
+			to: returnPath,
+			search: (previous) => ({ ...previous, unlock: undefined }),
+			replace: true,
+		})
+	}, [navigate, returnPath])
+
+	return (
+		<ClientIntroductions
+			clientRole={clientRole}
+			unlock={unlock}
+			onClearUnlock={clearUnlock}
+		/>
+	)
 }
 
 const UNLOCK_POLL_INTERVAL_MS = 1_500

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 import { cn } from '@/lib/utils/ui'
 
@@ -36,7 +36,7 @@ export function QuizProgress({
 			<span className="text-muted-foreground flex items-baseline gap-1 text-xs font-semibold whitespace-nowrap tabular-nums">
 				<span className="inline-flex overflow-hidden">
 					<AnimatePresence mode="popLayout" custom={direction} initial={false}>
-						<motion.span
+						<m.span
 							key={current}
 							custom={direction}
 							variants={tickVariants}
@@ -46,7 +46,7 @@ export function QuizProgress({
 							transition={{ duration: 0.15, ease: 'easeOut' }}
 						>
 							{current}
-						</motion.span>
+						</m.span>
 					</AnimatePresence>
 				</span>
 				of {total}

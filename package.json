@@ -3,6 +3,9 @@
 	"version": "0.0.1",
 	"private": true,
 	"type": "module",
+	"sideEffects": [
+		"**/*.css"
+	],
 	"scripts": {
 		"dev": "vp dev",
 		"build": "vp build && cp instrument.server.mjs .output/server",

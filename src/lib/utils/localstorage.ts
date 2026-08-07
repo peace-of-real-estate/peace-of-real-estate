@@ -1,11 +1,11 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
-function readLocalStorage<T>(key: string, schema: z.ZodType<T>): T | null {
+function readLocalStorage<T>(key: string, schema: z.ZodMiniType<T>): T | null {
 	if (typeof window === 'undefined') return null
 	const raw = window.localStorage.getItem(key)
 	if (!raw) return null
 	const parsed: unknown = JSON.parse(raw)
-	const result = schema.safeParse(parsed)
+	const result = z.safeParse(schema, parsed)
 	if (!result.success) {
 		throw new Error(
 			`Stored draft for ${key} is invalid and was discarded: ${result.error.message}`,
@@ -24,7 +24,7 @@ function removeLocalStorage(key: string) {
 	window.localStorage.removeItem(key)
 }
 
-export function createLocalStorage<T>(key: string, schema: z.ZodType<T>) {
+export function createLocalStorage<T>(key: string, schema: z.ZodMiniType<T>) {
 	return {
 		load: (): T | null => readLocalStorage(key, schema),
 		save: (value: T) => writeLocalStorage(key, value),

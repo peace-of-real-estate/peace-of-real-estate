@@ -65,9 +65,10 @@ vi.mock('@/routes/__root', async () => {
 
 const mockCitySuggestion = austinCity
 
-vi.mock('@/lib/profile', async () => {
-	const actual =
-		await vi.importActual<typeof import('@/lib/profile')>('@/lib/profile')
+vi.mock('@/lib/profile/server', async () => {
+	const actual = await vi.importActual<typeof import('@/lib/profile/server')>(
+		'@/lib/profile/server',
+	)
 	return {
 		...actual,
 		buyer: {

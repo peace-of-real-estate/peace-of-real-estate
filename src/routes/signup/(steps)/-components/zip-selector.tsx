@@ -10,7 +10,7 @@ import type {
 	MapLayerMouseEvent,
 	MapRef,
 } from 'react-map-gl/maplibre'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -419,7 +419,7 @@ function expandBoundsFromPolygon(
 	bounds: BBox,
 	coordinates: number[][][] | number[][][][],
 ) {
-	const polygon = polygonSchema.safeParse(coordinates)
+	const polygon = z.safeParse(polygonSchema, coordinates)
 	if (polygon.success) {
 		for (const ring of polygon.data) {
 			expandBoundsFromRing(bounds, ring)
@@ -427,7 +427,7 @@ function expandBoundsFromPolygon(
 		return
 	}
 
-	const multiPolygon = multiPolygonSchema.safeParse(coordinates)
+	const multiPolygon = z.safeParse(multiPolygonSchema, coordinates)
 	if (multiPolygon.success) {
 		for (const polygon of multiPolygon.data) {
 			for (const ring of polygon) {
@@ -461,22 +461,7 @@ function getBounds(features: FeatureCollection['features']): BBox | undefined {
 	return bounds
 }
 
-function ZipCodeMapSkeleton({ className }: { className?: string | undefined }) {
-	return (
-		<div
-			data-testid="zip-map"
-			data-idle="false"
-			className={cn(
-				'relative min-h-64 overflow-hidden rounded-lg border',
-				className,
-			)}
-		>
-			<Skeleton className="absolute inset-0" />
-		</div>
-	)
-}
-
-function ZipCodeMapImpl({
+function ZipCodeMap({
 	boundaries,
 	selectedZipCodes,
 	onToggleZipCode,
@@ -644,28 +629,4 @@ function ZipCodeMapImpl({
 			) : null}
 		</div>
 	)
-}
-
-function ZipCodeMap(props: ZipCodeMapProps) {
-	const [Inner, setInner] =
-		useState<React.ComponentType<ZipCodeMapProps> | null>(null)
-
-	useEffect(() => {
-		let cancelled = false
-
-		void import('react-map-gl/maplibre').then(() => {
-			if (cancelled) return
-			setInner(() => ZipCodeMapImpl)
-		})
-
-		return () => {
-			cancelled = true
-		}
-	}, [])
-
-	if (!Inner) {
-		return <ZipCodeMapSkeleton className={props.className} />
-	}
-
-	return <Inner {...props} />
 }

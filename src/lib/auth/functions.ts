@@ -5,7 +5,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
 
 import { serverEnv as env } from '@/env.server'
-import { getUserDashboardPath } from '@/lib/profile'
+import { getUserDashboardPath } from '@/lib/profile/server'
 
 import { getCurrentSession } from './session'
 

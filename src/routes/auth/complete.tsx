@@ -1,19 +1,17 @@
 import { SpinnerIcon } from '@phosphor-icons/react'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentSession } from '@/lib/auth/session'
+import type { AgentDraft, BuyerDraft, SellerDraft } from '@/lib/profile'
 import {
 	agent,
 	buyer,
 	loadExistingProfileRoles,
 	seller,
-	type AgentDraft,
-	type BuyerDraft,
-	type SellerDraft,
-} from '@/lib/profile'
+} from '@/lib/profile/server'
 import { agentDraftStorage } from '@/routes/signup/(steps)/agent/route'
 import { buyerDraftStorage } from '@/routes/signup/(steps)/buyer/route'
 import { sellerDraftStorage } from '@/routes/signup/(steps)/seller/route'
