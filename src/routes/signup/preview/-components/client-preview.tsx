@@ -10,7 +10,7 @@ import {
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { loadCityById } from '@/lib/geography/zip'
+import { loadCityById } from '@/lib/geography/server'
 import type { ClientPreviewProfile, ClientRole } from '@/lib/profile'
 import {
 	AgentPreviewCard,

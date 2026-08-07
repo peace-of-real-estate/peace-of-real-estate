@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@tests/support/fixtures/db'
 import { seedCities, uniqueCity } from '@tests/support/fixtures/geography'
 
-import { searchCities } from '@/lib/geography/zip'
+import { searchCities } from '@/lib/geography/server'
 
 describe('searchCities', () => {
 	test('matches by city name', async ({ db }) => {
