@@ -6,7 +6,7 @@ import {
 	useNavigate,
 	type RegisteredRouter,
 } from '@tanstack/react-router'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -109,18 +109,22 @@ export function SignupWizardShell<TDraft extends object, TStep extends string>({
 
 	return (
 		<SignupWizardContext.Provider value={{ state, updateState, goToStep }}>
-			<WizardChrome
-				steps={steps}
-				currentStepId={currentStepId}
-				progress={<FlowIntakeProgress steps={steps} current={currentStepId} />}
-				onHomeClick={() =>
-					hasDraft ? setShowLeaveDialog(true) : void navigate({ to: '/' })
-				}
-				onStepClick={(step) => goToStep(step)}
-				completedStepIds={completedStepIds}
-			>
-				<Outlet />
-			</WizardChrome>
+			<LazyMotion features={domAnimation} strict>
+				<WizardChrome
+					steps={steps}
+					currentStepId={currentStepId}
+					progress={
+						<FlowIntakeProgress steps={steps} current={currentStepId} />
+					}
+					onHomeClick={() =>
+						hasDraft ? setShowLeaveDialog(true) : void navigate({ to: '/' })
+					}
+					onStepClick={(step) => goToStep(step)}
+					completedStepIds={completedStepIds}
+				>
+					<Outlet />
+				</WizardChrome>
+			</LazyMotion>
 			<LeaveDialog
 				open={showLeaveDialog}
 				onConfirm={() => {
@@ -325,7 +329,7 @@ export function AnimatedStepCard({
 	return (
 		<div className="relative overflow-hidden">
 			<AnimatePresence mode="wait">
-				<motion.div
+				<m.div
 					key={stepKey}
 					variants={cardVariants}
 					initial="enter"
@@ -337,7 +341,7 @@ export function AnimatedStepCard({
 					}}
 				>
 					{children}
-				</motion.div>
+				</m.div>
 			</AnimatePresence>
 		</div>
 	)

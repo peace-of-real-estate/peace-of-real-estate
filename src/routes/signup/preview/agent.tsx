@@ -1,5 +1,6 @@
 import { UserIcon } from '@phosphor-icons/react'
 import { createFileRoute, ClientOnly, Navigate } from '@tanstack/react-router'
+import { safeParse } from 'zod/mini'
 
 import {
 	getProfileSummary,
@@ -7,11 +8,11 @@ import {
 } from '@/components/profile-summary'
 import { Card } from '@/components/ui/card'
 import {
-	agent,
 	agentCompletedDraftSchema,
 	agentPreviewProfileSchema,
 } from '@/lib/profile'
 import type { AgentPreviewProfile } from '@/lib/profile'
+import { agent } from '@/lib/profile/server'
 import {
 	AgentPreviewCard,
 	type MatchDetails,
@@ -96,7 +97,7 @@ function AgentPreviewRoute() {
 			createProfile={agent.createProfile}
 			loadDraft={agentDraftStorage.load}
 			validateDraft={(draft) =>
-				agentCompletedDraftSchema.safeParse(draft).success
+				safeParse(agentCompletedDraftSchema, draft).success
 			}
 			clearDraft={agentDraftStorage.clear}
 			submitLabel="Activate profile"
@@ -119,7 +120,7 @@ function AgentPreviewRoute() {
 }
 
 function AgentPreviewContent() {
-	const parsed = agentPreviewProfileSchema.safeParse(agentDraftStorage.load())
+	const parsed = safeParse(agentPreviewProfileSchema, agentDraftStorage.load())
 	if (!parsed.success) {
 		return <Navigate to="/signup/agent/identity" replace />
 	}

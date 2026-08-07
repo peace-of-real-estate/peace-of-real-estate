@@ -2,7 +2,7 @@ import { SpinnerIcon } from '@phosphor-icons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/mini'
 
 import { GoogleAuthButton } from '@/components/google-auth-button'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ const DEFAULT_POST_AUTH_REDIRECT = '/choose-role'
 
 export const Route = createFileRoute('/auth/login')({
 	validateSearch: z.object({
-		redirect: z.string().optional(),
+		redirect: z.optional(z.string()),
 	}),
 	beforeLoad: redirectAuthenticatedUsers,
 	component: LoginRoute,

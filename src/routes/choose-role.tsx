@@ -3,7 +3,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { redirectUnauthenticatedUsers } from '@/lib/auth/functions'
-import { loadExistingProfileRoles } from '@/lib/profile'
+import { loadExistingProfileRoles } from '@/lib/profile/server'
 import {
 	dashboardPaths,
 	resolveDashboardTarget,

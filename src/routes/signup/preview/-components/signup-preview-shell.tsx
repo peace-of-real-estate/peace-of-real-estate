@@ -5,7 +5,7 @@ import {
 	UserIcon,
 } from '@phosphor-icons/react'
 import { Link, useHydrated, useNavigate } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
+import { domAnimation, LazyMotion, m } from 'framer-motion'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -237,41 +237,43 @@ export function SignupPreviewShell<TData>({
 }: SignupPreviewShellProps<TData>) {
 	return (
 		<div className="bg-background min-h-dvh w-full">
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ duration: 0.45, ease: 'easeOut' }}
-				className="mx-auto grid min-h-dvh w-full lg:grid-cols-[minmax(420px,1fr)_1.4fr]"
-			>
-				<div className="bg-sidebar relative order-2 hidden flex-col justify-center border-r px-6 py-10 sm:px-10 lg:sticky lg:top-0 lg:order-1 lg:flex lg:h-dvh lg:px-12 lg:py-16 xl:px-20">
-					<div className="mx-auto w-full max-w-md">
-						<div className="mb-3 lg:mb-8">
-							<Link
-								to="/"
-								className="text-foreground mb-8 hidden items-center gap-3 text-lg font-semibold lg:inline-flex"
-							>
-								<img
-									src="/logomark-theme.svg"
-									alt="Peace of Real Estate"
-									className="h-10 w-10"
-								/>
-								Peace of Real Estate
-							</Link>
-							<h1 className="font-heading text-xl tracking-tight lg:text-3xl xl:text-4xl">
-								{panelTitle}
-							</h1>
-							<p className="text-muted-foreground mt-1 text-xs leading-relaxed lg:mt-3 lg:text-base">
-								{panelDescription}
-							</p>
+			<LazyMotion features={domAnimation} strict>
+				<m.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.45, ease: 'easeOut' }}
+					className="mx-auto grid min-h-dvh w-full lg:grid-cols-[minmax(420px,1fr)_1.4fr]"
+				>
+					<div className="bg-sidebar relative order-2 hidden flex-col justify-center border-r px-6 py-10 sm:px-10 lg:sticky lg:top-0 lg:order-1 lg:flex lg:h-dvh lg:px-12 lg:py-16 xl:px-20">
+						<div className="mx-auto w-full max-w-md">
+							<div className="mb-3 lg:mb-8">
+								<Link
+									to="/"
+									className="text-foreground mb-8 hidden items-center gap-3 text-lg font-semibold lg:inline-flex"
+								>
+									<img
+										src="/logomark-theme.svg"
+										alt="Peace of Real Estate"
+										className="h-10 w-10"
+									/>
+									Peace of Real Estate
+								</Link>
+								<h1 className="font-heading text-xl tracking-tight lg:text-3xl xl:text-4xl">
+									{panelTitle}
+								</h1>
+								<p className="text-muted-foreground mt-1 text-xs leading-relaxed lg:mt-3 lg:text-base">
+									{panelDescription}
+								</p>
+							</div>
+							<SignupForm {...signupFormProps} idPrefix="desktop-signup" />
 						</div>
-						<SignupForm {...signupFormProps} idPrefix="desktop-signup" />
 					</div>
-				</div>
 
-				<div className="order-1 flex flex-col px-5 pt-8 max-lg:pb-[calc(12rem+env(safe-area-inset-bottom))] sm:px-8 lg:order-2 lg:justify-center lg:px-12 lg:py-16 xl:px-20">
-					{children}
-				</div>
-			</motion.div>
+					<div className="order-1 flex flex-col px-5 pt-8 max-lg:pb-[calc(12rem+env(safe-area-inset-bottom))] sm:px-8 lg:order-2 lg:justify-center lg:px-12 lg:py-16 xl:px-20">
+						{children}
+					</div>
+				</m.div>
+			</LazyMotion>
 			<MobileSignupBanner
 				{...signupFormProps}
 				title={mobileTitle}

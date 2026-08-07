@@ -1,5 +1,5 @@
 import { CheckIcon } from '@phosphor-icons/react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 import type { MultiQuestion } from '@/lib/profile'
 import { cn } from '@/lib/utils/ui'
@@ -86,7 +86,7 @@ export function MultiQuestionCard<TAnswer extends string>({
 					const isSelected = selectedSet.has(slug)
 					const isUnavailable = !isSelected && isAtMax
 					return (
-						<motion.button
+						<m.button
 							key={slug}
 							type="button"
 							initial={{ opacity: 0, y: 6 }}
@@ -123,7 +123,7 @@ export function MultiQuestionCard<TAnswer extends string>({
 							<span className="leading-snug">
 								{question.options.labels[slug]}
 							</span>
-						</motion.button>
+						</m.button>
 					)
 				})}
 			</div>

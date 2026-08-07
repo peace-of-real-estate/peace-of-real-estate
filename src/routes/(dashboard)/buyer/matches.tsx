@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { buyer } from '@/lib/profile'
+import { buyer } from '@/lib/profile/server'
 import { ClientMatches } from '@/routes/(dashboard)/-components/client-matches'
 
 export const Route = createFileRoute('/(dashboard)/buyer/matches')({

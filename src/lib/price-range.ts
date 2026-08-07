@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
 export type PriceRange = {
 	min: number
@@ -37,11 +37,13 @@ export const AGENT_PRICE_BUCKET_LABELS: Record<AgentPriceBucket, string> = {
 export function toAgentPriceBucket(
 	value: string | null | undefined,
 ): AgentPriceBucket | undefined {
-	const parsed = agentPriceBucketSchema.safeParse(value)
+	const parsed = z.safeParse(agentPriceBucketSchema, value)
 	return parsed.success ? parsed.data : undefined
 }
 
-export const priceBoundSchema = z.number().int().min(PRICE_MIN).max(PRICE_MAX)
+export const priceBoundSchema = z
+	.int()
+	.check(z.minimum(PRICE_MIN), z.maximum(PRICE_MAX))
 
 export function formatPriceRange(range: PriceRange): string {
 	return `${formatPriceCompact(range.min)} - ${formatPriceCompact(range.max)}`

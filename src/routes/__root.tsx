@@ -1,18 +1,23 @@
 import type { QueryClient } from '@tanstack/react-query'
 import {
+	ClientOnly,
 	HeadContent,
 	Outlet,
 	Scripts,
 	createRootRouteWithContext,
 	redirect,
 } from '@tanstack/react-router'
-import { PostHogProvider } from 'posthog-js/react'
+import { Suspense, lazy } from 'react'
 
 import { NotFoundComponent, ServerErrorComponent } from '@/components/errors'
 import { hasBetaAccess } from '@/lib/auth/functions'
 import { getCurrentSession } from '@/lib/auth/session'
 
 import appCss from '../styles.css?url'
+
+const PostHogInit = lazy(() =>
+	import('@/lib/analytics/posthog').then((m) => ({ default: m.PostHogInit })),
+)
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient
@@ -89,21 +94,13 @@ function RootComponent() {
 					</noscript>
 				) : null}
 				{analyticsEnabled ? (
-					<PostHogProvider
-						apiKey={posthogKey}
-						options={{
-							api_host: '/api/ingest',
-							ui_host: 'https://us.posthog.com',
-							defaults: '2025-11-30',
-							person_profiles: 'always',
-							capture_exceptions: true,
-						}}
-					>
-						{content}
-					</PostHogProvider>
-				) : (
-					content
-				)}
+					<ClientOnly fallback={null}>
+						<Suspense fallback={null}>
+							<PostHogInit />
+						</Suspense>
+					</ClientOnly>
+				) : null}
+				{content}
 				<Scripts />
 			</body>
 		</html>

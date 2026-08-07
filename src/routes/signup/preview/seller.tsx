@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { seller } from '@/lib/profile'
+import { seller } from '@/lib/profile/server'
 import {
 	sellerCompletedDraftSchema,
 	sellerPreviewProfileSchema,
