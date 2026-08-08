@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
+import { createServer } from 'node:net'
 import { basename } from 'node:path'
 
 const MASK_64 = (1n << 64n) - 1n
@@ -58,6 +59,22 @@ function worktrunkHash(value: string): bigint {
 
 function hashPort(value: string): number {
 	return 10_000 + Number(worktrunkHash(value) % 10_000n)
+}
+
+// Hashed ports collide across workspaces; probe and advance until one binds.
+async function claimPort(seed: string): Promise<number> {
+	let port = hashPort(seed)
+	for (let attempt = 0; attempt < 10_000; attempt++) {
+		const free = await new Promise<boolean>((resolve) => {
+			const server = createServer()
+			server.once('error', () => resolve(false))
+			server.once('listening', () => server.close(() => resolve(true)))
+			server.listen(port, '0.0.0.0')
+		})
+		if (free) return port
+		port = port === 19_999 ? 10_000 : port + 1
+	}
+	throw new Error(`No free port found for ${seed}`)
 }
 
 function shortHash(value: string): string {
@@ -162,16 +179,29 @@ function updateEnvFile(path: string, groups: Record<string, string>[]): void {
 	writeFileSync(path, `${lines.join('\n')}\n`)
 }
 
-function main(): void {
-	const detected = detectWorkspace()
-	const branch = process.env.WORKTREE_BRANCH || detected.branch
-	const worktree = process.env.WORKTREE_NAME || detected.worktree
+// Env overrides are an escape hatch for hosts where repo detection is
+// impossible; detection always wins because tools like herdr export a stale
+// WORKTREE_NAME pointing at the repo root, not the current jj workspace.
+const detected = ((): { branch: string; worktree: string } | undefined => {
+	try {
+		return detectWorkspace()
+	} catch {
+		return undefined
+	}
+})()
+
+async function main(): Promise<void> {
+	const branch = detected?.branch || process.env.WORKTREE_BRANCH
+	const worktree = detected?.worktree || process.env.WORKTREE_NAME
+	if (!branch || !worktree) {
+		throw new Error('Run setup from inside a jj workspace or Git worktree')
+	}
 	const compose = sanitizeDatabaseName(worktree)
 	const database = sanitizeDatabaseName(branch)
-	const appPort = hashPort(branch)
-	const postgresPort = hashPort(`db-${branch}`)
-	const minioPort = hashPort(`minio-${branch}`)
-	const minioConsolePort = hashPort(`minio-console-${branch}`)
+	const appPort = await claimPort(branch)
+	const postgresPort = await claimPort(`db-${branch}`)
+	const minioPort = await claimPort(`minio-${branch}`)
+	const minioConsolePort = await claimPort(`minio-console-${branch}`)
 
 	updateEnvFile('.env.development.local', [
 		{
@@ -203,4 +233,4 @@ function main(): void {
 	console.log(`  minio:    http://localhost:${minioPort}`)
 }
 
-main()
+void main()

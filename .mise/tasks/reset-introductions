@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#USAGE arg "<email>" help="Account email whose sent introductions should be deleted"
+set -euo pipefail
+
+node scripts/reset-introductions.mjs "$usage_email"
