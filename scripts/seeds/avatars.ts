@@ -93,7 +93,9 @@ let bucketEnsured: Promise<void> | null = null
 
 async function ensureBucket(client: S3Client): Promise<void> {
 	try {
-		await client.send(new CreateBucketCommand({ Bucket: env.AVATAR_BUCKET }))
+		await client.send(
+			new CreateBucketCommand({ Bucket: env.AWS_S3_BUCKET_NAME }),
+		)
 	} catch (error) {
 		if (
 			error instanceof Error &&
@@ -108,7 +110,7 @@ async function ensureBucket(client: S3Client): Promise<void> {
 
 function canUseS3Storage(): boolean {
 	return Boolean(
-		env.AVATAR_BUCKET &&
+		env.AWS_S3_BUCKET_NAME &&
 		env.AWS_REGION &&
 		env.AWS_ENDPOINT_URL &&
 		env.AWS_ACCESS_KEY_ID &&
@@ -208,7 +210,7 @@ async function listPoolKeys(client: S3Client): Promise<string[]> {
 		do {
 			const listed = await client.send(
 				new ListObjectsV2Command({
-					Bucket: env.AVATAR_BUCKET,
+					Bucket: env.AWS_S3_BUCKET_NAME,
 					Prefix: prefix,
 					ContinuationToken: continuationToken,
 				}),
@@ -230,7 +232,10 @@ async function listPoolKeys(client: S3Client): Promise<string[]> {
 async function loadManifest(client: S3Client): Promise<AvatarPoolManifest> {
 	try {
 		const response = await client.send(
-			new GetObjectCommand({ Bucket: env.AVATAR_BUCKET, Key: MANIFEST_KEY }),
+			new GetObjectCommand({
+				Bucket: env.AWS_S3_BUCKET_NAME,
+				Key: MANIFEST_KEY,
+			}),
 		)
 		const body = await response.Body?.transformToString()
 		if (!body) throw new Error('Avatar manifest body is empty')
@@ -254,7 +259,7 @@ async function saveManifest(
 	manifest.updatedAt = new Date().toISOString()
 	await client.send(
 		new PutObjectCommand({
-			Bucket: env.AVATAR_BUCKET,
+			Bucket: env.AWS_S3_BUCKET_NAME,
 			Key: MANIFEST_KEY,
 			Body: JSON.stringify(manifest),
 			ContentType: 'application/json',
@@ -325,7 +330,7 @@ export async function ensureAvatarPool(targetSize: number): Promise<string[]> {
 				if (!poolKeys.has(key)) {
 					await client.send(
 						new PutObjectCommand({
-							Bucket: env.AVATAR_BUCKET,
+							Bucket: env.AWS_S3_BUCKET_NAME,
 							Key: key,
 							Body: buffer,
 							ContentType: 'image/jpeg',

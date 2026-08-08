@@ -22,7 +22,7 @@ export async function getAvatarUrl(
 	if (isPublicUrl) return image
 
 	const command = new GetObjectCommand({
-		Bucket: env.AVATAR_BUCKET,
+		Bucket: env.AWS_S3_BUCKET_NAME,
 		Key: image,
 	})
 
