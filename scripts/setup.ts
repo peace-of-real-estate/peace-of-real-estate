@@ -179,6 +179,7 @@ function main(): void {
 		AWS_ENDPOINT_URL: `http://localhost:${minioPort}`,
 		AWS_ACCESS_KEY_ID,
 		AWS_SECRET_ACCESS_KEY,
+		AVATAR_BUCKET: 'avatars',
 	})
 
 	console.log(`Generated .env.development.local for ${branch}:`)
