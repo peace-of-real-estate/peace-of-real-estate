@@ -62,7 +62,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 	const topSpecialties = match.specialties.slice(0, 2)
 
 	return (
-		<Card className="hover:border-primary/20 border-border bg-card flex flex-col overflow-hidden shadow-sm transition-colors">
+		<Card className="hover:border-primary/20 border-border bg-card flex flex-col overflow-hidden transition-colors">
 			<CardContent className="flex flex-1 flex-col items-center p-4 text-center">
 				{showAvatar ? (
 					<img
@@ -96,7 +96,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 						{topSpecialties.map((specialty) => (
 							<span
 								key={specialty}
-								className="bg-secondary text-secondary-foreground inline-block rounded-sm px-2 py-0.5 text-xs font-medium"
+								className="bg-sky-tint text-primary inline-block rounded-full px-2.5 py-0.5 text-xs font-medium"
 							>
 								{specialty}
 							</span>
@@ -104,7 +104,7 @@ export function AgentPreviewCard({ match }: { match: MatchDetails }) {
 					</div>
 				)}
 				<div className="mt-auto flex w-full items-center justify-center gap-1.5 pt-3">
-					<span className="bg-amber/15 text-amber-foreground inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold">
+					<span className="bg-amber/15 text-amber-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold">
 						<StarIcon className="h-3 w-3 fill-current" />
 						{match.fitScore}% match
 					</span>

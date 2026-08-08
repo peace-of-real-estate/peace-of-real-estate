@@ -25,7 +25,7 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
 	return (
 		<div
-			className={cn('bg-muted grid w-full rounded-lg p-1 gap-1', className)}
+			className={cn('bg-muted grid w-full rounded-md p-1 gap-1', className)}
 			style={{
 				gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
 			}}
@@ -40,7 +40,7 @@ export function SegmentedControl<T extends string>({
 						disabled={disabled}
 						onClick={() => onChange(option.value)}
 						className={cn(
-							'flex items-center justify-center gap-1.5 rounded-md px-2 py-2 text-sm font-medium leading-tight transition-all text-balance',
+							'flex items-center justify-center gap-1.5 rounded-sm px-2 py-2 text-sm font-medium leading-tight transition-all text-balance',
 							isSelected
 								? 'bg-background text-foreground shadow-sm'
 								: 'text-muted-foreground hover:text-foreground',

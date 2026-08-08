@@ -104,7 +104,7 @@ export function MultiQuestionCard<TAnswer extends string>({
 								'group flex min-h-13 items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-sm font-semibold transition-all',
 								'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
 								isSelected
-									? 'border-primary/60 bg-primary/[0.07] text-foreground shadow-sm'
+									? 'border-primary/60 bg-sky-tint text-foreground shadow-sm'
 									: 'border-border bg-card hover:border-primary/40 hover:bg-background',
 								isUnavailable && 'opacity-45 hover:border-border hover:bg-card',
 								disabled && 'cursor-not-allowed opacity-50',
@@ -112,7 +112,7 @@ export function MultiQuestionCard<TAnswer extends string>({
 						>
 							<span
 								className={cn(
-									'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors',
+									'flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border transition-colors',
 									isSelected
 										? 'border-primary bg-primary text-primary-foreground'
 										: 'border-muted-foreground/25 text-transparent group-hover:border-primary/50',

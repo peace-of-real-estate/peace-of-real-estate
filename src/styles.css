@@ -10,70 +10,73 @@
 	--app-header-height: 3.5rem;
 	--app-footer-height: 4rem;
 
-	--radius: 0.375rem;
+	/* Base radius: 10px controls; cards step up to 16-20px */
+	--radius: 0.625rem;
 
-	--background: oklch(0.985 0.003 240);
-	--foreground: oklch(0.21 0.04 240);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.21 0.04 240);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.21 0.04 240);
+	--background: #ffffff;
+	--foreground: #0f172a;
+	--card: #ffffff;
+	--card-foreground: #0f172a;
+	--popover: #ffffff;
+	--popover-foreground: #0f172a;
 
-	/* Primary: ink-depth brand navy (hue 235 held across the family) */
-	--primary: oklch(0.3 0.07 235);
-	--primary-foreground: oklch(0.98 0.005 240);
+	/* Wash: slate-50 section grounds */
+	--wash: #f8fafc;
+	--wash-foreground: #0f172a;
 
-	/* Brand: #024A70 re-derived — headings on white, links, emphasis.
-	   Never a large fill: light-only UI, navy acts through text and buttons. */
-	--brand: oklch(0.38 0.08 235);
-	--brand-foreground: oklch(0.98 0.005 240);
+	/* Primary: brand navy #024A70 — the single action voice */
+	--primary: #024a70;
+	--primary-foreground: #ffffff;
+	--primary-deep: #013655;
 
-	/* Secondary: navy-cast neutral */
-	--secondary: oklch(0.945 0.01 240);
-	--secondary-foreground: oklch(0.3 0.05 238);
+	/* Brand: same navy, kept as the emphasis/heading alias */
+	--brand: #024a70;
+	--brand-foreground: #ffffff;
 
-	/* Muted */
-	--muted: oklch(0.955 0.008 240);
-	--muted-foreground: oklch(0.5 0.025 240);
+	/* Secondary & muted: slate washes */
+	--secondary: #f1f5f9;
+	--secondary-foreground: #0f172a;
+	--muted: #f1f5f9;
+	--muted-foreground: #475569;
 
 	/* Accent: shadcn-conventional subtle tint for hover/selected states
 	   (menus, command items, ghost buttons). NOT the brand amber. */
-	--accent: oklch(0.945 0.01 240);
-	--accent-foreground: oklch(0.3 0.05 238);
+	--accent: #f1f5f9;
+	--accent-foreground: #0f172a;
 
-	/* Amber: brand highlight — match scores, badges, emphasized words.
+	/* Amber: brand highlight #FFB86A — informational only.
 	   Never a CTA, never a hover state. */
-	--amber: oklch(0.72 0.13 75);
-	--amber-foreground: oklch(0.25 0.06 70);
+	--amber: #ffb86a;
+	--amber-foreground: #45300e;
 
 	/* Destructive: red-orange, clearly distinct from amber */
 	--destructive: oklch(0.55 0.2 27);
-	--destructive-foreground: oklch(1 0 0);
+	--destructive-foreground: #ffffff;
 
 	/* Success: replaces ad-hoc emerald */
 	--success: oklch(0.55 0.12 155);
-	--success-foreground: oklch(1 0 0);
+	--success-foreground: #ffffff;
 	--success-tint: oklch(0.94 0.04 155);
 
-	/* Borders & inputs */
-	--border: oklch(0.88 0.012 240);
-	--input: oklch(0.9 0.01 240);
-	--ring: oklch(0.3 0.07 235);
+	/* Borders & inputs: slate hairlines */
+	--border: rgb(15 23 42 / 0.1);
+	--input: rgb(15 23 42 / 0.14);
+	--ring: #024a70;
 
-	/* Sky: illustration + tint source only; never text, never large fills */
-	--sky: oklch(0.82 0.08 230);
-	--sky-foreground: oklch(0.21 0.04 240);
-	--sky-tint: oklch(0.95 0.02 230);
+	/* Sky: chips/pills and illustration tint source; never large fills */
+	--sky: #bae6fd;
+	--sky-foreground: #024a70;
+	--sky-tint: #e0f2fe;
 
 	/* Sidebar */
-	--sidebar: oklch(0.97 0.005 240);
-	--sidebar-foreground: oklch(0.21 0.04 240);
-	--sidebar-primary: oklch(0.3 0.07 235);
-	--sidebar-primary-foreground: oklch(0.98 0.005 240);
-	--sidebar-accent: oklch(0.945 0.01 240);
-	--sidebar-accent-foreground: oklch(0.3 0.05 238);
-	--sidebar-border: oklch(0.88 0.012 240);
-	--sidebar-ring: oklch(0.3 0.07 235);
+	--sidebar: #f8fafc;
+	--sidebar-foreground: #0f172a;
+	--sidebar-primary: #024a70;
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: #f1f5f9;
+	--sidebar-accent-foreground: #0f172a;
+	--sidebar-border: rgb(15 23 42 / 0.1);
+	--sidebar-ring: #024a70;
 
 	/* Typography: one family — DM Sans for headings and body */
 	--font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
@@ -87,18 +90,21 @@
 	--font-body: var(--font-sans);
 	--font-heading: var(--font-family-heading);
 
-	/* Shadows: cast from deep navy */
-	--shadow-color: oklch(0.2 0.04 255);
-	--shadow-2xs: 0 1px 2px 0 oklch(0.2 0.04 255 / 0.04);
-	--shadow-xs: 0 1px 3px 0 oklch(0.2 0.04 255 / 0.06);
+	/* Shadows: cast from slate ink, nearly flat at rest. One soft card
+	   shadow carries elevated surfaces. */
+	--shadow-color: rgb(15 23 42);
+	--shadow-2xs: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+	--shadow-xs: 0 1px 3px 0 rgb(15 23 42 / 0.05);
 	--shadow-sm:
-		0 1px 3px 0 oklch(0.2 0.04 255 / 0.07),
-		0 1px 2px -1px oklch(0.2 0.04 255 / 0.06);
-	--shadow: 0 4px 20px -8px oklch(0.2 0.04 255 / 0.14);
-	--shadow-md: 0 10px 36px -14px oklch(0.2 0.04 255 / 0.18);
-	--shadow-lg: 0 18px 52px -20px oklch(0.2 0.04 255 / 0.22);
-	--shadow-xl: 0 26px 76px -24px oklch(0.2 0.04 255 / 0.26);
-	--shadow-2xl: 0 32px 92px -28px oklch(0.2 0.04 255 / 0.3);
+		0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px -1px rgb(15 23 42 / 0.05);
+	--shadow-card:
+		0 30px 70px -28px rgb(15 23 42 / 0.28),
+		0 10px 28px -14px rgb(15 23 42 / 0.14);
+	--shadow: var(--shadow-card);
+	--shadow-md: 0 10px 36px -14px rgb(15 23 42 / 0.18);
+	--shadow-lg: 0 18px 52px -20px rgb(15 23 42 / 0.22);
+	--shadow-xl: 0 26px 76px -24px rgb(15 23 42 / 0.26);
+	--shadow-2xl: 0 32px 92px -28px rgb(15 23 42 / 0.3);
 }
 
 @theme inline {
@@ -121,6 +127,9 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--color-wash: var(--wash);
+	--color-wash-foreground: var(--wash-foreground);
+	--color-primary-deep: var(--primary-deep);
 	--color-brand: var(--brand);
 	--color-brand-foreground: var(--brand-foreground);
 	--color-amber: var(--amber);
@@ -152,19 +161,20 @@
 		'JetBrains Mono Variable', ui-monospace, sfmono-regular, menlo, monaco,
 		consolas, monospace;
 
-	/* Radius caps at xl — pill and bubble radii don't exist in this theme */
+	/* Radius: 10px controls → 16-20px cards; pills allowed */
 	--radius-sm: calc(var(--radius) - 2px);
 	--radius-md: var(--radius);
 	--radius-lg: calc(var(--radius) + 2px);
 	--radius-xl: calc(var(--radius) + 6px);
-	--radius-2xl: initial;
-	--radius-3xl: initial;
-	--radius-4xl: initial;
+	--radius-2xl: calc(var(--radius) + 10px);
+	--radius-3xl: calc(var(--radius) + 14px);
+	--radius-4xl: calc(var(--radius) + 18px);
 
 	--shadow-2xs: var(--shadow-2xs);
 	--shadow-xs: var(--shadow-xs);
 	--shadow-sm: var(--shadow-sm);
 	--shadow: var(--shadow);
+	--shadow-card: var(--shadow-card);
 	--shadow-md: var(--shadow-md);
 	--shadow-lg: var(--shadow-lg);
 	--shadow-xl: var(--shadow-xl);
@@ -219,5 +229,95 @@
 
 	to {
 		opacity: 1;
+	}
+}
+
+/* ===== Landing components =====
+   The landing's component classes, promoted to the global world
+   2026-08-07: they consume the :root tokens directly. */
+.pre-btn-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 3.25rem;
+	padding: 0 1.75rem;
+	border-radius: 10px;
+	background-color: var(--primary);
+	color: #fff;
+	font-weight: 600;
+	font-size: 1rem;
+	line-height: 1;
+	transition: background-color 150ms ease;
+	cursor: pointer;
+
+	&:hover {
+		background-color: var(--primary-deep);
+	}
+}
+
+.pre-btn-outline {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 3.25rem;
+	padding: 0 1.75rem;
+	border-radius: 10px;
+	border: 1.5px solid var(--primary);
+	color: var(--primary);
+	font-weight: 600;
+	font-size: 1rem;
+	line-height: 1;
+	transition:
+		background-color 150ms ease,
+		color 150ms ease;
+	cursor: pointer;
+
+	&:hover {
+		background-color: var(--primary);
+		color: #fff;
+	}
+}
+
+.pre-chip {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 9999px;
+	background-color: var(--sky-tint);
+	color: var(--primary);
+	padding: 0.25rem 0.75rem;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.pre-match-card {
+	background-color: #fff;
+	border-radius: 20px;
+	box-shadow: var(--shadow-card);
+	animation: pre-card-rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
+}
+
+.pre-artifact-card {
+	background-color: #fff;
+	border-radius: 16px;
+	box-shadow: var(--shadow-card);
+}
+
+@keyframes pre-card-rise {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pre-match-card {
+		animation: none;
 	}
 }

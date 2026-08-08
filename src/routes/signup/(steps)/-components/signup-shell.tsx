@@ -154,7 +154,7 @@ function StepDot({
 					isCurrent
 						? 'bg-primary text-primary-foreground'
 						: isComplete
-							? 'bg-primary/15 text-primary'
+							? 'bg-sky-tint text-primary'
 							: 'bg-muted text-muted-foreground',
 				)}
 			>

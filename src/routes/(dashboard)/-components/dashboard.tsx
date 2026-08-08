@@ -215,7 +215,7 @@ export function DashboardSidebar({
 						<SidebarGroup>
 							<SidebarGroupLabel>
 								AI
-								<span className="bg-sky-tint text-brand ml-1.5 rounded-sm px-1.5 py-0.5 text-xs font-semibold tracking-wider uppercase">
+								<span className="bg-sky-tint text-primary ml-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wider uppercase">
 									beta
 								</span>
 							</SidebarGroupLabel>
