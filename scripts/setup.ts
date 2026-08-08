@@ -123,6 +123,9 @@ function detectWorkspace(): { branch: string; worktree: string } {
 	}
 }
 
+const AWS_ACCESS_KEY_ID = 'peace_minio'
+const AWS_SECRET_ACCESS_KEY = 'peace_minio_secret'
+
 const ENV_SPEC_HEADER = ['# @defaultSensitive=false', '# ---', '']
 
 function updateEnvFile(path: string, updates: Record<string, string>): void {
@@ -174,6 +177,8 @@ function main(): void {
 		MINIO_PORT: String(minioPort),
 		MINIO_CONSOLE_PORT: String(minioConsolePort),
 		AWS_ENDPOINT_URL: `http://localhost:${minioPort}`,
+		AWS_ACCESS_KEY_ID,
+		AWS_SECRET_ACCESS_KEY,
 	})
 
 	console.log(`Generated .env.development.local for ${branch}:`)
