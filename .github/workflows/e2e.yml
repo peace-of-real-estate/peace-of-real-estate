@@ -27,30 +27,32 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       # Railway reports dashboard URLs in deployment_status URL fields. The
-      # public service URL follows service-environment.up.railway.app.
+      # public service URL follows <service>-<environment>.up.railway.app.
+      # The service was renamed to "app"; deployment payloads from before the
+      # rename still carry the old service name, so try both candidates.
       - name: Resolve deployment URL
         env:
           DEPLOYMENT_ENVIRONMENT: ${{ github.event.deployment.environment }}
           MANUAL_BASE_URL: ${{ inputs.base_url }}
         run: |
           if [ -n "$MANUAL_BASE_URL" ]; then
-            base_url="${MANUAL_BASE_URL%/}"
+            candidates="${MANUAL_BASE_URL%/}"
           else
             service="${DEPLOYMENT_ENVIRONMENT%%/*}"
             environment="${DEPLOYMENT_ENVIRONMENT##*/}"
             service="${service//[[:space:]]/}"
             environment="${environment//[[:space:]]/}"
-            base_url="https://${service}-${environment}.up.railway.app"
+            if [ -z "$environment" ]; then
+              echo "No deployment environment was reported." >&2
+              exit 1
+            fi
+            candidates="https://${service}-${environment}.up.railway.app"
+            if [ "$service" != "app" ]; then
+              candidates="$candidates https://app-${environment}.up.railway.app"
+            fi
           fi
-          echo "BASE_URL=$base_url" >> "$GITHUB_ENV"
-          echo "Testing against $base_url"
-      - name: Check deployment URL
-        run: |
-          if [ -z "$BASE_URL" ]; then
-            echo "No deployment URL was resolved." >&2
-            exit 1
-          fi
-          echo "Testing against $BASE_URL"
+          echo "CANDIDATES=$candidates" >> "$GITHUB_ENV"
+          echo "Will try: $candidates"
       - name: checkout
         uses: actions/checkout@v6
         with:
@@ -70,15 +72,18 @@ jobs:
       - name: Wait for deployment to be reachable
         run: |
           for attempt in $(seq 1 30); do
-            status=$(curl -sL -o /dev/null -w '%{http_code}' --max-time 20 "$BASE_URL" || true)
-            if [ "$status" = "200" ]; then
-              echo "Deployment is up (attempt $attempt)"
-              exit 0
-            fi
-            echo "attempt $attempt: HTTP $status, retrying in 10s"
+            for url in $CANDIDATES; do
+              status=$(curl -sL -o /dev/null -w '%{http_code}' --max-time 20 "$url" || true)
+              if [ "$status" = "200" ]; then
+                echo "BASE_URL=$url" >> "$GITHUB_ENV"
+                echo "Deployment is up at $url (attempt $attempt)"
+                exit 0
+              fi
+              echo "attempt $attempt: $url returned HTTP $status"
+            done
             sleep 10
           done
-          echo "Deployment never became reachable at $BASE_URL" >&2
+          echo "Deployment never became reachable at any of: $CANDIDATES" >&2
           exit 1
       - name: Run Playwright tests
         env:

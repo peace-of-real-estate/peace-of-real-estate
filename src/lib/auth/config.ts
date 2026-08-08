@@ -21,6 +21,7 @@ export function getAuth() {
 				'www.peaceofrealestate.com',
 				'beta.peaceofrealestate.com',
 				'peace-of-real-estate-*.up.railway.app',
+				'app-peace-of-real-estate-*.up.railway.app',
 			],
 			protocol: 'auto',
 			fallback: appOrigin,

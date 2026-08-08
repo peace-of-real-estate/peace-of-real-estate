@@ -5,6 +5,8 @@ import {
 	TagIcon,
 } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { createIsomorphicFn } from '@tanstack/react-start'
+import { setResponseHeader } from '@tanstack/react-start/server'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -16,7 +18,19 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 
+const setLandingCacheHeaders = createIsomorphicFn()
+	.server(() => {
+		setResponseHeader(
+			'Cache-Control',
+			'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+		)
+	})
+	.client(() => {})
+
 export const Route = createFileRoute('/')({
+	loader: () => {
+		setLandingCacheHeaders()
+	},
 	component: LandingPage,
 })
 

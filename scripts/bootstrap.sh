@@ -17,6 +17,9 @@ if [[ -n "$main_root" && "$main_root" != "$PWD" ]]; then
 fi
 
 vp i
+if [[ -f .env.local ]]; then
+	vp exec varlock encrypt --file .env.local
+fi
 vp exec tsx scripts/setup.ts
 vp run compose:up
 vp run db:migrate
